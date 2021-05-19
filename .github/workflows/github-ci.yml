@@ -1,0 +1,143 @@
+# Copyright (C) 2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: he-toolkit
+on:
+  # By default this will run when the activity type is "opened", "synchronize",
+  # or "reopened".
+  pull_request:
+    branches:
+      - master
+  # Manually run this workflow on any specified branch.
+  workflow_dispatch:
+
+################
+# Ubuntu 18.04 #
+################
+jobs:
+  format:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      # NOTE: This is deprecated in favor of pre-commit.ci
+      - uses: pre-commit/action@v2.0.2
+        with:
+          extra_args: --all-files
+
+  build:
+    needs: [format]
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REF
+          pwd
+      - name: Build the repository
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10
+          make -j5 all
+          cd ..
+      - name: Archive successful build
+        uses: actions/upload-artifact@v2
+        with:
+          name: he-toolkit-build
+          path: |
+            build/ext_palisade/src/ext_palisade-build/third-party/
+            build/ext_palisade/src/ext_palisade-build/lib/
+            build/ext_palisade/src/ext_palisade-build/bin/benchmark/
+            build/ext_seal/src/ext_seal-build/lib/
+            build/ext_seal/lib/
+            build/micro-kernels/micro-kernels-seal
+            build/micro-kernels/micro-kernels-palisade
+            build/sample-kernels/kernels/
+            build/sample-kernels/sample-kernels-seal
+            build/sample-kernels/sample-kernels-palisade
+            build/sample-kernels/test/
+          retention-days: 1
+
+  test:
+    needs: [build]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: he-toolkit-build
+      - name: Run the unit tests
+        run: ./build/sample-kernels/test/unit-test
+
+  micro-kernels-palisade:
+    needs: [test]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: he-toolkit-build
+      - name: Run PALISADE micro kernels
+        run: ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${micro-kernels-palisade.name}_${GITHUB_SHA}.json"
+      - name: Archive PALISADE micro kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${micro-kernels-palisade.name}_${GITHUB_SHA}.json
+          path: ${micro-kernels-palisade.name}_${GITHUB_SHA}.json
+          retention-days: 90 # Maximum for free version
+
+  micro-kernels-seal:
+    needs: [test]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: he-toolkit-build
+      - name: Run SEAL micro kernels
+        run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${micro-kernels-seal.name}_${GITHUB_SHA}.json"
+      - name: Archive SEAL micro kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${micro-kernels-seal.name}_${GITHUB_SHA}.json
+          path: ${micro-kernels-seal.name}_${GITHUB_SHA}.json
+          retention-days: 90 # Maximum for free version
+
+  sample-kernels-palisade:
+    needs: [test]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: he-toolkit-build
+      - name: Run PALISADE micro kernels
+        run: ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${sample-kernels-palisade.name}_${GITHUB_SHA}.json"
+      - name: Archive PALISADE sample kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${sample-kernels-palisade.name}_${GITHUB_SHA}.json
+          path: ${sample-kernels-palisade.name}_${GITHUB_SHA}.json
+          retention-days: 90 # Maximum for free version
+
+  sample-kernels-seal:
+    needs: [test]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: he-toolkit-build
+      - name: Run SEAL micro kernels
+        run: ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${sample-kernels-seal}_${GITHUB_SHA}.json"
+      - name: Archive SEAL sample kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${sample-kernels-seal.name}_${GITHUB_SHA}.json
+          path: ${sample-kernels-seal.name}_${GITHUB_SHA}.json
+          retention-days: 90 # Maximum for free version
+
