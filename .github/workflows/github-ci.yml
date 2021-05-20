@@ -75,8 +75,9 @@ jobs:
           name: he-toolkit-build
           path: build
       - name: Run the unit tests
-        run: chmod u+x build/sample-kernels/test/unit-test
-        run: ./build/sample-kernels/test/unit-test
+        run: |
+          chmod u+x build/sample-kernels/test/unit-test
+          ./build/sample-kernels/test/unit-test
 
   micro-kernels-palisade:
     needs: [test]
@@ -88,13 +89,14 @@ jobs:
           name: he-toolkit-build
           path: build
       - name: Run PALISADE micro kernels
-        run: chmod u+x build/micro-kernels/micro-kernels-palisade
-        run: ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${micro-kernels-palisade.name}_${GITHUB_SHA}.json"
+        run: |
+          chmod u+x build/micro-kernels/micro-kernels-palisade
+          ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive PALISADE micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${micro-kernels-palisade.name}_${GITHUB_SHA}.json
-          path: ${micro-kernels-palisade.name}_${GITHUB_SHA}.json
+          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
           retention-days: 90 # Maximum for free version
 
   micro-kernels-seal:
@@ -107,13 +109,14 @@ jobs:
           name: he-toolkit-build
           path: build
       - name: Run SEAL micro kernels
-        run: chmod u+x build/micro-kernels/micro-kernels-seal 
-        run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${micro-kernels-seal.name}_${GITHUB_SHA}.json"
+        run: |
+          chmod u+x build/micro-kernels/micro-kernels-seal 
+          ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${micro-kernels-seal.name}_${GITHUB_SHA}.json
-          path: ${micro-kernels-seal.name}_${GITHUB_SHA}.json
+          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
           retention-days: 90 # Maximum for free version
 
   sample-kernels-palisade:
@@ -126,13 +129,14 @@ jobs:
           name: he-toolkit-build
           path: build
       - name: Run PALISADE micro kernels
-        run: chmod u+x build/sample-kernels/sample-kernels-palisade 
-        run: ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${sample-kernels-palisade.name}_${GITHUB_SHA}.json"
+        run: |
+          chmod u+x build/sample-kernels/sample-kernels-palisade 
+          ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${sample-kernels-palisade.name}_${GITHUB_SHA}.json
-          path: ${sample-kernels-palisade.name}_${GITHUB_SHA}.json
+          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
           retention-days: 90 # Maximum for free version
 
   sample-kernels-seal:
@@ -145,11 +149,12 @@ jobs:
           name: he-toolkit-build
           path: build
       - name: Run SEAL micro kernels
-        run: chmod u+x build/sample-kernels/sample-kernels-seal 
-        run: ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${sample-kernels-seal}_${GITHUB_SHA}.json"
+        run: |
+          chmod u+x build/sample-kernels/sample-kernels-seal 
+          ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${sample-kernels-seal.name}_${GITHUB_SHA}.json
-          path: ${sample-kernels-seal.name}_${GITHUB_SHA}.json
+          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
           retention-days: 90 # Maximum for free version
