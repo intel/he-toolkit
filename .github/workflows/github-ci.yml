@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      # Required for pre-commit
+      - run: pip3 install cpplint
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:
@@ -140,4 +142,3 @@ jobs:
           name: ${sample-kernels-seal.name}_${GITHUB_SHA}.json
           path: ${sample-kernels-seal.name}_${GITHUB_SHA}.json
           retention-days: 90 # Maximum for free version
-
