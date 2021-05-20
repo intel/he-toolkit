@@ -110,7 +110,7 @@ jobs:
           path: build
       - name: Run SEAL micro kernels
         run: |
-          chmod u+x build/micro-kernels/micro-kernels-seal 
+          chmod u+x build/micro-kernels/micro-kernels-seal
           ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
@@ -130,7 +130,7 @@ jobs:
           path: build
       - name: Run PALISADE micro kernels
         run: |
-          chmod u+x build/sample-kernels/sample-kernels-palisade 
+          chmod u+x build/sample-kernels/sample-kernels-palisade
           ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
@@ -150,7 +150,7 @@ jobs:
           path: build
       - name: Run SEAL micro kernels
         run: |
-          chmod u+x build/sample-kernels/sample-kernels-seal 
+          chmod u+x build/sample-kernels/sample-kernels-seal
           ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
