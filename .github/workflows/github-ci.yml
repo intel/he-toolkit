@@ -55,6 +55,7 @@ jobs:
             build/ext_palisade/src/ext_palisade-build/third-party/
             build/ext_palisade/src/ext_palisade-build/lib/
             build/ext_palisade/src/ext_palisade-build/bin/benchmark/
+            build/ext_palisade/lib/
             build/ext_seal/src/ext_seal-build/lib/
             build/ext_seal/lib/
             build/micro-kernels/micro-kernels-seal
@@ -76,6 +77,7 @@ jobs:
           path: build
       - name: Run the unit tests
         run: |
+          export LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/build/ext_palisade/lib/:${GITHUB_WORKSPACE}/build/sample-kernels/kernels/:$LD_LIBRARY_PATH
           chmod u+x build/sample-kernels/test/unit-test
           ./build/sample-kernels/test/unit-test
 
@@ -90,6 +92,7 @@ jobs:
           path: build
       - name: Run PALISADE micro kernels
         run: |
+          export LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/build/ext_palisade/lib/:${GITHUB_WORKSPACE}/build/sample-kernels/kernels/:$LD_LIBRARY_PATH
           chmod u+x build/micro-kernels/micro-kernels-palisade
           ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive PALISADE micro kernel results
@@ -110,6 +113,7 @@ jobs:
           path: build
       - name: Run SEAL micro kernels
         run: |
+          export LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/build/ext_palisade/lib/:${GITHUB_WORKSPACE}/build/sample-kernels/kernels/:$LD_LIBRARY_PATH
           chmod u+x build/micro-kernels/micro-kernels-seal
           ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
@@ -130,6 +134,7 @@ jobs:
           path: build
       - name: Run PALISADE micro kernels
         run: |
+          export LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/build/ext_palisade/lib/:${GITHUB_WORKSPACE}/build/sample-kernels/kernels/:$LD_LIBRARY_PATH
           chmod u+x build/sample-kernels/sample-kernels-palisade
           ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
@@ -150,6 +155,7 @@ jobs:
           path: build
       - name: Run SEAL micro kernels
         run: |
+          export LD_LIBRARY_PATH=${GITHUB_WORKSPACE}/build/ext_palisade/lib/:${GITHUB_WORKSPACE}/build/sample-kernels/kernels/:$LD_LIBRARY_PATH
           chmod u+x build/sample-kernels/sample-kernels-seal
           ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
