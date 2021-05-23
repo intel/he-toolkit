@@ -98,8 +98,8 @@ jobs:
       - name: Archive PALISADE micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
-          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          name: ${{github.job}}_${{github.sha}}.json
+          path: ${{github.job}}_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
   micro-kernels-seal:
@@ -111,15 +111,15 @@ jobs:
         with:
           name: he-toolkit-build
           path: build
-      - name: Run SEAL micro kernels
-        run: |
-          chmod u+x build/micro-kernels/micro-kernels-seal
-          ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
+          #- name: Run SEAL micro kernels
+          #run: |
+      - run: chmod u+x build/micro-kernels/micro-kernels-seal
+      - run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
-          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          name: ${{github.job}}_${{github.sha}}.json
+          path: ${{github.job}}_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
   sample-kernels-palisade:
@@ -138,8 +138,8 @@ jobs:
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
-          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          name: ${{github.job}}_${{github.sha}}.json
+          path: ${{github.job}}_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
   sample-kernels-seal:
@@ -158,6 +158,6 @@ jobs:
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${GITHUB_JOB}_${GITHUB_SHA}.json
-          path: ${GITHUB_JOB}_${GITHUB_SHA}.json
+          name: ${{github.job}}_${{github.sha}}.json
+          path: ${{github.job}}_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
