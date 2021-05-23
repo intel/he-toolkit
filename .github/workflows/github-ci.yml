@@ -111,10 +111,10 @@ jobs:
         with:
           name: he-toolkit-build
           path: build
-          #- name: Run SEAL micro kernels
-          #run: |
-      - run: chmod u+x build/micro-kernels/micro-kernels-seal
-      - run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
+      - name: Run SEAL micro kernels
+        run: |
+          chmod u+x build/micro-kernels/micro-kernels-seal
+          ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
         with:
