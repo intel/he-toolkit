@@ -58,7 +58,7 @@ seal::Ciphertext SealCKKSKernelExecutor::accumulate_internal(
   seal::Ciphertext retval;
   if (count > 0) {
     retval = cipher_input;
-    auto max_steps = (1 << seal::util::get_significant_bit_count(count));
+    auto max_steps = (1 << seal::util::get_significant_bit_count(count - 1));
     for (int steps = 1; steps < max_steps; steps <<= 1) {
       seal::Ciphertext rotated;
       m_pevaluator->rotate_vector(retval, steps, m_galois_keys, rotated,
@@ -81,8 +81,9 @@ seal::Ciphertext SealCKKSKernelExecutor::accumulate(
   if (count > 0) {
     std::size_t slot_count = m_pencoder->slot_count();
     for (std::size_t i = 0; i < V.size(); ++i) {
-      std::size_t chunk_count =
-          i + 1 < V.size() ? slot_count : count % slot_count;
+      std::size_t chunk_count = slot_count;
+      if (i >= V.size() - 1 && count % slot_count != 0)
+        chunk_count = count % slot_count;
       seal::Ciphertext chunk_retval = accumulate_internal(V[i], chunk_count);
       matchLevel(&retval, &chunk_retval);
       retval.scale() = chunk_retval.scale();
