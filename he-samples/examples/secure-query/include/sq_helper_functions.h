@@ -1,8 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_
-#define EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_
+#ifndef HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_
+#define HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_
 #include <fstream>
 #include <string>
 #include <vector>
@@ -131,4 +131,4 @@ static inline std::vector<EncryptedDatabaseEntry> encryptDatabase(
 
 }  // namespace sq
 
-#endif  // EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_
+#endif  // HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_
