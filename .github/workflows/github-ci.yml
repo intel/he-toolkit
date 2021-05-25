@@ -51,11 +51,11 @@ jobs:
 
       # Unit tests
       - name: Run the unit tests
-        run: ./sample-kernels/test/unit-test
+        run: ./build/sample-kernels/test/unit-test
 
       # PALISADE micro kernels
       - name: Run PALISADE micro kernels
-        run: ./micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="micro-kernels-palisade_${GITHUB_SHA}.json"
+        run: ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="micro-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE micro kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -65,7 +65,7 @@ jobs:
 
       # SEAL micro kernels
       - name: Run SEAL micro kernels
-        run: ./micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="micro-kernels-seal_${GITHUB_SHA}.json"
+        run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="micro-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -75,7 +75,7 @@ jobs:
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: ./sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -85,7 +85,7 @@ jobs:
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: ./sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="sample-kernels-seal_${GITHUB_SHA}.json"
+        run: ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
