@@ -11,9 +11,6 @@ on:
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
-env:
-  LD_LIBRARY_PATH: ${{github.workspace}}/build/ext_palisade/lib/:${{github.workspace}}/build/sample-kernels/kernels/
-
 ################
 # Ubuntu 18.04 #
 ################
@@ -29,7 +26,8 @@ jobs:
         with:
           extra_args: --all-files
 
-  build:
+  build-and-test:
+    name: Build, test and run kernels
     needs: [format]
     runs-on: ubuntu-18.04
     steps:
@@ -42,122 +40,55 @@ jobs:
           echo "Testing from branch:"
           echo $GITHUB_REF
           pwd
+
+      # Build toolkit
       - name: Build the repository
         run: |
           mkdir -p build
           cd build
           cmake .. -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10
           make -j5 all
-          cd ..
-      - name: Archive successful build
-        uses: actions/upload-artifact@v2
-        with:
-          name: he-toolkit-build
-          path: |
-            build/ext_palisade/src/ext_palisade-build/third-party/
-            build/ext_palisade/src/ext_palisade-build/lib/
-            build/ext_palisade/src/ext_palisade-build/bin/benchmark/
-            build/ext_palisade/lib/
-            build/ext_seal/src/ext_seal-build/lib/
-            build/ext_seal/lib/
-            build/micro-kernels/micro-kernels-seal
-            build/micro-kernels/micro-kernels-palisade
-            build/sample-kernels/kernels/
-            build/sample-kernels/sample-kernels-seal
-            build/sample-kernels/sample-kernels-palisade
-            build/sample-kernels/test/
-          retention-days: 1
 
-  test:
-    needs: [build]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: he-toolkit-build
-          path: build
+      # Unit tests
       - name: Run the unit tests
-        run: |
-          chmod u+x build/sample-kernels/test/unit-test
-          ./build/sample-kernels/test/unit-test
+        run: ./sample-kernels/test/unit-test
 
-  micro-kernels-palisade:
-    needs: [test]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: he-toolkit-build
-          path: build
+      # PALISADE micro kernels
       - name: Run PALISADE micro kernels
-        run: |
-          chmod u+x build/micro-kernels/micro-kernels-palisade
-          ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
+        run: ./micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="micro-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${{github.job}}_${{github.sha}}.json
-          path: ${{github.job}}_${{github.sha}}.json
+          name: micro-kernels-palisade_${{github.sha}}.json
+          path: micro-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
-  micro-kernels-seal:
-    needs: [test]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: he-toolkit-build
-          path: build
+      # SEAL micro kernels
       - name: Run SEAL micro kernels
-        run: |
-          chmod u+x build/micro-kernels/micro-kernels-seal
-          ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
+        run: ./micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="micro-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${{github.job}}_${{github.sha}}.json
-          path: ${{github.job}}_${{github.sha}}.json
+          name: micro-kernels-seal_${{github.sha}}.json
+          path: micro-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
-  sample-kernels-palisade:
-    needs: [test]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: he-toolkit-build
-          path: build
-      - name: Run PALISADE micro kernels
-        run: |
-          chmod u+x build/sample-kernels/sample-kernels-palisade
-          ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
+      # PALISADE sample kernels
+      - name: Run PALISADE sample kernels
+        run: ./sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${{github.job}}_${{github.sha}}.json
-          path: ${{github.job}}_${{github.sha}}.json
+          name: sample-kernels-palisade_${{github.sha}}.json
+          path: sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
-  sample-kernels-seal:
-    needs: [test]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: he-toolkit-build
-          path: build
-      - name: Run SEAL micro kernels
-        run: |
-          chmod u+x build/sample-kernels/sample-kernels-seal
-          ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_${GITHUB_SHA}.json"
+      # SEAL sample kernels
+      - name: Run SEAL sample kernels
+        run: ./sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: ${{github.job}}_${{github.sha}}.json
-          path: ${{github.job}}_${{github.sha}}.json
+          name: sample-kernels-seal_${{github.sha}}.json
+          path: sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
