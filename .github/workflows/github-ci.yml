@@ -30,6 +30,10 @@ jobs:
     name: Build, test and run kernels
     needs: [format]
     runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: $GITHUB_WORKSPACE/he-samples
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
