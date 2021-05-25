@@ -10,11 +10,16 @@ echo -e "\nPLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
 The Following script will install docker, enable it to be run without administrative
 privileges, and build/run a docker for testing several Homomophic Encryption workloads.
 
-Do note that this script MUST BE RUN as a user BESIDES root. Also, if you
-are located behind a firewall (corporate or otherwise), please make sure
-you have the proxies setup accordingly (e.g. environment variables:
-http_proxy and https_proxy). This script requires full internet connectivity.
-Finally, this script may also prompt you for passwords required for installation.\n"
+Do note that this script has a few usage requirements:
+    1. This script MUST BE RUN as a user BESIDES root.
+    2. It must be run from it's own base directory
+    3. The apt packages 'containerd' 'docker.io' will be installed and
+    the docker socket (docker.sock) will have it's permissions modified.
+    4. If you are located behind a firewall (corporate or otherwise),
+    please make sure you have the proxies setup accordingly
+    (e.g. environment variables: http_proxy and https_proxy are set).
+    5. Finally, this script may also prompt you for passwords required for
+    installation.\n"
 
 read -p "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
 echo
@@ -22,8 +27,16 @@ echo
 if [ "$EUID" -eq 0 ]
 then
     echo -e "Error: Please run this script as non-root\n"
-    exit
+    exit 1
 fi
+if [ ! -f "./setup_and_run_docker.sh" ]
+then
+    echo -e "This script MUST be run from it's own base directory."
+    echo -e "Please switch to that directory and run as follows:"
+    echo -e "./setup_and_run_docker.sh\n"
+    exit 1
+fi
+
 if [ -n "$http_proxy" ] || [ -n "$https_proxy" ];
 then
     PROXY=true
@@ -31,10 +44,25 @@ else
     PROXY=false
 fi
 
+if [ -f "./projects.tar.gz" ]
+then
+    echo -e "\nREMOVING OLD DOCKER PACKS"
+    rm -rf ./projects.tar.gz
+    rm -rf ./helpers.tar.gz
+fi
+
+echo -e "\nPACKAGING HE-SAMPLES CODE..."
+mkdir ./projects
+cp -rf ../../he-samples ./projects/
+tar -cvzf projects.tar.gz projects
+rm -rf ./projects
+
+echo -e "\nPACKAGING DOCKER HELPER SCRIPTS..."
+tar -cvzf helpers.tar.gz helpers
+
 echo -e "\nINSTALLING DOCKER FROM APT-GET..."
 sudo apt-get update
 sudo apt-get install -y containerd docker.io
-
 
 if [ ! -d "/etc/systemd/system/docker.service.d" ] && [ "$PROXY" = true ];
 then
@@ -52,7 +80,6 @@ Environment=\"HTTPS_PROXY=$http_proxy\"" | sudo tee /etc/systemd/system/docker.s
     echo -e "\nRESTARTING DOCKER SERVICE..."
     sudo systemctl restart docker
 fi
-
 
 if grep -q "docker" /etc/group
 then

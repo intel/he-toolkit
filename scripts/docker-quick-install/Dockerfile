@@ -50,10 +50,10 @@ Acquire::https::Proxy \"$http_proxy\";" > /etc/apt/apt.conf
 USER $UNAME
 
 COPY projects.tar.gz /home/$UNAME/
-COPY scripts.tar.gz /home/$UNAME/
-RUN tar -zxvf /home/$UNAME/scripts.tar.gz --directory /home/$UNAME/
-RUN sudo chmod +x /home/$UNAME/scripts/background/*
-RUN sudo chmod +x /home/$UNAME/scripts/runner/*
+COPY helpers.tar.gz /home/$UNAME/
+RUN tar -zxvf /home/$UNAME/helpers.tar.gz --directory /home/$UNAME/
+RUN sudo chmod +x /home/$UNAME/helpers/background/*
+RUN sudo chmod +x /home/$UNAME/helpers/runner/*
 
 # Define default command.
-ENTRYPOINT "/home/$UNAME/scripts/background/setup.sh" && cd /home/$UNAME/scripts/runner && "/home/$UNAME/scripts/background/welcome_msg.sh" && /bin/bash
+ENTRYPOINT "/home/$UNAME/helpers/background/setup.sh" && cd /home/$UNAME/helpers/runner && "/home/$UNAME/helpers/background/welcome_msg.sh" && /bin/bash
