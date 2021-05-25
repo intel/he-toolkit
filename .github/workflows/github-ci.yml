@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-18.04
     defaults:
       run:
-        working-directory: $GITHUB_WORKSPACE/he-samples
+        working-directory: :${{github.workspace}}/he-samples
     steps:
       - uses: actions/checkout@v2
       - name: Validate paths
