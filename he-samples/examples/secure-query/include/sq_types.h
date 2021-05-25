@@ -1,8 +1,8 @@
 // Copyright (C) 2020-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef EXAMPLES_SECURE_QUERY_INCLUDE_SQ_TYPES_H_
-#define EXAMPLES_SECURE_QUERY_INCLUDE_SQ_TYPES_H_
+#ifndef HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_TYPES_H_
+#define HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_TYPES_H_
 #include <string>
 #include <vector>
 
@@ -23,4 +23,4 @@ struct EncryptedDatabaseEntry {
   seal::Ciphertext value;
 };
 
-#endif  // EXAMPLES_SECURE_QUERY_INCLUDE_SQ_TYPES_H_
+#endif  // HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_TYPES_H_
