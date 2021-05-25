@@ -15,16 +15,16 @@ g++ #>= 10.0 or clang >= 10.0
 
 # Build
 ```bash
-export HE_TOOLKIT=$(pwd)
+export HE_SAMPLES=$(pwd)/he-samples
 mkdir build && cd build
-cmake ..
-make all
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j all
 ```
 
 You can pass additional options:
 ```bash
  -DENABLE_PALISADE=OFF
- -DENABLE_SEAL=ON
+ -DENABLE_SEAL=OFF
 ```
 to disable building of certain HE libraries.
 
@@ -34,22 +34,22 @@ to disable building of certain HE libraries.
 ## Micro kernels
 To run micro kernels, such as HE encryption, call
 ```bash
-$HE_TOOLKIT/build/micro-kernels/micro-kernels-seal
-$HE_TOOLKIT/build/micro-kernels/micro-kernels-palisade
+$HE_SAMPLES/build/micro-kernels/micro-kernels-seal
+$HE_SAMPLES/build/micro-kernels/micro-kernels-palisade
 ```
 
 ## Sample kernels
 To run larger sample kernels such as dot product, call
 ```bash
 # Note, these will take several minutes
-$HE_TOOLKIT/build/sample-kernels/sample-kernels-seal
-$HE_TOOLKIT/build/sample-kernels/sample-kernels-palisade
+$HE_SAMPLES/build/sample-kernels/sample-kernels-seal
+$HE_SAMPLES/build/sample-kernels/sample-kernels-palisade
 ```
 
 ### Test sample kernels
 To run unit tests on the sample kernels, call
 ```bash
-$HE_TOOLKIT/build/sample-kernels/test/unit-test
+$HE_SAMPLES/build/sample-kernels/test/unit-test
 ```
 
 # Examples
@@ -59,7 +59,7 @@ The secure query example implements a simple secure database query using the SEA
 It will be built whenever SEAL is enabled as part of he-toolkit build.
 To run it execute
 ```bash
-cd $HE_TOOLKIT/build/examples/secure-query
+cd $HE_SAMPLES/build/examples/secure-query
 ./secure-query
 ```
 

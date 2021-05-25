@@ -42,7 +42,7 @@ else()
   set(PALISADE_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_palisade)
   set(PALISADE_SRC_DIR ${PALISADE_PREFIX}/src/ext_palisade/)
   set(PALISADE_REPO_URL https://gitlab.com/palisade/palisade-development.git)
-  set(PALISADE_GIT_TAG 28f933e9)
+  set(PALISADE_GIT_TAG 0cf857bb)
 
   if (ENABLE_INTEL_HEXL)
     ExternalProject_Add(
