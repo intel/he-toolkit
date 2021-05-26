@@ -5,7 +5,7 @@
 
 set -e
 
-pushd $HOME/projects/he-toolkit/build/examples/secure-query
+pushd $HOME/projects/he-samples/build/examples/secure-query
 
 OMP_NUM_THREADS=$(nproc) ./secure-query
 
