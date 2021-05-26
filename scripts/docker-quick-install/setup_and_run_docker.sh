@@ -12,9 +12,9 @@ privileges, and build/run a docker for testing several Homomophic Encryption wor
 
 Do note that this script has a few usage requirements:
     1. This script MUST BE RUN as a user BESIDES root.
-    2. It must be run from it's own base directory
+    2. It must be run from its own base directory
     3. The apt packages 'containerd' 'docker.io' will be installed and
-    the docker socket (docker.sock) will have it's permissions modified.
+    the docker socket (docker.sock) will have its permissions modified.
     4. If you are located behind a firewall (corporate or otherwise),
     please make sure you have the proxies setup accordingly
     (e.g. environment variables: http_proxy and https_proxy are set).
@@ -31,7 +31,7 @@ then
 fi
 if [ ! -f "./setup_and_run_docker.sh" ]
 then
-    echo -e "This script MUST be run from it's own base directory."
+    echo -e "This script MUST be run from its own base directory."
     echo -e "Please switch to that directory and run as follows:"
     echo -e "./setup_and_run_docker.sh\n"
     exit 1
