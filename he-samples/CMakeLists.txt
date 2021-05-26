@@ -131,10 +131,6 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if (${ENABLE_INTEL_HEXL})
-  include(cmake/intel-hexl.cmake)
-endif()
-
 if (${ENABLE_SEAL})
   include(cmake/seal.cmake)
 endif()
