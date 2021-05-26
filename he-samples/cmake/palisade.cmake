@@ -74,8 +74,7 @@ else()
       BUILD_COMMAND $(MAKE) -j all
       # Skip updates
       UPDATE_COMMAND ""
-      DEPENDS ext_intel_hexl
-    )
+      )
   else()
     ExternalProject_Add(
       ext_palisade
