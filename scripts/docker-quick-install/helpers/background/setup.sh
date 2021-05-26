@@ -56,11 +56,11 @@ pushd build
 
 # ENABLE_[PALISADE|SEAL|INTEL_HEXL] are Enabled by Default
 cmake .. -DENABLE_PALISADE=ON \
-	 -DENABLE_SEAL=ON \
-	 -DENABLE_INTEL_HEXL=ON \
+         -DENABLE_SEAL=ON \
+         -DENABLE_INTEL_HEXL=ON \
          -DCMAKE_CXX_COMPILER=clang++-10 \
-	 -DCMAKE_C_COMPILER=clang-10 \
-	 -DCMAKE_BUILD_TYPE=Release
+         -DCMAKE_C_COMPILER=clang-10 \
+         -DCMAKE_BUILD_TYPE=Release
 make -j
 ./sample-kernels/test/unit-test
 echo -e "DONE TESTING HE-SAMPLES\n\n"
