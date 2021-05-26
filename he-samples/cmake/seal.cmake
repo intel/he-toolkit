@@ -13,7 +13,7 @@ if (SEAL_PREBUILT) # Skip download from gitlab
   add_library(libseal ALIAS SEAL::seal)
   # TODO(fboemer): Support pre-built shared seal
   if (ENABLE_INTEL_HEXL)
-    find_package(IntelHEXL 1.0.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
+    find_package(IntelHEXL 1.1.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
     if (NOT TARGET intel_hexl)
       FATAL_ERROR("TARGET intel_hexl not found")
     endif()
@@ -42,8 +42,6 @@ else()
         -DCMAKE_INSTALL_LIBDIR=${SEAL_PREFIX}/lib
         -DCMAKE_INSTALL_INCLUDEDIR=${SEAL_PREFIX}/include
         -DSEAL_USE_INTEL_HEXL=${ENABLE_INTEL_HEXL}
-        -DINTEL_HEXL_PREBUILT=OFF
-        -DINTEL_HEXL_HINT_DIR=${INTEL_HEXL_HINT_DIR}
         -DBUILD_SHARED_LIBS=${SEAL_SHARED_LIB}
       # Skip updates
       UPDATE_COMMAND ""
