@@ -7,4 +7,4 @@ set -e
 
 export KMP_WARNINGS=0
 
-OMP_NUM_THREADS=$(nproc) $HOME/projects/he-toolkit/build/sample-kernels/sample-kernels-seal --benchmark_min_time=2
+OMP_NUM_THREADS=$(nproc) $HOME/projects/he-samples/build/sample-kernels/sample-kernels-seal --benchmark_min_time=2

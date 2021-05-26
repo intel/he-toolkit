@@ -13,7 +13,7 @@ if (SEAL_PREBUILT) # Skip download from gitlab
   add_library(libseal ALIAS SEAL::seal)
   # TODO(fboemer): Support pre-built shared seal
   if (ENABLE_INTEL_HEXL)
-    find_package(IntelHEXL 1.0.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
+    find_package(IntelHEXL 1.1.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
     if (NOT TARGET intel_hexl)
       FATAL_ERROR("TARGET intel_hexl not found")
     endif()
@@ -24,7 +24,7 @@ else()
   set(SEAL_REPO_URL https://github.com/microsoft/SEAL.git)
   set(SEAL_GIT_TAG 3.6.5)
 
-  set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
 
   set(SEAL_SHARED_LIB OFF) # Set to ON/OFF to toggle shared build
 
@@ -36,17 +36,16 @@ else()
       PREFIX ${SEAL_PREFIX}
       INSTALL_DIR ${SEAL_PREFIX}
       CMAKE_ARGS ${BENCHMARK_FORWARD_CMAKE_ARGS}
+        -DCMAKE_CXX_FLAGS=${SEAL_CXX_FLAGS}
         -DCMAKE_INSTALL_PREFIX=${SEAL_PREFIX}
         -DSEAL_USE_CXX17=ON
         -DCMAKE_INSTALL_LIBDIR=${SEAL_PREFIX}/lib
         -DCMAKE_INSTALL_INCLUDEDIR=${SEAL_PREFIX}/include
         -DSEAL_USE_INTEL_HEXL=${ENABLE_INTEL_HEXL}
-        -DINTEL_HEXL_PREBUILT=OFF
-        -DINTEL_HEXL_HINT_DIR=${INTEL_HEXL_HINT_DIR}
         -DBUILD_SHARED_LIBS=${SEAL_SHARED_LIB}
       # Skip updates
       UPDATE_COMMAND ""
-      DEPENDS ext_intel_hexl)
+      )
   else()
     ExternalProject_Add(
       ext_seal
