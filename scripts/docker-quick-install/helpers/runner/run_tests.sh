@@ -5,4 +5,4 @@
 
 set -e
 
-OMP_NUM_THREADS=$(nproc) $HOME/projects/he-toolkit/build/sample-kernels/test/unit-test
+OMP_NUM_THREADS=$(nproc) $HOME/projects/he-samples/build/sample-kernels/test/unit-test
