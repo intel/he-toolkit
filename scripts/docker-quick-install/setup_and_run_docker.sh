@@ -7,8 +7,8 @@ set -e
 
 echo -e "\nPLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
 
-The Following script package the he-samples code, confirm docker functionality,
-and build/run a docker for testing several Homomophic Encryption workloads.
+The following script package the he-samples code, confirm Docker functionality,
+and build/run a Docker for testing several homomophic encryption workloads.
 
 Do note that this script has a few usage requirements:
     1. This script MUST BE RUN as a user BESIDES root.
