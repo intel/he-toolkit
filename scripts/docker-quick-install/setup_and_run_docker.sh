@@ -7,19 +7,15 @@ set -e
 
 echo -e "\nPLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
 
-The Following script will install docker, enable it to be run without administrative
-privileges, and build/run a docker for testing several Homomophic Encryption workloads.
+The Following script package the he-samples code, confirm docker functionality,
+and build/run a docker for testing several Homomophic Encryption workloads.
 
 Do note that this script has a few usage requirements:
     1. This script MUST BE RUN as a user BESIDES root.
     2. It must be run from its own base directory
-    3. The apt packages 'containerd' 'docker.io' will be installed and
-    the docker socket (docker.sock) will have its permissions modified.
-    4. If you are located behind a firewall (corporate or otherwise),
+    3. If you are located behind a firewall (corporate or otherwise),
     please make sure you have the proxies setup accordingly
-    (e.g. environment variables: http_proxy and https_proxy are set).
-    5. Finally, this script may also prompt you for passwords required for
-    installation.\n"
+    (e.g. environment variables: http_proxy and https_proxy are set).\n"
 
 read -p "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
 echo
@@ -37,13 +33,6 @@ then
     exit 1
 fi
 
-if [ -n "$http_proxy" ] || [ -n "$https_proxy" ];
-then
-    PROXY=true
-else
-    PROXY=false
-fi
-
 if [ -f "./projects.tar.gz" ]
 then
     echo -e "\nREMOVING OLD DOCKER PACKS"
@@ -59,37 +48,6 @@ rm -rf ./projects
 
 echo -e "\nPACKAGING DOCKER HELPER SCRIPTS..."
 tar -cvzf helpers.tar.gz helpers
-
-echo -e "\nINSTALLING DOCKER FROM APT-GET..."
-sudo apt-get update
-sudo apt-get install -y containerd docker.io
-
-if [ ! -d "/etc/systemd/system/docker.service.d" ] && [ "$PROXY" = true ];
-then
-    echo -e "\nCREATING DOCKER SERVICE DIRECTORY..."
-    sudo mkdir -p /etc/systemd/system/docker.service.d
-fi
-if [ ! -f "/etc/systemd/system/docker.service.d/http-proxy.conf" ] && [ "$PROXY" = true ];
-then
-    echo -e "\nCREATING DOCKER PROXY CONFIG..."
-    echo -e "[Service]
-Environment=\"HTTP_PROXY=$http_proxy\"
-Environment=\"HTTPS_PROXY=$http_proxy\"" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
-    sudo systemctl daemon-reload
-
-    echo -e "\nRESTARTING DOCKER SERVICE..."
-    sudo systemctl restart docker
-fi
-
-if grep -q "docker" /etc/group
-then
-    echo -e "\ndocker group already exists...\n"
-else
-    sudo groupadd docker
-fi
-
-sudo gpasswd -a $USER docker
-sudo chmod 666 /var/run/docker.sock
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
 docker run hello-world
