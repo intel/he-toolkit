@@ -64,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: micro-kernels-palisade_${{github.sha}}.json
-          path: micro-kernels-palisade_${{github.sha}}.json
+          path: ${{github.workspace}}/micro-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL micro kernels
@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: micro-kernels-seal_${{github.sha}}.json
-          path: micro-kernels-seal_${{github.sha}}.json
+          path: ${{github.workspace}}/micro-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # PALISADE sample kernels
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: sample-kernels-palisade_${{github.sha}}.json
-          path: sample-kernels-palisade_${{github.sha}}.json
+          path: ${{github.workspace}}/sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL sample kernels
@@ -94,5 +94,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: sample-kernels-seal_${{github.sha}}.json
-          path: sample-kernels-seal_${{github.sha}}.json
+          path: ${{github.workspace}}/sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
