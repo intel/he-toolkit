@@ -67,6 +67,8 @@ cd $HE_SAMPLES/build/examples/secure-query
 
 
 # Contributing
+At this time, Intel HE-toolkit does not accept external contributions. We encourage feedback and suggestions via [issues](https://github.com/intel/he-toolkit/issues) and [discussions](https://github.com/intel/he-toolkit/discussions).
+
 Before making a pull request, please make sure the pre-commit config is active, i.e. run
 ```bash
 pre-commit install
