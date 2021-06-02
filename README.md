@@ -1,4 +1,5 @@
-A collection of kernels (micro & macro) to compare different HE libraries
+# Docker Quick Install
+For a quick automatic setup/install, please check https://github.com/intel/he-toolkit/releases for the latest user guide. Otherwise, see below for a manual install.
 
 # Dependencies
 This has been tested on Ubuntu 18.04 & Ubuntu 20.04
