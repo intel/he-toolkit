@@ -16,12 +16,13 @@ g++ #>= 10.0 or clang >= 10.0
 # Build
 ```bash
 export HE_SAMPLES=$(pwd)/he-samples
+cd $HE_SAMPLES
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j all
 ```
 
-You can pass additional options:
+You can pass additional options during the configure step:
 ```bash
  -DENABLE_PALISADE=OFF
  -DENABLE_SEAL=OFF

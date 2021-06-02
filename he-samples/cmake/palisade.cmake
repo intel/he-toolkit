@@ -26,9 +26,7 @@ if (PALISADE_PREBUILT) # Skip download from gitlab
     ${PALISADE_INCLUDE}/third-party/include
     ${PALISADE_INCLUDE}/core
     ${PALISADE_INCLUDE}/pke
-    ${PALISADE_INCLUDE}/signature
     ${PALISADE_INCLUDE}/binfhe
-    ${PALISADE_INCLUDE}/abe
     )
 
   target_link_directories(libpalisade INTERFACE ${PALISADE_LIBDIR})
