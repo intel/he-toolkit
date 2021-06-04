@@ -10,6 +10,7 @@ cmake # >= 3.13
 git
 pthread
 patchelf
+autoconf
 m4
 g++ #>= 10.0 or clang >= 10.0
 ```
