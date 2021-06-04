@@ -7,7 +7,7 @@ on:
   # or "reopened".
   pull_request:
     branches:
-      - master
+      - main
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
