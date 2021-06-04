@@ -12,11 +12,11 @@ on:
   workflow_dispatch:
 
 ################
-# Ubuntu 18.04 #
+# Ubuntu 20.04 #
 ################
 jobs:
   format:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
@@ -29,7 +29,7 @@ jobs:
   build-and-test:
     name: Build, test and run kernels
     needs: [format]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash
@@ -50,7 +50,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_C_COMPILER=gcc-10
+          cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10
           make -j5 all
 
       # Unit tests
@@ -79,7 +79,7 @@ jobs:
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -89,7 +89,7 @@ jobs:
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="sample-kernels-seal_${GITHUB_SHA}.json"
+        run: OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
