@@ -17,6 +17,8 @@ on:
 jobs:
   format:
     runs-on: ubuntu-20.04
+    # Use environment protection (require review)
+    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
@@ -30,6 +32,8 @@ jobs:
     name: Build, test and run kernels
     needs: [format]
     runs-on: ubuntu-20.04
+    # Use environment protection (require review)
+    environment: intel_workflow
     defaults:
       run:
         shell: bash
