@@ -63,40 +63,129 @@ jobs:
 
       # PALISADE micro kernels
       - name: Run PALISADE micro kernels
-        run: ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="micro-kernels-palisade_${GITHUB_SHA}.json"
+        run: ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_micro-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: micro-kernels-palisade_${{github.sha}}.json
-          path: he-samples/micro-kernels-palisade_${{github.sha}}.json
+          name: ${{github.job}}_micro-kernels-palisade_${{github.sha}}.json
+          path: he-samples/${{github.job}}_micro-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL micro kernels
       - name: Run SEAL micro kernels
-        run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="micro-kernels-seal_${GITHUB_SHA}.json"
+        run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_micro-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL micro kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: micro-kernels-seal_${{github.sha}}.json
-          path: he-samples/micro-kernels-seal_${{github.sha}}.json
+          name: ${{github.job}}_micro-kernels-seal_${{github.sha}}.json
+          path: he-samples/${{github.job}}_micro-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/sample-kernels-palisade_${{github.sha}}.json
+          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
-          name: sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/sample-kernels-seal_${{github.sha}}.json
+          name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          retention-days: 90 # Maximum for free version
+
+##############
+# IceLake CI #
+##############
+  format-icelake:
+    runs-on: [self-hosted, Linux, X64, ice-lake]
+    # Use environment protection (require review)
+    environment: intel_workflow
+    steps:
+      - uses: actions/checkout@v2
+      # Required for pre-commit
+      - run: pip3 install cpplint
+      # NOTE: This is deprecated in favor of pre-commit.ci
+      - uses: pre-commit/action@v2.0.2
+        with:
+          extra_args: --all-files
+
+  build-and-test-icelake:
+    name: Build, test and run kernels
+    needs: [format-icelake]
+    runs-on: [self-hosted, Linux, X64, ice-lake]
+    # Use environment protection (require review)
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+        working-directory: he-samples
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REF
+          pwd
+
+      # Build toolkit
+      - name: Build the repository
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
+          make -j5 all
+
+      # Unit tests
+      - name: Run the unit tests
+        run: ./build/sample-kernels/test/unit-test
+
+      # PALISADE micro kernels
+      - name: Run PALISADE micro kernels
+        run: ./build/micro-kernels/micro-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_micro-kernels-palisade_${GITHUB_SHA}.json"
+      - name: Archive PALISADE micro kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{github.job}}_micro-kernels-palisade_${{github.sha}}.json
+          path: he-samples/${{github.job}}_micro-kernels-palisade_${{github.sha}}.json
+          retention-days: 90 # Maximum for free version
+
+      # SEAL micro kernels
+      - name: Run SEAL micro kernels
+        run: ./build/micro-kernels/micro-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_micro-kernels-seal_${GITHUB_SHA}.json"
+      - name: Archive SEAL micro kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{github.job}}_micro-kernels-seal_${{github.sha}}.json
+          path: he-samples/${{github.job}}_micro-kernels-seal_${{github.sha}}.json
+          retention-days: 90 # Maximum for free version
+
+      # PALISADE sample kernels
+      - name: Run PALISADE sample kernels
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+      - name: Archive PALISADE sample kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          retention-days: 90 # Maximum for free version
+
+      # SEAL sample kernels
+      - name: Run SEAL sample kernels
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+      - name: Archive SEAL sample kernel results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
