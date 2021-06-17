@@ -16,6 +16,7 @@ on:
 ################
 jobs:
   format:
+    name: Format
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
@@ -105,6 +106,7 @@ jobs:
 # IceLake CI #
 ##############
   format-icelake:
+    name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
     environment: intel_workflow
@@ -113,7 +115,7 @@ jobs:
       - run: pre-commit run --all-files
 
   build-and-test-icelake:
-    name: Build, test and run kernels
+    name: Build, test and run kernels (IceLake)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
