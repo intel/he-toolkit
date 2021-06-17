@@ -110,8 +110,6 @@ jobs:
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      - run: echo $PATH
-      - run: which cpplint
       - run: pre-commit run --all-files
 
   build-and-test-icelake:
