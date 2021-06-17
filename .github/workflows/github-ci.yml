@@ -110,10 +110,7 @@ jobs:
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
+      - run: pre-commit run --all-files
 
   build-and-test-icelake:
     name: Build, test and run kernels
