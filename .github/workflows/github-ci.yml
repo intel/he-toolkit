@@ -110,8 +110,6 @@ jobs:
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      # Required for pre-commit
-      - run: pip3 install cpplint
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:
