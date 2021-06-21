@@ -8,9 +8,10 @@ add_subdirectory(test)
 
 if (${ENABLE_SEAL})
     # SEAL sample kernel
+
     set(SAMPLE_KENREL_SEAL_SRC main.cpp
-	    seal/seal_sample_CKKS.cpp
-	    seal/seal_sample_BFV.cpp
+        seal/seal_ckks_sample.cpp
+        seal/seal_bfv_sample.cpp
     )
 
     add_executable(sample-kernels-seal ${SAMPLE_KENREL_SEAL_SRC})
@@ -27,8 +28,8 @@ if (${ENABLE_PALISADE})
     # PALISADE sample kernel
 
     set(SAMPLE_KERNEL_PALISADE_SRC main.cpp
-    	palisade/palisade_sample_CKKS.cpp
-	    palisade/palisade_sample_BFV.cpp
+        palisade/palisade_ckks_sample.cpp
+        palisade/palisade_bfv_sample.cpp
     )
 
     add_executable(sample-kernels-palisade ${SAMPLE_KERNEL_PALISADE_SRC})
