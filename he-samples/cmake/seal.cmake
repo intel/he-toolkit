@@ -22,7 +22,7 @@ else()
   set(SEAL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_seal)
   set(SEAL_SRC_DIR ${SEAL_PREFIX}/src/ext_seal/)
   set(SEAL_REPO_URL https://github.com/microsoft/SEAL.git)
-  set(SEAL_GIT_TAG v3.6.5)
+  set(SEAL_GIT_TAG v3.6.6)
 
   set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
 
