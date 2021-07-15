@@ -58,9 +58,19 @@ jobs:
           cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
           make -j5 all
 
-      # Unit tests
+      # Unit tests and examples
       - name: Run the unit tests
         run: ./build/sample-kernels/test/unit-test
+      - name: Run secure query example
+        run: |
+          cd build/examples/secure-query
+          ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
+          ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
+          ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
+      #- name: Run LR example
+      #  run: |
+      #    cd build/examples/logistic-regression
+      #    ./test_lr --docompare --data lrtest_large
 
       # PALISADE micro kernels
       - name: Run PALISADE micro kernels
@@ -143,9 +153,19 @@ jobs:
           cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
           make -j5 all
 
-      # Unit tests
+      # Unit tests and examples
       - name: Run the unit tests
         run: ./build/sample-kernels/test/unit-test
+      - name: Run secure query example
+        run: |
+          cd build/examples/secure-query
+          ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
+          ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
+          ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
+      #- name: Run LR example
+      #  run: |
+      #    cd build/examples/logistic-regression
+      #    ./test_lr --docompare --data lrtest_large
 
       # PALISADE micro kernels
       - name: Run PALISADE micro kernels
