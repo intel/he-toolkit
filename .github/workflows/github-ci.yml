@@ -64,9 +64,9 @@ jobs:
       - name: Run secure query example
         run: |
           cd build/examples/secure-query
-          ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
-          ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
-          ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
+          echo -n "Input: Arkansas, " && ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
+          echo -n "Input: New Mexico, " && ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
+          echo -n "Input: California, " && ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
       #- name: Run LR example
       #  run: |
       #    cd build/examples/logistic-regression
@@ -159,9 +159,9 @@ jobs:
       - name: Run secure query example
         run: |
           cd build/examples/secure-query
-          ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
-          ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
-          ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
+          echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
+          echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
+          echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
       #- name: Run LR example
       #  run: |
       #    cd build/examples/logistic-regression
