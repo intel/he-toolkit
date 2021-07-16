@@ -72,7 +72,7 @@ else()
       BUILD_COMMAND $(MAKE) -j all
       # Skip updates
       UPDATE_COMMAND ""
-      )
+    )
   else()
     ExternalProject_Add(
       ext_palisade

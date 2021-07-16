@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "kernels/palisade/omp_utils_palisade.h"
+#include "kernels/palisade/palisade_omp_utils.h"
 
 namespace intel {
 namespace he {

@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "omp_utils_palisade.h"
+#include "palisade_omp_utils.h"
 
 namespace intel {
 namespace he {

@@ -126,6 +126,87 @@ std::vector<seal::Ciphertext> SealCKKSKernelExecutor::matMul(
   return retval;
 }
 
+std::vector<seal::Ciphertext> SealCKKSKernelExecutor::vecMatProduct(
+    const std::vector<std::vector<seal::Ciphertext>>& A_T_extended,
+    const std::vector<std::vector<seal::Ciphertext>>& B) {
+  size_t rows = A_T_extended.size();
+  size_t chunks = A_T_extended[0].size();
+
+  std::vector<std::vector<seal::Ciphertext>> retval(rows);
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+  for (size_t r = 0; r < rows; ++r) {
+    retval[r].resize(chunks);
+    for (size_t c = 0; c < chunks; ++c)
+      m_pevaluator->multiply(A_T_extended[r][c], B[r][c], retval[r][c]);
+  }
+
+  size_t step = 2;
+  while ((step / 2) < rows) {
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+    for (size_t i = 0; i < rows; i += step) {
+      if ((i + step / 2) < rows) {
+        for (size_t j = 0; j < chunks; ++j)
+          m_pevaluator->add_inplace(retval[i][j], retval[i + step / 2][j]);
+      }
+    }
+    step *= 2;
+  }
+
+  for (size_t c = 0; c < chunks; ++c) {
+    m_pevaluator->relinearize_inplace(retval[0][c], m_relin_keys);
+    m_pevaluator->rescale_to_next_inplace(retval[0][c]);
+  }
+  return retval[0];
+}
+
+std::vector<seal::Ciphertext> SealCKKSKernelExecutor::evaluatePolynomialVector(
+    const std::vector<seal::Ciphertext>& inputs,
+    const gsl::span<const double>& coefficients, size_t inputs_count) {
+  if (coefficients.empty())
+    throw std::invalid_argument("coefficients cannot be empty");
+
+  std::vector<seal::Ciphertext> retval = encryptVector(
+      gsl::span(std::vector<double>(inputs_count, coefficients[0]).data(),
+                inputs_count),
+      m_pencoder->slot_count());
+
+  size_t chunks = inputs.size();
+  size_t degree = coefficients.size() - 1;
+
+  std::vector<seal::Ciphertext> x_ref = inputs;
+  std::vector<seal::Ciphertext> powx = inputs;
+  for (size_t d = 1; d <= degree; ++d) {
+    if (d > 1) {
+      for (size_t i = 0; i < chunks; ++i) {
+        m_pevaluator->multiply_inplace(powx[i], x_ref[i]);
+        m_pevaluator->relinearize_inplace(powx[i], m_relin_keys);
+        m_pevaluator->rescale_to_next_inplace(powx[i]);
+        matchLevel(&x_ref[i], &powx[i]);
+      }
+    }
+
+    if (coefficients[d] != 0.0) {
+      std::vector<seal::Plaintext> pt_coeff = encodeVector(
+          gsl::span(std::vector<double>(inputs_count, coefficients[d]).data(),
+                    inputs_count),
+          m_pencoder->slot_count());
+      std::vector<seal::Ciphertext> buf(chunks);
+
+      for (size_t i = 0; i < chunks; ++i) {
+        matchLevel(&powx[i], &pt_coeff[i]);
+        m_pevaluator->multiply_plain(powx[i], pt_coeff[i], buf[i]);
+        m_pevaluator->rescale_to_next_inplace(buf[i]);
+
+        matchLevel(&retval[i], &buf[i]);
+        buf[i].scale() = m_scale;
+        m_pevaluator->add_inplace(retval[i], buf[i]);
+      }
+    }
+  }
+
+  return retval;
+}
+
 std::vector<seal::Ciphertext> SealCKKSKernelExecutor::evaluatePolynomial(
     const std::vector<seal::Ciphertext>& inputs,
     const gsl::span<const double>& coefficients) {
@@ -239,8 +320,58 @@ SealCKKSKernelExecutor::evaluateLogisticRegression(
   return retval;
 }
 
+std::vector<seal::Ciphertext>
+SealCKKSKernelExecutor::evaluateLinearRegressionTransposed(
+    std::vector<std::vector<seal::Ciphertext>>& weights_T_extended,
+    std::vector<std::vector<seal::Ciphertext>>& inputs_T,
+    std::vector<seal::Ciphertext>& bias_extended) {
+  std::vector<seal::Ciphertext> retval =
+      vecMatProduct(weights_T_extended, inputs_T);
+
+  for (size_t i = 0; i < retval.size(); ++i) {
+    matchLevel(&retval[i], &bias_extended[i]);
+    bias_extended[i].scale() = m_scale;
+    retval[i].scale() = m_scale;
+    m_pevaluator->add_inplace(retval[i], bias_extended[i]);
+  }
+  return retval;
+}
+
+std::vector<seal::Ciphertext>
+SealCKKSKernelExecutor::evaluateLogisticRegressionTransposed(
+    std::vector<std::vector<seal::Ciphertext>>& weights_T_extended,
+    std::vector<std::vector<seal::Ciphertext>>& inputs_T,
+    std::vector<seal::Ciphertext>& bias_extended, size_t inputs_count,
+    unsigned int sigmoid_degree) {
+  std::vector<seal::Ciphertext> retval = evaluateLinearRegressionTransposed(
+      weights_T_extended, inputs_T, bias_extended);
+
+  switch (sigmoid_degree) {
+    case 5:
+      retval = sigmoid_vector<5>(retval, inputs_count);
+      break;
+    case 7:
+      retval = sigmoid_vector<7>(retval, inputs_count);
+      break;
+    default:
+      retval = sigmoid_vector<3>(retval, inputs_count);
+      break;
+  }
+  return retval;
+}
+
 void SealCKKSKernelExecutor::matchLevel(seal::Ciphertext* a,
                                         seal::Ciphertext* b) const {
+  int a_level = getLevel(*a);
+  int b_level = getLevel(*b);
+  if (a_level > b_level)
+    m_pevaluator->mod_switch_to_inplace(*a, b->parms_id());
+  else if (a_level < b_level)
+    m_pevaluator->mod_switch_to_inplace(*b, a->parms_id());
+}
+
+void SealCKKSKernelExecutor::matchLevel(seal::Ciphertext* a,
+                                        seal::Plaintext* b) const {
   int a_level = getLevel(*a);
   int b_level = getLevel(*b);
   if (a_level > b_level)
@@ -320,6 +451,53 @@ std::vector<seal::Ciphertext> SealCKKSKernelExecutor::dotCipherBatchAxis(
     m_pevaluator->rescale_to_next_inplace(out[out_idx]);
   }
   return out;
+}
+
+std::vector<seal::Plaintext> SealCKKSKernelExecutor::encodeVector(
+    const gsl::span<const double>& values, size_t batch_size) {
+  size_t total_chunks =
+      values.size() / batch_size + (values.size() % batch_size == 0 ? 0 : 1);
+  size_t last_chunk_size =
+      values.size() % batch_size == 0 ? batch_size : values.size() % batch_size;
+
+  std::vector<seal::Plaintext> ret(total_chunks);
+#pragma omp parallel for
+  for (size_t i = 0; i < total_chunks; ++i) {
+    size_t actual_chunk_size =
+        (i == total_chunks - 1) ? last_chunk_size : batch_size;
+    gsl::span data_chunk(&values[i * batch_size], actual_chunk_size);
+    m_pencoder->encode(data_chunk, m_scale, ret[i]);
+  }
+  return ret;
+}
+
+std::vector<seal::Plaintext> SealCKKSKernelExecutor::encodeVector(
+    const gsl::span<const double>& v) {
+  std::size_t slot_count = m_pencoder->slot_count();
+  std::size_t total_chunks =
+      v.size() / slot_count + (v.size() % slot_count == 0 ? 0 : 1);
+  gsl::span<const double> data = v;
+  std::vector<seal::Plaintext> retval;
+  retval.reserve(total_chunks);
+  while (!data.empty()) {
+    std::size_t actual_chunk_size =
+        (data.size() > slot_count ? slot_count : data.size());
+    gsl::span data_chunk = data.first(actual_chunk_size);
+    data = data.last(data.size() - actual_chunk_size);
+    seal::Plaintext plain;
+    m_pencoder->encode(data_chunk, m_scale, plain);
+    retval.emplace_back(std::move(plain));
+  }
+  return retval;
+}
+
+std::vector<seal::Ciphertext> SealCKKSKernelExecutor::encryptVector(
+    const std::vector<seal::Plaintext>& plain) {
+  std::vector<seal::Ciphertext> ret(plain.size());
+#pragma omp parallel for
+  for (size_t i = 0; i < plain.size(); ++i)
+    m_pencryptor->encrypt(plain[i], ret[i]);
+  return ret;
 }
 
 }  // namespace heseal

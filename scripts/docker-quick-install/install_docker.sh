@@ -61,6 +61,7 @@ Environment=\"HTTPS_PROXY=$http_proxy\"" | sudo tee /etc/systemd/system/docker.s
     sudo systemctl daemon-reload
 
     echo -e "\nRESTARTING DOCKER SERVICE..."
+    sudo systemctl reset-failed docker
     sudo systemctl restart docker
 fi
 

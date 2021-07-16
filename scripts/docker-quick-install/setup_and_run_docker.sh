@@ -43,6 +43,7 @@ fi
 echo -e "\nPACKAGING HE-SAMPLES CODE..."
 mkdir ./projects
 cp -rf ../../he-samples ./projects/
+rm -rf ./projects/he-samples/build
 tar -cvzf projects.tar.gz projects
 rm -rf ./projects
 
