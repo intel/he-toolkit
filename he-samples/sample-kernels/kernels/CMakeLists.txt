@@ -6,7 +6,7 @@ if (${ENABLE_PALISADE})
     set(PALISADE_KERNEL_EXECUTOR_SRC
         palisade/palisade_ckks_kernel_executor.cpp
         palisade/palisade_bfv_kernel_executor.cpp
-        palisade/omp_utils_palisade.cpp
+        palisade/palisade_omp_utils.cpp
         )
 
     add_library(palisade_kernel_executor SHARED ${PALISADE_KERNEL_EXECUTOR_SRC})

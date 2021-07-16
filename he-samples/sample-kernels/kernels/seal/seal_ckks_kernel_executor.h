@@ -6,6 +6,7 @@
 #include <seal/seal.h>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "kernels/seal/seal_ckks_context.h"
@@ -28,7 +29,7 @@ class SealCKKSKernelExecutor {
             seal_ckks_context.public_key(), seal_ckks_context.relin_keys(),
             seal_ckks_context.galois_keys()) {}
 
-  ~SealCKKSKernelExecutor();
+  virtual ~SealCKKSKernelExecutor();
 
   // Adds two ciphertext vectors element-wise
   std::vector<seal::Ciphertext> add(const std::vector<seal::Ciphertext>& A,
@@ -54,9 +55,21 @@ class SealCKKSKernelExecutor {
       const std::vector<std::vector<seal::Ciphertext>>& A,
       const std::vector<std::vector<seal::Ciphertext>>& B_T, size_t cols);
 
+  // Performs vector-matrix product of A_T_extended and B
+  // @param A_T_extended extended ciphertext of transpose of vector
+  // @param B matrix of ciphertext
+  // @returns A vector of ciphertext containing the vector-matrix product
+  virtual std::vector<seal::Ciphertext> vecMatProduct(
+      const std::vector<std::vector<seal::Ciphertext>>& A_T_extended,
+      const std::vector<std::vector<seal::Ciphertext>>& B);
+
   std::vector<seal::Ciphertext> evaluatePolynomial(
       const std::vector<seal::Ciphertext>& inputs,
       const gsl::span<const double>& coefficients);
+
+  std::vector<seal::Ciphertext> evaluatePolynomialVector(
+      const std::vector<seal::Ciphertext>& inputs,
+      const gsl::span<const double>& coefficients, size_t inputs_count);
 
   std::vector<seal::Ciphertext> collapse(
       const std::vector<seal::Ciphertext>& ciphers);
@@ -65,15 +78,48 @@ class SealCKKSKernelExecutor {
   std::vector<seal::Ciphertext> sigmoid(
       const std::vector<seal::Ciphertext>& inputs);
 
+  template <unsigned int degree = 3>
+  std::vector<seal::Ciphertext> sigmoid_vector(
+      const std::vector<seal::Ciphertext>& inputs, size_t inputs_count);
+
   std::vector<seal::Ciphertext> evaluateLinearRegression(
       std::vector<seal::Ciphertext>& weights,
       std::vector<std::vector<seal::Ciphertext>>& inputs,
       seal::Ciphertext& bias, size_t weights_count);
 
+  // Performs linear regression with transposed inputs for faster inference
+  // @param weights_T_extended Ciphertext of transpose of weight vector which is
+  // extended column-wise to match data size
+  // @param inputs_T Ciphertext of transpose of input where each row and column
+  // are features and inputs, respectively
+  // @param bias_extended Ciphertext of bias which is extended to be a vector to
+  // match data size
+  // @param inputs_count Number of inputs, equals to width of inputs_T
+  std::vector<seal::Ciphertext> evaluateLinearRegressionTransposed(
+      std::vector<std::vector<seal::Ciphertext>>& weights_T_extended,
+      std::vector<std::vector<seal::Ciphertext>>& inputs_T,
+      std::vector<seal::Ciphertext>& bias_extended);
+
   std::vector<seal::Ciphertext> evaluateLogisticRegression(
       std::vector<seal::Ciphertext>& weights,
       std::vector<std::vector<seal::Ciphertext>>& inputs,
       seal::Ciphertext& bias, size_t weights_count,
+      unsigned int sigmoid_degree = 3);
+
+  // Performs logistic regression with transposed inputs for faster inference
+  // @param weights_T_extended Ciphertext of transpose of weight vector which is
+  // extended column-wise to match data size
+  // @param inputs_T Ciphertext of transpose of input where each row and column
+  // are features and inputs, respectively
+  // @param bias_extended Ciphertext of bias which is extended to be a vector to
+  // match data size
+  // @param inputs_count Number of inputs, equals to width of inputs_T
+  // @param sigmoid_degree Degree of polynomial representation of sigmoid
+  // function, options = 3,5,7
+  std::vector<seal::Ciphertext> evaluateLogisticRegressionTransposed(
+      std::vector<std::vector<seal::Ciphertext>>& weights_T_extended,
+      std::vector<std::vector<seal::Ciphertext>>& inputs_T,
+      std::vector<seal::Ciphertext>& bias_extended, size_t inputs_count,
       unsigned int sigmoid_degree = 3);
 
   // Performs a ciphertext-plaintext dot product.
@@ -104,6 +150,10 @@ class SealCKKSKernelExecutor {
 
   //  Modulus switches a and b such that their levels match
   void matchLevel(seal::Ciphertext* a, seal::Ciphertext* b) const;
+  void matchLevel(seal::Ciphertext* a, seal::Plaintext* b) const;
+  inline void matchLevel(seal::Plaintext* a, seal::Ciphertext* b) const {
+    matchLevel(b, a);
+  }
 
   // Returns the level of the ciphertext
   size_t getLevel(const seal::Ciphertext& cipher) const {
@@ -149,6 +199,22 @@ class SealCKKSKernelExecutor {
   seal::RelinKeys m_relin_keys;
   seal::GaloisKeys m_galois_keys;
   double m_scale;
+
+  std::vector<seal::Plaintext> encodeVector(
+      const gsl::span<const double>& values, size_t batch_size);
+  std::vector<seal::Plaintext> encodeVector(const gsl::span<const double>& v);
+  std::vector<seal::Ciphertext> encryptVector(
+      const std::vector<seal::Plaintext>& plain);
+
+  inline std::vector<seal::Ciphertext> encryptVector(
+      const gsl::span<const double>& v, size_t batch_size) {
+    return encryptVector(encodeVector(v, batch_size));
+  }
+
+  std::vector<seal::Ciphertext> encryptVector(
+      const gsl::span<const double>& v) {
+    return encryptVector(encodeVector(v));
+  }
 };
 
 template <>
@@ -167,6 +233,27 @@ template <>
 inline std::vector<seal::Ciphertext> SealCKKSKernelExecutor::sigmoid<7>(
     const std::vector<seal::Ciphertext>& inputs) {
   return evaluatePolynomial(inputs, gsl::span(sigmoid_coeff_7, 8));
+}
+
+template <>
+inline std::vector<seal::Ciphertext> SealCKKSKernelExecutor::sigmoid_vector<3>(
+    const std::vector<seal::Ciphertext>& inputs, size_t inputs_count) {
+  return evaluatePolynomialVector(inputs, gsl::span(sigmoid_coeff_3, 4),
+                                  inputs_count);
+}
+
+template <>
+inline std::vector<seal::Ciphertext> SealCKKSKernelExecutor::sigmoid_vector<5>(
+    const std::vector<seal::Ciphertext>& inputs, size_t inputs_count) {
+  return evaluatePolynomialVector(inputs, gsl::span(sigmoid_coeff_5, 6),
+                                  inputs_count);
+}
+
+template <>
+inline std::vector<seal::Ciphertext> SealCKKSKernelExecutor::sigmoid_vector<7>(
+    const std::vector<seal::Ciphertext>& inputs, size_t inputs_count) {
+  return evaluatePolynomialVector(inputs, gsl::span(sigmoid_coeff_7, 8),
+                                  inputs_count);
 }
 
 }  // namespace heseal

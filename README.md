@@ -1,5 +1,4 @@
-# Docker Quick Install
-For a quick automatic setup/install, please check https://github.com/intel/he-toolkit/releases for the latest user guide. Otherwise, see below for a manual install.
+A collection of kernels (micro & macro) to compare different HE libraries
 
 # Dependencies
 This has been tested on Ubuntu 18.04 & Ubuntu 20.04
@@ -10,9 +9,10 @@ cmake # >= 3.13
 git
 pthread
 patchelf
-autoconf
 m4
 g++ #>= 10.0 or clang >= 10.0
+python3 >=3.5
+virtualenv or python3-venv
 ```
 
 # Build
@@ -20,14 +20,14 @@ g++ #>= 10.0 or clang >= 10.0
 export HE_SAMPLES=$(pwd)/he-samples
 cd $HE_SAMPLES
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake ..
 make -j all
 ```
 
-You can pass additional options during the configure step:
+You can pass additional options:
 ```bash
  -DENABLE_PALISADE=OFF
- -DENABLE_SEAL=OFF
+ -DENABLE_SEAL=ON
 ```
 to disable building of certain HE libraries.
 
@@ -66,12 +66,34 @@ cd $HE_SAMPLES/build/examples/secure-query
 ./secure-query
 ```
 
+## Logistic Regression
+The logistic regression example provides a fast and scalable implementation of SEAL CKKS HE scheme based logistic regression.
+It will be built whenever SEAL is enabled as part of he-toolkit build.
+To run it execute
+```bash
+cd $HE_SAMPLES/build/examples/logistic-regression
+./lr_test
+```
+For more detail, check [he-samples/examples/logistic-regression](he-samples/examples/logistic-regression).
 
 # Contributing
-At this time, Intel HE-toolkit does not accept external contributions. We encourage feedback and suggestions via [issues](https://github.com/intel/he-toolkit/issues) and [discussions](https://github.com/intel/he-toolkit/discussions).
-
 Before making a pull request, please make sure the pre-commit config is active, i.e. run
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
+
+# Contributors
+The Intel contributors to this project, sorted by last name, are
+  - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
+  - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
+  - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
+  - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
+  - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
+  - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
+  - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/) (lead)
+  - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
+  - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
+  - [Ernesto Z Ramos](https://www.linkedin.com/in/sidezr)
+  - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)

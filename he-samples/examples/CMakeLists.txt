@@ -6,6 +6,7 @@
 #------------------------------------------------------------------------------
 if (${ENABLE_SEAL})
         add_subdirectory(secure-query)
+        add_subdirectory(logistic-regression)
 else()
-        message(STATUS "BUILDING WITHOUT SEAL: Secure Query example WILL NOT be built")
+        message(STATUS "BUILDING WITHOUT SEAL: Secure Query and Logistic Regression examples WILL NOT be built")
 endif()

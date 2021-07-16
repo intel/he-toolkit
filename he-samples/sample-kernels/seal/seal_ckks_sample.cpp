@@ -197,6 +197,76 @@ BENCHMARK_CAPTURE(BM_Seal_LogisticRegression_CKKS, (20x16), 20, 16)
     ->Unit(benchmark::kMillisecond)
     ->Args({16384, 6});
 
+BENCHMARK_CAPTURE(BM_Seal_LogisticRegression_CKKS, (100x32), 100, 32)
+    ->Unit(benchmark::kMillisecond)
+    ->Args({16384, 6});
+
+template <class Dim1, class Dim2>
+void BM_Seal_LogisticRegressionTransposed_CKKS(benchmark::State& state,
+                                               Dim1&& n_inputs,
+                                               Dim2&& n_weights) {
+  SealCKKSContext context(state.range(0), std::vector<int>(state.range(1), 50),
+                          1UL << 40, true, true);
+  SealCKKSKernelExecutor kernel_executor(context);
+
+  std::vector<double> weights(n_weights);
+  std::vector<std::vector<double>> inputs_T(n_weights);
+
+  std::default_random_engine rand_gen;
+  std::uniform_real_distribution<double> uniform_rnd(-1.5, 1.5);
+  for (std::size_t i = 0; i < weights.size(); ++i)
+    weights[i] = uniform_rnd(rand_gen);
+  for (std::size_t j = 0; j < inputs_T.size(); ++j) {
+    inputs_T[j].resize(n_inputs);
+    for (std::size_t i = 0; i < inputs_T[j].size(); ++i)
+      inputs_T[j][i] = uniform_rnd(rand_gen);
+  }
+  double bias = uniform_rnd(rand_gen);
+
+  std::vector<std::vector<seal::Ciphertext>> cipher_weights_extended(n_weights);
+  for (size_t i = 0; i < n_weights; ++i)
+    cipher_weights_extended[i] = context.encryptVector(
+        gsl::span(std::vector<double>(n_inputs, weights[i]).data(), n_inputs),
+        context.encoder().slot_count());
+
+  std::vector<seal::Ciphertext> cipher_bias_extended = context.encryptVector(
+      gsl::span(std::vector<double>(n_inputs, bias).data(), n_inputs),
+      context.encoder().slot_count());
+
+  std::vector<std::vector<seal::Ciphertext>> cipher_inputs_T(inputs_T.size());
+
+  for (std::size_t inputs_r = 0; inputs_r < inputs_T.size(); ++inputs_r)
+    cipher_inputs_T[inputs_r] = context.encryptVector(
+        gsl::span(inputs_T[inputs_r].data(), inputs_T[inputs_r].size()),
+        context.encoder().slot_count());
+  std::vector<seal::Ciphertext> cipher_retval;
+
+  int omp_remaining_threads = OMPUtilitiesS::MaxThreads;
+  OMPUtilitiesS::setThreadsAtLevel(
+      0,
+      OMPUtilitiesS::assignOMPThreads(omp_remaining_threads, inputs_T.size()));
+
+  for (auto _s : state) {
+    cipher_retval = kernel_executor.evaluateLogisticRegressionTransposed(
+        cipher_weights_extended, cipher_inputs_T, cipher_bias_extended,
+        n_inputs, 3);
+  }
+
+  OMPUtilitiesS::setThreadsAtLevel(0, OMPUtilitiesS::MaxThreads);
+}
+
+BENCHMARK_CAPTURE(BM_Seal_LogisticRegressionTransposed_CKKS, (5x4), 5, 4)
+    ->Unit(benchmark::kMillisecond)
+    ->Args({16384, 6});
+
+BENCHMARK_CAPTURE(BM_Seal_LogisticRegressionTransposed_CKKS, (20x16), 20, 16)
+    ->Unit(benchmark::kMillisecond)
+    ->Args({16384, 6});
+
+BENCHMARK_CAPTURE(BM_Seal_LogisticRegressionTransposed_CKKS, (100x32), 100, 32)
+    ->Unit(benchmark::kMillisecond)
+    ->Args({16384, 6});
+
 //=================================================================
 
 }  // namespace heseal
