@@ -111,6 +111,52 @@ std::vector<double> testLogisticRegression4x3(
   return retval;
 }
 
+std::vector<double> testLogisticRegressionTransposed4x3(
+    double bias, const std::vector<double>& weights,
+    const std::vector<std::vector<double>>& inputs,
+    std::size_t sigmoid_degree) {
+  SealCKKSContext context(1UL << 14, {60, 45, 45, 45, 45, 45}, 1UL << 45, true,
+                          true);
+  SealCKKSKernelExecutor kernel_executor(context);
+
+  // Get transpose of inputs
+  std::vector<std::vector<double>> inputs_T(inputs[0].size());
+  for (size_t i = 0; i < inputs[0].size(); ++i) {
+    inputs_T[i].resize(inputs.size());
+    for (size_t j = 0; j < inputs.size(); ++j) inputs_T[i][j] = inputs[j][i];
+  }
+  size_t n_inputs = inputs.size();
+  size_t n_weights = weights.size();
+
+  // extend weights_T to ciphertext
+  std::vector<std::vector<seal::Ciphertext>> cipher_weights_extended(n_weights);
+  for (size_t i = 0; i < n_weights; ++i)
+    cipher_weights_extended[i] = context.encryptVector(
+        gsl::span(std::vector<double>(n_inputs, weights[i]).data(), n_inputs),
+        context.encoder().slot_count());
+
+  // extend bias to ciphertext
+  std::vector<seal::Ciphertext> cipher_bias_extended = context.encryptVector(
+      gsl::span(std::vector<double>(n_inputs, bias).data(), n_inputs),
+      context.encoder().slot_count());
+
+  // transpose inputs to ciphertext
+  std::vector<std::vector<seal::Ciphertext>> cipher_inputs_T(n_weights);
+  for (size_t i = 0; i < n_weights; ++i)
+    cipher_inputs_T[i] =
+        context.encryptVector(gsl::span(inputs_T[i].data(), inputs_T[i].size()),
+                              context.encoder().slot_count());
+
+  std::vector<seal::Ciphertext> cipher_retval =
+      kernel_executor.evaluateLogisticRegressionTransposed(
+          cipher_weights_extended, cipher_inputs_T, cipher_bias_extended,
+          n_inputs, sigmoid_degree);
+  std::vector<double> retval =
+      context.decodeVector(context.decryptVector(cipher_retval));
+  retval.resize(inputs.size());
+  return retval;
+}
+
 TEST(seal_ckks_kernel_executor, encode_vector) {
   SealCKKSContext context(8192, {60, 40, 40}, 1UL << 40, false, false);
 
@@ -329,6 +375,30 @@ TEST(seal_ckks_kernel_executor, add) {
   checkEqual(output, expected_out);
 }
 
+TEST(seal_ckks_kernel_executor, accumulate_powerOf2) {
+  SealCKKSContext context(16384, {60, 40, 40}, 1UL << 40);
+  SealCKKSKernelExecutor kernel_executor(context);
+
+  size_t inputsize = 8192;
+  std::vector<double> input(inputsize);
+
+  for (size_t i = 0; i < input.size(); ++i) {
+    input[i] = static_cast<double>(i + 1);
+  }
+
+  std::vector<seal::Ciphertext> ciphers =
+      context.encryptVector(gsl::span(input.data(), input.size()));
+
+  seal::Ciphertext cipher_sum =
+      kernel_executor.accumulate(ciphers, input.size());
+
+  seal::Plaintext plain_sum;
+  context.decryptor().decrypt(cipher_sum, plain_sum);
+  std::vector<double> output;
+  context.encoder().decode(plain_sum, output);
+  ASSERT_NEAR(output[0], inputsize * (inputsize + 1) / 2.0, 0.01);
+}
+
 TEST(seal_ckks_kernel_executor, accumulate) {
   SealCKKSContext context(8192, {60, 40, 40}, 1UL << 40);
   SealCKKSKernelExecutor kernel_executor(context);
@@ -465,6 +535,19 @@ TEST(seal_ckks_kernel_executor, DotPlainBatchAxis2x2x2) {
   std::vector<double> output = testDotPlainBatchAxis(input1, input2, 2, 2, 2);
 
   checkEqual(output, exp_out);
+}
+
+TEST(seal_ckks_kernel_executor, LogisticRegressionTransposed4x3_SigDeg3) {
+  constexpr unsigned int sigmoid_deg = 3;
+  double bias;
+  std::vector<double> weights;
+  std::vector<std::vector<double>> inputs;
+  std::vector<double> ground_truth;
+  prepareLogisticRegression4x3(bias, weights, inputs, ground_truth);
+  std::vector<double> output =
+      testLogisticRegressionTransposed4x3(bias, weights, inputs, sigmoid_deg);
+
+  checkEqual(output, ground_truth);
 }
 
 }  // namespace heseal

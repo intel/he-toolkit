@@ -28,11 +28,11 @@ if (${ENABLE_SEAL})
     #------------------------------------------------------------------------------
 
     set(MICRO_SRC main.cpp
-        seal/seal_ckks_micro.cpp
-        seal/seal_bfv_micro.cpp
-        seal/seal_micro.cpp
-        seal/seal_bfv_context.cpp
-        seal/seal_ckks_context.cpp
+            seal/seal_ckks_micro.cpp
+            seal/seal_bfv_micro.cpp
+            seal/seal_micro.cpp
+            seal/seal_bfv_context.cpp
+            seal/seal_ckks_context.cpp
     )
 
     add_executable(micro-kernels-seal ${MICRO_SRC})

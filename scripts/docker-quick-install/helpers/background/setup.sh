@@ -35,6 +35,13 @@ sudo apt-get -y install gcc-10 g++-10
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 echo -e "DONE INSTALLING GCC-10\n"
 
+# Virtualenv
+echo -e "\nINSTALLING VIRTUALENV"
+sudo apt-get -y install python3-pip
+sudo apt-get -y install python3-venv
+python3 -m pip install --user virtualenv
+echo -e "DONE INSTALLING VIRTUALENV\n"
+
 # Last Dep
 echo -e "\nINSTALLING AUTOCONF"
 sudo apt-get install -y autoconf
