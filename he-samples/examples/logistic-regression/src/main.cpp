@@ -87,7 +87,8 @@ int main(int argc, char** argv) {
         match_ct--;
       }
     }
-    LOG<Info>("Match count with cleartext LR:", match_ct, "out of", n_inputs);
+    LOG<Info>("Mismatch count with cleartext LR:", match_ct, "out of",
+              n_inputs);
   }
   return 0;
 }
