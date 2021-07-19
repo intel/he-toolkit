@@ -81,14 +81,13 @@ int main(int argc, char** argv) {
     auto lrcleartext_evalout = lrhelper::test(evalData, lr_weights, lr_bias);
 
     // Count mismatch
-    int mismatch_ct = n_inputs;
+    int match_ct = n_inputs;
     for (size_t j = 0; j < n_inputs; ++j) {
       if ((lrhe_evalout[j] - lrcleartext_evalout[j]) != 0.0) {
-        mismatch_ct--;
+        match_ct--;
       }
     }
-    LOG<Info>("Mismatch count with cleartext LR:", match_ct, "out of",
-              n_inputs);
+    LOG<Info>("Match count with cleartext LR:", match_ct, "out of", n_inputs);
   }
   return 0;
 }
