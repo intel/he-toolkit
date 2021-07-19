@@ -79,19 +79,18 @@ int main(int argc, char** argv) {
     auto lrcleartext_evalout =
         lrhelper::test(evalData, pretrained_weights, pretrained_bias);
 
-    // Check for match
-    if (lrhe_evalout == lrcleartext_evalout) {
-      LOG<Info>("All match!");
-    } else {
-      // Count mismatch
-      int mismatch_ct = 0;
-      for (size_t j = 0; j < n_inputs; ++j) {
-        if (lrhe_evalout[j] != lrcleartext_evalout[j]) {
-          mismatch_ct++;
-        }
+    // Count mismatch
+    int mismatch_ct = 0;
+    for (size_t j = 0; j < n_inputs; ++j) {
+      if (lrhe_evalout[j] != lrcleartext_evalout[j]) {
+        mismatch_ct++;
       }
+    }
+    if (mismatch_ct > 0) {
       LOG<Info>("Mismatch count with cleartext LR:", mismatch_ct, "/",
                 n_inputs);
+    } else {
+      LOG<Info>("All match!");
     }
   }
   return 0;
