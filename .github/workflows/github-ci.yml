@@ -70,7 +70,7 @@ jobs:
       - name: Run LR example
         run: |
           cd build/examples/logistic-regression
-          ./lr_test --docompare --data lrtest_large
+          ./lr_test --docompare --data lrtest_large | grep "All match!"
 
       # PALISADE micro kernels
       - name: Run PALISADE micro kernels
@@ -165,7 +165,7 @@ jobs:
       - name: Run LR example
         run: |
           cd build/examples/logistic-regression
-          ./lr_test --docompare --data lrtest_large
+          ./lr_test --docompare --data lrtest_large | grep "All match!"
 
       # PALISADE micro kernels
       - name: Run PALISADE micro kernels
