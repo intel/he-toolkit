@@ -76,18 +76,22 @@ int main(int argc, char** argv) {
   if (FLAGS_docompare) {  // If docompare==true, compare with non-HE inference
                           // result
     // Get cleartext inference results
-    std::vector<double> lr_weights = lrhe.get_weights();
-    double lr_bias = lrhe.get_bias();
-    auto lrcleartext_evalout = lrhelper::test(evalData, lr_weights, lr_bias);
+    auto lrcleartext_evalout =
+        lrhelper::test(evalData, pretrained_weights, pretrained_bias);
 
     // Count mismatch
-    double match_ct = n_inputs;
+    int mismatch_ct = 0;
     for (size_t j = 0; j < n_inputs; ++j) {
-      if ((lrhe_evalout[j] - lrcleartext_evalout[j]) != 0.0) {
-        match_ct--;
+      if (lrhe_evalout[j] != lrcleartext_evalout[j]) {
+        mismatch_ct++;
       }
     }
-    LOG<Info>("Match count with cleartext LR:", match_ct, "out of", n_inputs);
+    if (mismatch_ct > 0) {
+      LOG<Info>("Mismatch count with cleartext LR:", mismatch_ct, "/",
+                n_inputs);
+    } else {
+      LOG<Info>("All match!");
+    }
   }
   return 0;
 }
