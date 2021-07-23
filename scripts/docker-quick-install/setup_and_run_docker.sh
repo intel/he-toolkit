@@ -5,7 +5,9 @@
 
 set -e
 
-echo -e "\nPLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
+cat << EOF
+
+PLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
 
 The following script package the he-samples code, confirm Docker functionality,
 and build/run a Docker for testing several homomorphic encryption workloads.
@@ -15,7 +17,9 @@ Do note that this script has a few usage requirements:
     2. It must be run from its own base directory
     3. If you are located behind a firewall (corporate or otherwise),
     please make sure you have the proxies setup accordingly
-    (e.g. environment variables: http_proxy and https_proxy are set).\n"
+    (e.g. environment variables: http_proxy and https_proxy are set).
+
+EOF
 
 read -p "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
 echo
