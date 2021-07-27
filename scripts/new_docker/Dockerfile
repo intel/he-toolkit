@@ -60,7 +60,9 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2
     chmod +x cmake-3.19.2-Linux-x86_64.sh && \
     mkdir cmake_files && \
     yes Y | ./cmake-3.19.2-Linux-x86_64.sh --skip-license --prefix=cmake_files && \
-    cp -rf cmake_files/{doc,man,share} / && \
+    cp -rf cmake_files/doc / && \
+    cp -rf cmake_files/man / && \
+    cp -rf cmake_files/share / && \
     cp -rf cmake_files/share /usr/ && \
     cp -rf cmake_files/bin/* /bin/ && \
     rm -rf cmake_files
