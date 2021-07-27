@@ -47,6 +47,10 @@ check_dependecies \
     python        \
     virtualenv
 
+check_required_command_version "cmake --version" ">=3.13.x"
+check_required_command_version "python --version" ">=3.5.x.x"
+check_required_command_version "g++ --version" ">=10.0.x"
+
 if [ ! -f "projects.tar.gz" ]; then
     echo -e "\nPACKAGING HE-SAMPLES CODE..."
     tar --exclude ../../he-samples/build -cvzf projects.tar.gz ../../he-samples
