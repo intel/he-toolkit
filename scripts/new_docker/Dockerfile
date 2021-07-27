@@ -17,14 +17,14 @@ ARG no_proxy
 ARG UNAME
 ARG UID
 ARG GID
+ARG TZ=UTC 
+ARG DEBIAN_FRONTEND=noninteractive 
 
 ENV http_proxy=$http_proxy   \
     https_proxy=$https_proxy \
     socks_proxy=$socks_proxy \
     ftp_proxy=$ftp_proxy     \
     no_proxy=$no_proxy       \
-    DEBIAN_FRONTEND=noninteractive \
-    TZ=UTC \
     UNAME=$UNAME
 
 # Installation run as "root" in the container
@@ -40,7 +40,7 @@ RUN apt-get -y dist-upgrade && \
     apt-get install -y libterm-readline-gnu-perl && \
     apt-get install -y --no-install-recommends tzdata && \
     apt-get install -y build-essential && \
-    apt-get install -y byobu curl git htop man xz-utils unzip vim wget sudo cmake m4 file patchelf autoconf
+    apt-get install -y byobu curl git htop man xz-utils unzip vim wget sudo cmake m4 file patchelf autoconf virtualenv
     # Install and configure gcc 10 \
     # Add required PPA \
 RUN add-apt-repository ppa:ubuntu-toolchain-r/ppa  && \
@@ -59,7 +59,11 @@ RUN apt-get -y install apt-transport-https && \
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2-Linux-x86_64.sh && \
     chmod +x cmake-3.19.2-Linux-x86_64.sh && \
     mkdir cmake_files && \
-    yes Y | ./cmake-3.19.2-Linux-x86_64.sh --skip-license --prefix=cmake_files
+    yes Y | ./cmake-3.19.2-Linux-x86_64.sh --skip-license --prefix=cmake_files && \
+    cp -rf cmake_files/{doc,man,share} / && \
+    cp -rf cmake_files/share /usr/ && \
+    cp -rf cmake_files/bin/* /bin/ && \
+    rm -rf cmake_files
     # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
@@ -72,10 +76,13 @@ RUN apt-get autoremove -y && \
 RUN groupadd -g $GID $UNAME && \
     useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
     echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-    # Install venv \
-RUN apt-get -y install python3-pip && \
-    apt-get -y install python3-venv && \
-    python3 -m pip install --user virtualenv
+    
+
+COPY projects.tar.gz /
+COPY helpers.tar.gz /
+RUN tar -zxvf projects.tar.gz && \
+    tar -zxvf helpers.tar.gz
+
 
 # Switch user to
 USER $UNAME

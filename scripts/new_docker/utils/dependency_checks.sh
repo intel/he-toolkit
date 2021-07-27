@@ -42,8 +42,9 @@ __version_string_to_tuple() {
 
 #
 # Check if version is what we require.
-# e.g. check_required_command_version "python" "==3.5.0" # exact
-# e.g. check_required_command_version "python" ">=3.5.0" # minimum
+# e.g. check_required_command_version "python --version" "==3.5.0" # exact
+# e.g. check_required_command_version "python --version" ">=3.5.0" # minimum
+# e.g. check_required_command_version "python --version" ">=3.x.x" # minimum
 #
 check_required_command_version() {
 
