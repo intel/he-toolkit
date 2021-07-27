@@ -72,35 +72,44 @@ docker run -v                                       \
     /bin/bash                                       \
     /basic-docker-test.sh
 
-echo -e "\nBUILDING BASE DOCKERFILE..."
-docker build \
-    --build-arg http_proxy     \
-    --build-arg https_proxy    \
-    --build-arg socks_proxy    \
-    --build-arg ftp_proxy      \
-    --build-arg no_proxy       \
-    --build-arg UID=$(id -u)   \
-    --build-arg GID=$(id -g)   \
-    --build-arg UNAME=$(whoami)\
-    -t ubuntu_he_base:1.3 .
+version=1.3
+base_label="ubuntu_he_base:$version"
+derived_label="ubuntu_he_test"
+
+if [ -z "$(docker images -q $base_label)"]; then
+    echo -e "\nBUILDING BASE DOCKERFILE..."
+    docker build \
+        --build-arg http_proxy     \
+        --build-arg https_proxy    \
+        --build-arg socks_proxy    \
+        --build-arg ftp_proxy      \
+        --build-arg no_proxy       \
+        --build-arg UID=$(id -u)   \
+        --build-arg GID=$(id -g)   \
+        --build-arg UNAME=$(whoami)\
+        -t "$base_label" .
+fi
 
 echo -e "\nCLONING REPOS..."
 if [ ! -d "SEAL/.git" ]
 then
   git clone https://github.com/microsoft/SEAL.git
 else
-  cd SEAL && git pull --ff-only && cd ..
+  (cd SEAL && git pull --ff-only)
 fi
+
 if [ ! -d "palisade-development/.git" ]
 then
   git clone https://gitlab.com/palisade/palisade-development.git
 else
-  cd palisade-development && git pull --ff-only && cd ..
+  (cd palisade-development && git pull --ff-only)
 fi
+
+echo -e "\nPACKAGING LIBS..."
 tar -cvzf libs.tar.gz SEAL palisade-development
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
-docker build -t ubuntu_he_test -f toolkit.Dockerfile .
+docker build -t "$derived_label" -f toolkit.Dockerfile .
 
-# Run docker container
-docker run -it ubuntu_he_test
+echo -e "\nRUN DOCKER CONTAINER..."
+docker run -it "$derived_label"

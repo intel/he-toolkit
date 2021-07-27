@@ -1,7 +1,6 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# Pull base image.
 FROM ubuntu_he_base:1.3
 
 LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
