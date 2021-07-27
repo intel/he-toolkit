@@ -72,7 +72,7 @@ docker run -v                                       \
     /bin/bash                                       \
     /basic-docker-test.sh
 
-echo -e "\nBUILDING DOCKERFILE..."
+echo -e "\nBUILDING BASE DOCKERFILE..."
 docker build \
     --build-arg http_proxy     \
     --build-arg https_proxy    \
@@ -82,7 +82,25 @@ docker build \
     --build-arg UID=$(id -u)   \
     --build-arg GID=$(id -g)   \
     --build-arg UNAME=$(whoami)\
-    -t ubuntu_he_test .
+    -t ubuntu_he_base:1.3 .
+
+echo -e "\nCLONING REPOS..."
+if [ ! -d "SEAL/.git" ]
+then
+  git clone https://github.com/microsoft/SEAL.git
+else
+  cd SEAL && git pull --ff-only && cd ..
+fi
+if [ ! -d "palisade-development/.git" ]
+then
+  git clone https://gitlab.com/palisade/palisade-development.git
+else
+  cd palisade-development && git pull --ff-only && cd ..
+fi
+tar -cvzf libs.tar.gz SEAL palisade-development
+
+echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
+docker build -t ubuntu_he_test -f toolkit.Dockerfile .
 
 # Run docker container
 docker run -it ubuntu_he_test

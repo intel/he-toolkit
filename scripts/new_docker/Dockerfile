@@ -82,11 +82,9 @@ RUN groupadd -g $GID $UNAME && \
 
 COPY projects.tar.gz /
 COPY helpers.tar.gz /
+COPY welcome_msg.txt /home/$UNAME/
 RUN tar -zxvf projects.tar.gz && \
     tar -zxvf helpers.tar.gz
 
 
-# Switch user to
-USER $UNAME
-
-ENTRYPOINT cd /home/$UNAME && /bin/bash
+CMD cd /home/$UNAME && /bin/bash
