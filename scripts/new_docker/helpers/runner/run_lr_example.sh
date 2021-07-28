@@ -5,7 +5,7 @@
 
 set -e
 
-pushd $HOME/projects/he-samples/build/examples/logistic-regression
+pushd $HOME/he-samples/build/examples/logistic-regression
 
 OMP_NUM_THREADS=$(nproc) ./lr_test $@
 
