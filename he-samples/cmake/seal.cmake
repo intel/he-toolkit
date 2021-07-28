@@ -7,17 +7,14 @@ option(SEAL_PREBUILT OFF) # Set to ON/OFF to use prebuilt installation
 message(STATUS "SEAL_PREBUILT: ${SEAL_PREBUILT}")
 
 if (SEAL_PREBUILT) # Skip download from gitlab
+  if (ENABLE_INTEL_HEXL)
+    find_package(HEXL 1.1.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
+  endif()
   find_package(SEAL 3.6
     HINTS ${SEAL_HINT_DIR}
     REQUIRED)
   add_library(libseal ALIAS SEAL::seal)
   # TODO(fboemer): Support pre-built shared seal
-  if (ENABLE_INTEL_HEXL)
-    find_package(IntelHEXL 1.1.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
-    if (NOT TARGET intel_hexl)
-      FATAL_ERROR("TARGET intel_hexl not found")
-    endif()
-  endif()
 else()
   set(SEAL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_seal)
   set(SEAL_SRC_DIR ${SEAL_PREFIX}/src/ext_seal/)

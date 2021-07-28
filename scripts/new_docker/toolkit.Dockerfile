@@ -6,14 +6,43 @@ ARG UNAME
 
 FROM $UNAME/ubuntu_he_base:1.3
 
+ARG UNAME
+
 LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 
 COPY libs.tar.gz /
 
 RUN tar -zxvf libs.tar.gz && \
+    # Build and install HEXL \
+    cd /hexl && \
+    # NOTE: HEXL_EXPORT is removed in versions > 1.1 \
+    cmake -S . -B build -DHEXL_EXPORT=ON && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install GSL \
+    cd /GSL && \
+    cmake -S . -B build -DGSL_TEST=OFF && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install zlib \
+    cd /zlib && \
+    cmake -S . -B build && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install zstd \
+    cd /zstd/build/cmake && \
+    cmake -S . -B build -DZSTD_BUILD_PROGRAMS=OFF \
+                        -DZSTD_BUILD_SHARED=OFF \
+                        -DZSTD_BUILD_STATIC=ON \
+                        -DZSTD_BUILD_TESTS=OFF \
+                        -DZSTD_MULTITHREAD_SUPPORT=OFF && \
+    cmake --build build -j && \
+    cmake --install build && \
     # Build and install SEAL \
     cd /SEAL && \
-    cmake -S . -B build -DSEAL_USE_INTEL_HEXL=ON && \
+    cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
+                        -DSEAL_USE_INTEL_HEXL=ON \
+                        -DHEXL_DIR=/usr/local/lib/cmake/ && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install PALISADE \
@@ -26,16 +55,16 @@ RUN tar -zxvf libs.tar.gz && \
 RUN mv /runners /home/$UNAME/ && \
     mv /he-samples /home/$UNAME/ && \
     cd /home/$UNAME/he-samples && \
-    # FIXME: Temporarily disabling Palisade to get a working build \
     cmake -S . -B build \
-             # -DENABLE_PALISADE=ON \
+             -DENABLE_PALISADE=ON \
              -DENABLE_SEAL=ON \
-    # FIXME: Setting HEXL to OFF as libraries include HEXL. Requires re-think \
-             -DENABLE_INTEL_HEXL=OFF \
+    # FIXME: HEXL cmake logic requires re-think \
+             -DENABLE_INTEL_HEXL=ON \
+             -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/ \
              -DCMAKE_CXX_COMPILER=clang++-10 \
              -DCMAKE_C_COMPILER=clang-10 \
              -DCMAKE_BUILD_TYPE=Release \
-             # -DPALISADE_PREBUILT=ON \
+             -DPALISADE_PREBUILT=ON \
              -DSEAL_PREBUILT=ON && \
     cmake --build build -j
 

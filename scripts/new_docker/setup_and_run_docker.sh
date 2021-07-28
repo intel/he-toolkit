@@ -87,22 +87,45 @@ if [ -z "$(docker images -q $base_label)"]; then
 fi
 
 echo -e "\nCLONING REPOS..."
-if [ ! -d "SEAL/.git" ]
-then
+if [ ! -d "SEAL/.git" ]; then
   git clone https://github.com/microsoft/SEAL.git
 else
   (cd SEAL && git pull --ff-only)
 fi
 
-if [ ! -d "palisade-development/.git" ]
-then
+if [ ! -d "palisade-development/.git" ]; then
   git clone https://gitlab.com/palisade/palisade-development.git
 else
   (cd palisade-development && git pull --ff-only)
 fi
 
+if [ ! -d "hexl/.git" ]; then
+  git clone -b 1.1.0-patch https://github.com/intel/hexl.git
+else
+  (cd hexl && git pull --ff-only)
+fi
+
+# SEAL dependencies
+if [ ! -d "GSL/.git" ]; then
+  git clone https://github.com/microsoft/GSL.git
+else
+  (cd GSL && git pull --ff-only)
+fi
+
+if [ ! -d "zlib/.git" ]; then
+  git clone https://github.com/madler/zlib.git
+else
+  (cd zlib && git pull --ff-only)
+fi
+
+if [ ! -d "zstd/.git" ]; then
+  git clone https://github.com/facebook/zstd.git
+else
+  (cd zstd && git pull --ff-only)
+fi
+
 echo -e "\nPACKAGING LIBS..."
-tar -cvzf libs.tar.gz SEAL palisade-development
+tar -cvzf libs.tar.gz SEAL GSL zlib zstd palisade-development hexl
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
 docker build --build-arg UNAME=$user -t "$derived_label" -f toolkit.Dockerfile .
