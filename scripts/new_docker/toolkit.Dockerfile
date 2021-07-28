@@ -23,13 +23,12 @@ RUN tar -zxvf libs.tar.gz && \
     cmake --install build
 
 # Build he-samples and link to SEAL and PALISADE
-RUN mv /helpers /home/$UNAME/ && \
+RUN mv /runners /home/$UNAME/ && \
     mv /he-samples /home/$UNAME/ && \
     cd /home/$UNAME/he-samples && \
-    mkdir build && \
-    cd build && \
     # FIXME: Temporarily disabling Palisade to get a working build \
-    cmake .. # -DENABLE_PALISADE=ON \
+    cmake -S . -B build \
+             # -DENABLE_PALISADE=ON \
              -DENABLE_SEAL=ON \
     # FIXME: Setting HEXL to OFF as libraries include HEXL. Requires re-think \
              -DENABLE_INTEL_HEXL=OFF \
@@ -38,11 +37,11 @@ RUN mv /helpers /home/$UNAME/ && \
              -DCMAKE_BUILD_TYPE=Release \
              # -DPALISADE_PREBUILT=ON \
              -DSEAL_PREBUILT=ON && \
-    make -j
+    cmake --build build -j
 
 # Switch user to
 USER $UNAME
 
-ENTRYPOINT cd /home/$UNAME/helpers/runner && \
+ENTRYPOINT cd /home/$UNAME/runners && \
            cat /home/$UNAME/welcome_msg.txt && \
            /bin/bash

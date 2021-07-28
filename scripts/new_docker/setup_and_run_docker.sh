@@ -53,12 +53,7 @@ check_required_command_version "g++ --version" ">=10.0.x"
 
 if [ ! -f "projects.tar.gz" ]; then
     echo -e "\nPACKAGING HE-SAMPLES CODE..."
-    tar --exclude ../../he-samples/build -cvzf projects.tar.gz ../../he-samples
-fi
-
-if [ ! -f "helpers.tar.gz" ]; then
-    echo -e "\nPACKAGING DOCKER HELPER SCRIPTS..."
-    tar -cvzf helpers.tar.gz helpers
+    tar --exclude ../../he-samples/build -cvzf parts.tar.gz ../../he-samples runners
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
