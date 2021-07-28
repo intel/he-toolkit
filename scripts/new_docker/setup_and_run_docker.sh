@@ -72,21 +72,22 @@ docker run -v                                       \
     /bin/bash                                       \
     /basic-docker-test.sh
 
+user=$(whoami)
 version=1.3
-base_label="ubuntu_he_base:$version"
-derived_label="ubuntu_he_test"
+base_label="$user/ubuntu_he_base:$version"
+derived_label="$user/ubuntu_he_test"
 
 if [ -z "$(docker images -q $base_label)"]; then
     echo -e "\nBUILDING BASE DOCKERFILE..."
     docker build \
-        --build-arg http_proxy     \
-        --build-arg https_proxy    \
-        --build-arg socks_proxy    \
-        --build-arg ftp_proxy      \
-        --build-arg no_proxy       \
-        --build-arg UID=$(id -u)   \
-        --build-arg GID=$(id -g)   \
-        --build-arg UNAME=$(whoami)\
+        --build-arg http_proxy   \
+        --build-arg https_proxy  \
+        --build-arg socks_proxy  \
+        --build-arg ftp_proxy    \
+        --build-arg no_proxy     \
+        --build-arg UID=$(id -u) \
+        --build-arg GID=$(id -g) \
+        --build-arg UNAME=$user  \
         -t "$base_label" .
 fi
 
@@ -109,7 +110,7 @@ echo -e "\nPACKAGING LIBS..."
 tar -cvzf libs.tar.gz SEAL palisade-development
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
-docker build -t "$derived_label" -f toolkit.Dockerfile .
+docker build --build-arg UNAME=$user -t "$derived_label" -f toolkit.Dockerfile .
 
 echo -e "\nRUN DOCKER CONTAINER..."
 docker run -it "$derived_label"

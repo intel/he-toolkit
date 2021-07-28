@@ -1,7 +1,10 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-FROM ubuntu_he_base:1.3
+# Username
+ARG UNAME
+
+FROM $UNAME/ubuntu_he_base:1.3
 
 LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 
@@ -25,13 +28,15 @@ RUN mv /helpers /home/$UNAME/ && \
     cd /home/$UNAME/he-samples && \
     mkdir build && \
     cd build && \
-    cmake .. -DENABLE_PALISADE=ON \
+    # FIXME: Temporarily disabling Palisade to get a working build \
+    cmake .. # -DENABLE_PALISADE=ON \
              -DENABLE_SEAL=ON \
-             -DENABLE_INTEL_HEXL=ON \
+    # FIXME: Setting HEXL to OFF as libraries include HEXL. Requires re-think \
+             -DENABLE_INTEL_HEXL=OFF \
              -DCMAKE_CXX_COMPILER=clang++-10 \
              -DCMAKE_C_COMPILER=clang-10 \
              -DCMAKE_BUILD_TYPE=Release \
-             -DPALISADE_PREBUILT=ON \
+             # -DPALISADE_PREBUILT=ON \
              -DSEAL_PREBUILT=ON && \
     make -j
 
