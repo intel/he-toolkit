@@ -8,10 +8,14 @@ set -e
 echo "Running as user $USER..."
 
 echo -e "\nTesting apt-get Config:"
-echo "Acquire::ftp::proxy \"$ftp_proxy\"; \n\
-Acquire::socks::proxy \"$socks_proxy\"; \n\
-Acquire::http::proxy \"$http_proxy\"; \n\
-Acquire::https::Proxy \"$http_proxy\";" > /etc/apt/apt.conf
+cat > /etc/apt/apt.conf << EOF
+Acquire::ftp::proxy "$ftp_proxy";
+Acquire::socks::proxy "$socks_proxy";
+Acquire::http::proxy "$http_proxy";
+Acquire::https::proxy "$http_proxy";
+EOF
+
+cat /etc/apt/apt.conf
 
 echo -e "\nTesting apt-get:"
 apt-get update && \
