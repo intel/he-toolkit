@@ -51,9 +51,12 @@ check_required_command_version "cmake --version" ">=3.13.x"
 check_required_command_version "python --version" ">=3.5.x.x"
 check_required_command_version "g++ --version" ">=10.0.x"
 
-if [ ! -f "projects.tar.gz" ]; then
+if [ ! -f "parts.tar.gz" ]; then
     echo -e "\nPACKAGING HE-SAMPLES CODE..."
-    tar --exclude ../../he-samples/build -cvzf parts.tar.gz ../../he-samples runners
+    tar --exclude ../../he-samples/build \
+        -cvzf parts.tar.gz               \
+        ../../he-samples                 \
+        runners                          
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
@@ -72,7 +75,7 @@ version=1.3
 base_label="$user/ubuntu_he_base:$version"
 derived_label="$user/ubuntu_he_test"
 
-if [ -z "$(docker images -q $base_label)"]; then
+if [ -z "$(docker images -q $base_label)" ]; then
     echo -e "\nBUILDING BASE DOCKERFILE..."
     docker build \
         --build-arg http_proxy   \
@@ -87,48 +90,32 @@ if [ -z "$(docker images -q $base_label)"]; then
 fi
 
 echo -e "\nCLONING REPOS..."
-if [ ! -d "SEAL/.git" ]; then
-  git clone https://github.com/microsoft/SEAL.git
-else
-  (cd SEAL && git pull --ff-only)
-fi
+# HEXL
+git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
 
-if [ ! -d "palisade-development/.git" ]; then
-  git clone https://gitlab.com/palisade/palisade-development.git
-else
-  (cd palisade-development && git pull --ff-only)
-fi
-
-if [ ! -d "hexl/.git" ]; then
-  git clone -b 1.1.0-patch https://github.com/intel/hexl.git
-else
-  (cd hexl && git pull --ff-only)
-fi
+# HE libs
+git_clone "https://github.com/microsoft/SEAL.git"
+git_clone "https://gitlab.com/palisade/palisade-development.git"
 
 # SEAL dependencies
-if [ ! -d "GSL/.git" ]; then
-  git clone https://github.com/microsoft/GSL.git
-else
-  (cd GSL && git pull --ff-only)
-fi
-
-if [ ! -d "zlib/.git" ]; then
-  git clone https://github.com/madler/zlib.git
-else
-  (cd zlib && git pull --ff-only)
-fi
-
-if [ ! -d "zstd/.git" ]; then
-  git clone https://github.com/facebook/zstd.git
-else
-  (cd zstd && git pull --ff-only)
-fi
+git_clone "https://github.com/microsoft/GSL.git"
+git_clone "https://github.com/madler/zlib.git"
+git_clone "https://github.com/facebook/zstd.git"
 
 echo -e "\nPACKAGING LIBS..."
-tar -cvzf libs.tar.gz SEAL GSL zlib zstd palisade-development hexl
+tar -cvzf libs.tar.gz \
+    SEAL                 \
+    GSL                  \
+    zlib                 \
+    zstd                 \
+    palisade-development \
+    hexl
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
-docker build --build-arg UNAME=$user -t "$derived_label" -f toolkit.Dockerfile .
+docker build \
+    --build-arg UNAME=$user \
+    -t "$derived_label"     \
+    -f toolkit.Dockerfile .
 
 echo -e "\nRUN DOCKER CONTAINER..."
 docker run -it "$derived_label"

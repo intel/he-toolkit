@@ -14,7 +14,7 @@ Acquire::http::proxy \"$http_proxy\"; \n\
 Acquire::https::Proxy \"$http_proxy\";" > /etc/apt/apt.conf
 
 echo -e "\nTesting apt-get:"
-apt-get update
+apt-get update && \
 apt-get install -y build-essential wget
 
 echo -e "\nTesting wget:"
