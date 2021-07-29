@@ -90,26 +90,24 @@ if [ -z "$(docker images -q $base_label)" ]; then
 fi
 
 echo -e "\nCLONING REPOS..."
-# HEXL
-git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
+libs_dir=libs
+( # Start subshell
+    mkdir -p $libs_dir && cd $libs_dir
+    # HEXL
+    git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
 
-# HE libs
-git_clone "https://github.com/microsoft/SEAL.git"
-git_clone "https://gitlab.com/palisade/palisade-development.git"
+    # HE libs
+    git_clone "https://github.com/microsoft/SEAL.git"
+    git_clone "https://gitlab.com/palisade/palisade-development.git"
 
-# SEAL dependencies
-git_clone "https://github.com/microsoft/GSL.git"
-git_clone "https://github.com/madler/zlib.git"
-git_clone "https://github.com/facebook/zstd.git"
+    # SEAL dependencies
+    git_clone "https://github.com/microsoft/GSL.git"
+    git_clone "https://github.com/madler/zlib.git"
+    git_clone "https://github.com/facebook/zstd.git"
+) # End subshell
 
 echo -e "\nPACKAGING LIBS..."
-tar -cvzf libs.tar.gz \
-    SEAL                 \
-    GSL                  \
-    zlib                 \
-    zstd                 \
-    palisade-development \
-    hexl
+tar -cvzf libs.tar.gz $libs_dir
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
 docker build \

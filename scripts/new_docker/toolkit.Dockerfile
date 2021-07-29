@@ -14,23 +14,23 @@ COPY libs.tar.gz /
 
 RUN tar -zxvf libs.tar.gz && \
     # Build and install HEXL \
-    cd /hexl && \
+    cd /libs/hexl && \
     # NOTE: HEXL_EXPORT is removed in versions > 1.1 \
     cmake -S . -B build -DHEXL_EXPORT=ON && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install GSL \
-    cd /GSL && \
+    cd /libs/GSL && \
     cmake -S . -B build -DGSL_TEST=OFF && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install zlib \
-    cd /zlib && \
+    cd /libs/zlib && \
     cmake -S . -B build && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install zstd \
-    cd /zstd/build/cmake && \
+    cd /libs/zstd/build/cmake && \
     cmake -S . -B build -DZSTD_BUILD_PROGRAMS=OFF \
                         -DZSTD_BUILD_SHARED=OFF \
                         -DZSTD_BUILD_STATIC=ON \
@@ -39,14 +39,14 @@ RUN tar -zxvf libs.tar.gz && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install SEAL \
-    cd /SEAL && \
+    cd /libs/SEAL && \
     cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
                         -DSEAL_USE_INTEL_HEXL=ON \
                         -DHEXL_DIR=/usr/local/lib/cmake/ && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install PALISADE \
-    cd /palisade-development && \
+    cd /libs/palisade-development && \
     cmake -S . -B build -DWITH_INTEL_HEXL=ON && \
     cmake --build build -j && \
     cmake --install build
