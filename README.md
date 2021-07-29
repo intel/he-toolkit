@@ -5,14 +5,14 @@ This has been tested on Ubuntu 18.04 & Ubuntu 20.04
 
 A non-exhaustive list of dependencies is:
 ```
-cmake # >= 3.13
+cmake >= 3.13
 git
 pthread
 patchelf
 m4
-g++ #>= 10.0 or clang >= 10.0
+g++ >= 10.0 or clang >= 10.0
 python >=3.5
-virtualenv or python3-venv
+virtualenv
 ```
 
 # Build
