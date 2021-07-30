@@ -10,6 +10,7 @@ check_dependecies \
     patchelf      \
     m4            \
     g++           \
+    clang         \
     python        \
     virtualenv
 
@@ -17,10 +18,11 @@ echo "$? missing dependencies."
 
 # Array must be even length !
 cmds_and_vers=( "cmake --version" ">=3.13.x"
-                        "python --version" ">=7.5.x.x"
-                        "g++ --version" ">=10.0.x" )
+                "python --version" ">=3.5.x"
+                "clang --version" ">=10.0.x"
+                "g++ --version" ">=10.0.x" )
 
-for (( i = 0, j = 1; j <= ${#cmds_and_vers[@]}; i = i + 2, j = i + 1))
+for (( i = 0, j = 1; j < ${#cmds_and_vers[@]}; i = i + 2, j = i + 1))
 do
     if ! check_required_command_version   \
            "${cmds_and_vers[$i]}" \
