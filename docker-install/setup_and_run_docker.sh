@@ -53,13 +53,17 @@ fi
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
 docker run hello-world
 
-#echo -e "\nCHECKING IN-DOCKER CONNECTIVITY..."
-#docker run -v                                       \
-#    $PWD/basic-docker-test.sh:/basic-docker-test.sh \
-#    --env-file ./env.list                           \
-#    ubuntu:bionic                                   \
-#    /bin/bash                                       \
-#    /basic-docker-test.sh
+echo -e "\nCHECKING IN-DOCKER CONNECTIVITY..."
+if ! docker run -v                                       \
+        $PWD/basic-docker-test.sh:/basic-docker-test.sh \
+        --env-file ./env.list                           \
+        ubuntu:bionic                                   \
+        /bin/bash                                       \
+        /basic-docker-test.sh
+then
+    echo "In-docker connectivity failing."
+    exit 1
+fi
 
 user=$(whoami)
 version=1.3
