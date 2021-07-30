@@ -6,18 +6,18 @@
 # and return the number of dependecies not found.
 # e.g. check_dependecies python nl cat 
 #
-check_dependecies () {
+check_dependencies () {
 
   local not_found=0
   local dep=""
 
   for i in $@; do
     dep=$(which $i)
-    if [ -z "$dep" ]; then 
+    if [ $? -eq 0 ]; then 
+      echo "Dependency '$i' in $dep"
+    else
       echo "Dependency '$i' not found." 
       not_found=$(($not_found+1))
-    else
-      echo "Dependecy '$i' in $dep"
     fi
   done
   
@@ -47,6 +47,11 @@ __version_string_to_tuple() {
 # e.g. check_required_command_version "python --version" ">=3.x.x" # minimum
 #
 check_required_command_version() {
+
+  # Only check version if command exists.
+  if ! which ${version_cmd% *}; then
+    return 1
+  fi
 
   local version_cmd=$1
   local version_policy=${2:0:2} # First two chars
@@ -88,7 +93,6 @@ check_required_command_version() {
       return 1
     fi
   fi
-
 }
 
 #

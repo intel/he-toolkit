@@ -5,13 +5,13 @@
 
 source ./utils/dependency_checks.sh
 
-check_dependecies \
-    cmake         \
-    patchelf      \
-    m4            \
-    g++           \
-    clang         \
-    python        \
+check_dependencies \
+    cmake          \
+    patchelf       \
+    m4             \
+    g++            \
+    clang          \
+    python         \
     virtualenv
 
 echo "$? missing dependencies."
