@@ -5,6 +5,9 @@
 
 set -e
 
+ROOT="$(realpath ..)"
+DOCKER="$(realpath .)"
+
 cat << EOF
 
 PLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
@@ -41,10 +44,11 @@ source ./utils/dependency_checks.sh
 
 if [ ! -f "parts.tar.gz" ]; then
     echo -e "\nPACKAGING HE-SAMPLES CODE..."
-    tar --exclude ../../he-samples/build \
-        -cvzf parts.tar.gz               \
-        ../../he-samples                 \
-        runners                          
+    (cd $ROOT &&                    \
+     tar --exclude he-samples/build \
+         -cvzf $DOCKER/parts.tar.gz \
+         he-samples                 \
+         runners)
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
