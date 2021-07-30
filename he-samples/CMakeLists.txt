@@ -48,6 +48,7 @@ set(BENCHMARK_FORWARD_CMAKE_ARGS
 #------------------------------------------------------------------------------
 # Options...
 #------------------------------------------------------------------------------
+option(ENABLE_HELIB "Enable HElib library" ON)
 option(ENABLE_PALISADE "Enable PALISADE library" ON)
 option(ENABLE_SEAL "Enable SEAL library" ON)
 option(ENABLE_INTEL_HEXL "Enable Intel HEXL library" ON)
@@ -57,6 +58,7 @@ option(ENABLE_ADDRESS_SANITIZER "Compiles and links with Address Sanitizer" OFF)
 option(ENABLE_THREAD_SANITIZER "Compiles and links with Thread Sanitizer" OFF)
 option(ENABLE_UB_SANITIZER "Compiles and links with Undefined Behavior Sanitizer" OFF)
 
+message(STATUS "ENABLE_HELIB:             ${ENABLE_HELIB}")
 message(STATUS "ENABLE_PALISADE:          ${ENABLE_PALISADE}")
 message(STATUS "ENABLE_SEAL:              ${ENABLE_SEAL}")
 message(STATUS "ENABLE_ADDRESS_SANITIZER: ${ENABLE_ADDRESS_SANITIZER}")
@@ -136,6 +138,10 @@ endif()
 
 if (${ENABLE_PALISADE})
   include(cmake/palisade.cmake)
+endif()
+
+if (${ENABLE_HELIB})
+  include(cmake/helib.cmake)
 endif()
 
 include(cmake/gtest.cmake)
