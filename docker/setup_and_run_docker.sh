@@ -39,7 +39,7 @@ if [ "$(dirname $0)" != "." ]; then
     exit 1
 fi
 
-source ./utils/dependency_checks.sh
+source ./utils/gitops.sh
 
 if [ ! -f "parts.tar.gz" ]; then
     echo -e "\nPACKAGING HE-SAMPLES CODE..."
