@@ -47,7 +47,7 @@ if [ ! -f "parts.tar.gz" ]; then
         runners                    \
         -C "$ROOT"                 \
         --exclude he-samples/build \
-        he-samples                       
+        he-samples
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."

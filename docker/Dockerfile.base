@@ -17,8 +17,8 @@ ARG no_proxy
 ARG UNAME
 ARG UID
 ARG GID
-ARG TZ=UTC 
-ARG DEBIAN_FRONTEND=noninteractive 
+ARG TZ=UTC
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV http_proxy=$http_proxy   \
     https_proxy=$https_proxy \
@@ -34,7 +34,7 @@ RUN \
     # Initial setup \
     apt-get update && \
     apt-get install -y apt-utils && \
-    apt-get install -y software-properties-common 
+    apt-get install -y software-properties-common
     # Basic Tools setup \
 RUN apt-get -y dist-upgrade && \
     apt-get install -y libterm-readline-gnu-perl && \
@@ -49,7 +49,7 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/ppa  && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 10 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 20 && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 20 && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 10 
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 10
     # Install clang 10 \
 RUN apt-get -y install apt-transport-https && \
     wget https://apt.llvm.org/llvm.sh && \
@@ -78,10 +78,10 @@ RUN apt-get autoremove -y && \
 RUN groupadd -g $GID $UNAME && \
     useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
     echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-    
-COPY parts.tar.gz /
-COPY welcome_msg.txt /home/$UNAME/
 
-RUN tar -zxvf parts.tar.gz 
+COPY parts.tar.gz /
+COPY welcome_msg.sh /home/$UNAME/
+
+RUN tar -zxvf parts.tar.gz
 
 CMD cd /home/$UNAME && /bin/bash

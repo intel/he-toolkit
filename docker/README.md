@@ -3,7 +3,7 @@
 # Dependencies
 This has been tested on Ubuntu 20.04
   Docker version 20.10.x
-  
+
 If you don't have docker in your system, here are the quick installation instructions
 to install Docker from a standard Ubuntu Repository:
   https://linuxconfig.org/how-to-install-docker-on-ubuntu-20-04-lts-focal-fossa

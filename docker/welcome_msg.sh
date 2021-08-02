@@ -1,3 +1,9 @@
+#!/bin/bash
+
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+cat << EOF
 
 In the current directory, you will find 3 scripts:
   1. run_sample_kernels_[palisade|seal].sh: This will run several HE sample kernels including
@@ -23,3 +29,4 @@ the docker Ctrl+p -> Ctrl+q, then re-enter using docker exec (see "Docker Contro
 the User Guide for more information).
 
 
+EOF

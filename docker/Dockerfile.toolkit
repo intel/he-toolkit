@@ -72,5 +72,5 @@ RUN mv /runners /home/$UNAME/ && \
 USER $UNAME
 
 ENTRYPOINT cd /home/$UNAME/runners && \
-           cat /home/$UNAME/welcome_msg.txt && \
+           /home/$UNAME/welcome_msg.sh && \
            /bin/bash

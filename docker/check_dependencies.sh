@@ -27,7 +27,7 @@ do
     if ! check_required_command_version   \
            "${cmds_and_vers[$i]}" \
            "${cmds_and_vers[$j]}"
-    then 
-        echo "${cmds_and_vers[$i]% *} version must be ${cmds_and_vers[$j]}"    
+    then
+        echo "${cmds_and_vers[$i]% *} version must be ${cmds_and_vers[$j]}"
     fi
 done

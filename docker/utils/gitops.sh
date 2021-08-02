@@ -12,7 +12,7 @@ git_clone() {
     local branch=$2
     local repo=$(basename ${url%.git})
     local opts=""
-   
+
     if [ ! -z "$branch" ]; then
         opts="-v -b $branch"
     fi
@@ -23,4 +23,3 @@ git_clone() {
         (cd $repo && git pull --ff-only)
     fi
 }
-
