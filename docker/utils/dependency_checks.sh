@@ -13,17 +13,18 @@ check_dependencies () {
   local not_found=0
   local dep=""
 
-  for i in $@; do
-    dep=$(which $i)
-    if [ $? -eq 0 ]; then
+  for i in "$@"; do
+    dep="$(which "$i")"
+    # shellcheck disable=SC2181 # $dep gets used twice.
+    if [ "$?" -eq 0 ]; then
       echo "Dependency '$i' in $dep"
     else
       echo "Dependency '$i' not found."
-      not_found=$(($not_found+1))
+      not_found=$(( not_found + 1 ))
     fi
   done
 
-  return $not_found
+  return "$not_found"
 
 }
 
@@ -34,7 +35,7 @@ __version_string_to_tuple() {
 
   # $1 is output tuple
   # $2 is input string
-  local version_tuple=$( \
+  local -r version_tuple=$( \
     sed -ne 's/[^0-9]*\([0-9x][0-9]*\)\.\([0-9x][0-9]*\)\.\([0-9x][0-9]*\).*/(\1 \2 \3)/p' \
     <<< "$2")
 
@@ -51,13 +52,14 @@ __version_string_to_tuple() {
 check_required_command_version() {
 
   # Only check version if command exists.
-  if ! which ${version_cmd% *}; then
+  if ! which "${version_cmd% *}"; then
     return 1
   fi
 
-  local version_cmd=$1
-  local version_policy=${2:0:2} # First two chars
-  local version_required=${2:2} # The rest
+  local -r version_cmd="$1"
+  local version_policy="${2:0:2}" # First two chars
+  local version_required="${2:2}" # The rest
+  local actual_version
 
   __version_string_to_tuple actual_version "$($version_cmd)"
   __version_string_to_tuple version_required "$version_required"

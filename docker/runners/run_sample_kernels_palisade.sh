@@ -7,4 +7,4 @@ set -e
 
 export KMP_WARNINGS=0
 
-OMP_NUM_THREADS=$(nproc) $HOME/he-samples/build/sample-kernels/sample-kernels-palisade --benchmark_min_time=2
+OMP_NUM_THREADS=$(nproc) "$HOME"/he-samples/build/sample-kernels/sample-kernels-palisade --benchmark_min_time=2

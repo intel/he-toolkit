@@ -23,7 +23,7 @@ Do note that this script has a few usage requirements:
 
 EOF
 
-read -p "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
+read -rp "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
 echo
 
 if [ "$EUID" -eq 0 ]
@@ -32,14 +32,15 @@ then
     exit 1
 fi
 
-if [ "$(dirname $0)" != "." ]; then
+if [ "$(dirname "$0")" != "." ]; then
     echo -e "This script MUST be run from its base directory."
-    echo -e "Please switch directory '$(dirname $0)' and run as follows:"
-    echo -e "./$(basename $0)\n"
+    echo -e "Please switch directory '$(dirname "$0")' and run as follows:"
+    echo -e "./$(basename "$0")\n"
     exit 1
 fi
 
-source ./utils/gitops.sh
+# shellcheck source=utils/gitops.sh
+source utils/gitops.sh
 
 if [ ! -f "parts.tar.gz" ]; then
     echo -e "\nPACKAGING HE-SAMPLES CODE..."
@@ -54,41 +55,41 @@ echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
 docker run hello-world
 
 echo -e "\nCHECKING IN-DOCKER CONNECTIVITY..."
-if ! docker run -v                                       \
-        $PWD/basic-docker-test.sh:/basic-docker-test.sh \
-        --env-file ./env.list                           \
-        ubuntu:bionic                                   \
-        /bin/bash                                       \
+if ! docker run -v                                        \
+        "$PWD"/basic-docker-test.sh:/basic-docker-test.sh \
+        --env-file ./env.list                             \
+        ubuntu:bionic                                     \
+        /bin/bash                                         \
         /basic-docker-test.sh
 then
     echo "In-docker connectivity failing."
     exit 1
 fi
 
-user=$(whoami)
+user="$(whoami)"
 version=1.3
 base_label="$user/ubuntu_he_base:$version"
 derived_label="$user/ubuntu_he_test"
 
-if [ -z "$(docker images -q $base_label)" ]; then
+if [ -z "$(docker images -q "$base_label")" ]; then
     echo -e "\nBUILDING BASE DOCKERFILE..."
     docker build \
-        --build-arg http_proxy   \
-        --build-arg https_proxy  \
-        --build-arg socks_proxy  \
-        --build-arg ftp_proxy    \
-        --build-arg no_proxy     \
-        --build-arg UID=$(id -u) \
-        --build-arg GID=$(id -g) \
-        --build-arg UNAME=$user  \
-        -t "$base_label"         \
+        --build-arg http_proxy     \
+        --build-arg https_proxy    \
+        --build-arg socks_proxy    \
+        --build-arg ftp_proxy      \
+        --build-arg no_proxy       \
+        --build-arg UID="$(id -u)" \
+        --build-arg GID="$(id -g)" \
+        --build-arg UNAME="$user"  \
+        -t "$base_label"           \
         -f Dockerfile.base .
 fi
 
 echo -e "\nCLONING REPOS..."
 libs_dir=libs
 ( # Start subshell
-    mkdir -p $libs_dir && cd $libs_dir
+    mkdir -p "$libs_dir" && cd "$libs_dir"
     # HEXL
     git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
 
@@ -103,12 +104,12 @@ libs_dir=libs
 ) # End subshell
 
 echo -e "\nPACKAGING LIBS..."
-tar -cvzf libs.tar.gz $libs_dir
+tar -cvzf libs.tar.gz "$libs_dir"
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
 docker build \
-    --build-arg UNAME=$user \
-    -t "$derived_label"     \
+    --build-arg UNAME="$user" \
+    -t "$derived_label"       \
     -f Dockerfile.toolkit .
 
 echo -e "\nRUN DOCKER CONTAINER..."

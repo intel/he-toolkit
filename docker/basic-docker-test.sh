@@ -5,6 +5,11 @@
 
 set -e
 
+ftp_proxy="$ftp_proxy"
+socks_proxy="$socks_proxy"
+http_proxy="$http_proxy"
+http_proxy="$http_proxy"
+
 echo "Running as user $USER..."
 
 echo -e "\nTesting apt-get Config:"
@@ -24,4 +29,4 @@ apt-get install -y build-essential wget
 echo -e "\nTesting wget:"
 wget http://www.google.com
 
-echo -e "DONE"
+echo "DONE"

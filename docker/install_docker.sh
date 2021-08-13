@@ -2,6 +2,9 @@
 
 set -e
 
+http_proxy="$http_proxy"
+https_proxy="$https_proxy"
+
 echo -e "\nPLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
 
 The Following script will remove any pre-existing docker install,
@@ -17,7 +20,7 @@ Do note that this script has a few usage requirements:
     3. Finally, this script may also prompt you for your sudo password
     required for installation or deletion.\n"
 
-read -p "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
+read -rp "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
 echo
 
 if [ "$EUID" -eq 0 ]
@@ -72,7 +75,7 @@ else
     sudo groupadd docker
 fi
 
-sudo gpasswd -a $USER docker
+sudo gpasswd -a "$USER" docker
 sudo chmod 666 /var/run/docker.sock
 
 docker run hello-world

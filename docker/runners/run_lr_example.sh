@@ -5,8 +5,8 @@
 
 set -e
 
-pushd $HOME/he-samples/build/examples/logistic-regression
+pushd "$HOME"/he-samples/build/examples/logistic-regression
 
-OMP_NUM_THREADS=$(nproc) ./lr_test $@
+OMP_NUM_THREADS="$(nproc)" ./lr_test "$@"
 
 popd

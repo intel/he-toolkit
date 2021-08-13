@@ -18,7 +18,8 @@ repos:
           entry: clang-format-10
           language: system
           files: \.(c|cc|cxx|cpp|h|hpp|hxx|js|proto)$
-          args: ["-i"]
+          args:
+            - -i
         - id: cpplint
           name: cpplint
           entry: cpplint
@@ -26,3 +27,13 @@ repos:
           files: \.(c|cc|cxx|cpp|h|hpp|hxx)$
           args:
             - --recursive
+        - id: shellcheck
+          name: shellcheck
+          entry: shellcheck
+          language: system
+          files: \.sh$
+          args:
+            - -s
+            - bash
+            - -e
+            - SC1091

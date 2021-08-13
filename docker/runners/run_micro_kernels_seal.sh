@@ -5,4 +5,4 @@
 
 set -e
 
-$HOME/he-samples/build/micro-kernels/micro-kernels-seal --benchmark_min_time=2
+"$HOME"/he-samples/build/micro-kernels/micro-kernels-seal --benchmark_min_time=2
