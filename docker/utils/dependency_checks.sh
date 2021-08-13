@@ -52,15 +52,15 @@ __version_string_to_tuple() {
 #
 check_required_command_version() {
 
-  # Only check version if command exists.
-  if ! which "${version_cmd% *}"; then
-    return 1
-  fi
-
   local -r version_cmd="$1"
   local version_policy="${2:0:2}" # First two chars
   local version_required="${2:2}" # The rest
   local actual_version
+
+  # Only check version if command exists.
+  if ! type -P "${version_cmd% *}" > /dev/null; then
+    return 1
+  fi
 
   __version_string_to_tuple actual_version "$($version_cmd)"
   __version_string_to_tuple version_required "$version_required"
