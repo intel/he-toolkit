@@ -14,7 +14,8 @@ check_dependencies () {
   local dep=""
 
   for i in "$@"; do
-    dep="$(which "$i")"
+    # type -P alternative to which. Which behaviour can vary based on platform.
+    dep="$(type -P "$i")"
     # shellcheck disable=SC2181 # $dep gets used twice.
     if [ "$?" -eq 0 ]; then
       echo "Dependency '$i' in $dep"
