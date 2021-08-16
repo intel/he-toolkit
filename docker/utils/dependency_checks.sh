@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 #
-# Checks and prints out to stdout where dependecies are located
-# and return the number of dependecies not found.
-# e.g. check_dependecies python nl cat
+# Checks and prints out to stdout where dependencies are located
+# and return the number of dependencies not found.
+# e.g. check_dependencies python nl cat
 #
 check_dependencies () {
 
@@ -14,7 +14,7 @@ check_dependencies () {
   local dep=""
 
   for i in "$@"; do
-    # type -P alternative to which. Which behaviour can vary based on platform.
+    # type -P alternative to which. Which behavior can vary based on platform.
     dep="$(type -P "$i")"
     # shellcheck disable=SC2181 # $dep gets used twice.
     if [ "$?" -eq 0 ]; then

@@ -13,7 +13,7 @@ Alternatively you can also install Docker from docker.com, See instructions at
 
 
 # Build
-To build the base Ubuntu 20.04 image from whithin this directory
+To build the base Ubuntu 20.04 image from within this directory
 The arguments UNAME, UID, and GID need to be passed to the `docker build` command. There is no default set at the moment.
 
 At the moment, there is no password set for the user `hexl`

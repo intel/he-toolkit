@@ -58,7 +58,8 @@ $HE_SAMPLES/build/sample-kernels/test/unit-test
 # Examples
 
 ## Secure Query
-The secure query example implements a simple secure database query using the SEAL BFV HE scheme.
+The secure query example implements a simple secure database query using the
+SEAL BFV HE scheme.
 It will be built whenever SEAL is enabled as part of he-toolkit build.
 To run it execute
 ```bash
@@ -67,17 +68,20 @@ cd $HE_SAMPLES/build/examples/secure-query
 ```
 
 ## Logistic Regression
-The logistic regression example provides a fast and scalable implementation of SEAL CKKS HE scheme based logistic regression.
-It will be built whenever SEAL is enabled as part of he-toolkit build.
+The logistic regression example provides a fast and scalable implementation of
+SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
+is enabled as part of he-toolkit build.
 To run it execute
 ```bash
 cd $HE_SAMPLES/build/examples/logistic-regression
 ./lr_test
 ```
-For more detail, check [he-samples/examples/logistic-regression](he-samples/examples/logistic-regression).
+For more detail, check
+[he-samples/examples/logistic-regression](he-samples/examples/logistic-regression).
 
 # Contributing
-Before making a pull request, please make sure the pre-commit config is active, i.e. run
+Before making a pull request, please make sure the
+[pre-commit](https://pre-commit.com) config is active, i.e. run
 ```bash
 pre-commit install
 pre-commit run --all-files
