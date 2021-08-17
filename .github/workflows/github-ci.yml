@@ -55,7 +55,7 @@ jobs:
       - name: Build the repository
         run: |
           cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --target all -j 5
+          cmake --build build --target all -j
 
       # Unit tests and examples
       - name: Run the unit tests
@@ -152,7 +152,7 @@ jobs:
       - name: Build the repository
         run: |
           cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --target all -j 5
+          cmake --build build --target all -j
 
       # Unit tests and examples
       - name: Run the unit tests
