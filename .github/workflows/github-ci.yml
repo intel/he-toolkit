@@ -24,6 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       # Required for pre-commit
       - run: pip3 install cpplint
+      - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
