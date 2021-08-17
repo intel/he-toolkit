@@ -20,6 +20,19 @@ repos:
           files: \.(c|cc|cxx|cpp|h|hpp|hxx|js|proto)$
           args:
             - -i
+        - id: shfmt
+          name: shfmt
+          entry: shfmt
+          language: system
+          files: \.sh$
+          args:
+            - -d
+            - -i
+            - '2'
+            - -ci
+            - -sr
+            - -bn
+            - -w
         - id: cpplint
           name: cpplint
           entry: cpplint

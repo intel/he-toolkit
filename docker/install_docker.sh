@@ -23,17 +23,15 @@ Do note that this script has a few usage requirements:
 read -rp "If understood, press enter to continue. Otherwise, exit with Ctrl+C"
 echo
 
-if [ "$EUID" -eq 0 ]
-then
-    echo -e "Error: Please run this script as non-root\n"
-    exit 1
+if [ "$EUID" -eq 0 ]; then
+  echo -e "Error: Please run this script as non-root\n"
+  exit 1
 fi
 
-if [ -n "$http_proxy" ] || [ -n "$https_proxy" ];
-then
-    PROXY=true
+if [ -n "$http_proxy" ] || [ -n "$https_proxy" ]; then
+  PROXY=true
 else
-    PROXY=false
+  PROXY=false
 fi
 
 echo -e "\nREMOVING OLD DOCKER INSTALLATIONS..."
@@ -41,38 +39,34 @@ sudo apt-get purge -y docker*
 sudo rm -rf /etc/docker*
 sudo rm -rf /var/run/docker*
 sudo rm -rf /etc/systemd/system/docker*
-if grep -q docker /etc/group
-then
-    sudo groupdel docker
+if grep -q docker /etc/group; then
+  sudo groupdel docker
 fi
 
 echo -e "\nINSTALLING DOCKER FROM APT-GET..."
 sudo apt-get update
 sudo apt-get install -y containerd docker.io
 
-if [ ! -d "/etc/systemd/system/docker.service.d" ] && [ "$PROXY" = true ];
-then
-    echo -e "\nCREATING DOCKER SERVICE DIRECTORY..."
-    sudo mkdir -p /etc/systemd/system/docker.service.d
+if [ ! -d "/etc/systemd/system/docker.service.d" ] && [ "$PROXY" = true ]; then
+  echo -e "\nCREATING DOCKER SERVICE DIRECTORY..."
+  sudo mkdir -p /etc/systemd/system/docker.service.d
 fi
-if [ ! -f "/etc/systemd/system/docker.service.d/http-proxy.conf" ] && [ "$PROXY" = true ];
-then
-    echo -e "\nCREATING DOCKER PROXY CONFIG..."
-    echo -e "[Service]
+if [ ! -f "/etc/systemd/system/docker.service.d/http-proxy.conf" ] && [ "$PROXY" = true ]; then
+  echo -e "\nCREATING DOCKER PROXY CONFIG..."
+  echo -e "[Service]
 Environment=\"HTTP_PROXY=$http_proxy\"
 Environment=\"HTTPS_PROXY=$http_proxy\"" | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
-    sudo systemctl daemon-reload
+  sudo systemctl daemon-reload
 
-    echo -e "\nRESTARTING DOCKER SERVICE..."
-    sudo systemctl reset-failed docker
-    sudo systemctl restart docker
+  echo -e "\nRESTARTING DOCKER SERVICE..."
+  sudo systemctl reset-failed docker
+  sudo systemctl restart docker
 fi
 
-if grep -q "docker" /etc/group
-then
-    echo -e "\ndocker group already exists...\n"
+if grep -q "docker" /etc/group; then
+  echo -e "\ndocker group already exists...\n"
 else
-    sudo groupadd docker
+  sudo groupadd docker
 fi
 
 sudo gpasswd -a "$USER" docker

@@ -8,7 +8,7 @@
 # and return the number of dependencies not found.
 # e.g. check_dependencies python nl cat
 #
-check_dependencies () {
+check_dependencies() {
 
   local not_found=0
   local dep=""
@@ -21,7 +21,7 @@ check_dependencies () {
       echo "Dependency '$i' in $dep"
     else
       echo "Dependency '$i' not found."
-      not_found=$(( not_found + 1 ))
+      not_found=$((not_found + 1))
     fi
   done
 
@@ -36,9 +36,10 @@ __version_string_to_tuple() {
 
   # $1 is output tuple
   # $2 is input string
-  local -r version_tuple=$( \
+  local -r version_tuple=$(
     sed -ne 's/[^0-9]*\([0-9x][0-9]*\)\.\([0-9x][0-9]*\)\.\([0-9x][0-9]*\).*/(\1 \2 \3)/p' \
-    <<< "$2")
+      <<< "$2"
+  )
 
   eval "$1=$version_tuple"
 
