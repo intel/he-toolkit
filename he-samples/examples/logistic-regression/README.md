@@ -1,19 +1,19 @@
-Logistic Regression with Homomorphic Encryption
+# Logistic Regression with Homomorphic Encryption
 
-# Requirements
+## Requirements
 ```
 python3 >= 3.5
 virtualenv or python3-venv
 ```
 Packages needed for generating the synthetic datasets are automatically installed in a virtual environment within ```$HE_SAMPLES/build/examples/logistic-regression/datasets/```.
 
-# Usage
+## Usage
 ```bash
 cd $HE_SAMPLES/build/examples/logistic-regression
 ./lr_test
 ```
 
-## Flags
+### Flags
 ```--data```: Dataset name. Default is ```lrtest_mid```. There are four different synthetic datasets available for testing, which are automatically generated during build time.
 
 | Name | Features | # Samples |
