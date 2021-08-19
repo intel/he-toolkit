@@ -26,6 +26,7 @@ jobs:
       - run: pip3 install cpplint
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
+      - run: cargo install typos
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:

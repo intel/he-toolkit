@@ -50,3 +50,10 @@ repos:
             - bash
             - -e
             - SC1091
+        - id: typos
+          name: typos
+          entry: typos
+          language: system
+          files: \.sh$
+          args:
+            - -w
