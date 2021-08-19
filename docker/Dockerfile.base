@@ -28,7 +28,7 @@ ENV http_proxy=$http_proxy   \
     UNAME=$UNAME
 
 # Installation run as "root" in the container
-# before switching to non-priviledged user for the toolkit.
+# before switching to non-privileged user for the toolkit.
 
 RUN \
     # Initial setup \

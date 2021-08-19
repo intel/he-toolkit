@@ -9,12 +9,12 @@ add_subdirectory(test)
 if (${ENABLE_SEAL})
     # SEAL sample kernel
 
-    set(SAMPLE_KENREL_SEAL_SRC main.cpp
+    set(SAMPLE_KERNEL_SEAL_SRC main.cpp
 	    seal/seal_ckks_sample.cpp
 	    seal/seal_bfv_sample.cpp
     )
 
-    add_executable(sample-kernels-seal ${SAMPLE_KENREL_SEAL_SRC})
+    add_executable(sample-kernels-seal ${SAMPLE_KERNEL_SEAL_SRC})
 
     target_include_directories(sample-kernels-seal PRIVATE ".")
     target_compile_options(sample-kernels-seal PRIVATE ${BENCHMARKS_COMPILE_FLAGS})

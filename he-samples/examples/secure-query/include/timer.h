@@ -20,7 +20,7 @@ namespace Common {
 class Timer {
  public:
   /**
-   * @brief Contructor for the Timer Class
+   * @brief Constructor for the Timer Class
    * @param high_precision - flag to use high precision for time
    * @param start_active   - flag to start timer instantly
    */

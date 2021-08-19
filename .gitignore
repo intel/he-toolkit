@@ -16,3 +16,4 @@ he-benchmarks-venv/
 
 # Other artifacts
 **.tar.gz
+docker/libs/
