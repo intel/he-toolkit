@@ -86,24 +86,11 @@ The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
 requiring multiple API calls such as Matrix Multiplication and Vector Dot
 Product. Follow the link to see instructions on how to run these kernels.
 
-**Move to Kernels README**
-To run larger sample kernels such as dot product, call
-```bash
-# Note, these will take several minutes
-$HE_SAMPLES/build/sample-kernels/sample-kernels-seal
-$HE_SAMPLES/build/sample-kernels/sample-kernels-palisade
-```
-
 ### Test sample kernels
 The [unit tests](he-samples/tests) are a selection of unit tests meant for
 verifying the accuracy of the various sample kernels included in this project.
 See the link for more information.
 
-**Move to Tests or Kernels README**
-To run unit tests on the sample kernels, call
-```bash
-$HE_SAMPLES/build/sample-kernels/test/unit-test
-```
 
 ## Examples
 HE examples includes example applications built using HE technology. The
@@ -120,16 +107,6 @@ server hosting the database and optionally the key-value pairs in the database
 as well. The secure query example is implemented using the SEAL BFV scheme. See
 the link for more details and instructions on how to run this program.
 
-**Move to Secure Query README**
-The secure query example implements a simple secure database query using the
-SEAL BFV HE scheme.
-It will be built whenever SEAL is enabled as part of he-toolkit build.
-To run it execute
-```bash
-cd $HE_SAMPLES/build/examples/secure-query
-./secure-query
-```
-
 ### Logistic Regression
 The transposed [logistic regression](he-samples/examples/logistic-regression)
 example presents a scalable and fast method of logistic regression inference in
@@ -138,22 +115,12 @@ weight) and takes batches of encrypted data samples to perform the inference
 all within the HE domain. See the README in the link above for usage
 information.
 
-**Move to Logistic Regression README**
-The logistic regression example provides a fast and scalable implementation of
-SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
-is enabled as part of he-toolkit build.
-To run it execute
-```bash
-cd $HE_SAMPLES/build/examples/logistic-regression
-./lr_test
-```
-For more detail, check
-[he-samples/examples/logistic-regression](he-samples/examples/logistic-regression).
-
 
 ## Contributing
 At this time, Intel HE Toolkit does not accept external contributions. We
-encourage feedback and suggestions via issues.
+encourage feedback and suggestions via
+[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
+[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
 
 For Intel developers, ensure the [pre-commit](https://pre-commit.com) config is
 active prior to contributing, i.e. run
@@ -169,11 +136,11 @@ The Intel contributors to this project, sorted by last name, are
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
-  - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
+  - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
-  - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/) (lead)
+  - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
   - [Ernesto Z Ramos](https://www.linkedin.com/in/sidezr)
