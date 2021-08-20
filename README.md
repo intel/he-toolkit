@@ -1,9 +1,35 @@
-A collection of kernels (micro & macro) to compare different HE libraries
+# Intel Homomorphic Encryption Toolkit
+The Intel Homomorphic Encryption (HE) toolkit is designed to make it fast and
+easy to evaluate homomorphic encryption technology on the 3rd Generation Intel®
+Xeon® Scalable Processors using libraries optimized to take advantage of the
+newest Intel hardware features such as [HEXL](https://github.com/intel/hexl).
+Additionally, the Intel HE-Toolkit is a great starting point for people new to
+homomorphic encryption, offering numerous sample kernels showing multiple
+examples of how the libraries can be used to implement common mathematical
+operations using [HElib](https://github.com/homenc/HElib),
+[SEAL](https://github.com/microsoft/SEAL), or
+[PALISADE](https://gitlab.com/palisade/palisade-release). In addition, there
+are example applications which demonstrate how HE technology can be used to
+create secure applications.
 
-# Dependencies
-This has been tested on Ubuntu 18.04 & Ubuntu 20.04
+## Contents
+- [Dependencies](#dependencies)
+- [Instructions](#instructions)
+- [Kernels](#kernels)
+  - [Micro Kernels](#micro-kernels)
+  - [Sample Kernels](#sample-kernels)
+  - [Test Sample Kernels](#test-sample-kernels)
+- [Examples](#examples)
+  - [Secure Query](#secure-query)
+  - [Logistic Regression](#logistic-regression)
+- [Contributing](#contributing)
+- [Contributors](#contributors)
 
-A non-exhaustive list of dependencies is:
+
+## Dependencies
+The toolkit has been tested on Ubuntu 20.04
+
+Dependencies include:
 ```
 cmake >= 3.13
 git
@@ -15,33 +41,51 @@ python >=3.5
 virtualenv
 ```
 
-# Build
+## Instructions
+There are currently two methods for building the toolkit project.
+
+### Docker Build (Recommended)
+The **recommended** method is to use the Docker build and installation which
+builds the toolkit in its entirety including all HE libraries in a self
+contained docker container running Ubuntu 20.04. See [here](docker) for a
+detailed description on the usage and components of this build.
+
+### Native Build (Advanced)
+Alternatively, one can build the toolkit natively using the following commands
+
 ```bash
 export HE_SAMPLES=$(pwd)/he-samples
 cd $HE_SAMPLES
-mkdir build && cd build
-cmake ..
-make -j all
+cmake -S . -B build
+cmake --build build -j
 ```
 
-You can pass additional options:
+This will build the toolkit project with the default settings. The toolkit will
+download and build all three HE libraries automatically. 
+
+It is possible to pass additional options, for example:
 ```bash
- -DENABLE_PALISADE=OFF
+ -DENABLE_PALISADE=ON
  -DENABLE_SEAL=ON
+ -DENABLE_HELIB=OFF
 ```
-to disable building of certain HE libraries.
+to enable/disable building of certain HE libraries.
 
 
+## Kernels
+Located in `he-samples` is a collection of software components build on
+Microsoft SEAL and PALISADE comprising of sample kernels for operations
+performed homomorphically and example applications. The HE Samples are designed
+to enable quicker evaluation of HE on Intel platforms, serve as a learning tool
+for how to implement operations in different HE libraries, and provide examples
+of how these operations can be used to build applications based on HE
+technology for different use cases.
 
-# Kernels
-## Micro kernels
-To run micro kernels, such as HE encryption, call
-```bash
-$HE_SAMPLES/build/micro-kernels/micro-kernels-seal
-$HE_SAMPLES/build/micro-kernels/micro-kernels-palisade
-```
+### Sample kernels
+The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
+requiring multiple API calls such as Matrix Multiplication and Vector Dot
+Product. Follow the link to see instructions on how to run these kernels.
 
-## Sample kernels
 To run larger sample kernels such as dot product, call
 ```bash
 # Note, these will take several minutes
@@ -50,14 +94,30 @@ $HE_SAMPLES/build/sample-kernels/sample-kernels-palisade
 ```
 
 ### Test sample kernels
+The [unit tests](he-samples/tests) are a selection of unit tests meant for
+verifying the accuracy of the various sample kernels included in this project.
+See the link for more information.
+
 To run unit tests on the sample kernels, call
 ```bash
 $HE_SAMPLES/build/sample-kernels/test/unit-test
 ```
 
-# Examples
+## Examples
+HE examples includes example applications built using HE technology. The
+primary purpose of these examples is to serve as a showcase of different use
+cases which can be implemented using HE,  as well as learning references and
+starting points for further development. The toolkit currently includes the
+following examples listed below.
 
-## Secure Query
+### Secure Query
+The [secure query](he-samples/examples/secure-query) example shows how it is
+possible to implement a key-value database using HE and then allow a client to
+perform lookups of values in the database without exposing the query to the
+server hosting the database and optionally the key-value pairs in the database
+as well. The secure query example is implemented using the SEAL BFV scheme. See
+the link for more details and instructions on how to run this program.
+
 The secure query example implements a simple secure database query using the
 SEAL BFV HE scheme.
 It will be built whenever SEAL is enabled as part of he-toolkit build.
@@ -67,7 +127,14 @@ cd $HE_SAMPLES/build/examples/secure-query
 ./secure-query
 ```
 
-## Logistic Regression
+### Logistic Regression
+The transposed [logistic regression](he-samples/examples/logistic-regression)
+example presents a scalable and fast method of logistic regression inference in
+HE. Using the SEAL CKKS scheme, the example will encrypt the model (bias and
+weight) and takes batches of encrypted data samples to perform the inference
+all within the HE domain. See the README in the link above for usage
+information.
+
 The logistic regression example provides a fast and scalable implementation of
 SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
 is enabled as part of he-toolkit build.
@@ -79,7 +146,8 @@ cd $HE_SAMPLES/build/examples/logistic-regression
 For more detail, check
 [he-samples/examples/logistic-regression](he-samples/examples/logistic-regression).
 
-# Contributing
+
+## Contributing
 Before making a pull request, please make sure the
 [pre-commit](https://pre-commit.com) config is active, i.e. run
 ```bash
@@ -87,7 +155,7 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-# Contributors
+## Contributors
 The Intel contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
@@ -95,6 +163,7 @@ The Intel contributors to this project, sorted by last name, are
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - [Hamish Hunt]() TODO: get link
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/) (lead)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
