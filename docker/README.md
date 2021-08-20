@@ -129,7 +129,7 @@ docker controls:
   containers, including the `container_id`. Use this to check if there is a
   pre-existing docker running.
 - **docker exec -it <container_id> /bin/bash**: This will allow re-connection
-  to a running docker container (e.g. if exited by way of `Ctrl+P -< Ctrl+Q` or
+  to a running docker container (e.g. if exited by way of `Ctrl+P -> Ctrl+Q` or
   a connection interruption). By default, this will place users in the root
   directory. So, use `cd $HOME` to switch to the user directory. Refer to
   [Running the Examples](#running-the-examples) to locate and run examples from

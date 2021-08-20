@@ -86,6 +86,7 @@ The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
 requiring multiple API calls such as Matrix Multiplication and Vector Dot
 Product. Follow the link to see instructions on how to run these kernels.
 
+**Move to Kernels README**
 To run larger sample kernels such as dot product, call
 ```bash
 # Note, these will take several minutes
@@ -98,6 +99,7 @@ The [unit tests](he-samples/tests) are a selection of unit tests meant for
 verifying the accuracy of the various sample kernels included in this project.
 See the link for more information.
 
+**Move to Tests or Kernels README**
 To run unit tests on the sample kernels, call
 ```bash
 $HE_SAMPLES/build/sample-kernels/test/unit-test
@@ -118,6 +120,7 @@ server hosting the database and optionally the key-value pairs in the database
 as well. The secure query example is implemented using the SEAL BFV scheme. See
 the link for more details and instructions on how to run this program.
 
+**Move to Secure Query README**
 The secure query example implements a simple secure database query using the
 SEAL BFV HE scheme.
 It will be built whenever SEAL is enabled as part of he-toolkit build.
@@ -135,6 +138,7 @@ weight) and takes batches of encrypted data samples to perform the inference
 all within the HE domain. See the README in the link above for usage
 information.
 
+**Move to Logistic Regression README**
 The logistic regression example provides a fast and scalable implementation of
 SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
 is enabled as part of he-toolkit build.
@@ -148,22 +152,26 @@ For more detail, check
 
 
 ## Contributing
-Before making a pull request, please make sure the
-[pre-commit](https://pre-commit.com) config is active, i.e. run
+At this time, Intel HE Toolkit does not accept external contributions. We
+encourage feedback and suggestions via issues.
+
+For Intel developers, ensure the [pre-commit](https://pre-commit.com) config is
+active prior to contributing, i.e. run
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
+and make sure all pre-commit checks pass.
 
 ## Contributors
 The Intel contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
-  - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi-1634141/)
+  - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
-  - [Hamish Hunt]() TODO: get link
+  - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Sejun Kim](https://www.linkedin.com/in/sejun-kim-2b1b4866/) (lead)
   - [Nir Peled](https://www.linkedin.com/in/nir-peled-4a52266/)
