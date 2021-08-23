@@ -8,7 +8,7 @@ set(GBENCHMARK_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_gbenchmark)
 set(GBENCHMARK_SRC_DIR ${GBENCHMARK_PREFIX}/src/ext_gbenchmark/)
 set(GBENCHMARK_BUILD_DIR ${GBENCHMARK_PREFIX}/src/ext_gbenchmark-build/)
 set(GBENCHMARK_REPO_URL https://github.com/google/benchmark.git)
-set(GBENCHMARK_GIT_TAG main)
+set(GBENCHMARK_GIT_TAG v1.5.6)
 
 set(GBENCHMARK_PATHS ${GBENCHMARK_SRC_DIR} ${GBENCHMARK_BUILD_DIR}/src/libbenchmark.a)
 
