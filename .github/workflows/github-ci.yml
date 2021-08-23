@@ -122,7 +122,11 @@ jobs:
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      - run: pre-commit run --all-files
+        # Add local bin for cpplint
+      - name: Setup
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: pre-commit
+        run: pre-commit run --all-files
 
   build-and-test-icelake:
     name: Build, test and run kernels (IceLake)
