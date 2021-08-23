@@ -99,7 +99,7 @@ This directory will contain the following scripts:
 - ***run_sample_kernels_palisade.sh***: This will run several HE sample kernels
   in PALISADE including Matrix Multiplication and Logistic Regression.
 - ***run_sample_kernels_seal.sh***: This will run several HE sample kernels in
-  SEAL including Matrix Multiplication and Logistic Regression. 
+  SEAL including Matrix Multiplication and Logistic Regression.
 - ***run_tests.sh***: This will run several unit tests to confirm the validity
   of the above sample kernels by comparing against the same operation in the
   non-HE space.

@@ -61,7 +61,7 @@ cmake --build build -j
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
-download and build all three HE libraries automatically. 
+download and build all three HE libraries automatically.
 
 It is possible to pass additional options, for example:
 ```bash
@@ -87,9 +87,9 @@ requiring multiple API calls such as Matrix Multiplication and Vector Dot
 Product. Follow the link to see instructions on how to run these kernels.
 
 ### Test sample kernels
-The [unit tests](he-samples/tests) are a selection of unit tests meant for
-verifying the accuracy of the various sample kernels included in this project.
-See the link for more information.
+The [unit tests](he-samples/sample-kernels/test) are a selection of unit tests
+meant for verifying the accuracy of the various sample kernels included in this
+project.  See the link for more information.
 
 
 ## Examples
