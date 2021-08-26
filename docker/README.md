@@ -70,7 +70,7 @@ welcome message to the console.
 
 If this step fails due to a missing or incorrectly configured docker
 installation then you can install Docker directly from the official
-[Docker website](https://docs.docker.com/engine/install/) following these
+[Docker website](https://docs.docker.com/get-docker/) following these
 [instructions](https://docs.docker.com/engine/install/ubuntu/) to install on
 Ubuntu.
 
