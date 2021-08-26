@@ -51,7 +51,9 @@ if [ ! -f "parts.tar.gz" ]; then
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
-docker run hello-world
+if ! docker images > /dev/null; then
+  echo 1>&2 "FATAL: You need docker."
+fi
 
 echo -e "\nCHECKING IN-DOCKER CONNECTIVITY..."
 if ! docker run -v \
@@ -60,14 +62,14 @@ if ! docker run -v \
   ubuntu:bionic \
   /bin/bash \
   /basic-docker-test.sh; then
-  echo "In-docker connectivity failing."
+  echo 1>&2 "In-docker connectivity failing."
   exit 1
 fi
 
-user="$(whoami)"
-version=1.3
-base_label="$user/ubuntu_he_base:$version"
-derived_label="$user/ubuntu_he_test"
+readonly user="$(whoami)"
+readonly version=1.3
+readonly base_label="$user/ubuntu_he_base:$version"
+readonly derived_label="$user/ubuntu_he_test"
 
 if [ -z "$(docker images -q "$base_label")" ]; then
   echo -e "\nBUILDING BASE DOCKERFILE..."
