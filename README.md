@@ -13,18 +13,20 @@ are example applications which demonstrate how HE technology can be used to
 create secure applications.
 
 ## Contents
-- [Dependencies](#dependencies)
-- [Instructions](#instructions)
-- [Kernels](#kernels)
-  - [Micro Kernels](#micro-kernels)
-  - [Sample Kernels](#sample-kernels)
-  - [Test Sample Kernels](#test-sample-kernels)
-- [Examples](#examples)
-  - [Secure Query](#secure-query)
-  - [Logistic Regression](#logistic-regression)
-- [Contributing](#contributing)
-- [Contributors](#contributors)
-
+- [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
+  - [Contents](#contents)
+  - [Dependencies](#dependencies)
+  - [Instructions](#instructions)
+    - [Docker Build (Recommended)](#docker-build-recommended)
+    - [Native Build (Advanced)](#native-build-advanced)
+  - [Kernels](#kernels)
+    - [Sample kernels](#sample-kernels)
+    - [Test sample kernels](#test-sample-kernels)
+  - [Examples](#examples)
+    - [Secure Query](#secure-query)
+    - [Logistic Regression](#logistic-regression)
+  - [Contributing](#contributing)
+  - [Contributors](#contributors)
 
 ## Dependencies
 The toolkit has been tested on Ubuntu 20.04
