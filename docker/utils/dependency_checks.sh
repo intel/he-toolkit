@@ -73,14 +73,8 @@ check_required_command_version() {
         if [ "${version_required[2]}" == "x" ]; then return 0; fi
         if [ "${actual_version[2]}" -eq "${version_required[2]}" ]; then
           return 0
-        else
-          return 1
         fi
-      else
-        return 1
       fi
-    else
-      return 1
     fi
   elif [ "$version_policy" == ">=" ]; then
     if [ "${actual_version[0]}" -ge "${version_required[0]}" ]; then
@@ -89,14 +83,10 @@ check_required_command_version() {
         if [ "${version_required[2]}" == "x" ]; then return 0; fi
         if [ "${actual_version[2]}" -ge "${version_required[2]}" ]; then
           return 0
-        else
-          return 1
         fi
-      else
-        return 1
       fi
-    else
-      return 1
     fi
   fi
+
+  return 1 # Requirements not met. Return fail.
 }
