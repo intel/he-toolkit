@@ -158,6 +158,5 @@ if(POCBENCH_DIR)
   endif()
 endif()
 
-add_subdirectory(micro-kernels)
 add_subdirectory(sample-kernels)
 add_subdirectory(examples)
