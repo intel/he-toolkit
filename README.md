@@ -39,7 +39,7 @@ pthread
 patchelf
 m4
 g++ >= 10.0 or clang >= 10.0
-python >=3.5
+python >= 3.5
 virtualenv
 ```
 
