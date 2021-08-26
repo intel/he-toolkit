@@ -28,8 +28,6 @@ The `he-toolkit/docker` directory currently contains:
 - ***setup_and_run_docker.sh***: Script for building and running a docker
   container containing all HE libraries with HEXL enabled. This will be the
   main entry point for most users.
-- ***install_docker.sh***: Script for installing and configuring docker if not
-  already installed by the user.
 - ***basic-docker-test.sh***: Script for testing in-docker connectivity.
 - ***check_dependencies.sh***: Script for checking if all required dependencies
   are installed.
@@ -52,9 +50,10 @@ Toolkit Docker installation as well as instructions for building the docker
 container.
 
 ### Requirements
-- **Docker**: Must have a working installation of docker with network
-  connectivity.  If this is not already set up then run `./install-docker.sh`.
-  Note this will overwrite any previous docker installation.
+- **Docker**: Must have a working installation of Docker with network
+  connectivity.  If this is not already set up then you can install Docker
+  following these
+  [instructions](https://docs.docker.com/engine/install/ubuntu/).
 - **Supported Underlying Hardware** (Recommended): Intel HEXL will be enabled
   by default, it is recommended to use a processor with at least Intel AVX512DQ
   support. For best performance, it is recommended to use processors supporting
@@ -62,18 +61,18 @@ container.
 
 ### Steps
 To build and run the Intel HE Toolkit container, from `he-toolkit/docker` run
-```
-./setup_and_run_docker.sh
-```
-If this step fails due to a missing or incorrectly configured docker
-installation then run
-```
-./install_docker.sh
+```bash
 ./setup_and_run_docker.sh
 ```
 The installation should take a few minutes and once successful will run the
 container as the current user. This will be signified with the printing of the
 welcome message to the console.
+
+If this step fails due to a missing or incorrectly configured docker
+installation then you can install Docker directly from the official
+[Docker website](https://docs.docker.com/engine/install/) following these
+[instructions](https://docs.docker.com/engine/install/ubuntu/) to install on
+Ubuntu.
 
 ## Running the Examples
 After a successful install and build of the docker container, the user should
@@ -89,13 +88,6 @@ This directory will contain the following scripts:
   users to query on a database of the 50 U.S. States while controlling
   (optionally) the crypto-parameters used. When prompted, enter a State and, if
   present, the corresponding City will be decoded and printed.
-- ***run_micro_kernels_palisade.sh***: This will run many HE micro kernels
-  using PALISADE that span a wide range of schemes and display different parts
-  of the HE pipeline from encoding to encryption and beyond. The script will
-  display Wall time, CPU time, and the number of iterations that were run.
-- ***run_micro_kernels_seal.sh***: This will run many HE micro kernels using
-  SEAL that span a wide range of schemes and display different parts of the HE
-  pipeline from encoding to encryption and beyond.
 - ***run_sample_kernels_palisade.sh***: This will run several HE sample kernels
   in PALISADE including Matrix Multiplication and Logistic Regression.
 - ***run_sample_kernels_seal.sh***: This will run several HE sample kernels in
@@ -141,20 +133,15 @@ creations of new ones. All HE-Toolkit code can be found in
 `/home/$USER/he-samples` with a directory structure directly reflected in this
 repository.
 
-HE-Samples consists of four different sub-components:
-1. **Micro Kernels**: Micro kernels which, when used together, allow the
-  formation of higher-level HE operations. Each of these calls are at the API
-  level of the underlying HE library being run at the time (e.g. SEAL or
-  PALISADE). A few micro kernels include (but is not limited to): Encode,
-  Encrypt, Add, Multiply, Rotate, Decrypt, Decode.
-2. **Sample Kernels**: Sample kernels created through a combination of various
+HE-Samples consists of three different sub-components:
+1. **Sample Kernels**: Sample kernels created through a combination of various
   micro kernels. They are meant as samples of how the  micro kernels can be
   used together. A few sample kernels (but is not limited to): Matrix
   Multiplication and Logistic Regression.
-3. **Unit Tests**: A collection of unit tests meant to test the validity of the
+2. **Unit Tests**: A collection of unit tests meant to test the validity of the
   various sample kernels described above by comparing their results to the
   same operation in the non-HE space.
-4. **Examples**: A collection of high-level examples that utilize the sample
+3. **Examples**: A collection of high-level examples that utilize the sample
   kernels to provide a peek into what a real-world example may look like.
   Currently two examples are implemented:
   [Secure Query](../he-samples/examples/secure-query) and
