@@ -24,6 +24,8 @@ jobs:
       - uses: actions/checkout@v2
       # Required for pre-commit
       - run: pip3 install cpplint
+      - run: sudo snap install shfmt
+      - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.2
         with:
@@ -53,10 +55,8 @@ jobs:
       # Build toolkit
       - name: Build the repository
         run: |
-          mkdir -p build
-          cd build
-          cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
-          make -j5 all
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target all -j
 
       # Unit tests and examples
       - name: Run the unit tests
@@ -152,10 +152,8 @@ jobs:
       # Build toolkit
       - name: Build the repository
         run: |
-          mkdir -p build
-          cd build
-          cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
-          make -j5 all
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target all -j
 
       # Unit tests and examples
       - name: Run the unit tests

@@ -5,4 +5,8 @@
 
 set -e
 
-OMP_NUM_THREADS=$(nproc) $HOME/projects/he-samples/build/sample-kernels/test/unit-test
+pushd "$HOME"/he-samples/build/examples/secure-query
+
+OMP_NUM_THREADS=$(nproc) ./secure-query
+
+popd

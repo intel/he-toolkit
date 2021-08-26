@@ -11,6 +11,10 @@ repos:
         - id: mixed-line-ending
         - id: check-byte-order-marker
         - id: check-yaml
+    - repo: https://github.com/crate-ci/typos
+      rev: v1.1.6
+      hooks:
+        - id: typos
     - repo: local
       hooks:
         - id: clang-format-10
@@ -18,7 +22,21 @@ repos:
           entry: clang-format-10
           language: system
           files: \.(c|cc|cxx|cpp|h|hpp|hxx|js|proto)$
-          args: ["-i"]
+          args:
+            - -i
+        - id: shfmt
+          name: shfmt
+          entry: shfmt
+          language: system
+          files: \.sh$
+          args:
+            - -d
+            - -i
+            - '2'
+            - -ci
+            - -sr
+            - -bn
+            - -w
         - id: cpplint
           name: cpplint
           entry: cpplint
@@ -26,3 +44,13 @@ repos:
           files: \.(c|cc|cxx|cpp|h|hpp|hxx)$
           args:
             - --recursive
+        - id: shellcheck
+          name: shellcheck
+          entry: shellcheck
+          language: system
+          files: \.sh$
+          args:
+            - -s
+            - bash
+            - -e
+            - SC1091

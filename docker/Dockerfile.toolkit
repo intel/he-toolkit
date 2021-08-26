@@ -1,0 +1,78 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Username
+ARG UNAME
+
+FROM $UNAME/ubuntu_he_base:1.3
+
+ARG UNAME
+
+LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
+
+COPY libs.tar.gz /
+
+RUN tar -zxvf libs.tar.gz && \
+    # Build and install HEXL \
+    cd /libs/hexl && \
+    # NOTE: HEXL_EXPORT is removed in versions > 1.1 \
+    cmake -S . -B build -DHEXL_EXPORT=ON && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install GSL \
+    cd /libs/GSL && \
+    cmake -S . -B build -DGSL_TEST=OFF && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install zlib \
+    cd /libs/zlib && \
+    cmake -S . -B build && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install zstd \
+    cd /libs/zstd/build/cmake && \
+    cmake -S . -B build -DZSTD_BUILD_PROGRAMS=OFF \
+                        -DZSTD_BUILD_SHARED=OFF \
+                        -DZSTD_BUILD_STATIC=ON \
+                        -DZSTD_BUILD_TESTS=OFF \
+                        -DZSTD_MULTITHREAD_SUPPORT=OFF && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install SEAL \
+    cd /libs/SEAL && \
+    cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
+                        -DSEAL_USE_INTEL_HEXL=ON \
+                        -DHEXL_DIR=/usr/local/lib/cmake/ && \
+    cmake --build build -j && \
+    cmake --install build && \
+    # Build and install PALISADE \
+    cd /libs/palisade-release && \
+    cmake -S . -B build -DWITH_INTEL_HEXL=ON \
+                        -DINTEL_HEXL_PREBUILT=ON \
+                        -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/ && \
+    cmake --build build -j && \
+    cmake --install build
+
+# Build he-samples and link to SEAL and PALISADE
+RUN mv /runners /home/$UNAME/ && \
+    mv /he-samples /home/$UNAME/ && \
+    cd /home/$UNAME/he-samples && \
+    cmake -S . -B build \
+             -DENABLE_PALISADE=ON \
+             -DENABLE_SEAL=ON \
+    # FIXME: HEXL cmake logic requires re-think \
+             -DENABLE_INTEL_HEXL=ON \
+             -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/ \
+             -DCMAKE_CXX_COMPILER=clang++-10 \
+             -DCMAKE_C_COMPILER=clang-10 \
+             -DCMAKE_BUILD_TYPE=Release \
+             -DPALISADE_PREBUILT=ON \
+             -DSEAL_PREBUILT=ON && \
+    cmake --build build -j
+
+# Switch user to $UNAME
+USER $UNAME
+
+ENTRYPOINT cd /home/$UNAME/runners && \
+           /home/$UNAME/welcome_msg.sh && \
+           /bin/bash

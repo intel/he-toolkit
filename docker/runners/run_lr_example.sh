@@ -5,8 +5,8 @@
 
 set -e
 
-pushd $HOME/projects/he-samples/build/examples/secure-query
+pushd "$HOME"/he-samples/build/examples/logistic-regression
 
-OMP_NUM_THREADS=$(nproc) ./secure-query
+OMP_NUM_THREADS="$(nproc)" ./lr_test "$@"
 
 popd
