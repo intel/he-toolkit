@@ -14,17 +14,12 @@ Alternatively you can also install Docker from docker.com, See instructions at
 
 # Build
 To build the base Ubuntu 20.04 image from within this directory
-The arguments UNAME, UID, and GID need to be passed to the `docker build` command. There is no default set at the moment.
-
-At the moment, there is no password set for the user `hexl`
+run the following command
 ```bash
-docker build -f ./Dockerfile.UBUNTU.HEXL -t hetoolkit --build-arg UNAME=hexl --build-arg UID=3000 --build-arg GID=3000 .
+./setup_and_run_docker.sh
 ```
-Once the base docker image is created, you can start and log into the `hexl` user with the following command:
-```bash
-docker run --name hexl -h hexldemo -it hetoolkit /bin/bash
+This will build the docker images and you should be entered into a command prompt
+inside the toolkit docker container.
 ```
-Everything going well you should a prompt into the toolkit
-```
-hexl@hexldemo:~$
+<username>@<host>:~/runners$
 ```

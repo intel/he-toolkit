@@ -70,7 +70,7 @@ RUN mv /runners /home/$UNAME/ && \
              -DSEAL_PREBUILT=ON && \
     cmake --build build -j
 
-# Switch user to
+# Switch user to $UNAME
 USER $UNAME
 
 ENTRYPOINT cd /home/$UNAME/runners && \
