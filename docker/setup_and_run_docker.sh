@@ -92,8 +92,8 @@ libs_dir=libs
   git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
 
   # HE libs
-  git_clone "https://github.com/microsoft/SEAL.git"
-  git_clone "https://gitlab.com/palisade/palisade-development.git"
+  git_clone "https://github.com/microsoft/SEAL.git" "3.6.6"
+  git_clone "https://gitlab.com/palisade/palisade-release.git"
 
   # SEAL dependencies
   git_clone "https://github.com/microsoft/GSL.git"

@@ -46,8 +46,10 @@ RUN tar -zxvf libs.tar.gz && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install PALISADE \
-    cd /libs/palisade-development && \
-    cmake -S . -B build -DWITH_INTEL_HEXL=ON && \
+    cd /libs/palisade-release && \
+    cmake -S . -B build -DWITH_INTEL_HEXL=ON \
+                        -DINTEL_HEXL_PREBUILT=ON \
+                        -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/ && \
     cmake --build build -j && \
     cmake --install build
 
