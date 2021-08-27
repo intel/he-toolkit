@@ -1,25 +1,30 @@
-# User Guide
+# HE-toolit Docker User Guide
 
 ## Contents
-- [Introduction](#introduction)
-- [Components](#components)
-- [Installation](#installation)
-  - [Requirements](#requirements)
-  - [Steps](#steps)
-- [Running the Examples](#running-the-examples)
-  - [Script Usage](#script-usage)
-  - [Docker Controls](#docker-controls)
-- [Modifying the Examples](#modifying-the-examples)
-- [Common Issues](#common-issues)
+- [User Guide](#user-guide)
+  - [Contents](#contents)
+  - [Introduction](#introduction)
+  - [Components](#components)
+  - [Installation](#installation)
+    - [Requirements](#requirements)
+    - [Steps](#steps)
+  - [Running the Examples](#running-the-examples)
+    - [Docker Controls](#docker-controls)
+      - [Inside of the Docker Container:](#inside-of-the-docker-container:)
+      - [Outside of the Docker Container:](#outside-of-the-docker-container:)
+  - [Modifying the Examples](#modifying-the-examples)
+  - [Common Issues](#common-issues)
+
 
 ## Introduction
-Provided is a description of the components and usage of the Intel
-Homomorphic Encryption Toolkit Docker installation. The toolkit provides a
+Provided is a description of the components and usage and installation of the Dockerized Intel
+Homomorphic Encryption Toolkit. The toolkit provides a
 docker environment in which one can run and modify example programs that have
 been built using various Homomorphic Encryption libraries, including
-[HElib](https://github.com/homenc/HElib),
-[SEAL](https://github.com/microsoft/SEAL), and
-[PALISADE](https://gitlab.com/palisade/palisade-release). All of which use the
+[SEAL](https://github.com/microsoft/SEAL),
+[PALISADE](https://gitlab.com/palisade/palisade-release), and
+[HElib](https://github.com/homenc/HElib).
+All of which use the
 [Intel HEXL](https://github.com/intel/hexl) library to take advantage of the
 newest Intel hardware features.
 
@@ -148,7 +153,7 @@ HE-Samples consists of three different sub-components:
   [Logistic Regression](../he-samples/examples/logistic-regression).
 
 ## Common Issues
-Below is a list of common issues, causes and potential solutions.
+The following table documents common issues, causes, and potential solutions.
 
 |         Issue           |          Cause          |                  Workload                 |
 |-------------------------|-------------------------|-------------------------------------------|
