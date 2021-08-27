@@ -88,6 +88,7 @@ contains the current CMake options, default values are in bold.
 |`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|
 |`SEAL_PREBUILT`           |ON/**OFF**|Use a pre-built installation of SEAL|
 |`PALISADE_PREBUILT`       |ON/**OFF**|Use a pre-built installation of PALISADE|
+|`HELIB_PREBUILT`          |ON/**OFF**|Use a pre-built installation of HElib|
 
 **Note:** If using a pre-built library then you may need to use the option
 `-DSEAL_HINT_DIR=<path-to-installation>` if you have installed them in a
