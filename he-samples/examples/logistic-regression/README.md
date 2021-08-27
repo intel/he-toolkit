@@ -6,7 +6,7 @@ is enabled as part of HE Toolkit build.
 ## Requirements
 ```
 python3 >= 3.5
-virtualenv or python3-venv
+virtualenv
 ```
 Packages needed for generating the synthetic datasets are automatically
 installed in a virtual environment within
