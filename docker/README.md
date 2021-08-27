@@ -21,7 +21,7 @@ Provided is a description of the components, usage, and installation of the
 Dockerized Intel Homomorphic Encryption Toolkit. The toolkit provides a docker
 environment in which one can run and modify example programs that have been
 built using various Homomorphic Encryption libraries, including
-[SEAL](https://github.com/microsoft/SEAL),
+[Microsoft SEAL](https://github.com/microsoft/SEAL),
 [PALISADE](https://gitlab.com/palisade/palisade-release), and
 [HElib](https://github.com/homenc/HElib).
 All of which use the
@@ -60,8 +60,9 @@ container.
   following these
   [instructions](https://docs.docker.com/engine/install/ubuntu/).
 - **Supported Underlying Hardware** (Recommended): Intel HEXL will be enabled
-  by default, it is recommended to use a processor with at least Intel AVX512DQ
-  support. For best performance, it is recommended to use processors supporting
+  by default. Although Intel HEXL does not require any AVX512-enabled hardware,
+  it is recommended to use a processor with at least Intel AVX512DQ support.
+  For best performance, it is recommended to use processors supporting
   AVX512-IFMA52.
 
 ### Steps
