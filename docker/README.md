@@ -1,7 +1,7 @@
-# HE-toolit Docker User Guide
+# Intel HE Toolkit Docker User Guide
 
 ## Contents
-- [User Guide](#user-guide)
+- [Intel HE Toolkit Docker User Guide](#intel-he-toolkit-docker-user-guide)
   - [Contents](#contents)
   - [Introduction](#introduction)
   - [Components](#components)
