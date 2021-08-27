@@ -10,17 +10,17 @@
     - [Steps](#steps)
   - [Running the Examples](#running-the-examples)
     - [Docker Controls](#docker-controls)
-      - [Inside of the Docker Container:](#inside-of-the-docker-container:)
-      - [Outside of the Docker Container:](#outside-of-the-docker-container:)
+      - [Inside of the Docker Container](#inside-of-the-docker-container)
+      - [Outside of the Docker Container](#outside-of-the-docker-container)
   - [Modifying the Examples](#modifying-the-examples)
   - [Common Issues](#common-issues)
 
 
 ## Introduction
-Provided is a description of the components and usage and installation of the Dockerized Intel
-Homomorphic Encryption Toolkit. The toolkit provides a
-docker environment in which one can run and modify example programs that have
-been built using various Homomorphic Encryption libraries, including
+Provided is a description of the components and usage and installation of the
+Dockerized Intel Homomorphic Encryption Toolkit. The toolkit provides a docker
+environment in which one can run and modify example programs that have been
+built using various Homomorphic Encryption libraries, including
 [SEAL](https://github.com/microsoft/SEAL),
 [PALISADE](https://gitlab.com/palisade/palisade-release), and
 [HElib](https://github.com/homenc/HElib).
