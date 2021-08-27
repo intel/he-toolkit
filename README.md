@@ -77,11 +77,12 @@ It is possible to pass additional options, for example:
 to enable/disable building of certain HE libraries. The following table
 contains the current CMake options, default values are in bold.
 
-| CMake options            | Values   | Comments |
-|--------------------------|----------|----------|
+| CMake options            | Values   | Comments      |
+|--------------------------|----------|---------------|
 |`ENABLE_PALISADE`         |**ON**/OFF|Enable PALISADE|
 |`ENABLE_SEAL`             |**ON**/OFF|Enable SEAL|
 |`ENABLE_HELIB`            |**ON**/OFF|Enable HElib|
+|`ENABLE_INTEL_HEXL`       |**ON**/OFF|Enable Intel HEXL|
 |`ENABLE_ADDRESS_SANITIZER`|ON/**OFF**|Compiles and link with Address Sanitizer|
 |`ENABLE_THREAD_SANITIZER` |ON/**OFF**|Compiles and link with Thread Sanitizer|
 |`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|
