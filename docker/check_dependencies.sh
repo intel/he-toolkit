@@ -9,8 +9,7 @@ check_dependencies \
   cmake \
   patchelf \
   m4 \
-  g++ \
-  clang \
+  'clang | g++' \
   python \
   virtualenv
 
