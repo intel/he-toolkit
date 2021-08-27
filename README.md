@@ -6,11 +6,11 @@ newest Intel hardware features such as [HEXL](https://github.com/intel/hexl).
 Additionally, the Intel HE-Toolkit is a great starting point for people new to
 homomorphic encryption, offering numerous sample kernels showing multiple
 examples of how the libraries can be used to implement common mathematical
-operations using [HElib](https://github.com/homenc/HElib),
-[SEAL](https://github.com/microsoft/SEAL), or
-[PALISADE](https://gitlab.com/palisade/palisade-release). In addition, there
-are example applications which demonstrate how HE technology can be used to
-create secure applications.
+operations using [SEAL](https://github.com/microsoft/SEAL),
+[PALISADE](https://gitlab.com/palisade/palisade-release), or
+[HElib](https://github.com/homenc/HElib). In addition, there are example
+applications which demonstrate how HE technology can be used to create secure
+applications.
 
 ## Contents
 - [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
@@ -25,8 +25,8 @@ create secure applications.
   - [Examples](#examples)
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
-  - [Contributing](#contributing)
-  - [Contributors](#contributors)
+- [Contributing](#contributing)
+- [Contributors](#contributors)
 
 ## Dependencies
 The toolkit has been tested on Ubuntu 20.04
@@ -52,7 +52,7 @@ builds the toolkit in its entirety including all HE libraries in a self
 contained docker container running Ubuntu 20.04. See [here](docker) for a
 detailed description on the usage and components of this build.
 
-### Native Build (Advanced)
+### Native Build
 Alternatively, one can build the toolkit natively using the following commands
 
 ```bash
@@ -63,7 +63,10 @@ cmake --build build -j
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
-download and build all three HE libraries automatically.
+download and build all three HE libraries automatically with HEXL enabled.
+
+**Note:** You will be responsible for installing all of the required
+[dependencies](#dependencies).
 
 It is possible to pass additional options, for example:
 ```bash
@@ -71,54 +74,75 @@ It is possible to pass additional options, for example:
  -DENABLE_SEAL=ON
  -DENABLE_HELIB=OFF
 ```
-to enable/disable building of certain HE libraries.
+to enable/disable building of certain HE libraries. The following table
+contains the current CMake options, default values are in bold.
+
+| CMake options            | Values   | Comments |
+|--------------------------|----------|----------|
+|`ENABLE_PALISADE`         |**ON**/OFF|Enable PALISADE|
+|`ENABLE_SEAL`             |**ON**/OFF|Enable SEAL|
+|`ENABLE_HELIB`            |**ON**/OFF|Enable HElib|
+|`ENABLE_ADDRESS_SANITIZER`|ON/**OFF**|Compiles and link with Address Sanitizer|
+|`ENABLE_THREAD_SANITIZER` |ON/**OFF**|Compiles and link with Thread Sanitizer|
+|`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|
+|`SEAL_PREBUILT`           |ON/**OFF**|Use a pre-built installation of SEAL|
+|`PALISADE_PREBUILT`       |ON/**OFF**|Use a pre-built installation of PALISADE|
+
+**Note:** If using a pre-built library then you may need to use the option
+`-DSEAL_HINT_DIR=<path-to-installation>` if you have installed them in a
+non-default location.
 
 
 ## Kernels
-Located in `he-samples` is a collection of software components build on
-Microsoft SEAL and PALISADE comprising of sample kernels for operations
-performed homomorphically and example applications. The HE Samples are designed
-to enable quicker evaluation of HE on Intel platforms, serve as a learning tool
-for how to implement operations in different HE libraries, and provide examples
-of how these operations can be used to build applications based on HE
-technology for different use cases.
+Located in `he-samples` is a collection of software components built on
+Microsoft SEAL and PALISADE comprising sample kernels for operations performed
+homomorphically and example applications. The HE Samples are designed to enable
+quicker evaluation of HE on Intel platforms, serve as a learning tool for how
+to implement operations in different HE libraries, and provide examples of how
+these operations can be used to build applications based on HE technology for
+different use cases.
 
 ### Sample kernels
 The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
 requiring multiple API calls such as Matrix Multiplication and Vector Dot
-Product. Follow the link to see instructions on how to run these kernels.
+Product. See the [README](he-samples/sample-kernels/README.md) for
+instructions.
 
 ### Test sample kernels
 The [unit tests](he-samples/sample-kernels/test) are a selection of unit tests
 meant for verifying the accuracy of the various sample kernels included in this
-project.  See the link for more information.
+project.  See the [README](he-samples/sample-kernels/test/README.md) for
+more information.
 
 
 ## Examples
-HE examples includes example applications built using HE technology. The
-primary purpose of these examples is to serve as a showcase of different use
-cases which can be implemented using HE,  as well as learning references and
-starting points for further development. The toolkit currently includes the
-following examples listed below.
+The [examples](he-samples/examples) directory includes example applications
+built using HE technology. The primary purpose of these examples is to serve as
+a showcase of different use cases which can be implemented using HE. Moreover,
+these can be used as learning references and starting points for further
+development. The toolkit currently includes the following examples listed
+below.
 
 ### Secure Query
 The [secure query](he-samples/examples/secure-query) example shows how it is
-possible to implement a key-value database using HE and then allow a client to
+possible to implement a key-value database using HE. This allows a client to
 perform lookups of values in the database without exposing the query to the
 server hosting the database and optionally the key-value pairs in the database
 as well. The secure query example is implemented using the SEAL BFV scheme. See
-the link for more details and instructions on how to run this program.
+the [README](he-samples/examples/secure-query/README) for more details and
+instructions on how to run this program.
 
 ### Logistic Regression
 The transposed [logistic regression](he-samples/examples/logistic-regression)
 example presents a scalable and fast method of logistic regression inference in
 HE. Using the SEAL CKKS scheme, the example will encrypt the model (bias and
 weight) and takes batches of encrypted data samples to perform the inference
-all within the HE domain. See the README in the link above for usage
+all within the HE domain. See the
+[README](he-samples/examples/logistic-regression/README.md) for usage
 information.
 
 
-## Contributing
+# Contributing
 At this time, Intel HE Toolkit does not accept external contributions. We
 encourage feedback and suggestions via
 [GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
@@ -132,7 +156,7 @@ pre-commit run --all-files
 ```
 and make sure all pre-commit checks pass.
 
-## Contributors
+# Contributors
 The Intel contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
