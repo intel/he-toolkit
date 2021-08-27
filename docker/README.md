@@ -17,7 +17,7 @@
 
 
 ## Introduction
-Provided is a description of the components and usage and installation of the
+Provided is a description of the components, usage, and installation of the
 Dockerized Intel Homomorphic Encryption Toolkit. The toolkit provides a docker
 environment in which one can run and modify example programs that have been
 built using various Homomorphic Encryption libraries, including
