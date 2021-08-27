@@ -1,12 +1,12 @@
 # Intel Homomorphic Encryption Toolkit
 The Intel Homomorphic Encryption (HE) toolkit is designed to make it fast and
-easy to evaluate homomorphic encryption technology on the 3rd Generation Intel®
-Xeon® Scalable Processors using libraries optimized to take advantage of the
-newest Intel hardware features such as [HEXL](https://github.com/intel/hexl).
-Additionally, the Intel HE-Toolkit is a great starting point for people new to
-homomorphic encryption, offering numerous sample kernels showing multiple
-examples of how the libraries can be used to implement common mathematical
-operations using [SEAL](https://github.com/microsoft/SEAL),
+easy to evaluate homomorphic encryption technology on Intel® Processors using
+libraries, such as [Intel HEXL](https://github.com/intel/hexl), optimized to
+take advantage of the newest Intel hardware features.  Additionally, the Intel
+HE-Toolkit is a great starting point for people new to homomorphic encryption,
+offering sample kernels showing multiple examples of how the libraries can be
+used to implement common mathematical operations using
+[Microsoft SEAL](https://github.com/microsoft/SEAL),
 [PALISADE](https://gitlab.com/palisade/palisade-release), or
 [HElib](https://github.com/homenc/HElib). In addition, there are example
 applications which demonstrate how HE technology can be used to create secure
@@ -18,7 +18,7 @@ applications.
   - [Dependencies](#dependencies)
   - [Instructions](#instructions)
     - [Docker Build (Recommended)](#docker-build-recommended)
-    - [Native Build (Advanced)](#native-build-advanced)
+    - [Native Build](#native-build)
   - [Kernels](#kernels)
     - [Sample kernels](#sample-kernels)
     - [Test sample kernels](#test-sample-kernels)
@@ -48,8 +48,8 @@ There are currently two methods for building the toolkit project.
 
 ### Docker Build (Recommended)
 The **recommended** method is to use the Docker build and installation which
-builds the toolkit in its entirety including all HE libraries in a self
-contained docker container running Ubuntu 20.04. See [here](docker) for a
+builds the toolkit in its entirety including all HE libraries in a
+self-contained docker container running Ubuntu 20.04. See [here](docker) for a
 detailed description on the usage and components of this build.
 
 ### Native Build
@@ -77,30 +77,32 @@ It is possible to pass additional options, for example:
 to enable/disable building of certain HE libraries. The following table
 contains the current CMake options, default values are in bold.
 
-| CMake options            | Values   | Comments |
-|--------------------------|----------|----------|
+| CMake options            | Values   | Comments      |
+|--------------------------|----------|---------------|
 |`ENABLE_PALISADE`         |**ON**/OFF|Enable PALISADE|
 |`ENABLE_SEAL`             |**ON**/OFF|Enable SEAL|
 |`ENABLE_HELIB`            |**ON**/OFF|Enable HElib|
+|`ENABLE_INTEL_HEXL`       |**ON**/OFF|Enable Intel HEXL|
 |`ENABLE_ADDRESS_SANITIZER`|ON/**OFF**|Compiles and link with Address Sanitizer|
 |`ENABLE_THREAD_SANITIZER` |ON/**OFF**|Compiles and link with Thread Sanitizer|
 |`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|
 |`SEAL_PREBUILT`           |ON/**OFF**|Use a pre-built installation of SEAL|
 |`PALISADE_PREBUILT`       |ON/**OFF**|Use a pre-built installation of PALISADE|
+|`HELIB_PREBUILT`          |ON/**OFF**|Use a pre-built installation of HElib|
 
 **Note:** If using a pre-built library then you may need to use the option
-`-DSEAL_HINT_DIR=<path-to-installation>` if you have installed them in a
-non-default location.
+`-D<SEAL|PALISADE|HELIB>_HINT_DIR=<path-to-installation>` if you have installed
+them in a non-default location.
 
 
 ## Kernels
-Located in `he-samples` is a collection of software components built on
-Microsoft SEAL and PALISADE comprising sample kernels for operations performed
-homomorphically and example applications. The HE Samples are designed to enable
-quicker evaluation of HE on Intel platforms, serve as a learning tool for how
-to implement operations in different HE libraries, and provide examples of how
-these operations can be used to build applications based on HE technology for
-different use cases.
+Located in [he-samples](he-samples) is a collection of software components
+built on Microsoft SEAL and PALISADE comprising sample kernels for operations
+performed homomorphically and example applications. The HE Samples are designed
+to enable quicker evaluation of HE on Intel platforms, serve as a learning tool
+for how to implement operations in different HE libraries, and provide examples
+of how these operations can be used to build applications based on HE
+technology for different use cases.
 
 ### Sample kernels
 The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
@@ -129,7 +131,7 @@ possible to implement a key-value database using HE. This allows a client to
 perform lookups of values in the database without exposing the query to the
 server hosting the database and optionally the key-value pairs in the database
 as well. The secure query example is implemented using the SEAL BFV scheme. See
-the [README](he-samples/examples/secure-query/README) for more details and
+the [README](he-samples/examples/secure-query/README.md) for more details and
 instructions on how to run this program.
 
 ### Logistic Regression
