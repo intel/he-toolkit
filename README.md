@@ -129,7 +129,7 @@ possible to implement a key-value database using HE. This allows a client to
 perform lookups of values in the database without exposing the query to the
 server hosting the database and optionally the key-value pairs in the database
 as well. The secure query example is implemented using the SEAL BFV scheme. See
-the [README](he-samples/examples/secure-query/README) for more details and
+the [README](he-samples/examples/secure-query/README.md) for more details and
 instructions on how to run this program.
 
 ### Logistic Regression
