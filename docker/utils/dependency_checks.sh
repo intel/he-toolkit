@@ -13,16 +13,18 @@ check_dependencies() {
   local not_found=0
   local dep=""
   local i_array=""
+  local tmp=""
 
   for s_array in "$@"; do
     # read string into an array
     IFS='|' read -r -a i_array <<< "$s_array"
-    # type -P alternative to which. Which behavior can vary based on platform.
+    # type -P alternative to which (whose behavior can vary per platform).
     # shellcheck disable=SC2068 # Split the array.
     IFS=$'\n' read -r -d '' -a dep <<< "$(type -P ${i_array[@]})"
     # shellcheck disable=SC2181 # $dep gets used twice.
     if [ ! "${#dep[@]}" -eq 0 ]; then
-      echo "Dependency '${s_array//|/ or }' in '${dep[*]//\ / and }'"
+      tmp="${dep[*]}"
+      echo "Dependency '${s_array//|/ or }' in '${tmp//\ / and }'"
     else
       echo "Dependency '${s_array//|/ or }' not found."
       not_found=$((not_found + 1))

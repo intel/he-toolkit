@@ -26,10 +26,10 @@ if [ -z "$have_gcpp" ] && [ -z "$have_clang" ]; then
   echo "g++ version must be $gcpp_req_ver or clang version must be $clang_req_ver"
 elif [ -n "$have_gcpp" ] && [ -n "$have_clang" ]; then
   if ! check_required_command_version "g++ --version" "$gcpp_req_ver"; then
-    echo "g++ version must be $gcpp_req_ver"
+    echo "if you plan to use g++ the version must be $gcpp_req_ver"
   fi
   if ! check_required_command_version "clang --version" "$clang_req_ver"; then
-    echo "clang version must be $clang_req_ver"
+    echo "if you plan to use clang the version must be $clang_req_ver"
   fi
 elif [ -n "$have_gcpp" ]; then
   if ! check_required_command_version "g++ --version" "$gcpp_req_ver"; then
