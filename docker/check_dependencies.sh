@@ -16,7 +16,7 @@ check_dependencies \
 echo "$? missing dependencies."
 
 # TODO For now this is good enough.
-# As the only dependency or is g++ or clang.
+# As the only dependency is g++ or clang.
 readonly have_gcpp="$(type -P g++)"
 readonly have_clang="$(type -P clang)"
 readonly gcpp_req_ver=">=10.0.x"
