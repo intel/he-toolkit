@@ -21,7 +21,5 @@ git_clone() {
     # $opts cannot be quoted.
     # shellcheck disable=SC2086
     git clone $opts "$url"
-  else
-    (cd "$repo" && git pull --ff-only)
   fi
 }
