@@ -52,6 +52,12 @@ jobs:
           echo $GITHUB_REF
           pwd
 
+      # Install GMP and NTL
+      - name: Install GMP and NTL
+        run: |
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libntl-dev
+
       # Build toolkit
       - name: Build the repository
         run: |
