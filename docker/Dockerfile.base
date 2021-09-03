@@ -66,6 +66,8 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2
     cp -rf cmake_files/share /usr/ && \
     cp -rf cmake_files/bin/* /bin/ && \
     rm -rf cmake_files
+    # Install NTL and GMP \
+RUN apt-get install -y libgmp-dev libntl-dev
     # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \

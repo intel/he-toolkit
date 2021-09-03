@@ -19,6 +19,11 @@ RUN tar -zxvf libs.tar.gz && \
     cmake -S . -B build -DHEXL_EXPORT=ON && \
     cmake --build build -j && \
     cmake --install build && \
+    # Build and install HEXL 1.2.1 for HElib \
+    git checkout 1.2.1 && \
+    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/helib-hexl/ && \
+    cmake --build build -j && \
+    cmake --install build && \
     # Build and install GSL \
     cd /libs/GSL && \
     cmake -S . -B build -DGSL_TEST=OFF && \
@@ -51,6 +56,12 @@ RUN tar -zxvf libs.tar.gz && \
                         -DINTEL_HEXL_PREBUILT=ON \
                         -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/ && \
     cmake --build build -j && \
+    cmake --install build && \
+    # Build and install HElib \
+    cd /libs/HElib && \
+    cmake -S . -B build -DUSE_INTEL_HEXL=ON \
+                        -DHEXL_DIR=$HOME/helib-hexl/lib/cmake/hexl-1.2.1/ && \
+    cmake --build build -j && \
     cmake --install build
 
 # Build he-samples and link to SEAL and PALISADE
@@ -60,6 +71,7 @@ RUN mv /runners /home/$UNAME/ && \
     cmake -S . -B build \
              -DENABLE_PALISADE=ON \
              -DENABLE_SEAL=ON \
+             -DENABLE_HELIB=ON \
     # FIXME: HEXL cmake logic requires re-think \
              -DENABLE_INTEL_HEXL=ON \
              -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/ \
@@ -67,7 +79,8 @@ RUN mv /runners /home/$UNAME/ && \
              -DCMAKE_C_COMPILER=clang-10 \
              -DCMAKE_BUILD_TYPE=Release \
              -DPALISADE_PREBUILT=ON \
-             -DSEAL_PREBUILT=ON && \
+             -DSEAL_PREBUILT=ON \
+             -DHELIB_PREBUILT=ON && \
     cmake --build build -j
 
 # Switch user to $UNAME

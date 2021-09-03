@@ -9,7 +9,7 @@ message(STATUS "HELIB_PREBUILT: ${HELIB_PREBUILT}")
 if (HELIB_PREBUILT) # Skip download from GitHub
 
   message(STATUS "HELIB_HINT_DIR: ${HELIB_HINT_DIR}")
-  find_package(helib 2.1.0
+  find_package(helib
     HINTS ${HELIB_HINT_DIR}
     REQUIRED)
 
@@ -46,7 +46,7 @@ else()
       -DNTL_DIR=${NTL_DIR}
       -DGMP_DIR=${GMP_DIR}
       -DUSE_INTEL_HEXL=${ENABLE_INTEL_HEXL}
-      -DHEXL_HINT_DIR=${INTEL_HEXL_HINT_DIR}
+      -DHEXL_DIR=${INTEL_HEXL_HINT_DIR}
       -DPEDANTIC_BUILD=ON
       # Skip updates
       UPDATE_COMMAND ""
