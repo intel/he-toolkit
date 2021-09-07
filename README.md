@@ -43,7 +43,8 @@ python >= 3.5
 virtualenv
 ```
 
-Dependecies required per library include:
+
+Dependencies required per library include:
 ```
 autoconf (PALISADE)
 gmp >= 6.2.1 (HElib)
