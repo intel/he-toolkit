@@ -76,31 +76,36 @@ set(SINGLE_THREAD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 set(SINGLE_THREAD_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
 
 # OpenMP
- if (APPLE)
-   set(OPENMP_LIBRARIES "/opt/local/lib/libomp")
-   set(OPENMP_INCLUDES "/opt/local/include/libomp")
+# MacOS requires manual configuration
+if (APPLE)
+  set(OPENMP_LIBRARIES "/opt/local/lib/libomp")
+  set(OPENMP_INCLUDES "/opt/local/include/libomp")
 
-   if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-     set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -lomp -Wno-unused-command-line-argument")
-     set(OpenMP_C_LIB_NAMES "libomp")
-     set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
-   endif()
-   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-     set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp -Wno-unused-command-line-argument")
-     set(OpenMP_CXX_LIB_NAMES "libomp")
-     set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
-   endif()
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -lomp -Wno-unused-command-line-argument")
+    set(OpenMP_C_LIB_NAMES "libomp")
+    set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+  endif()
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -lomp -Wno-unused-command-line-argument")
+    set(OpenMP_CXX_LIB_NAMES "libomp")
+    set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+  endif()
 
-   include_directories("${OPENMP_INCLUDES}")
-   link_directories("${OPENMP_LIBRARIES}")
-   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-else()
+  include_directories("${OPENMP_INCLUDES}")
+  link_directories("${OPENMP_LIBRARIES}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
+
+find_package (OpenMP REQUIRED)
+
+if (NOT APPLE)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
-find_package (OpenMP REQUIRED)
 
 #------------------------------------------------------------------------------
 # Installation logic...
@@ -151,7 +156,7 @@ endif()
 # Third-party code...
 #------------------------------------------------------------------------------
 # Pthreads
-# Assume pthreads are built-in on Mac
+# Assume pthreads are built-in on macOS
 if(APPLE)
   set(CMAKE_THREAD_LIBS_INIT "-lpthread")
   set(CMAKE_HAVE_THREADS_LIBRARY 1)
