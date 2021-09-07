@@ -5,17 +5,17 @@
 
 namespace intel {
 namespace timer {
-std::chrono::system_clock::time_point now() {
+std::chrono::steady_clock::time_point now() {
   return std::chrono::high_resolution_clock::now();
 }
 
-double delta(std::chrono::system_clock::time_point start) {
+double delta(std::chrono::steady_clock::time_point start) {
   auto end = now();
   return delta(start, end);
 }
 
-double delta(std::chrono::system_clock::time_point start,
-             std::chrono::system_clock::time_point end) {
+double delta(std::chrono::steady_clock::time_point start,
+             std::chrono::steady_clock::time_point end) {
   return static_cast<double>(
              std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
                  .count()) /
