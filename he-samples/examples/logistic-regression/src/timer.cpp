@@ -6,7 +6,7 @@
 namespace intel {
 namespace timer {
 std::chrono::steady_clock::time_point now() {
-  return std::chrono::high_resolution_clock::now();
+  return std::chrono::steady_clock::now();
 }
 
 double delta(std::chrono::steady_clock::time_point start) {
