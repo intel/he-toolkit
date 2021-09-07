@@ -21,7 +21,8 @@ else()
   set(SEAL_REPO_URL https://github.com/microsoft/SEAL.git)
   set(SEAL_GIT_TAG v3.7.0)
 
-  set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
+  # TODO: Find where there is a conflict with fvisiblity
+  #set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
 
   set(SEAL_SHARED_LIB OFF) # Set to ON/OFF to toggle shared build
 
@@ -33,7 +34,7 @@ else()
       PREFIX ${SEAL_PREFIX}
       INSTALL_DIR ${SEAL_PREFIX}
       CMAKE_ARGS ${BENCHMARK_FORWARD_CMAKE_ARGS}
-        -DCMAKE_CXX_FLAGS=${SEAL_CXX_FLAGS}
+        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
         -DCMAKE_INSTALL_PREFIX=${SEAL_PREFIX}
         -DSEAL_USE_CXX17=ON
         -DCMAKE_INSTALL_LIBDIR=${SEAL_PREFIX}/lib

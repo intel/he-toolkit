@@ -78,8 +78,8 @@ set(SINGLE_THREAD_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
 # OpenMP
 # MacOS requires manual configuration
 if (APPLE)
-  set(OPENMP_LIBRARIES "/opt/local/lib/libomp")
-  set(OPENMP_INCLUDES "/opt/local/include/libomp")
+  set(OPENMP_LIBRARIES "/usr/local/opt/libomp/lib")
+  set(OPENMP_INCLUDES "/usr/local/opt/libomp/include")
 
   if(CMAKE_C_COMPILER_ID MATCHES "Clang")
     set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -lomp -Wno-unused-command-line-argument")
