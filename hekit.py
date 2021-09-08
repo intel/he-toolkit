@@ -1,11 +1,37 @@
 #! /usr/bin/python3
 
+import re
 import toml
 import sys
 import argparse
 from subprocess import Popen, PIPE, STDOUT
 
 import pprint
+
+
+def fill_self_ref_string_dict(d):
+    """Returns a dict with str values.
+    NB. Only works for flat str value dict."""
+
+    def fill_str(s):
+        if not isinstance(s, str):
+            raise TypeError(
+                f"fill_str expects type str, but got type '{type(s).__name__}'"
+            )
+
+        symbols = re.findall(r"(%(.*?)%)", s)
+
+        if not symbols:
+            return s
+
+        new_s = s
+        for symbol, k in symbols:
+            new_s = new_s.replace(symbol, fill_str(d[k]))
+
+        return new_s
+
+    return {k: fill_str(v) for k, v in d.items()}
+
 
 def run(cmd_and_args):
     with Popen(cmd_and_args, stdout=PIPE, stderr=STDOUT) as proc:
@@ -16,28 +42,61 @@ def run(cmd_and_args):
 
 # run(["ls", "-al", "wow"])
 
+
 def install_components(args):
     """"""
     pp = pprint.PrettyPrinter(indent=4)
     t = toml.load(args.install_file)
     pp.pprint(t)
+    hexl_install = fill_self_ref_string_dict(t['dependencies']['hexl'][0])
+    print(hexl_install)
+
+
 
 # components = components_to_build_from(toml_file)
 # for component in components:
 #     print(component.label())
-#     success, return_code = component.install()
+#     success, return_code = component.pre_build()
 #     if success:
-#         print(success)
+#         print("success")
 #     else:
-#         print(success, return_code)
+#         print("failure", return_code)
+#         exit(1)
+
+
+
+class ComponentBuilder:
+    def __init__(self, spec):
+        """"""
+        self.__spec = spec
+
+
+    def pre_build(self):
+        """"""
+
+
+    def build(self):
+        """"""
+
+
+    def post_build(self):
+        """"""
+
+
+    def install(self):
+        """"""
+
+
 
 
 
 def list_installed_components(args):
     """"""
 
+
 def remove_components(args):
     """"""
+
 
 def parse_cmds():
     """"""
@@ -62,12 +121,13 @@ def parse_cmds():
     parser_install.set_defaults(fn=install_components)
 
     # create the parser for the "remove" command
-    parser_remove = subparsers.add_parser("remove", help="removes/uninstalls components")
+    parser_remove = subparsers.add_parser(
+        "remove", help="removes/uninstalls components"
+    )
     #    parser_remove.add_argument('--baz', choices='XYZ', help='baz help')
     parser_remove.set_defaults(fn=remove_components)
 
     return parser.parse_args()
-
 
 
 def main():
