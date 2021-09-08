@@ -11,6 +11,13 @@ on:
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
+###################
+# Define env vars #
+###################
+env:
+  HEXL_VER: 1.2.1
+  HEXL_DIR: ${GITHUB_WORKSPACE}/hexl-install/lib/cmake/hexl-${HEXL_VER}
+
 ################
 # Ubuntu 20.04 #
 ################
@@ -61,7 +68,7 @@ jobs:
       # Build and install HEXL 1.2.1 for HElib
       - name: Install HEXL (for HElib)
         run: |
-          git clone https://github.com/intel/hexl.git -b v1.2.1
+          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
           cd hexl
           cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
           cmake --build build -j
@@ -70,7 +77,7 @@ jobs:
       # Build toolkit
       - name: Build the repository
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=$GITHUB_WORKSPACE/hexl-install/lib/cmake/hexl-1.2.1
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
           cmake --build build --target all -j
 
       # Unit tests and examples
@@ -124,7 +131,7 @@ jobs:
         run: pre-commit run --all-files
 
   build-and-test-icelake:
-    name: Build, test and run kernels (IceLake)
+    name: Build, test and run kernels (IceLake - Excl. HElib)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
@@ -144,7 +151,7 @@ jobs:
           echo $GITHUB_REF
           pwd
 
-      # Build toolkit
+      # Build toolkit (Excl. HElib)
       - name: Build the repository
         run: |
           cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_HELIB=OFF
@@ -197,10 +204,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Build and install HEXL 1.2.1
+      # Build and install HEXL
       - name: Build and install HEXL
         run: |
-          git clone https://github.com/intel/hexl.git -b v1.2.1
+          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
           cd hexl
           cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
           cmake --build build -j
@@ -209,5 +216,5 @@ jobs:
       # Build the toolkit with only HElib and HEXL
       - name: Build HElib
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=$GITHUB_WORKSPACE/hexl-install/lib/cmake/hexl-1.2.1
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
           cmake --build build --target all -j
