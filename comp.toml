@@ -1,0 +1,42 @@
+
+
+[dependencies]
+
+
+
+[[dependencies.hexl]]
+name = "1.2.2"
+tool = "cmake"
+url = "bla.git-%name%"
+decompress = "tar xvf"
+src_dir = ""
+pre-build = "-S %src_dir% -B %build_dir% -DENABLE_DEBUG=ON"
+build = "--build %build_dir% -j"
+install = "--install %install_dir%"
+
+
+#class ComponentBuilder:
+#
+#class HEXLComponentBuilder(ComponentBuilder)
+#
+#downloads /-
+#build/-
+#     |-1.2.1
+#        |-HEKIT_SUCCESS
+#
+#[[hexl]]
+#
+#
+#[[hexl]]
+#
+#
+#[libraries]
+#
+#[[seal]]
+#name
+#
+#
+#{
+#  dependencies : { hexl : {name : "1.2.1", ..., }, {...} , {...},
+#                   globel : 5 }
+#}
