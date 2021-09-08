@@ -7,6 +7,7 @@ import argparse
 from subprocess import Popen, PIPE, STDOUT
 
 import pprint
+from component_builder import ComponentBuilder, chain_run
 
 
 def fill_self_ref_string_dict(d):
@@ -40,54 +41,29 @@ def run(cmd_and_args):
     return proc.returncode
 
 
-# run(["ls", "-al", "wow"])
+def components_to_build_from(filename, label):
+    """Returns a generator that yields a component to be built and/or installed"""
+    toml_dict = toml.load(filename)
+    label_objs = toml_dict[label]
+    return (ComponentBuilder(obj) for obj in label_objs)
 
 
 def install_components(args):
     """"""
-    pp = pprint.PrettyPrinter(indent=4)
-    t = toml.load(args.install_file)
-    pp.pprint(t)
-    hexl_install = fill_self_ref_string_dict(t['dependencies']['hexl'][0])
-    print(hexl_install)
 
+    label = "dependencies"
+    components = components_to_build_from(args.install_file, label)
 
-
-# components = components_to_build_from(toml_file)
-# for component in components:
-#     print(component.label())
-#     success, return_code = component.pre_build()
-#     if success:
-#         print("success")
-#     else:
-#         print("failure", return_code)
-#         exit(1)
-
-
-
-class ComponentBuilder:
-    def __init__(self, spec):
-        """"""
-        self.__spec = spec
-
-
-    def pre_build(self):
-        """"""
-
-
-    def build(self):
-        """"""
-
-
-    def post_build(self):
-        """"""
-
-
-    def install(self):
-        """"""
-
-
-
+    for component in components:
+        print(label)
+        chain_run(
+            [
+                component.pre_build,
+                component.build,
+                component.post_build,
+                component.install,
+            ]
+        )
 
 
 def list_installed_components(args):
