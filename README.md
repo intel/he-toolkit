@@ -31,7 +31,7 @@ applications.
 ## Dependencies
 The toolkit has been tested on Ubuntu 20.04
 
-Dependencies include:
+Must have dependencies include:
 ```
 cmake >= 3.13
 git
@@ -41,6 +41,14 @@ m4
 g++ >= 10.0 or clang >= 10.0
 python >= 3.5
 virtualenv
+```
+
+
+Dependencies required per library include:
+```
+autoconf (PALISADE)
+gmp >= 6.2.1 (HElib)
+NTL >= 11.5.1 (HElib)
 ```
 
 ## Instructions
