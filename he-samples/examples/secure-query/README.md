@@ -8,7 +8,7 @@ It will be built whenever SEAL is enabled as part of he-toolkit build.
 The example consists of 2 component classes and a main file.
  - SQClient implements basic client funcionality including initializing the encryption context, key generation, and encrypting and decrypting database queries.
  - SQServer stores the encrypted database and implements the encrypted database query algorithm.
- - Main.cpp Simple program which creates an instance of SQClient with either default or user specified encryption parameters, an instance of SQServer is then also initialized with the chosen parameters. Next the application reads in a simple set of key/value pairs from a user specified csv file and encrypts them using the HE context. The user is then prompted to enter a search key and the results of the search are then displayed.
+ - Main.cpp Program which creates an instance of SQClient with either default or user specified encryption parameters, an instance of SQServer is then also initialized with the chosen parameters. Next the application reads in a set of key/value pairs from a user specified csv file and encrypts them using the HE context. The user is then prompted to enter a search key and the results of the search are then displayed.
 
 ## Usage
 
