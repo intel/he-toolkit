@@ -47,7 +47,7 @@ The default options are set to allow the demo to work well with the current exam
 
 ### Custom options
 
-The sample also supports specifying custom encryption parameters and input options. This can be useful to test more secure settings as well as to adjust keylength to support different database files.
+The sample also supports specifying custom encryption parameters and input options. This can be useful to test more secure settings as well as to adjust key length to support different database files. The sample uses the default SEAL security level of 128-bits but all security related values should be verified before use in a real application.  
 The encryption parameters which can be specified are
  - Poly modulus degree specified as 2^[x]
  - Plain modulus, this must be prime and > than 17
