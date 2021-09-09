@@ -3,17 +3,9 @@
 import toml
 import sys
 import argparse
-from subprocess import Popen, PIPE, STDOUT
 
 import pprint
 from component_builder import ComponentBuilder, chain_run
-
-
-def run(cmd_and_args):
-    with Popen(cmd_and_args, stdout=PIPE, stderr=STDOUT) as proc:
-        for line in proc.stdout:
-            print(line.decode("ascii"), end="")
-    return proc.returncode
 
 
 def components_to_build_from(filename, category):
@@ -40,6 +32,7 @@ def install_components(args):
         print(label)
         chain_run(
             [
+                component.fetch,
                 component.pre_build,
                 component.build,
                 component.post_build,

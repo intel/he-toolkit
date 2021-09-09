@@ -1,11 +1,12 @@
 
 
-[dependencies]
+#[dependencies]
 
 [[dependencies.hexl]]
-name = "1.2.2"
+name = "1.2.1"
 tool = "cmake"
-url = "bla.git-%name%"
+fetch = "git"
+#fetch = "git clone git@github.com:intel/hexl.git --branch %name%"
 decompress = "tar xvf"
 src_dir = ""
 build_dir = ""

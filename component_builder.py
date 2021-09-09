@@ -1,4 +1,6 @@
 import re
+import os
+from subprocess import Popen, PIPE, STDOUT
 
 
 class BuildError(Exception):
@@ -43,32 +45,50 @@ def fill_self_ref_string_dict(d):
     return {k: fill_str(v) for k, v in d.items()}
 
 
+def run(cmd_and_args):
+    """Takes either a string or list of strings and runs as command."""
+    with Popen(cmd_and_args, stdout=PIPE, stderr=STDOUT) as proc:
+        for line in proc.stdout:
+            print(line.decode("ascii"), end="")
+    success = True if proc.returncode == 0 else False
+    return success, proc.returncode
+
+
 class ComponentBuilder:
     def __init__(self, spec):
         """"""
         if not isinstance(spec, dict):
             raise TypeError(
-                f"A spec should be a of type dict, but got '{type(spec).__name__}'"
+                f"A spec must be type dict, but got '{type(spec).__name__}'"
             )
+        os.chdir("tmp")
+        print("Working in:", os.getcwd())
         self.__spec = fill_self_ref_string_dict(spec)
         print(self.__spec)
+
+    def fetch(self):
+        """"""
+        print("fetch")
+        success, rt = run(self.__spec["fetch"])
+        return success, rt
 
     def pre_build(self):
         """"""
         print("pre-build")
-        return "success", 0
+        # rt = run(self.spec)
+        return True, 0
 
     def build(self):
         """"""
         print("build")
-        return "success", 0
+        return True, 0
 
     def post_build(self):
         """"""
         print("post-build")
-        return "success", 0
+        return True, 0
 
     def install(self):
         """"""
         print("install")
-        return "success", 0
+        return True, 0
