@@ -94,10 +94,9 @@ libs_dir=libs
   git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
 
   # HE libs
-  git_clone "https://github.com/microsoft/SEAL.git" "3.6.6"
+  git_clone "https://github.com/microsoft/SEAL.git" "v3.6.6"
   git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.3"
-  # FIXME: Set this to pick 2.2.0 release when available
-  git_clone "https://github.com/helibproject/HElib.git"
+  git_clone "https://github.com/homenc/HElib.git" "v2.2.0"
 
   # SEAL dependencies
   git_clone "https://github.com/microsoft/GSL.git"
