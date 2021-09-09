@@ -66,3 +66,8 @@ For this example, database keys are assumed to be char strings. With the default
 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)
 
 [HELib country db lookup sample](https://github.com/homenc/HElib/tree/master/examples/BGV_country_db_lookup)
+
+## Acknowledgements
+
+This database lookup example is a derived port of the the BGV Country Lookup example code that ships with [HElib](https://github.com/homenc/HElib) and can be found [here](https://github.com/homenc/HElib/tree/master/examples/BGV_country_db_lookup).
+
