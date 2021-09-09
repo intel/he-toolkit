@@ -33,8 +33,8 @@ The following shows an example of a run of the sample using the default encrypti
 	Querying database for key: Oregon
 	Decoded database entry: Salem
 
-	Total query elapsed time(seconds): 0.0
-	Records searched per second: 0
+	Total query elapsed time(seconds): (Time in for database query)
+	Records searched per second: (number of records searched per second)
 ```
 
 ### Default options
