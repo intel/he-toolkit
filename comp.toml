@@ -2,8 +2,6 @@
 
 [dependencies]
 
-
-
 [[dependencies.hexl]]
 name = "1.2.2"
 tool = "cmake"
@@ -17,10 +15,6 @@ build = "--build %build_dir% -j"
 install = "--install %install_dir%"
 
 
-#class ComponentBuilder:
-#
-#class HEXLComponentBuilder(ComponentBuilder)
-#
 #downloads /-
 #build/-
 #     |-1.2.1
@@ -37,8 +31,3 @@ install = "--install %install_dir%"
 #[[seal]]
 #name
 #
-#
-#{
-#  dependencies : { hexl : {name : "1.2.1", ..., }, {...} , {...},
-#                   globel : 5 }
-#}

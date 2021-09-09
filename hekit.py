@@ -1,6 +1,5 @@
 #! /usr/bin/python3
 
-import re
 import toml
 import sys
 import argparse
@@ -10,30 +9,6 @@ import pprint
 from component_builder import ComponentBuilder, chain_run
 
 
-def fill_self_ref_string_dict(d):
-    """Returns a dict with str values.
-    NB. Only works for flat str value dict."""
-
-    def fill_str(s):
-        if not isinstance(s, str):
-            raise TypeError(
-                f"fill_str expects type str, but got type '{type(s).__name__}'"
-            )
-
-        symbols = re.findall(r"(%(.*?)%)", s)
-
-        if not symbols:
-            return s
-
-        new_s = s
-        for symbol, k in symbols:
-            new_s = new_s.replace(symbol, fill_str(d[k]))
-
-        return new_s
-
-    return {k: fill_str(v) for k, v in d.items()}
-
-
 def run(cmd_and_args):
     with Popen(cmd_and_args, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
@@ -41,17 +16,24 @@ def run(cmd_and_args):
     return proc.returncode
 
 
-def components_to_build_from(filename, label):
+def components_to_build_from(filename, category):
     """Returns a generator that yields a component to be built and/or installed"""
     toml_dict = toml.load(filename)
-    label_objs = toml_dict[label]
-    return (ComponentBuilder(obj) for obj in label_objs)
+    category_objs = toml_dict[category]
+    # Extracting specs also flattens 'list of list' to list
+    specs = (
+        specs
+        for name, category_specs in category_objs.items()
+        for specs in category_specs
+    )
+    return (ComponentBuilder(spec) for spec in specs)
 
 
 def install_components(args):
     """"""
 
     label = "dependencies"
+    # label = "libraries"
     components = components_to_build_from(args.install_file, label)
 
     for component in components:
