@@ -63,4 +63,4 @@ For this example database keys are assumed to be char strings. With the default 
 
 [Microsoft SEAL](https://github.com/microsoft/SEAL)
 [Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)
-[HELib country db lookup sample](https://github.com/IBM-HElib/HElib/tree/master/examples/BGV_country_db_lookup)
+[HELib country db lookup sample](https://github.com/homenc/HElib/tree/master/examples/BGV_country_db_lookup)
