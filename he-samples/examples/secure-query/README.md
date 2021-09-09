@@ -43,7 +43,7 @@ The default options are set to allow the demo to work well with the current exam
  - Polymodulus degree: 8192
  - Plain Modulus: 17
  - Key length: 8 characters
- - Input database: us_state_capitals.csv (Has 50 entries consisting of key:value (state name : Capitol name) First letter capitalized.
+ - Input database: us_state_capitals.csv (Has 50 entries consisting of key:value (state name : Capital name) First letter capitalized.
 
 ### Custom options
 
