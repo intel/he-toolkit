@@ -57,7 +57,7 @@ Additionally a custom database can be specified. The format of this database has
 
 ## Implementation Details
 
-For this example database keys are assumed to be char strings. With the default options they are encoded into 2 4bit chunks. This is done so that each chunk can be represented by the plain modulus of 17. The secure query lookup algorithm is based on using Fermat's little theorem to generate a mask from the query and for each database entries key. This results in mask values of 1 for matches and 0 for non matches. This mask is then multiplied against the database entry value which is accumulated for all entries and returned. For this sample it is required that all entries possess a unique key.
+For this example, database keys are assumed to be char strings. With the default options, they are encoded into 2 4-bit chunks. This is done so that each chunk can be represented by the plain modulus of 17. The secure query lookup algorithm is based on using Fermat's little theorem to generate a mask from the query and for each database entry's key. This results in mask values of 1 for matches and 0 for non matches. This mask is then multiplied against the database entry value which is accumulated for all entries and returned. For this sample it is required that all entries possess a unique key.
 
 ## References
 
