@@ -5,12 +5,12 @@ The secure query example is designed to serve as a reference and proof of concep
 ## Description
 The secure query example implements a simple secure database query using the SEAL BFV HE scheme.
 It will be built whenever SEAL is enabled as part of he-toolkit build.
-The example consists of 2 component classes and a main file. 
- - SQClient implements basic client funcionality including initializing the encryption context, key generation, and encrypting and decrypting database queries. 
- - SQServer stores the encrypted database and implements the encrypted database query algorithm. 
- - Main.cpp Simple program which creates an instance of SQClient with either default or user specified encryption parameters, an instance of SQServer is then also initialized with the chosen parameters. Next the application reads in a simple set of key/value pairs from a user specified csv file and encrypts them using the HE context. The user is then prompted to enter a search key and the results of the search are then displayed. 
+The example consists of 2 component classes and a main file.
+ - SQClient implements basic client funcionality including initializing the encryption context, key generation, and encrypting and decrypting database queries.
+ - SQServer stores the encrypted database and implements the encrypted database query algorithm.
+ - Main.cpp Simple program which creates an instance of SQClient with either default or user specified encryption parameters, an instance of SQServer is then also initialized with the chosen parameters. Next the application reads in a simple set of key/value pairs from a user specified csv file and encrypts them using the HE context. The user is then prompted to enter a search key and the results of the search are then displayed.
 
-## Useage
+## Usage
 
 To run it execute
 ```bash
@@ -19,7 +19,7 @@ To run it execute
 ```
 ### Example output
 
-The following shows an example of a run of the sample using the default encryption and database file. 
+The following shows an example of a run of the sample using the default encryption and database file.
 ```bash
 	Initialize SEAL BFV scheme with default parameters[Y(default)|N]:
 	SEAL BFV context initialized with following parameters
@@ -48,12 +48,12 @@ The default options are set to allow the demo to work well with the current exam
 ### Custom options
 
 The sample also supports specifying custom encryption parameters and input options. This can be useful to test more secure settings as well as to adjust keylength to support different database files.
-The encryption parameters which can be specified are 
+The encryption parameters which can be specified are
  - Poly modulus degree specified as 2^[x]
  - Plain modulus, this must be prime and > than 17
  - Database key length: The maximum key length in characters, should be long enough to fit the longest key specified in the dataset.
 
-Additionaly a custom database can be specified. The format of this database has the format (key , value).
+Additionally a custom database can be specified. The format of this database has the format (key , value).
 
 ## Implementation Details
 
@@ -61,8 +61,6 @@ For this example database keys are assumed to be char strings. With the default 
 
 ## References
 
-[Microsoft SEAL](https://github.com/microsoft/SEAL)  
-[Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)  
-[HELib country db lookup sample](https://github.com/IBM-HElib/HElib/tree/master/examples/BGV_country_db_lookup)  
-
-
+[Microsoft SEAL](https://github.com/microsoft/SEAL)
+[Fermat's Little Theorem](https://en.wikipedia.org/wiki/Fermat%27s_little_theorem)
+[HELib country db lookup sample](https://github.com/IBM-HElib/HElib/tree/master/examples/BGV_country_db_lookup)
