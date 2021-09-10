@@ -47,7 +47,7 @@ The default options are set to allow the demo to work well with the current exam
 
 ### Custom options
 
-The sample also supports specifying custom encryption parameters and input options. This can be useful to test more secure settings as well as to adjust key length to support different database files. The sample uses the default SEAL security level of 128-bits but all security related values should be verified before use in a real application.  
+The sample also supports specifying custom encryption parameters and input options. This can be useful to test more secure settings as well as to adjust key length to support different database files. The sample uses the default SEAL security level of 128-bits but all security related values should be verified before use in a real application.
 The encryption parameters which can be specified are
 - A power-of-two poly modulus degree specified as e.g. "10" for degree 1024=2^10
  - Plain modulus, this must be prime and > than 17
@@ -70,4 +70,3 @@ For this example, database keys are assumed to be char strings. With the default
 ## Acknowledgements
 
 This database lookup example is a derived port of the the BGV Country Lookup example code that ships with [HElib](https://github.com/homenc/HElib) and can be found [here](https://github.com/homenc/HElib/tree/master/examples/BGV_country_db_lookup).
-
