@@ -1,0 +1,12 @@
+
+[[dependency.hexl]]
+name = "1.2.1"
+tool = "cmake"
+fetch = "git clone https://github.com/intel/hexl.git --branch 1.2.1"
+decompress = "tar xvf"
+src_dir = ""
+build_dir = ""
+install_dir = ""
+pre-build = "-S %src_dir% -B %build_dir% -DENABLE_DEBUG=ON"
+build = "--build %build_dir% -j"
+install = "--install %install_dir%"

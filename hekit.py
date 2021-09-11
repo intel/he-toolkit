@@ -1,11 +1,17 @@
 #! /usr/bin/python3
 
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import toml
 import sys
 import argparse
 
+import os
 import pprint
 from component_builder import ComponentBuilder, chain_run
+
+repo_location = os.path.expanduser("~/.hekit")
 
 
 def components_to_build_from(filename, category):
@@ -24,7 +30,7 @@ def components_to_build_from(filename, category):
 def install_components(args):
     """"""
 
-    label = "dependencies"
+    label = "dependency"
     # label = "libraries"
     components = components_to_build_from(args.install_file, label)
 
@@ -41,8 +47,26 @@ def install_components(args):
         )
 
 
-def list_installed_components(args):
-    """"""
+def list_dirs(path: str):
+    """Just return list of dirs in path."""
+    _, dirs, _ = next(os.walk(path))
+    return dirs
+
+
+def list_components(args):
+    """List to stdout info on components."""
+    global repo_location
+    # At the mo, just lists installed.
+    root = f"{repo_location}/installs"
+    for dir in sorted(list_dirs(root)):
+        try:
+            info_filepath = f"{root}/{dir}/hekit.info"
+            info_file = toml.load(info_filepath)
+            print(dir, info_file["status"])
+        except FileNotFoundError:
+            print(dir, "unknown", f"'{info_filepath}' not found")
+        except KeyError as emsg:
+            print(dir, "unknown", f"key {emsg} not found")
 
 
 def remove_components(args):
@@ -59,7 +83,7 @@ def parse_cmds():
     # create the parser for the "list" command
     parser_list = subparsers.add_parser("list", help="lists installed components")
     #    parser_list.add_argument('bar', type=int, help='bar help')
-    parser_list.set_defaults(fn=list_installed_components)
+    parser_list.set_defaults(fn=list_components)
 
     # create the parser for the "install" command
     parser_install = subparsers.add_parser("install", help="installs components")

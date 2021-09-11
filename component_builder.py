@@ -1,4 +1,8 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import re
+import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT
 
@@ -6,7 +10,7 @@ from subprocess import Popen, PIPE, STDOUT
 class BuildError(Exception):
     """Exception for something wrong with the build."""
 
-    def __init__(self, message, errors):
+    def __init__(self, message):
         super().__init__(message)
 
 
@@ -47,9 +51,13 @@ def fill_self_ref_string_dict(d):
 
 def run(cmd_and_args):
     """Takes either a string or list of strings and runs as command."""
-    with Popen(cmd_and_args, stdout=PIPE, stderr=STDOUT) as proc:
+    cmd_and_args_list = (
+        shlex.split(cmd_and_args) if isinstance(cmd_and_args, str) else cmd_and_args
+    )
+    basename = os.path.basename(cmd_and_args_list[0]).upper()  # Capitalized
+    with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
-            print(line.decode("ascii"), end="")
+            print(f"[{basename}]", line.decode("ascii"), end="")
     success = True if proc.returncode == 0 else False
     return success, proc.returncode
 
