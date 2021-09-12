@@ -11,19 +11,17 @@ from subprocess import Popen, PIPE, STDOUT
 class BuildError(Exception):
     """Exception for something wrong with the build."""
 
-    def __init__(self, message):
+    def __init__(self, message, error):
         super().__init__(message)
+        self.error = error
 
 
 def chain_run(funcs):
     """"""
     for fn in funcs:
         success, return_code = fn()
-        if success:
-            print("success")
-        else:
-            print("failure", return_code)
-            raise BuildError("")
+        if not success:
+            raise BuildError("", return_code)
 
 
 def fill_self_ref_string_dict(d):
@@ -50,13 +48,15 @@ def fill_self_ref_string_dict(d):
 
 def run(cmd_and_args):
     """Takes either a string or list of strings and runs as command."""
+    if not cmd_and_args:
+        return True, 0
+
     if isinstance(cmd_and_args, str):
         cmd_and_args_list = shlex.split(cmd_and_args)
         print(cmd_and_args)
     else:
         cmd_and_args_list = cmd_and_args
         print(" ".join(cmd_and_args))
-
     basename = os.path.basename(cmd_and_args_list[0]).upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
@@ -80,28 +80,27 @@ class ComponentBuilder:
             raise TypeError(
                 f"A spec must be type dict, but got '{type(spec).__name__}'"
             )
-        self.__spec = fill_self_ref_string_dict(spec)
-        self.__comp_instance = self.__spec["name"]
-        self.__location = f"{repo_path}/{comp_name}/{self.__comp_instance}"
-        self.__skip = self.__spec["skip"] if "skip" in self.__spec else False
-        if not isinstance(self.__skip, bool):
+        self._spec = fill_self_ref_string_dict(spec)
+        self._comp_instance = self._spec["name"]
+        self._location = f"{repo_path}/{comp_name}/{self._comp_instance}"
+        self._skip = self._spec["skip"] if "skip" in self._spec else False
+        if not isinstance(self._skip, bool):
             raise ValueError("Skip must be set to true or false")
-        print(self.__spec)
+        print(self._spec)
 
         # load previous from info file
         try:
-            with open(f"{self.__location}/hekit.info") as info_file:
-                self.__info_file = toml.load(info_file)
+            with open(f"{self._location}/hekit.info") as info_file:
+                self._info_file = toml.load(info_file)
         except FileNotFoundError:
-            self.__info_file = {
-                "status": {"fetch": None, "build": None, "install": None}
-            }
+            self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
 
     def skip(self):
-        return self.__skip
+        return self._skip
 
     def setup(self):
-        root = self.__location
+        """Create the layout for the component"""
+        root = self._location
         for dirname in ("fetch", "build", "install"):
             try:
                 os.makedirs(f"{root}/{dirname}")
@@ -112,37 +111,57 @@ class ComponentBuilder:
 
     def already_successful(self, stage):
         """Returns True if stage already recorded in info file
-           as succcessul"""
-        return self.__info_file["status"][stage] == "success"
+           as successul"""
+        return self._info_file["status"][stage] == "success"
 
     def update_info_file(self, stage, success):
-        with open(f"{self.__location}/hekit.info", "w") as info_file:
-            self.__info_file["status"][stage] = "success" if success else "failure"
-            toml.dump(self.__info_file, info_file)
+        with open(f"{self._location}/hekit.info", "w") as info_file:
+            self._info_file["status"][stage] = "success" if success else "failure"
+            toml.dump(self._info_file, info_file)
 
-    def __stage(self, stage):
+    def _stage(self, stage):
         print(stage)
         if self.already_successful(stage):
             return True, 0
 
-        change_cwd_to(f"{self.__location}/{stage}")
-        success, rt = run(self.__spec[stage])
-        self.update_info_file(stage, success)
-        return success, rt
+        def closure():
+            return run(self._spec[stage])
+
+        fns = []
+        # Will need run add a pre_method if it exists
+        if f"pre_{stage}" in dir(self):
+            fns.append(getattr(self, f"pre_{stage}"))
+
+        # Now run the stage
+        fns.append(closure)
+
+        # And same again for post_method if it exists
+        if f"post_{stage}" in dir(self):
+            fns.append(getattr(self, f"post_{stage}"))
+
+        change_cwd_to(f"{self._location}/{stage}")
+
+        try:
+            chain_run(fns)
+            self.update_info_file(stage, success=True)
+            return True, 0
+        except BuildError as be:
+            self.update_info_file(stage, success=False)
+            return False, be.error
 
     def fetch(self):
         """"""
-        return self.__stage("fetch")
+        return self._stage("fetch")
 
     def pre_build(self):
         """"""
         print("pre-build")
-        success, rt = run(self.__spec["pre-build"])
+        success, rt = run(self._spec["pre-build"])
         return success, rt
 
     def build(self):
         """"""
-        return self.__stage("build")
+        return self._stage("build")
 
     def post_build(self):
         """"""
@@ -151,4 +170,4 @@ class ComponentBuilder:
 
     def install(self):
         """"""
-        return self.__stage("install")
+        return self._stage("install")

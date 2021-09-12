@@ -8,6 +8,7 @@ import sys
 import argparse
 
 import os
+import shutil
 import pprint
 from component_builder import ComponentBuilder, chain_run
 
@@ -39,14 +40,7 @@ def install_components(args):
             print(f"Skipping {label}")
             continue
         chain_run(
-            [
-                component.setup,
-                component.fetch,
-                component.pre_build,
-                component.build,
-                component.post_build,
-                component.install,
-            ]
+            [component.setup, component.fetch, component.build, component.install]
         )
 
 
@@ -89,6 +83,18 @@ def list_components(args):
 
 def remove_components(args):
     """"""
+    try:
+        component = args.component
+        instance = args.instance
+        path = f"{repo_location}/{component}/{instance}"
+        shutil.rmtree(path)
+        print(f"Instance '{instance}' of component '{component}' successfully removed")
+
+    except FileNotFoundError:
+        print(
+            "Nothing to remove",
+            f"Instance '{instance}' of component '{component}' not found.",
+        )
 
 
 def parse_cmds():
@@ -117,7 +123,8 @@ def parse_cmds():
     parser_remove = subparsers.add_parser(
         "remove", help="removes/uninstalls components"
     )
-    #    parser_remove.add_argument('--baz', choices='XYZ', help='baz help')
+    parser_remove.add_argument("component", type=str, help="component to be removed")
+    parser_remove.add_argument("instance", type=str, help="instance to be removed")
     parser_remove.set_defaults(fn=remove_components)
 
     return parser.parse_args()
