@@ -1,7 +1,18 @@
-
 [[dependency.hexl]]
 name = "1.2.1"
-tool = "cmake"
+fetch = "git clone https://github.com/intel/hexl.git --branch %name%"
+decompress = "tar xvf"
+fetch_dir = "~/.hekit/hexl/1.2.1/fetch"
+build_dir = "~/.hekit/hexl/1.2.1/build"
+install_dir = "~/.hekit/hexl/1.2.1/build"
+pre-build = """ cmake -S %fetch_dir%/hexl -B %build_dir%
+               -DCMAKE_INSTALL_PREFIX=%install_dir%"""
+build = "cmake --build %build_dir% -j"
+install = "cmake --install %install_dir%"
+
+[[dependency.hexl]]
+skip = true
+name = "1.2.0"
 fetch = "git clone https://github.com/intel/hexl.git --branch 1.2.1"
 decompress = "tar xvf"
 src_dir = ""

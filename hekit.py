@@ -19,25 +19,28 @@ def components_to_build_from(filename, category):
     toml_dict = toml.load(filename)
     category_objs = toml_dict[category]
     # Extracting specs also flattens 'list of list' to list
-    specs = (
-        specs
-        for name, category_specs in category_objs.items()
-        for specs in category_specs
+    specs = ((name, spec) for name, specs in category_objs.items() for spec in specs)
+
+    return (
+        ComponentBuilder(category, name, spec, repo_location) for name, spec in specs
     )
-    return (ComponentBuilder(spec) for spec in specs)
 
 
 def install_components(args):
     """"""
 
     label = "dependency"
-    # label = "libraries"
+    # label = "library"
     components = components_to_build_from(args.install_file, label)
 
     for component in components:
         print(label)
+        if component.skip():
+            print(f"Skipping {label}")
+            continue
         chain_run(
             [
+                component.setup,
                 component.fetch,
                 component.pre_build,
                 component.build,
@@ -57,16 +60,31 @@ def list_components(args):
     """List to stdout info on components."""
     global repo_location
     # At the mo, just lists installed.
-    root = f"{repo_location}/installs"
-    for dir in sorted(list_dirs(root)):
-        try:
-            info_filepath = f"{root}/{dir}/hekit.info"
-            info_file = toml.load(info_filepath)
-            print(dir, info_file["status"])
-        except FileNotFoundError:
-            print(dir, "unknown", f"'{info_filepath}' not found")
-        except KeyError as emsg:
-            print(dir, "unknown", f"key {emsg} not found")
+    width = 10
+    print(f"{'component':{width}} {'instance':{width}} {'install':{width}}")
+
+    for comp_name in sorted(list_dirs(repo_location)):
+        comp_name_path = f"{repo_location}/{comp_name}"
+        for comp_inst in sorted(list_dirs(comp_name_path)):
+            try:
+                info_filepath = f"{comp_name_path}/{comp_inst}/hekit.info"
+                info_file = toml.load(info_filepath)
+                print(
+                    f"{comp_name:{width}} {comp_inst:{width}}",
+                    f"{info_file['status']['install']:{width}}",
+                )
+            except FileNotFoundError:
+                print(
+                    f"{comp_name:{width}} {comp_inst:{width}}",
+                    f"{'unknown':{width}}",
+                    f"'{info_filepath}' not found",
+                )
+            except KeyError as emsg:
+                print(
+                    f"{comp_name:{width}} {comp_inst:{width}}",
+                    f"{'unknown':{width}}",
+                    f"key {emsg} not found",
+                )
 
 
 def remove_components(args):

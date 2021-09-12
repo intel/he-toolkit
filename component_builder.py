@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import re
+import toml
 import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT
@@ -31,12 +32,10 @@ def fill_self_ref_string_dict(d):
 
     def fill_str(s):
         if not isinstance(s, str):
-            raise TypeError(
-                f"fill_str expects type str, but got type '{type(s).__name__}'"
-            )
+            # Not string do nothing
+            return s
 
         symbols = re.findall(r"(%(.*?)%)", s)
-
         if not symbols:
             return s
 
@@ -51,9 +50,13 @@ def fill_self_ref_string_dict(d):
 
 def run(cmd_and_args):
     """Takes either a string or list of strings and runs as command."""
-    cmd_and_args_list = (
-        shlex.split(cmd_and_args) if isinstance(cmd_and_args, str) else cmd_and_args
-    )
+    if isinstance(cmd_and_args, str):
+        cmd_and_args_list = shlex.split(cmd_and_args)
+        print(cmd_and_args)
+    else:
+        cmd_and_args_list = cmd_and_args
+        print(" ".join(cmd_and_args))
+
     basename = os.path.basename(cmd_and_args_list[0]).upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
@@ -62,34 +65,84 @@ def run(cmd_and_args):
     return success, proc.returncode
 
 
+def change_cwd_to(path):
+    try:
+        os.makedirs(path)
+    except FileExistsError:
+        pass
+    os.chdir(path)
+
+
 class ComponentBuilder:
-    def __init__(self, spec):
+    def __init__(self, category, comp_name, spec, repo_path):
         """"""
         if not isinstance(spec, dict):
             raise TypeError(
                 f"A spec must be type dict, but got '{type(spec).__name__}'"
             )
-        os.chdir("tmp")
-        print("Working in:", os.getcwd())
         self.__spec = fill_self_ref_string_dict(spec)
+        self.__comp_instance = self.__spec["name"]
+        self.__location = f"{repo_path}/{comp_name}/{self.__comp_instance}"
+        self.__skip = self.__spec["skip"] if "skip" in self.__spec else False
+        if not isinstance(self.__skip, bool):
+            raise ValueError("Skip must be set to true or false")
         print(self.__spec)
+
+        # load previous from info file
+        try:
+            with open(f"{self.__location}/hekit.info") as info_file:
+                self.__info_file = toml.load(info_file)
+        except FileNotFoundError:
+            self.__info_file = {
+                "status": {"fetch": None, "build": None, "install": None}
+            }
+
+    def skip(self):
+        return self.__skip
+
+    def setup(self):
+        root = self.__location
+        for dirname in ("fetch", "build", "install"):
+            try:
+                os.makedirs(f"{root}/{dirname}")
+            except FileExistsError:
+                pass  # nothing to do
+        # Should return successful
+        return True, 0
+
+    def already_successful(self, stage):
+        """Returns True if stage already recorded in info file
+           as succcessul"""
+        return self.__info_file["status"][stage] == "success"
+
+    def update_info_file(self, stage, success):
+        with open(f"{self.__location}/hekit.info", "w") as info_file:
+            self.__info_file["status"][stage] = "success" if success else "failure"
+            toml.dump(self.__info_file, info_file)
+
+    def __stage(self, stage):
+        print(stage)
+        if self.already_successful(stage):
+            return True, 0
+
+        change_cwd_to(f"{self.__location}/{stage}")
+        success, rt = run(self.__spec[stage])
+        self.update_info_file(stage, success)
+        return success, rt
 
     def fetch(self):
         """"""
-        print("fetch")
-        success, rt = run(self.__spec["fetch"])
-        return success, rt
+        return self.__stage("fetch")
 
     def pre_build(self):
         """"""
         print("pre-build")
-        # rt = run(self.spec)
-        return True, 0
+        success, rt = run(self.__spec["pre-build"])
+        return success, rt
 
     def build(self):
         """"""
-        print("build")
-        return True, 0
+        return self.__stage("build")
 
     def post_build(self):
         """"""
@@ -98,5 +151,4 @@ class ComponentBuilder:
 
     def install(self):
         """"""
-        print("install")
-        return True, 0
+        return self.__stage("install")
