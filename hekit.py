@@ -101,7 +101,9 @@ def parse_cmds():
     """"""
     # create the top-level parser
     parser = argparse.ArgumentParser(prog="PROG")
-    #    parser.add_argument('--foo', action='store_true', help='foo help')
+    parser.add_argument(
+        "--version", action="store_true", help="display Intel HE toolit version"
+    )
     subparsers = parser.add_subparsers(help="sub-command help")
 
     # create the parser for the "list" command
@@ -134,10 +136,12 @@ def main():
     # Parse cmdline
     args = parse_cmds()
 
+    if args.version:
+        print("Intel HE Toolkit version 1.3.0")
+        exit(0)
+
     # Run the command
     args.fn(args)
-
-    print(args)
 
 
 if __name__ == "__main__":

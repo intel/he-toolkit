@@ -1,29 +1,41 @@
 [[dependency.hexl]]
-skip = true
+skip = false
 name = "1.2.1"
 fetch = "git clone https://github.com/intel/hexl.git --branch %name%"
 fetch_dir = "~/.hekit/hexl/1.2.1/fetch"
 build_dir = "~/.hekit/hexl/1.2.1/build"
-install_dir = "~/.hekit/hexl/1.2.1/install"
-pre-build = """ cmake -S %fetch_dir%/hexl -B %build_dir%
-               -DCMAKE_INSTALL_PREFIX=%install_dir%"""
+install_dir = "~/.hekit/hexl/1.2.1/build"
+pre-build = """cmake -S %fetch_dir%/hexl -B %build_dir%
+               -DCMAKE_INSTALL_PREFIX=%actual_install_dir%"""
 build = "cmake --build %build_dir% -j"
+post-build = ""
+actual_install_dir = "~/.hekit/hexl/1.2.1/install"
 install = "cmake --install %install_dir%"
 
 
-[[dependency.hexl]]
-skip = true
-name = "1.2.0"
-fetch = "git clone https://github.com/intel/hexl.git --branch 1.2.1"
-src_dir = ""
-build_dir = ""
-install_dir = ""
-pre-build = "-S %src_dir% -B %build_dir% -DENABLE_DEBUG=ON"
-build = "--build %build_dir% -j"
-install = "--install %install_dir%"
+[[dependency.ntl]]
+skip = false
+version = "11.5.1"
+name = "%version%"
+fetch_dir = "~/.hekit/ntl/%version%/fetch"
+build_dir_pre = "~/.hekit/ntl/%version%/build"
+build_dir = "~/.hekit/ntl/%version%/build/ntl-%version%/src"
+install_dir = "~/.hekit/ntl/%version%/install"
+fetch = "wget https://libntl.org/ntl-%version%.tar.gz"
+# At mo, some progs can't expand tilde
+pre-build = "bash -c 'tar -xvf %fetch_dir%/ntl-%version%.tar.gz -C %build_dir_pre%'"
+build = "bash -c './configure PREFIX=%install_dir% && make -j'"
+install = "make install"
+
+
+[[library.dummy]]
+skip = false
+dependecies = ["hexl/1.2.1", "ntl/11-debug"]
+system_dependencies = [ "libgmp" ]
 
 
 [[dependency.dummy]]
+skip = true
 name = "a"
 fetch = ""
 fetch_dir = "~/.hekit/dummy/a/fetch"

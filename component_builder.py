@@ -21,7 +21,10 @@ def chain_run(funcs):
     for fn in funcs:
         success, return_code = fn()
         if not success:
-            raise BuildError("", return_code)
+            raise BuildError(
+                f"Function '{fn.__name__}' failed to execute external process",
+                return_code,
+            )
 
 
 def fill_self_ref_string_dict(d):
@@ -60,17 +63,14 @@ def run(cmd_and_args):
     basename = os.path.basename(cmd_and_args_list[0]).upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
-            print(f"[{basename}]", line.decode("ascii"), end="")
+            print(f"[{basename}]", line.decode("utf-8"), end="")
     success = True if proc.returncode == 0 else False
     return success, proc.returncode
 
 
 def change_cwd_to(path):
-    try:
-        os.makedirs(path)
-    except FileExistsError:
-        pass
-    os.chdir(path)
+    expanded_path = os.path.expanduser(path)
+    os.chdir(expanded_path)
 
 
 class ComponentBuilder:
@@ -139,7 +139,8 @@ class ComponentBuilder:
         if f"post_{stage}" in dir(self):
             fns.append(getattr(self, f"post_{stage}"))
 
-        change_cwd_to(f"{self._location}/{stage}")
+        stage_dir = self._spec[f"{stage}_dir"]
+        change_cwd_to(stage_dir)
 
         try:
             chain_run(fns)
@@ -150,24 +151,23 @@ class ComponentBuilder:
             return False, be.error
 
     def fetch(self):
-        """"""
+        """Fetch the source"""
         return self._stage("fetch")
 
     def pre_build(self):
-        """"""
+        """Any setup steps before building"""
         print("pre-build")
-        success, rt = run(self._spec["pre-build"])
-        return success, rt
+        return run(self._spec["pre-build"])
 
     def build(self):
-        """"""
+        """Build the software"""
         return self._stage("build")
 
     def post_build(self):
-        """"""
+        """Any steps after a build"""
         print("post-build")
-        return True, 0
+        return run(self._spec["post-build"])
 
     def install(self):
-        """"""
+        """Installation of the component, ready to use"""
         return self._stage("install")
