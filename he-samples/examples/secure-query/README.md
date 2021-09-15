@@ -51,13 +51,47 @@ The sample also supports specifying custom encryption parameters and input optio
 The encryption parameters which can be specified are
  - A power-of-two poly modulus degree specified as e.g. "10" for degree 1024=2^10
  - Plain modulus, this must be prime and > than 17
- - Database key length: The maximum key length in characters, should be long enough to fit the longest key specified in the dataset.
+ - Database key length: The key length in characters, shorter keys will be padded with 0 to this length and longer keys will be truncated, should be long enough to fit the longest key specified in the dataset.
 
 Additionally a custom database can be specified. The format of this database has the format (key , value).
 
 ## Implementation Details
 
-For this example, database keys are assumed to be char strings. With the default options, they are encoded into 2 4-bit chunks. This is done so that each chunk can be represented by the plain modulus of 17. The secure query lookup algorithm is based on using Fermat's little theorem to generate a mask from the query and for each database entry's key. This results in mask values of 1 for matches and 0 for non matches. This mask is then multiplied against the database entry value which is accumulated for all entries and returned. For this sample it is required that all entries possess a unique key.
+This section provides additional details on the implementation of the secure query lookup algorithm. It should be used in tandem with the in source 
+documentation and provided references. 
+
+### Database key and user query encoding scheme
+
+Each database entry in our sample consists of a key string and value string pair. Keys and user queries are encoded so that we can perform an encrypted
+comparison between them and return a keys associated value string when it matches the user query string. The following diagram illustrates how strings are 
+decomposed into individual characters and then encoded 4 bits at a time into ciphertexts. For this example we choose 4 bits to encode at a time because that is the largest that can be represented by our coefficients given our plain modulus size of 17 which is a parameter of the lookup comparison algorithm. 
+
+![encoding_diagram](images/encoding_diagram.png)
+
+### Key comparison and mask generation using Fermat's Little Theorem
+
+Combining the attribute that our plaintext coefficients exist modulus our plaintext modulus p and the idea presented in fermat's 
+little theorem which states that for any integer a that is not a multiple of p, and p is prime, then a^(p-1) = 1 % p, we are able to 
+calculated a comparison mask that evaluates to 0 for non matches and 1 for matches. The following diagram illustrates how these 
+masks are calculated for each entry of our query and database key.
+
+![Query Key comparison](images/query_key_comparison.png)
+
+### Value encoding scheme
+
+Database entry values are encoded in a similar but different and more efficient way than our database keys. For the database values 
+the string is split into the same vector of integers with values from [0,15], but instead of encoding 1 integer per ciphertext we are
+able to encode all integers into a single ciphertext upto the coefficient count of the ciphertext.
+
+### Results accumulation and return
+For each database entry we perform keylength*2 component comparisons generating keylength*2 mask ciphertext results. These masks all contain a value of 0 if the values did not match or 1 if the values were the same. We then multiply all of these results together resulting in a value of 0 if the key and query differ or 1 if they match exactly. This value is then multipled against the value 
+ciphertext which results in a ciphertext containing all 0 coefficients for non matches or a ciphertext with coefficients identical to 
+the value ciphertext. As all database keys are required to be unique the result of any query can only return 0 or 1 matches, allowing us to safely accumulate the result of all our comparisons into a single ciphertext which is then returned. The value of this ciphertext will
+be either 0 which decodes to an empty string for non matches or the value string of the matching key. The following diagram illustrates how these accumulation steps are performed.
+
+![Mask comparison](images/mask_comparison.png)
+
+
 
 ## References
 
