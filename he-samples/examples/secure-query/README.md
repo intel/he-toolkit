@@ -62,18 +62,16 @@ documentation and provided references.
 
 ### Database key and user query encoding scheme
 
-Each database entry in our sample consists of a key string and value string pair. Keys and user queries are encoded so that we can perform an encrypted
-comparison between them and return a keys associated value string when it matches the user query string. The following diagram illustrates how strings are 
-decomposed into individual characters and then encoded 4 bits at a time into ciphertexts. For this example we choose 4 bits to encode at a time because that is the largest that can be represented by our coefficients given our plain modulus size of 17 which is a parameter of the lookup comparison algorithm. 
+Each database entry in our sample consists of a key string and value string pair. Keys and user queries are encoded so that we can perform an encrypted comparison between them and return a keys associated value string when it matches the user query string. The following diagram illustrates how strings are decomposed into individual characters and then encoded 4 bits at a time into ciphertexts. For this example we choose 4 bits to encode at a time because that is the largest that can be represented by our coefficients given our plain modulus size of 17 which is a parameter of the lookup comparison algorithm. 
 
 ![encoding_diagram](images/encoding_diagram.png)
 
 ### Key comparison and mask generation using Fermat's Little Theorem
 
 Combining the attribute that our plaintext coefficients exist modulus our plaintext modulus p and the idea presented in fermat's 
-little theorem which states that for any integer a that is not a multiple of p, and p is prime, then a^(p-1) = 1 % p, we are able to 
-calculated a comparison mask that evaluates to 0 for non matches and 1 for matches. The following diagram illustrates how these 
-masks are calculated for each entry of our query and database key.
+little theorem which states that for any integer a that is not a multiple of p, and given p is prime, then a^(p-1) = 1 % p, we are able to 
+calculate a comparison mask that evaluates to 0 for non matches and 1 for matches. The following diagram illustrates how these 
+masks are calculated for each element wise value from our query and database key vectors.
 
 ![Query Key comparison](images/query_key_comparison.png)
 
@@ -81,16 +79,16 @@ masks are calculated for each entry of our query and database key.
 
 Database entry values are encoded in a similar but different and more efficient way than our database keys. For the database values 
 the string is split into the same vector of integers with values from [0,15], but instead of encoding 1 integer per ciphertext we are
-able to encode all integers into a single ciphertext upto the coefficient count of the ciphertext.
+able to encode all integers into a single ciphertext up to the coefficient count of the ciphertext.
 
 ### Results accumulation and return
-For each database entry we perform keylength*2 component comparisons generating keylength*2 mask ciphertext results. These masks all contain a value of 0 if the values did not match or 1 if the values were the same. We then multiply all of these results together resulting in a value of 0 if the key and query differ or 1 if they match exactly. This value is then multipled against the value 
+
+For each database entry we perform keylength*2 element wise comparisons between query and key cihpertext vectors generating keylength*2 mask ciphertext results. These masks all contain a value of 0 if the values did not match or 1 if the values were the same. We then multiply all of these results together resulting in a value of 0 if the key and query differ or 1 if they match exactly. This value is then multiplied against the value 
 ciphertext which results in a ciphertext containing all 0 coefficients for non matches or a ciphertext with coefficients identical to 
 the value ciphertext. As all database keys are required to be unique the result of any query can only return 0 or 1 matches, allowing us to safely accumulate the result of all our comparisons into a single ciphertext which is then returned. The value of this ciphertext will
 be either 0 which decodes to an empty string for non matches or the value string of the matching key. The following diagram illustrates how these accumulation steps are performed.
 
 ![Mask comparison](images/mask_comparison.png)
-
 
 
 ## References
