@@ -32,7 +32,7 @@ class SQClient {
   /**
    * @brief encodeStringQuery converts an std::string to a 4-bit encoded/encrypted vector of ciphertexts. See the README for details on this encoding.
    * @param query an std::string to be encoded/encrypted.
-   * @return a vector of ciphertexts containing values in the range [0,7] representing the value of each character in query as 2 ciphertexts.
+   * @return a vector of ciphertexts containing values in the range [0,15] representing the value of each character in query as 2 ciphertexts.
    */
   std::vector<seal::Ciphertext> encodeStringQuery(const std::string& query);
   /**
