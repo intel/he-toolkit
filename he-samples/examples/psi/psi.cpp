@@ -12,7 +12,7 @@ using Ptxt = helib::Ptxt<helib::BGV>;
 
 static inline NTL::ZZX binary_to_poly(long x) {
   constexpr long N = 16;
-  std::bitset<N> b(x);
+  const std::bitset<N> b(x);
   NTL::ZZX poly;
 
   for (long i = 0; i < N; ++i) {
@@ -20,6 +20,17 @@ static inline NTL::ZZX binary_to_poly(long x) {
   }
 
   return poly;
+}
+
+static inline long binary_to_poly(const NTL::ZZX& poly) {
+  constexpr long N = 16;
+  std::bitset<N> b;
+
+  for (long i = 0; i < N; ++i) {
+    b[i] = NTL::conv<long>(coeff(poly, i));
+  }
+
+  return static_cast<long>(b.to_ulong());
 }
 
 void read_in_set(std::vector<NTL::ZZX>& out, const std::string& filename) {
