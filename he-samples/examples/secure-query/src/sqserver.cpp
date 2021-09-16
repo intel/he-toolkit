@@ -52,10 +52,10 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
 
   seal::Ciphertext mult_accumulate;
   m_encryptor->encrypt_zero(mult_accumulate);
-  /* For each entry in the encrypted database we perform a comparison between the
-   * query key and entry key which evaluates to 1 if the query and entry match or
-   * 0 if they differ. This result is then multipled against the encrypted value
-   * ciphertext which is then added to the return ciphertext.
+  /* For each entry in the encrypted database we perform a comparison between
+   * the query key and entry key which evaluates to 1 if the query and entry
+   * match or 0 if they differ. This result is then multiplied against the
+   * encrypted value ciphertext which is then added to the return ciphertext.
    */
 #pragma omp parallel for
   for (unsigned int entry = 0; entry < m_encrypted_database.size(); entry++) {
@@ -66,7 +66,8 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
     std::vector<seal::Ciphertext> masks;
     masks.reserve(enc_db_entry.key.size() + 1);
     for (size_t x = 0; x < enc_db_entry.key.size(); x++) {
-      //We add the results of the comparison between all of the component elements of the query and key.
+      // We add the results of the comparison between all of the component
+      // elements of the query and key.
       masks.push_back(generateComparisonMaskUsingFLT(enc_db_entry.key[x],
                                                      query_key[x], relin_keys));
     }
@@ -85,8 +86,8 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
     /* We enforce that all key values in the database are unique. Thus we can
      * return the result of the query by adding the results from all of the
      * key/value multiplications performend previously. If we had 3 values and
-     * key 1 matched the query the resultant computation would look like the following
-     * 0 + key[1].value + 0 = key[1].value
+     * key 1 matched the query the resultant computation would look like the
+     * following 0 + key[1].value + 0 = key[1].value
      */
 #pragma omp critical
     m_evaluator->add_inplace(mult_accumulate, return_values);
