@@ -29,14 +29,22 @@ void read_in_set(std::vector<NTL::ZZX>& out, const std::string& filename) {
   out.clear();
   std::string line;
   while (std::getline(file, line)) {
-    out.emplace_back(std::stoi(line));
+    out.emplace_back(binary_to_poly(std::stoi(line)));
   }
+}
+
+template <typename T>
+void printVector(const std::vector<T>& v) {
+  for (long i = 0; i < long(v.size()); ++i) {
+    std::cout << v[i] << "\n";
+  }
+  std::cout << std::endl;
 }
 
 struct CmdLineOpts {
   std::string client_set_path;
   long m = 771;
-  long bits = 1000;
+  long bits = 700;
   long nthreads = 1;
   bool ptxt = false;  // Default value
 };
@@ -47,14 +55,16 @@ int main(int argc, char** argv) {
   helib::ArgMap()
     .required()
     .positional()
-      .arg("<client-set>", cmdline_opts.client_set_path, "Query file.", nullptr)
+      .arg("<client-set>", cmdline_opts.client_set_path, "Client set.", nullptr)
     .named()
     .optional()
       .arg("-n", cmdline_opts.nthreads, "Number of threads.")
-      .arg("--ptxt", cmdline_opts.ptxt, "Keep client set in encoded plaintext.")
       .arg("--m", cmdline_opts.m,
            "Change the order of the cyclotomic polynomial.")
       .arg("--bits", cmdline_opts.bits, "Change number of big Q bits.")
+    .toggle()
+      .arg("--ptxt", cmdline_opts.ptxt,
+           "Keep client set in encoded plaintext.", nullptr)
     .parse(argc, argv);
   // clang-format on
 
@@ -66,7 +76,7 @@ int main(int argc, char** argv) {
 
   NTL::SetNumThreads(cmdline_opts.nthreads);
 
-  // Create context and keys
+  std::cout << "Creating context and keys" << std::endl;
   // clang-format off
   helib::Context context = helib::ContextBuilder<helib::BGV>()
                              .m(cmdline_opts.m)
@@ -75,7 +85,6 @@ int main(int argc, char** argv) {
                              .bits(cmdline_opts.bits)
                              .build();
   // clang-format on
-
   helib::SecKey secretKey(context);
   secretKey.GenSecKey();
 
@@ -84,18 +93,22 @@ int main(int argc, char** argv) {
   helib::addFrbMatrices(secretKey);
   const helib::EncryptedArray& ea = context.getEA();
 
-  // Load things
-  // create client set - single ctxt
+  std::cout << "Reading in client set" << std::endl;
+  // create client set
   std::vector<NTL::ZZX> client_set;
   read_in_set(client_set, cmdline_opts.client_set_path);
+  printVector(client_set);
 
   // Encode the client set into a Ptxt
   Ptxt client_set_in_ptxt(context, client_set);
 
+  std::cout << "Reading in server set" << std::endl;
   // Create server set - simple array
   std::vector<NTL::ZZX> server_set;
   read_in_set(server_set, "server.txt");
+  printVector(server_set);
 
+  std::cout << "Performing the set intersection" << std::endl;
   Ptxt result(context);
   try {
     if (cmdline_opts.ptxt) {
@@ -115,11 +128,12 @@ int main(int argc, char** argv) {
     std::exit(1);
   }
 
-  // Print out intersection
-  for (long i = 0; result.lsize(); ++i) {
+  std::cout << "The following were found in both sets" << std::endl;
+  std::cout << "Size: " << result.lsize() << std::endl;
+  for (long i = 0; i < result.lsize(); ++i) {
     std::cout << result[i] << "\n";
   }
-  std::cout << std::endl;
+  std::cout << "FIN." << std::endl;
 
   return 0;
 }
