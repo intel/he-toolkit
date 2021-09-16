@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
   CmdLineOpts cmdline_opts;
   // clang-format off
   helib::ArgMap()
+    .separator(helib::ArgMap::Separator::WHITESPACE)
     .required()
     .positional()
       .arg("<client-set>", cmdline_opts.client_set_path, "Client set.", nullptr)
@@ -117,11 +118,14 @@ int main(int argc, char** argv) {
     } else {
       helib::Ctxt encrypted_client_set(publicKey);
       publicKey.Encrypt(encrypted_client_set, client_set_in_ptxt);
+      std::cout << "Encrypt" << std::endl;
       // Set intersect
       auto encrypted_result =
           helib::calculateSetIntersection(encrypted_client_set, server_set);
+      std::cout << "PSI'd" << std::endl;
       // Decrypt result
       secretKey.Decrypt(result, encrypted_result);
+      std::cout << "Decrypt" << std::endl;
     }
   } catch (std::runtime_error e) {
     std::cout << e.what() << std::endl;
