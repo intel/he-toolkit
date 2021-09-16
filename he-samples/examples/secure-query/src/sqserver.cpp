@@ -85,8 +85,8 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
     m_evaluator->multiply_many(masks, relin_keys, return_values);
     /* We enforce that all key values in the database are unique. Thus we can
      * return the result of the query by adding the results from all of the
-     * key/value multiplications performend previously. If we had 3 values and
-     * key 1 matched the query the resultant computation would look like the
+     * key/value multiplications performed previously. If we had 3 values and
+     * key 1 matched the query, the resultant computation would look like the
      * following 0 + key[1].value + 0 = key[1].value
      */
 #pragma omp critical

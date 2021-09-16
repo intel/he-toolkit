@@ -23,14 +23,14 @@ class SQServer {
   size_t keyLength() const;
   void setKeyLength(const size_t& keyLength);
   /**
-   * @brief queryDatabaseForMatchingEntry compares the query key against the key
-   * value of all database entries and returns a ciphertext containing the
-   * entry's value if a match is found
-   * @param query_key is a vector of cipher texts representing the encoded and
+   * @brief `queryDatabaseForMatchingEntry` compares the query key against the
+   * key value of all database entries and returns a ciphertext containing the
+   * entry's value if a match is found.
+   * @param query_key is a vector of ciphertexts representing the encoded and
    * encrypted query key.
-   * @param relin_keys used for reliniarization during function execution
+   * @param relin_keys used for relinearization during function execution
    * @return A ciphertext containing the encrypted value if a match is found or
-   * zero if query did not match any of the database keys
+   * zero if the query did not match any of the database keys.
    */
   seal::Ciphertext queryDatabaseForMatchingEntry(
       std::vector<seal::Ciphertext> query_key, seal::RelinKeys relin_keys);
@@ -38,24 +38,26 @@ class SQServer {
  private:
   void createPlain1CT();
   /**
-   * @brief generateComparisonMaskUsingFLT performs a comparison between cipher1
-   * and cipher2 that evaluates to 1 if they are same value or 0 if they differ
+   * @brief `generateComparisonMaskUsingFLT` performs a comparison between
+   * `cipher1` and `cipher2` that evaluates to 1 if they are same value or 0 if
+   * they differ.
    *
-   * This comparison is achieved by combining the property that plaintext values
-   * are defined modulus the plain modulus and the concept from fermat's little
-   * theorem which states  that if p is a prime and a is any integer not
-   * divisible by p then a^(p-1) = 1 % p : where a is an integer, p is the plain
-   * modulus. To perform this comparison Cipher1 is subtracted from cipher 2 to
-   * generate a mask ciphertext. The value of this mask is 0 if cipher1 and
-   * cipher2 are the same value or some value between (-p,-1) or (1,p). We then
-   * raise this value to p - 1 which per FLT results in the value being 1 % p =
-   * 1 if a != 0 or 0 if a = 0. We finally negate the value and add 1 resulting
-   * in 0 for all non matches and 1 for matching case.
-   * @param cipher1 contains a value between [0,p)
-   * @param cipher2 contains a value between [0,p)
-   * @param relin_keys required for exponentiating in place
-   * @return A ciphertext encoding a value of 1 if the value of cipher1 ==
-   * cipher2 or 0 if the value of cipher1 != cipher2
+   * This comparison is achieved by combining the property that plaintext
+   * values are defined modulo the plaintext modulus and the concept from
+   * Fermat's little theorem which states that if `p` is a prime and `a` is any
+   * integer not divisible by `p` then `a^(p-1) = 1 % p`, where `a` is an
+   * integer and `p` is the plaintext modulus. To perform this comparison
+   * `cipher1` is subtracted from `cipher2` to generate a mask ciphertext. The
+   * value of this mask is 0 if `cipher1` and `cipher2` are the same value or
+   * some value between `(-p,-1)` or `(1,p)`. We then raise this value to `p -
+   * 1` which per FLT results in the value being `1 % p = 1 iff a != 0` or `0
+   * iff a = 0`. We finally negate the value and add 1, resulting in 0 for all
+   * non matches and 1 for any matching case.
+   * @param cipher1 contains a value between `[0,p)`.
+   * @param cipher2 contains a value between `[0,p)`.
+   * @param relin_keys required for exponentiating in place.
+   * @return A ciphertext encoding a value of 1 if the value of `cipher1 ==
+   * cipher2` or 0 if the value of `cipher1 != cipher2`.
    */
   seal::Ciphertext generateComparisonMaskUsingFLT(
       const seal::Ciphertext& cipher1, const seal::Ciphertext& cipher2,
