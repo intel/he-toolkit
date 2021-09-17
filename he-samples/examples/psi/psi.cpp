@@ -51,7 +51,7 @@ TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
   if (translation) {
     TranslationTable* translation_table = new TranslationTable;
     while (std::getline(file, line)) {
-      hashed_value = std::hash<std::string>{}(line) % 65536;
+      hashed_value = std::hash<std::string>{}(line) % (1 << N);
       translation_table->try_emplace(hashed_value,
                                      line);  // First come, first served.
       out.emplace_back(long_to_poly(hashed_value, N));
@@ -59,7 +59,7 @@ TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
     return translation_table;
   } else {
     while (std::getline(file, line)) {
-      hashed_value = std::hash<std::string>{}(line) % 65536;
+      hashed_value = std::hash<std::string>{}(line) % (1 << N);
       out.emplace_back(long_to_poly(hashed_value, N));
     }
     return nullptr;
