@@ -78,7 +78,7 @@ struct CmdLineOpts {
   std::string client_set_path;
   std::string server_set_path = "./datasets/fruits.set";
   long m = 771;
-  long bits = 700;
+  long bits = 60;
   long nthreads = 1;
   bool ptxt = false;  // Default value
 };
@@ -139,7 +139,6 @@ int main(int argc, char** argv) {
   std::unique_ptr<TranslationTable> translation_table{
       read_in_set(client_set, cmdline_opts.client_set_path, N,
                   /*translation table=*/true)};
-  if (translation_table->empty()) std::cout << "table is empty !!!\n";
   printVector(client_set);
 
   // Encode the client set into a Ptxt
@@ -160,14 +159,11 @@ int main(int argc, char** argv) {
     } else {
       helib::Ctxt encrypted_client_set(publicKey);
       publicKey.Encrypt(encrypted_client_set, client_set_in_ptxt);
-      std::cout << "Encrypt" << std::endl;
       // Set intersect
       auto encrypted_result =
           helib::calculateSetIntersection(encrypted_client_set, server_set);
-      std::cout << "PSI'd" << std::endl;
       // Decrypt result
       secretKey.Decrypt(result, encrypted_result);
-      std::cout << "Decrypt" << std::endl;
     }
   } catch (std::runtime_error e) {
     std::cout << e.what() << std::endl;
@@ -175,13 +171,11 @@ int main(int argc, char** argv) {
   }
 
   std::cout << "The following were found in both sets" << std::endl;
-  std::cout << "Size: " << result.lsize() << std::endl;
   for (long i = 0; i < result.lsize(); ++i) {
     const auto it =
         translation_table->find(poly_to_long(result[i].getData(), N));
     if (it != translation_table->end()) std::cout << it->second << "\n";
   }
-  std::cout << "FIN." << std::endl;
 
   return 0;
 }
