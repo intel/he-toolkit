@@ -76,7 +76,7 @@ void printVector(const std::vector<T>& v) {
 
 struct CmdLineOpts {
   std::string client_set_path;
-  std::string server_set_path = "./datasets/egyptian_gods.set";
+  std::string server_set_path = "./datasets/fruits.set";
   long m = 771;
   long bits = 700;
   long nthreads = 1;
