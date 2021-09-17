@@ -5,7 +5,6 @@
 #include <helib/helib.h>
 #include <helib/set.h>  // <- set intersection
 
-#include <bitset>
 #include <fstream>
 #include <functional>  // std::hash
 #include <memory>
@@ -14,31 +13,32 @@
 using TranslationTable = std::unordered_map<long, std::string>;
 using Ptxt = helib::Ptxt<helib::BGV>;
 
-static inline NTL::ZZX binary_to_poly(long x) {
-  constexpr long N = 16;
-  const std::bitset<N> b(x);
+static inline NTL::ZZX long_to_poly(long x, long N) {
   NTL::ZZX poly;
 
-  for (long i = 0; i < N; ++i) {
-    SetCoeff(poly, i, b[i]);
+  unsigned long bits = static_cast<unsigned long>(x);
+  unsigned long mask = 1;
+  for (long i = 0; i < N; ++i, mask <<= 1) {
+    SetCoeff(poly, i, (bits & mask) > 0);
   }
 
   return poly;
 }
 
-static inline long poly_to_binary(const NTL::ZZX& poly) {
-  constexpr long N = 16;
-  std::bitset<N> b;
-
-  for (long i = 0; i < N; ++i) {
-    b[i] = NTL::conv<long>(coeff(poly, i));
+static inline long poly_to_long(const NTL::ZZX& poly, long N) {
+  unsigned long bits = 0, bit;
+  long poly_deg = NTL::deg(poly);
+  N = (poly_deg < N) ? poly_deg : N;
+  for (long i = N; i >= 0; --i) {
+    bit = NTL::conv<long>(coeff(poly, i));
+    bits = (bits << 1) | bit;
   }
 
-  return static_cast<long>(b.to_ulong());
+  return static_cast<long>(bits);
 }
 
 TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
-                              const std::string& filename,
+                              const std::string& filename, long N,
                               bool translation = false) {
   std::ifstream file(filename);
   if (!file.is_open())
@@ -54,13 +54,13 @@ TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
       hashed_value = std::hash<std::string>{}(line) % 65536;
       translation_table->try_emplace(hashed_value,
                                      line);  // First come, first served.
-      out.emplace_back(binary_to_poly(hashed_value));
+      out.emplace_back(long_to_poly(hashed_value, N));
     }
     return translation_table;
   } else {
     while (std::getline(file, line)) {
       hashed_value = std::hash<std::string>{}(line) % 65536;
-      out.emplace_back(binary_to_poly(hashed_value));
+      out.emplace_back(long_to_poly(hashed_value, N));
     }
     return nullptr;
   }
@@ -121,6 +121,10 @@ int main(int argc, char** argv) {
                              .bits(cmdline_opts.bits)
                              .build();
   // clang-format on
+
+  // Number of bits in slot given by order of p
+  long N = context.getOrdP();
+
   helib::SecKey secretKey(context);
   secretKey.GenSecKey();
 
@@ -133,7 +137,7 @@ int main(int argc, char** argv) {
   // create client set
   std::vector<NTL::ZZX> client_set;
   std::unique_ptr<TranslationTable> translation_table{
-      read_in_set(client_set, cmdline_opts.client_set_path,
+      read_in_set(client_set, cmdline_opts.client_set_path, N,
                   /*translation table=*/true)};
   if (translation_table->empty()) std::cout << "table is empty !!!\n";
   printVector(client_set);
@@ -144,7 +148,7 @@ int main(int argc, char** argv) {
   std::cout << "Reading in server set" << std::endl;
   // Create server set - simple array
   std::vector<NTL::ZZX> server_set;
-  read_in_set(server_set, cmdline_opts.server_set_path);
+  read_in_set(server_set, cmdline_opts.server_set_path, N);
   printVector(server_set);
 
   std::cout << "Performing the set intersection" << std::endl;
@@ -174,7 +178,7 @@ int main(int argc, char** argv) {
   std::cout << "Size: " << result.lsize() << std::endl;
   for (long i = 0; i < result.lsize(); ++i) {
     const auto it =
-        translation_table->find(poly_to_binary(result[i].getData()));
+        translation_table->find(poly_to_long(result[i].getData(), N));
     if (it != translation_table->end()) std::cout << it->second << "\n";
   }
   std::cout << "FIN." << std::endl;
