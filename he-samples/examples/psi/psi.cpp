@@ -7,7 +7,11 @@
 
 #include <bitset>
 #include <fstream>
+#include <functional>  // std::hash
+#include <memory>
+#include <unordered_map>
 
+using TranslationTable = std::unordered_map<long, std::string>;
 using Ptxt = helib::Ptxt<helib::BGV>;
 
 static inline NTL::ZZX binary_to_poly(long x) {
@@ -22,7 +26,7 @@ static inline NTL::ZZX binary_to_poly(long x) {
   return poly;
 }
 
-static inline long binary_to_poly(const NTL::ZZX& poly) {
+static inline long poly_to_binary(const NTL::ZZX& poly) {
   constexpr long N = 16;
   std::bitset<N> b;
 
@@ -33,14 +37,32 @@ static inline long binary_to_poly(const NTL::ZZX& poly) {
   return static_cast<long>(b.to_ulong());
 }
 
-void read_in_set(std::vector<NTL::ZZX>& out, const std::string& filename) {
+TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
+                              const std::string& filename,
+                              bool translation = false) {
   std::ifstream file(filename);
   if (!file.is_open())
     throw std::runtime_error("File '" + filename + "' not found.");
+
   out.clear();
   std::string line;
-  while (std::getline(file, line)) {
-    out.emplace_back(binary_to_poly(std::stoi(line)));
+  long hashed_value;
+
+  if (translation) {
+    TranslationTable* translation_table = new TranslationTable;
+    while (std::getline(file, line)) {
+      hashed_value = std::hash<std::string>{}(line) % 65536;
+      translation_table->try_emplace(hashed_value,
+                                     line);  // First come, first served.
+      out.emplace_back(binary_to_poly(hashed_value));
+    }
+    return translation_table;
+  } else {
+    while (std::getline(file, line)) {
+      hashed_value = std::hash<std::string>{}(line) % 65536;
+      out.emplace_back(binary_to_poly(hashed_value));
+    }
+    return nullptr;
   }
 }
 
@@ -54,6 +76,7 @@ void printVector(const std::vector<T>& v) {
 
 struct CmdLineOpts {
   std::string client_set_path;
+  std::string server_set_path = "./datasets/egyptian_gods.set";
   long m = 771;
   long bits = 700;
   long nthreads = 1;
@@ -73,6 +96,7 @@ int main(int argc, char** argv) {
       .arg("-n", cmdline_opts.nthreads, "Number of threads.")
       .arg("--m", cmdline_opts.m,
            "Change the order of the cyclotomic polynomial.")
+      .arg("--server", cmdline_opts.server_set_path, "Change the server set.")
       .arg("--bits", cmdline_opts.bits, "Change number of big Q bits.")
     .toggle()
       .arg("--ptxt", cmdline_opts.ptxt,
@@ -108,7 +132,10 @@ int main(int argc, char** argv) {
   std::cout << "Reading in client set" << std::endl;
   // create client set
   std::vector<NTL::ZZX> client_set;
-  read_in_set(client_set, cmdline_opts.client_set_path);
+  std::unique_ptr<TranslationTable> translation_table{
+      read_in_set(client_set, cmdline_opts.client_set_path,
+                  /*translation table=*/true)};
+  if (translation_table->empty()) std::cout << "table is empty !!!\n";
   printVector(client_set);
 
   // Encode the client set into a Ptxt
@@ -117,7 +144,7 @@ int main(int argc, char** argv) {
   std::cout << "Reading in server set" << std::endl;
   // Create server set - simple array
   std::vector<NTL::ZZX> server_set;
-  read_in_set(server_set, "server.txt");
+  read_in_set(server_set, cmdline_opts.server_set_path);
   printVector(server_set);
 
   std::cout << "Performing the set intersection" << std::endl;
@@ -146,7 +173,9 @@ int main(int argc, char** argv) {
   std::cout << "The following were found in both sets" << std::endl;
   std::cout << "Size: " << result.lsize() << std::endl;
   for (long i = 0; i < result.lsize(); ++i) {
-    std::cout << result[i] << "\n";
+    const auto it =
+        translation_table->find(poly_to_binary(result[i].getData()));
+    if (it != translation_table->end()) std::cout << it->second << "\n";
   }
   std::cout << "FIN." << std::endl;
 
