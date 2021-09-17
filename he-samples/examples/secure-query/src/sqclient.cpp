@@ -30,7 +30,6 @@ void SQClient::initializeSealContext(size_t _polymodulus_degree,
   m_relin_keys = new seal::RelinKeys();
   m_keygen->create_relin_keys(*m_relin_keys);
   m_encryptor = new seal::Encryptor(m_context, *m_public_key);
-  // m_evaluator = new seal::Evaluator(m_context);
   m_decryptor = new seal::Decryptor(m_context, *m_secret_key);
 }
 

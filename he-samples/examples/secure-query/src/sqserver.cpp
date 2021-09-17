@@ -40,8 +40,6 @@ void SQServer::setEncryptedDatabase(
   m_encrypted_database = encrypted_database;
 }
 
-void SQServer::createEncryptedDatabaseFromCSVFile(std::string filename) {}
-
 size_t SQServer::keyLength() const { return m_key_length; }
 
 void SQServer::setKeyLength(const size_t& key_length) {
@@ -54,6 +52,11 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
 
   seal::Ciphertext mult_accumulate;
   m_encryptor->encrypt_zero(mult_accumulate);
+  /* For each entry in the encrypted database we perform a comparison between
+   * the query key and entry key which evaluates to 1 if the query and entry
+   * match or 0 if they differ. This result is then multiplied against the
+   * encrypted value ciphertext which is then added to the return ciphertext.
+   */
 #pragma omp parallel for
   for (unsigned int entry = 0; entry < m_encrypted_database.size(); entry++) {
     const EncryptedDatabaseEntry& enc_db_entry = m_encrypted_database[entry];
@@ -63,12 +66,14 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
     std::vector<seal::Ciphertext> masks;
     masks.reserve(enc_db_entry.key.size() + 1);
     for (size_t x = 0; x < enc_db_entry.key.size(); x++) {
+      // We add the results of the comparison between all of the component
+      // elements of the query and key.
       masks.push_back(generateComparisonMaskUsingFLT(enc_db_entry.key[x],
                                                      query_key[x], relin_keys));
     }
     seal::Ciphertext return_values;
     masks.push_back(enc_db_entry.value);
-    /**
+    /*
      * Masks contains the results of comparing each 4 bit element of the query
      * key against the key for a database entry plus the db_entry value. This
      * results in the following computation being performed
@@ -80,15 +85,12 @@ seal::Ciphertext SQServer::queryDatabaseForMatchingEntry(
     m_evaluator->multiply_many(masks, relin_keys, return_values);
     /* We enforce that all key values in the database are unique. Thus we can
      * return the result of the query by adding the results from all of the
-     * key/value multiplications performend previously. If we had 3 values and
-     * key 1 matched the query the resultant computation would look like follows
-     * 0 + key[1].value + 0 = key[1].value
+     * key/value multiplications performed previously. If we had 3 values and
+     * key 1 matched the query, the resultant computation would look like the
+     * following 0 + key[1].value + 0 = key[1].value
      */
 #pragma omp critical
     m_evaluator->add_inplace(mult_accumulate, return_values);
-    // std::cout << "    + noise budget in freshly encrypted x: " <<
-    // m_decryptor->invariant_noise_budget(return_values) << " bits"
-    //                       << std::endl;
   }
   return mult_accumulate;
 }
@@ -107,7 +109,6 @@ void SQServer::createPlain1CT() {
 
   return;
 }
-
 seal::Ciphertext SQServer::generateComparisonMaskUsingFLT(
     const seal::Ciphertext& cipher1, const seal::Ciphertext& cipher2,
     seal::RelinKeys relin_keys) {
