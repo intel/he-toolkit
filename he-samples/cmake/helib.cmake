@@ -81,7 +81,8 @@ else()
 
   add_library(libhelib INTERFACE)
   add_dependencies(libhelib ext_helib)
-  target_include_directories(libhelib INTERFACE ${HELIB_PREFIX}/include/helib)
+  target_include_directories(libhelib INTERFACE ${HELIB_PREFIX}/include/)
+  #message(FATAL_ERROR "${HELIB_PREFIX}")
 
   if (HELIB_SHARED_LIB)
     target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.so)

@@ -14,7 +14,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 ## Require full C++ standard
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(psi LANGUAGES CXX)
-find_package(helib 2.2.0 REQUIRED)
 add_executable(psi psi.cpp)
-target_link_libraries(psi helib)
+
+find_package(helib HINTS ${HELIB_PREFIX}/share/cmake/helib/ REQUIRED)
+target_link_libraries(psi PRIVATE helib)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/datasets/
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
