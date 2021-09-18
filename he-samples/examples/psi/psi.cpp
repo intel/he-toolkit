@@ -28,7 +28,7 @@ static inline NTL::ZZX long_to_poly(long x, long N) {
 static inline long poly_to_long(const NTL::ZZX& poly, long N) {
   unsigned long bits = 0, bit;
   long poly_deg = NTL::deg(poly);
-  N = (poly_deg < N) ? poly_deg : N;
+  N = (poly_deg < N) ? poly_deg : N - 1;
   for (long i = N; i >= 0; --i) {
     bit = NTL::conv<long>(coeff(poly, i));
     bits = (bits << 1) | bit;
