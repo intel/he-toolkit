@@ -10,7 +10,7 @@ if (SEAL_PREBUILT) # Skip download from gitlab
   if (ENABLE_INTEL_HEXL)
     find_package(HEXL 1.1.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
   endif()
-  find_package(SEAL 3.6
+  find_package(SEAL 3.7
     HINTS ${SEAL_HINT_DIR}
     REQUIRED)
   add_library(libseal ALIAS SEAL::seal)
@@ -19,7 +19,7 @@ else()
   set(SEAL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_seal)
   set(SEAL_SRC_DIR ${SEAL_PREFIX}/src/ext_seal/)
   set(SEAL_REPO_URL https://github.com/microsoft/SEAL.git)
-  set(SEAL_GIT_TAG v3.6.6)
+  set(SEAL_GIT_TAG v3.7.0)
 
   set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
 
@@ -66,12 +66,12 @@ else()
 
   add_library(libseal INTERFACE)
   add_dependencies(libseal ext_seal)
-  target_include_directories(libseal INTERFACE ${SEAL_PREFIX}/include/SEAL-3.6)
+  target_include_directories(libseal INTERFACE ${SEAL_PREFIX}/include/SEAL-3.7)
 
   if (SEAL_SHARED_LIB)
-      target_link_libraries(libseal INTERFACE ${SEAL_PREFIX}/lib/libseal.so.3.6)
+      target_link_libraries(libseal INTERFACE ${SEAL_PREFIX}/lib/libseal.so.3.7)
   else()
-      target_link_libraries(libseal INTERFACE ${SEAL_PREFIX}/lib/libseal-3.6.a)
+      target_link_libraries(libseal INTERFACE ${SEAL_PREFIX}/lib/libseal-3.7.a)
   endif()
 
 endif()
