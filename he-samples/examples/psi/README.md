@@ -3,8 +3,10 @@ Generally, write a text file for the client set. For this example let's call it 
 Make sure they are lower case and no whitespace either side.
 Then run,
 ```bash
-./psi client.txt
+./psi client.txt -n 64
 ```
+Although optional, it is a good idea to run the example with multiple threads
+using the `-n` flag and specifying the number of threads.
 There are three sets to choose from of differing sizes under `datasets`.
 The default is `fruits.set`. To change the default set,
 ```bash
@@ -34,3 +36,6 @@ noise at larger m values.
 
 The client keeps a translation table for the client set of which hashes goes
 with which word.  So that returned hashes can be translated back to words.
+
+The maximum number of entries that the client set supports is the number of
+slots in the plaintext/ciphertext.

@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 
   std::cout << "Creating context and keys" << std::endl;
   // clang-format off
-  helib::Context context = helib::ContextBuilder<helib::BGV>()
+  const helib::Context context = helib::ContextBuilder<helib::BGV>()
                              .m(cmdline_opts.m)
                              .p(2)
                              .r(1)
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
   // clang-format on
 
   // Number of bits in slot given by order of p
-  long N = context.getOrdP();
+  const long N = context.getOrdP();
 
   helib::SecKey secretKey(context);
   secretKey.GenSecKey();
