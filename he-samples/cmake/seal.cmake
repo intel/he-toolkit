@@ -8,7 +8,7 @@ message(STATUS "SEAL_PREBUILT: ${SEAL_PREBUILT}")
 
 if (SEAL_PREBUILT) # Skip download from gitlab
   if (ENABLE_INTEL_HEXL)
-    find_package(HEXL 1.1.0 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
+    find_package(HEXL 1.2.1 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
   endif()
   find_package(SEAL 3.7
     HINTS ${SEAL_HINT_DIR}
