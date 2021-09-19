@@ -19,9 +19,9 @@ RUN tar -zxvf libs.tar.gz && \
     cmake -S . -B build -DHEXL_EXPORT=ON && \
     cmake --build build -j && \
     cmake --install build && \
-    # Build and install HEXL 1.2.1 for HElib \
+    # Build and install HEXL 1.2.1 for HElib and SEAL \
     git checkout 1.2.1 && \
-    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/helib-hexl/ && \
+    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/hexl-1.2.1/ && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install GSL \
@@ -47,7 +47,7 @@ RUN tar -zxvf libs.tar.gz && \
     cd /libs/SEAL && \
     cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
                         -DSEAL_USE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/ && \
+                        -DHEXL_DIR=$HOME/hexl-1.2.1/lib/cmake/hexl-1.2.1/ && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install PALISADE \
@@ -60,7 +60,7 @@ RUN tar -zxvf libs.tar.gz && \
     # Build and install HElib \
     cd /libs/HElib && \
     cmake -S . -B build -DUSE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=$HOME/helib-hexl/lib/cmake/hexl-1.2.1/ && \
+                        -DHEXL_DIR=$HOME/hexl-1.2.1/lib/cmake/hexl-1.2.1/ && \
     cmake --build build -j && \
     cmake --install build
 
