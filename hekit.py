@@ -55,7 +55,9 @@ def list_components(args):
     global repo_location
     # At the mo, just lists installed.
     width = 10
-    print(f"{'component':{width}} {'instance':{width}} {'install':{width}}")
+    print(
+        f"{'component':{width}} {'instance':{width}} {'fetch':{width}} {'build':{width}} {'install':{width}}"
+    )
 
     for comp_name in sorted(list_dirs(repo_location)):
         comp_name_path = f"{repo_location}/{comp_name}"
@@ -65,11 +67,15 @@ def list_components(args):
                 info_file = toml.load(info_filepath)
                 print(
                     f"{comp_name:{width}} {comp_inst:{width}}",
+                    f"{info_file['status']['fetch']:{width}}",
+                    f"{info_file['status']['build']:{width}}",
                     f"{info_file['status']['install']:{width}}",
                 )
             except FileNotFoundError:
                 print(
                     f"{comp_name:{width}} {comp_inst:{width}}",
+                    f"{'unknown':{width}}",
+                    f"{'unknown':{width}}",
                     f"{'unknown':{width}}",
                     f"'{info_filepath}' not found",
                 )
@@ -77,12 +83,14 @@ def list_components(args):
                 print(
                     f"{comp_name:{width}} {comp_inst:{width}}",
                     f"{'unknown':{width}}",
+                    f"{'unknown':{width}}",
+                    f"{'unknown':{width}}",
                     f"key {emsg} not found",
                 )
 
 
 def remove_components(args):
-    """"""
+    """Remove component instances"""
     try:
         component = args.component
         instance = args.instance

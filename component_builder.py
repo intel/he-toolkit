@@ -17,7 +17,8 @@ class BuildError(Exception):
 
 
 def chain_run(funcs):
-    """"""
+    """Run functions sequentially. Fail at first function with failed
+       return value."""
     for fn in funcs:
         success, return_code = fn()
         if not success:
@@ -139,8 +140,8 @@ class ComponentBuilder:
         if f"post_{stage}" in dir(self):
             fns.append(getattr(self, f"post_{stage}"))
 
-        stage_dir = self._spec[f"{stage}_dir"]
-        change_cwd_to(stage_dir)
+        init_stage_dir = self._spec[f"init_{stage}_dir"]
+        change_cwd_to(init_stage_dir)
 
         try:
             chain_run(fns)

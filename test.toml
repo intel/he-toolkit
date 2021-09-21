@@ -2,19 +2,19 @@
 skip = false
 name = "1.2.1"
 fetch = "git clone https://github.com/intel/hexl.git --branch %name%"
-fetch_dir = "~/.hekit/hexl/1.2.1/fetch"
-build_dir = "~/.hekit/hexl/1.2.1/build"
-install_dir = "~/.hekit/hexl/1.2.1/build"
-pre-build = """cmake -S %fetch_dir%/hexl -B %build_dir%
-               -DCMAKE_INSTALL_PREFIX=%actual_install_dir%"""
-build = "cmake --build %build_dir% -j"
+init_fetch_dir = "~/.hekit/hexl/1.2.1/fetch"
+init_build_dir = "~/.hekit/hexl/1.2.1/build"
+init_install_dir = "%init_build_dir%"
+pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
+build = "cmake --build %init_build_dir% -j"
 post-build = ""
-actual_install_dir = "~/.hekit/hexl/1.2.1/install"
-install = "cmake --install %install_dir%"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "~/.hekit/hexl/1.2.1/install"
 
 
 [[dependency.ntl]]
-skip = false
+skip = true
 version = "11.5.1"
 name = "%version%"
 fetch_dir = "~/.hekit/ntl/%version%/fetch"
@@ -26,6 +26,10 @@ fetch = "wget https://libntl.org/ntl-%version%.tar.gz"
 pre-build = "bash -c 'tar -xvf %fetch_dir%/ntl-%version%.tar.gz -C %build_dir_pre%'"
 build = "bash -c './configure PREFIX=%install_dir% && make -j'"
 install = "make install"
+
+
+[[library.seal]]
+skip = true
 
 
 [[library.dummy]]
