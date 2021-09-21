@@ -33,19 +33,22 @@ def fill_self_ref_string_dict(d):
     NB. Only works for flat str value dict."""
 
     def fill_str(s):
-        if not isinstance(s, str):
-            # Not string do nothing
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = re.findall(r"(%(.*?)%)", s)
+            if not symbols:
+                return s
+
+            new_s = s
+            for symbol, k in symbols:
+                new_s = new_s.replace(symbol, fill_str(d[k]))
+
+            return new_s
+        elif isinstance(s, list):
+            return [fill_str(e) for e in s]
+        else:
+            # Not str or list
             return s
-
-        symbols = re.findall(r"(%(.*?)%)", s)
-        if not symbols:
-            return s
-
-        new_s = s
-        for symbol, k in symbols:
-            new_s = new_s.replace(symbol, fill_str(d[k]))
-
-        return new_s
 
     return {k: fill_str(v) for k, v in d.items()}
 
