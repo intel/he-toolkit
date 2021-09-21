@@ -91,11 +91,11 @@ libs_dir=libs
 (# Start subshell
   mkdir -p "$libs_dir" && cd "$libs_dir"
   # HEXL
-  git_clone "https://github.com/intel/hexl.git" "1.1.0-patch"
+  git_clone "https://github.com/intel/hexl.git" "v1.2.1"
 
   # HE libs
   git_clone "https://github.com/microsoft/SEAL.git" "v3.7.0"
-  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.3"
+  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.5"
   git_clone "https://github.com/homenc/HElib.git" "v2.2.0"
 
   # SEAL dependencies
