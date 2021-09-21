@@ -14,17 +14,18 @@ export_install_dir = "~/.hekit/hexl/1.2.1/install"
 
 
 [[dependency.ntl]]
-skip = true
+skip = false
 version = "11.5.1"
 name = "%version%"
-fetch_dir = "~/.hekit/ntl/%version%/fetch"
+init_fetch_dir = "~/.hekit/ntl/%version%/fetch"
 build_dir_pre = "~/.hekit/ntl/%version%/build"
-build_dir = "~/.hekit/ntl/%version%/build/ntl-%version%/src"
-install_dir = "~/.hekit/ntl/%version%/install"
+init_build_dir = "~/.hekit/ntl/%version%/build/ntl-%version%/src"
+init_install_dir = "%init_build_dir%"
+export_install_dir = "~/.hekit/ntl/%version%/install"
 fetch = "wget https://libntl.org/ntl-%version%.tar.gz"
 # At mo, some progs can't expand tilde
-pre-build = "bash -c 'tar -xvf %fetch_dir%/ntl-%version%.tar.gz -C %build_dir_pre%'"
-build = "bash -c './configure PREFIX=%install_dir% && make -j'"
+post-fetch = "bash -c 'tar -xvf %init_fetch_dir%/ntl-%version%.tar.gz -C %build_dir_pre%'"
+build = "bash -c './configure PREFIX=%export_install_dir% && make -j'"
 install = "make install"
 
 

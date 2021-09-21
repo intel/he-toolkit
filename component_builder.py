@@ -69,6 +69,16 @@ def run(cmd_and_args):
     return success, proc.returncode
 
 
+def try_run(spec: dict, attrib: str):
+    """Try to run the attrib in the spec.
+       Do nothing (pass success) if no key in dict.
+    """
+    try:
+        return run(spec[attrib])
+    except KeyError:
+        return True, 0
+
+
 def change_cwd_to(path):
     expanded_path = os.path.expanduser(path)
     os.chdir(expanded_path)
@@ -155,10 +165,15 @@ class ComponentBuilder:
         """Fetch the source"""
         return self._stage("fetch")
 
+    def post_fetch(self):
+        """Any steps after a fetch"""
+        print("post-fetch")
+        return try_run(self._spec, "post-fetch")
+
     def pre_build(self):
         """Any setup steps before building"""
         print("pre-build")
-        return run(self._spec["pre-build"])
+        return try_run(self._spec, "pre-build")
 
     def build(self):
         """Build the software"""
@@ -167,7 +182,7 @@ class ComponentBuilder:
     def post_build(self):
         """Any steps after a build"""
         print("post-build")
-        return run(self._spec["post-build"])
+        return try_run(self._spec, "post-build")
 
     def install(self):
         """Installation of the component, ready to use"""
