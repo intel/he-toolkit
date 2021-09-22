@@ -10,9 +10,8 @@ import argparse
 import os
 import shutil
 import pprint
-from component_builder import ComponentBuilder, chain_run
-
-repo_location = os.path.expanduser("~/.hekit")
+import itertools as it
+from component_builder import ComponentBuilder, chain_run, repo_location
 
 
 def components_to_build_from(filename, category):
@@ -29,15 +28,13 @@ def components_to_build_from(filename, category):
 
 def install_components(args):
     """"""
+    deps = components_to_build_from(args.install_file, "dependency")
+    libs = components_to_build_from(args.install_file, "library")
 
-    label = "dependency"
-    # label = "library"
-    components = components_to_build_from(args.install_file, label)
-
-    for component in components:
-        print(label)
+    for component in it.chain(deps, libs):
+        print(component.category)
         if component.skip():
-            print(f"Skipping {label}")
+            print(f"Skipping {component.category}")
             continue
         chain_run(
             [component.setup, component.fetch, component.build, component.install]

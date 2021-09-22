@@ -7,6 +7,17 @@ import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT
 
+# FIXME remove hardcoding and global
+repo_location = os.path.expanduser("~/.hekit")
+
+
+def read_spec(component, name, attrib):
+    """"""
+    global repo_location
+    path = f"{repo_location}/{component}/{name}/hekit.spec"
+    spec = toml.load(path)
+    return spec[attrib]
+
 
 class BuildError(Exception):
     """Exception for something wrong with the build."""
@@ -50,7 +61,27 @@ def fill_self_ref_string_dict(d):
             # Not str or list
             return s
 
-    return {k: fill_str(v) for k, v in d.items()}
+    def fill_dep_str(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = re.findall(r"(\$(.*?)/(.*?)/(.*?)\$)", s)
+            if not symbols:
+                return s
+
+            new_s = s
+            for symbol, comp, name, k in symbols:
+                # Assume finalised spec is already expanded
+                sub = read_spec(comp, name, k)
+                new_s = new_s.replace(symbol, sub)
+
+            return new_s
+        elif isinstance(s, list):
+            return [fill_dep_str(e) for e in s]
+        else:
+            # Not str or list
+            return s
+
+    return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
 def run(cmd_and_args):
@@ -94,13 +125,13 @@ class ComponentBuilder:
             raise TypeError(
                 f"A spec must be type dict, but got '{type(spec).__name__}'"
             )
+        self._category = category
         self._spec = fill_self_ref_string_dict(spec)
         self._comp_instance = self._spec["name"]
         self._location = f"{repo_path}/{comp_name}/{self._comp_instance}"
         self._skip = self._spec["skip"] if "skip" in self._spec else False
         if not isinstance(self._skip, bool):
             raise ValueError("Skip must be set to true or false")
-        print(self._spec)
 
         # load previous from info file
         try:
@@ -112,6 +143,9 @@ class ComponentBuilder:
     def skip(self):
         return self._skip
 
+    def category(self):
+        return self._category
+
     def setup(self):
         """Create the layout for the component"""
         root = self._location
@@ -120,6 +154,11 @@ class ComponentBuilder:
                 os.makedirs(f"{root}/{dirname}")
             except FileExistsError:
                 pass  # nothing to do
+
+        # Save expanded copy on disk
+        with open(f"{root}/hekit.spec", "w") as f:
+            toml.dump(self._spec, f)
+
         # Should return successful
         return True, 0
 

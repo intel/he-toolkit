@@ -1,5 +1,6 @@
 [[dependency.hexl]]
 skip = false
+version = "1.2.1"
 name = "1.2.1"
 fetch = "git clone https://github.com/intel/hexl.git --branch %name%"
 init_fetch_dir = "~/.hekit/hexl/1.2.1/fetch"
@@ -11,6 +12,7 @@ build = "cmake --build %init_build_dir% -j"
 post-build = ""
 install = "cmake --install %init_install_dir%"
 export_install_dir = "~/.hekit/hexl/1.2.1/install"
+export_cmake = "%export_install_dir%/lib/cmake/hexl-%version%"
 
 
 [[dependency.ntl]]
@@ -29,12 +31,30 @@ build = "bash -c './configure PREFIX=%export_install_dir% && make -j'"
 install = "make install"
 
 
-[[library.seal]]
-skip = true
+[[library.helib]]
+skip = false
+version = "2.2.0"
+name = "v%version%"
+root = "~/.hekit/helib/%name%"
+init_fetch_dir = "%root%/fetch"
+init_build_dir = "%root%/build"
+init_install_dir = "%root%/build"
+export_install_dir = "%root%/install"
+fetch = "git clone https://github.com/homenc/HElib.git --branch %name%"
+pre-build = """cmake -S %init_fetch_dir%/HElib -B %init_build_dir% \
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%         \
+               -DUSE_INTEL_HEXL=ON                                 \
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+# Dependencies
+hexl = "hexl/1.2.1"
 
 
 [[library.dummy]]
-skip = false
+skip = true
+name = "dave"
 dependecies = ["hexl/1.2.1", "ntl/11-debug"]
 system_dependencies = [ "libgmp" ]
 
