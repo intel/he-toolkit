@@ -29,7 +29,7 @@ The default order of the cyclotomic polynomial used in the BGV scheme is 771
 which gives a ord(p) = 16. You can change the default m by running you set
 intersection
 ```bash
-./psi client.txt -m 21845 --bits 100
+./psi client.txt --m 21845 --bits 100
 ```
 Although this usually means increasing the number of bits for HElib to handle
 noise at larger m values.
