@@ -31,7 +31,7 @@ if (${ENABLE_PALISADE})
 endif()
 
 if (${ENABLE_SEAL})
-    target_link_libraries(unit-test PRIVATE libseal seal_kernel_executor)
+    target_link_libraries(unit-test PRIVATE SEAL::seal seal_kernel_executor)
 endif()
 
 target_link_libraries(unit-test PRIVATE Threads::Threads)

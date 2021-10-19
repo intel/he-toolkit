@@ -20,12 +20,10 @@ add_executable(secure-query)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if (TARGET libseal) ## true if doing online/offline he-toolkit build
-        target_link_libraries(secure-query PRIVATE libseal)
-else() ## true if building secure query standalone
-        include_directories(${SEAL_PREFIX}/include/SEAL-3.7/)
-        target_link_libraries(secure-query PUBLIC ${SEAL_PREFIX}/lib/libseal-3.7.a)
+if(NOT TARGET SEAL::seal) # true if doing online/offline he-toolkit build
+    find_package(SEAL 3.7 HINTS ${SEAL_HINT_DIR} REQUIRED)
 endif()
+target_link_libraries(secure-query PRIVATE SEAL::seal)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 target_link_libraries(secure-query PRIVATE Threads::Threads)

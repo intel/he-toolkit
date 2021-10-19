@@ -9,4 +9,4 @@ set(LRHE_KERNEL_SRC
 
 add_library(lrhe_kernel SHARED ${LRHE_KERNEL_SRC})
 target_include_directories(lrhe_kernel PRIVATE ${LR_BENCH_SRC_DIR})
-target_link_libraries(lrhe_kernel PRIVATE libseal)
+target_link_libraries(lrhe_kernel PRIVATE SEAL::seal)
