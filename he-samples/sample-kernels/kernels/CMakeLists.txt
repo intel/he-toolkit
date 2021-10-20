@@ -11,7 +11,7 @@ if (${ENABLE_PALISADE})
 
     add_library(palisade_kernel_executor SHARED ${PALISADE_KERNEL_EXECUTOR_SRC})
     target_include_directories(palisade_kernel_executor PRIVATE ${SAMPLE_KERNELS_SRC_DIR})
-    target_link_libraries(palisade_kernel_executor PRIVATE libpalisade)
+    target_link_libraries(palisade_kernel_executor PRIVATE PALISADEcore PALISADEpke)
 endif()
 
 # SEAL ops

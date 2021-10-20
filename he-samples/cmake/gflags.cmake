@@ -17,11 +17,6 @@ if(NOT gflags_POPULATED)
   set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} CACHE STRING "" FORCE)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE STRING "" FORCE)
 
-  mark_as_advanced(BUILD_gflags)
-  mark_as_advanced(INSTALL_gflags)
-  mark_as_advanced(FETCHCONTENT_SOURCE_DIR_gflags)
-  mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED_gflags)
-
   add_subdirectory(
       ${gflags_SOURCE_DIR}
       EXCLUDE_FROM_ALL

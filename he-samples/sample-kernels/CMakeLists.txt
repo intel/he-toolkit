@@ -37,7 +37,8 @@ if (${ENABLE_PALISADE})
     target_include_directories(sample-kernels-palisade PRIVATE ".")
     target_compile_options(sample-kernels-palisade PRIVATE ${BENCHMARKS_COMPILE_FLAGS})
 
-    target_link_libraries(sample-kernels-palisade PRIVATE libpalisade palisade_kernel_executor)
+    target_link_libraries(sample-kernels-palisade PRIVATE
+        PALISADEcore PALISADEpke palisade_kernel_executor)
     target_link_libraries(sample-kernels-palisade PRIVATE libgbenchmark)
     target_link_libraries(sample-kernels-palisade PRIVATE Threads::Threads)
 

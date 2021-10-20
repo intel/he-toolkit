@@ -26,11 +26,6 @@ else()
     set(SEAL_USE_CXX17 ON CACHE BOOL "" FORCE)
     set(SEAL_USE_INTEL_HEXL ${ENABLE_INTEL_HEXL})
 
-    mark_as_advanced(BUILD_SEAL)
-    mark_as_advanced(INSTALL_SEAL)
-    mark_as_advanced(FETCHCONTENT_SOURCE_DIR_SEAL)
-    mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED_SEAL)
-
     add_subdirectory(
         ${seal_SOURCE_DIR}
         EXCLUDE_FROM_ALL
