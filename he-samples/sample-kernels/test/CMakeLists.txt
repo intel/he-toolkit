@@ -27,7 +27,7 @@ target_include_directories(unit-test PRIVATE ${SAMPLE_KERNELS_SRC_DIR})
 target_link_libraries(unit-test PRIVATE gtest)
 
 if (${ENABLE_PALISADE})
-    target_link_libraries(unit-test PRIVATE PALISADEcore PALISADEpke palisade_kernel_executor)
+    target_link_libraries(unit-test PRIVATE libpalisade palisade_kernel_executor)
 endif()
 
 if (${ENABLE_SEAL})
