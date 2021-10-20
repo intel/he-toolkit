@@ -37,6 +37,10 @@ if (PALISADE_PREBUILT) # Skip download from gitlab
   # Ignore errors from PALISADE
   add_compile_options(-Wno-error=unused-parameter -Wno-error=ignored-qualifiers -Wno-error=deprecated-copy)
 
+  if (${ENABLE_INTEL_HEXL} AND NOT TARGET HEXL::hexl)
+    find_package(HEXL HINTS ${HEXL_HINT_DIR} 1.2.1 REQUIRED)
+  endif()
+
 else()
 
   set(PALISADE_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_palisade)
