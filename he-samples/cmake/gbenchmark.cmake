@@ -15,6 +15,8 @@ FetchContent_GetProperties(gbenchmark)
 
 if(NOT gbenchmark_POPULATED)
   FetchContent_Populate(gbenchmark)
+  set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+  set(BENCHMARK_ENABLE_TESTING OFF)
   add_subdirectory(
       ${gbenchmark_SOURCE_DIR}
       EXCLUDE_FROM_ALL
