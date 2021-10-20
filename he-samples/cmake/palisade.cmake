@@ -1,6 +1,8 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# Defines "libpalisade" target
+
 include(ExternalProject)
 
 option(PALISADE_PREBUILT OFF) # Set to ON/OFF to use prebuilt installation

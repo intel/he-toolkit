@@ -20,7 +20,7 @@ if (${ENABLE_SEAL})
     target_compile_options(sample-kernels-seal PRIVATE ${BENCHMARKS_COMPILE_FLAGS})
 
     target_link_libraries(sample-kernels-seal PRIVATE SEAL::seal seal_kernel_executor)
-    target_link_libraries(sample-kernels-seal PRIVATE libgbenchmark)
+    target_link_libraries(sample-kernels-seal PRIVATE benchmark)
     target_link_libraries(sample-kernels-seal PRIVATE Threads::Threads)
 endif()
 
@@ -39,7 +39,7 @@ if (${ENABLE_PALISADE})
 
     target_link_libraries(sample-kernels-palisade PRIVATE
         libpalisade palisade_kernel_executor)
-    target_link_libraries(sample-kernels-palisade PRIVATE libgbenchmark)
+    target_link_libraries(sample-kernels-palisade PRIVATE benchmark)
     target_link_libraries(sample-kernels-palisade PRIVATE Threads::Threads)
 
 endif()

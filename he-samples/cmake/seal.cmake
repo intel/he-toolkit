@@ -1,6 +1,8 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# Defines "SEAL::seal" target
+
 include(FetchContent)
 
 option(SEAL_PREBUILT OFF) # Set to ON/OFF to use prebuilt installation
