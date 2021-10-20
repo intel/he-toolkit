@@ -25,8 +25,6 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
@@ -42,8 +40,6 @@ jobs:
     name: Build, test and run kernels
     needs: [format]
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -120,8 +116,6 @@ jobs:
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
         # Add local bin for cpplint
@@ -134,8 +128,6 @@ jobs:
     name: Build, test and run kernels (IceLake - Excl. HElib)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -195,8 +187,6 @@ jobs:
     name: Build HElib with HEXL (Icelake)
     needs: [format-icelake]
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
