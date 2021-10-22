@@ -10,12 +10,18 @@
 #include "include/timer.hpp"
 
 namespace lrhe {
-LogisticRegressionHE::LogisticRegressionHE(
-    const kernel::LRHEKernel& lrheKernel,
-    const bool encrypt_data, const bool encrypt_model, const bool linear_regression, const size_t batch_size)
-    : m_encrypt_data(encrypt_data), m_encrypt_model(encrypt_model), m_linear_regression(linear_regression), m_batch_size(batch_size) {
+LogisticRegressionHE::LogisticRegressionHE(const kernel::LRHEKernel& lrheKernel,
+                                           const bool encrypt_data,
+                                           const bool encrypt_model,
+                                           const bool linear_regression,
+                                           const size_t batch_size)
+    : m_encrypt_data(encrypt_data),
+      m_encrypt_model(encrypt_model),
+      m_linear_regression(linear_regression),
+      m_batch_size(batch_size) {
   if (!encrypt_data && !encrypt_model) {
-    throw "During construction of LogisticRegressionHE: Either model or data (or both) must be encrypted.";
+    throw "During construction of LogisticRegressionHE: "
+          "Either model or data (or both) must be encrypted.";
   }
   init(lrheKernel);
 }
@@ -24,8 +30,7 @@ void LogisticRegressionHE::init(const kernel::LRHEKernel& lrheKernel) {
   m_kernel = std::make_unique<kernel::LRHEKernel>(lrheKernel);
   m_isTrained = false;
   m_slot_count = m_kernel->slot_count();
-  if (m_batch_size)
-    m_slot_count = m_batch_size;
+  if (m_batch_size) m_slot_count = m_batch_size;
 }
 
 void LogisticRegressionHE::load_weight(const std::vector<double>& weights,
@@ -43,8 +48,7 @@ void LogisticRegressionHE::load_weight(const std::vector<double>& weights,
     m_ct_bias = encodeEncryptBias(bias);
     LOG<Info>("Encode/encrypt weights and bias", "complete",
               "Elapsed(s):", intel::timer::delta(t_started));
-  }
-  else {
+  } else {
     LOG<Info>("Encode weights and bias");
     auto t_started = intel::timer::now();
     m_pt_weights = encodeWeights(weights);
@@ -105,8 +109,7 @@ std::vector<double> LogisticRegressionHE::inference(
 
     LOG<Info>("  - Encode/encrypt data complete!",
               "Elapsed(s):", intel::timer::delta(t_started));
-  }
-  else {
+  } else {
     LOG<Info>("  Encode data");
     t_started = intel::timer::now();
 
@@ -132,36 +135,31 @@ std::vector<double> LogisticRegressionHE::inference(
         if (m_linear_regression) {
           ct_lrhe_inference[i] = m_kernel->evaluateLinearRegressionTransposed(
               m_ct_weights, ct_inputs[i], m_ct_bias);
-        }
-        else {
+        } else {
           ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
               m_ct_weights, ct_inputs[i], m_ct_bias);
         }
-      }
-      else {
+      } else {
         if (m_linear_regression) {
           ct_lrhe_inference[i] = m_kernel->evaluateLinearRegressionTransposed(
               m_pt_weights, ct_inputs[i], m_pt_bias);
-        }
-        else {
+        } else {
           ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
               m_pt_weights, ct_inputs[i], m_pt_bias);
         }
       }
-    }
-    else {
+    } else {
       if (m_encrypt_model) {
         if (m_linear_regression) {
           ct_lrhe_inference[i] = m_kernel->evaluateLinearRegressionTransposed(
               m_ct_weights, pt_inputs[i], m_ct_bias);
-        }
-        else {
+        } else {
           ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
               m_ct_weights, pt_inputs[i], m_ct_bias);
         }
-      }
-      else {
-        throw "During execution of LogisticRegressionHE::inference: Either model or data (or both) must be encrypted.";
+      } else {
+        throw "During execution of LogisticRegressionHE::inference: "
+              "Either model or data (or both) must be encrypted.";
       }
     }
   }
@@ -233,8 +231,7 @@ LogisticRegressionHE::encodeEncryptData(
   return ct_ret;
 }
 
-std::vector<std::vector<seal::Plaintext>>
-LogisticRegressionHE::encodeData(
+std::vector<std::vector<seal::Plaintext>> LogisticRegressionHE::encodeData(
     const std::vector<std::vector<std::vector<double>>>& data_T) {
   size_t n_batches = data_T.size();
   size_t n_features = data_T[0].size();
@@ -246,8 +243,8 @@ LogisticRegressionHE::encodeData(
     num_threads(OMPUtilitiesS::getThreadsAtLevel())
   for (size_t i = 0; i < n_batches; ++i)
     for (size_t j = 0; j < n_features; ++j)
-      ct_ret[i][j] = m_kernel->encode(
-          gsl::span(data_T[i][j].data(), data_T[i][j].size()));
+      ct_ret[i][j] =
+          m_kernel->encode(gsl::span(data_T[i][j].data(), data_T[i][j].size()));
 
   return ct_ret;
 }

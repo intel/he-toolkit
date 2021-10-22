@@ -20,11 +20,10 @@ class LogisticRegressionHE {
  public:
   LogisticRegressionHE() {}
   LogisticRegressionHE(const kernel::LRHEKernel& lrheKernel,
-      const bool encrypt_data = true,
-      const bool encrypt_model = true,
-      const bool linear_regression = false,
-      const size_t batch_size = 0
-  );
+                       const bool encrypt_data = true,
+                       const bool encrypt_model = true,
+                       const bool linear_regression = false,
+                       const size_t batch_size = 0);
 
   ~LogisticRegressionHE() {}
 

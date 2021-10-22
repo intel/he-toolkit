@@ -14,9 +14,10 @@
 #include "include/lrhe.hpp"
 #include "include/timer.hpp"
 
-DEFINE_string(data, "lrtest_mid",
-              "Dataset name to test. Files should have preset name conventions. "
-              "Refer to the datasets folder for more information.");
+DEFINE_string(
+    data, "lrtest_mid",
+    "Dataset name to test. Files should have preset name conventions. "
+    "Refer to the datasets folder for more information.");
 
 DEFINE_bool(compare, false,
             "Compare the HE logistic regression inference results with "
@@ -27,26 +28,24 @@ DEFINE_int32(poly_modulus_degree, 8192,
              "size and security level, thus recommended size is 4096-16384. "
              "Must be a power of 2, with the range of [1024, 32768]");
 
-DEFINE_bool(data_plain, false,
-            "Run with the data as plaintext.");
+DEFINE_bool(data_plain, false, "Run with the data as plaintext.");
 
-DEFINE_bool(model_plain, false,
-            "Run with the model as plaintext.");
+DEFINE_bool(model_plain, false, "Run with the model as plaintext.");
 
 DEFINE_bool(linear_regression, false,
             "Calculate linear regression instead of logistic regression.");
 
-DEFINE_int32(security_level, 0,
-             "Security level. One of [0, 128, 192, 256].");
+DEFINE_int32(security_level, 0, "Security level. One of [0, 128, 192, 256].");
 
 DEFINE_string(coeff_modulus, "60,45,45,45,45,60",
-              "Coefficient modulus (list of primes). The bit-lengths of the primes to be generated.");
+              "Coefficient modulus (list of primes). The bit-lengths of the "
+              "primes to be generated.");
 
 DEFINE_int32(batch_size, 0,
-             "Batch size. 0 = automatic (poly_modulus_degree / 2). Max = poly_modulus_degree / 2.");
+             "Batch size. 0 = automatic (poly_modulus_degree / 2). Max = "
+             "poly_modulus_degree / 2.");
 
-DEFINE_int32(scale, 45,
-             "Scaling parameter defining precision.");
+DEFINE_int32(scale, 45, "Scaling parameter defining precision.");
 
 int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -85,8 +84,7 @@ int main(int argc, char** argv) {
   std::stringstream ss(FLAGS_coeff_modulus);
   for (int i; ss >> i;) {
     coeff_modulus.push_back(i);
-    if (ss.peek() == ',')
-      ss.ignore();
+    if (ss.peek() == ',') ss.ignore();
   }
 
   kernel::LRHEKernel kernel(FLAGS_poly_modulus_degree, coeff_modulus,
@@ -95,7 +93,8 @@ int main(int argc, char** argv) {
     LOG<Info>("ERROR: Either model or data (or both) must be encrypted.");
     return EXIT_FAILURE;
   }
-  lrhe::LogisticRegressionHE lrhe(kernel, !FLAGS_data_plain, !FLAGS_model_plain, FLAGS_linear_regression, FLAGS_batch_size);
+  lrhe::LogisticRegressionHE lrhe(kernel, !FLAGS_data_plain, !FLAGS_model_plain,
+                                  FLAGS_linear_regression, FLAGS_batch_size);
 
   // load eval data for inference
   LOG<Info>("Loading EVAL dataset");
@@ -135,10 +134,12 @@ int main(int argc, char** argv) {
   auto eval = lrhelper::get_evalmetrics(evalTarget, lrhe_evalout);
   LOG<Info>("HE inference result - accuracy: ", eval["acc"]);
 
-  if (FLAGS_compare) {  // If compare==true, compare with non-HE inference result
+  if (FLAGS_compare) {  // If compare==true, compare with non-HE inference
+                        // result
     // Get cleartext inference results
     auto lrcleartext_evalout =
-        lrhelper::test(evalData, pretrained_weights, pretrained_bias, true, FLAGS_linear_regression);
+        lrhelper::test(evalData, pretrained_weights, pretrained_bias, true,
+                       FLAGS_linear_regression);
 
     // Count mismatch
     int mismatch_ct = 0;

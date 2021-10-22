@@ -22,7 +22,9 @@ class LRHEKernel {
              double scale, bool generate_relin_keys = true,
              bool generate_galois_keys = true,
              seal::sec_level_type sec_level = seal::sec_level_type::none)
-      : m_poly_modulus_degree(poly_modulus_degree), m_scale(scale), m_sec_level(sec_level) {
+      : m_poly_modulus_degree(poly_modulus_degree),
+        m_scale(scale),
+        m_sec_level(sec_level) {
     initContext(poly_modulus_degree, coeff_modulus, scale, generate_relin_keys,
                 generate_galois_keys);
   }

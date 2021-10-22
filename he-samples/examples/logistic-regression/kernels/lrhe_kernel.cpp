@@ -26,8 +26,7 @@ void LRHEKernel::initContext(size_t poly_modulus_degree,
   m_parms.set_coeff_modulus(
       seal::CoeffModulus::Create(poly_modulus_degree, coeff_modulus));
 
-  m_context.reset(
-      new seal::SEALContext(m_parms, true, m_sec_level));
+  m_context.reset(new seal::SEALContext(m_parms, true, m_sec_level));
   m_keygen = std::make_shared<seal::KeyGenerator>(*m_context);
   m_keygen->create_public_key(m_public_key);
   m_secret_key = m_keygen->secret_key();
