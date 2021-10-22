@@ -48,7 +48,7 @@ def doTrain(Xtrain, ytrain, Xtest, ytest, epochs=10, verbose=False):
     smoothing = (1 - lmbda) / new_lmbda
     lmbda = new_lmbda
 
-    loss, dw = lrb.get_lgd_poly3(Xtrain, ytrain, v)
+    loss, dw = lrb.get_lgd(Xtrain, ytrain, v)
 
     new_w = v - learning_rate * dw
     new_v = (1 - smoothing) * new_w + smoothing * w
@@ -56,11 +56,11 @@ def doTrain(Xtrain, ytrain, Xtest, ytest, epochs=10, verbose=False):
     if verbose:
       if epochs < 10:
         if i % (int(epochs / 5)) == 0:
-          _, acc, _, _ = lrb.test_poly3(Xtest, ytest, v)
+          _, acc, _, _ = lrb.test(Xtest, ytest, v)
           print("Epoch: %s, - loss: %s - acc: %s" % (i, loss, acc))
       else:
         if i % (int(epochs / 10)) == 0:
-          _, acc, _, _ = lrb.test_poly3(Xtest, ytest, v)
+          _, acc, _, _ = lrb.test(Xtest, ytest, v)
           print("Epoch: %s, - loss: %s - acc: %s" % (i, loss, acc))
 
     v = new_v
@@ -189,7 +189,14 @@ if __name__ == "__main__":
                       default=0,
                       type=int,
                       help="# of features")
-  parser.add_argument("--name", "-n", default=None, help="Data prefix")
+  parser.add_argument("--name",
+                      "-n",
+                      default=None,
+                      help="Data prefix")
+  parser.add_argument("--verbose",
+                      '-v',
+                      action='store_true',
+                      help="Set to see training progress")
 
   args = parser.parse_args()
 
@@ -210,7 +217,8 @@ if __name__ == "__main__":
       X_train, y_train, X_test, y_test, X_eval, y_eval = generateSynData(
           n_samples * 4, n_features)
       print(" - Training LR model...")
-      bias, weights = doTrain(X_train, y_train, X_test, y_test)
+      bias, weights = doTrain(X_train, y_train, X_test, y_test,
+          verbose = args.verbose)
       print(" - Storing LR model and eval data")
       saveModel(dataname, bias, weights)
       saveData(dataname, X_eval, y_eval)
@@ -224,7 +232,8 @@ if __name__ == "__main__":
     X_train, y_train, X_test, y_test, X_eval, y_eval = generateSynData(
         args.samples * 4, args.features)
     print(" - Training LR model...")
-    bias, weights = doTrain(X_train, y_train, X_test, y_test)
+    bias, weights = doTrain(X_train, y_train, X_test, y_test,
+        verbose = args.verbose)
     print(" - Storing LR model and eval data")
     saveModel(args.name, bias, weights)
     saveData(args.name, X_eval, y_eval)
