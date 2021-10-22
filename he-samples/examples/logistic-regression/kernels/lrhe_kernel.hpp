@@ -20,8 +20,9 @@ class LRHEKernel {
  public:
   LRHEKernel(size_t poly_modulus_degree, std::vector<int> coeff_modulus,
              double scale, bool generate_relin_keys = true,
-             bool generate_galois_keys = true)
-      : m_poly_modulus_degree(poly_modulus_degree), m_scale(scale) {
+             bool generate_galois_keys = true,
+             seal::sec_level_type sec_level = seal::sec_level_type::none)
+      : m_poly_modulus_degree(poly_modulus_degree), m_scale(scale), m_sec_level(sec_level) {
     initContext(poly_modulus_degree, coeff_modulus, scale, generate_relin_keys,
                 generate_galois_keys);
   }
@@ -56,6 +57,12 @@ class LRHEKernel {
 
   virtual seal::Ciphertext vecMatProduct(
       const std::vector<seal::Ciphertext>& A_T_extended,
+      const std::vector<seal::Ciphertext>& B);
+  virtual seal::Ciphertext vecMatProduct(
+      const std::vector<seal::Ciphertext>& A_T_extended,
+      const std::vector<seal::Plaintext>& B);
+  virtual seal::Ciphertext vecMatProduct(
+      const std::vector<seal::Plaintext>& A_T_extended,
       const std::vector<seal::Ciphertext>& B);
 
   // Performs polynomial function evaluation using conventional method
@@ -100,6 +107,12 @@ class LRHEKernel {
   seal::Ciphertext evaluateLinearRegressionTransposed(
       std::vector<seal::Ciphertext> weights_T_extended,
       std::vector<seal::Ciphertext>& inputs_T, seal::Ciphertext bias_extended);
+  seal::Ciphertext evaluateLinearRegressionTransposed(
+      std::vector<seal::Ciphertext> weights_T_extended,
+      std::vector<seal::Plaintext>& inputs_T, seal::Ciphertext bias_extended);
+  seal::Ciphertext evaluateLinearRegressionTransposed(
+      std::vector<seal::Plaintext> weights_T_extended,
+      std::vector<seal::Ciphertext>& inputs_T, seal::Plaintext bias_extended);
 
   // Performs logistic regression with transposed inputs for faster inference
   // @param weights_T_extended Ciphertext of transpose of weight vector which is
@@ -114,6 +127,14 @@ class LRHEKernel {
   seal::Ciphertext evaluateLogisticRegressionTransposed(
       std::vector<seal::Ciphertext> weights_T_extended,
       std::vector<seal::Ciphertext>& inputs_T, seal::Ciphertext bias_extended,
+      unsigned int sigmoid_degree = 3);
+  seal::Ciphertext evaluateLogisticRegressionTransposed(
+      std::vector<seal::Ciphertext> weights_T_extended,
+      std::vector<seal::Plaintext>& inputs_T, seal::Ciphertext bias_extended,
+      unsigned int sigmoid_degree = 3);
+  seal::Ciphertext evaluateLogisticRegressionTransposed(
+      std::vector<seal::Plaintext> weights_T_extended,
+      std::vector<seal::Ciphertext>& inputs_T, seal::Plaintext bias_extended,
       unsigned int sigmoid_degree = 3);
 
   //  Modulus switches a and b such that their levels match
@@ -168,6 +189,7 @@ class LRHEKernel {
   double m_scale;
   seal::EncryptionParameters m_parms{seal::scheme_type::ckks};
   size_t m_slot_count;
+  seal::sec_level_type m_sec_level;
 };
 
 template <>

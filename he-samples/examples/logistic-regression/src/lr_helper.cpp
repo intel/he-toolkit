@@ -204,7 +204,7 @@ std::map<std::string, double> get_evalmetrics(
 
 std::vector<double> test(const std::vector<std::vector<double>>& X,
                          const std::vector<double>& W, const double bias,
-                         bool clipResult) {
+                         bool clipResult, bool linear_regression) {
   if (X.size() < 1) throw std::invalid_argument("Input data cannot be empty");
 
   std::vector<double> retval(X.size());
@@ -212,7 +212,8 @@ std::vector<double> test(const std::vector<std::vector<double>>& X,
   for (size_t i = 0; i < X.size(); ++i)
     retval[i] = std::inner_product(X[i].begin(), X[i].end(), W.begin(), bias);
 
-  std::transform(retval.begin(), retval.end(), retval.begin(), sigmoid<3>);
+  if (!linear_regression)
+    std::transform(retval.begin(), retval.end(), retval.begin(), sigmoid<3>);
 
   if (clipResult)
     std::transform(
