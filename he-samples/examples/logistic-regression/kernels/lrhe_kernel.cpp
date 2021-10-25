@@ -95,7 +95,6 @@ seal::Ciphertext LRHEKernel::vecMatProduct(
     step *= 2;
   }
 
-  evaluator().relinearize_inplace(retval[0], m_relin_keys);
   evaluator().rescale_to_next_inplace(retval[0]);
 
   return retval[0];
@@ -123,7 +122,6 @@ seal::Ciphertext LRHEKernel::vecMatProduct(
     step *= 2;
   }
 
-  evaluator().relinearize_inplace(retval[0], m_relin_keys);
   evaluator().rescale_to_next_inplace(retval[0]);
 
   return retval[0];

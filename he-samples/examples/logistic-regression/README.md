@@ -32,14 +32,27 @@ automatically generated during build time.
 | lrtest_large | 120 | 10000 |
 | lrtest_xlarge | 200 | 50000 |
 
-
-`-poly_modulus_degree`: Polynomial modulus degree, which determines the
+`--poly_modulus_degree`: Polynomial modulus degree. Determines the
 encoding slot count (half of the parameter) and encryption security level.
 Default is `8192`, and recommended size is `{4096, 8192, 16384}`, and
 must be a power of 2, with full range of `[1024, 32768]`.
 
-`--docompare`: Compare the HE logistic regression inference result with non-HE
+`--compare`: Compare the HE logistic regression inference result with non-HE
 inference for validation purposes. Default is `false`.
+
+`--data_plain`: Run with the data as plaintext.
+
+`--model_plain`: Run with the model as plaintext.
+
+`--linear_regression`: Calculate linear regression instead of logistic regression.
+
+`--security_level`: Security level. One of `[0, 128, 192, 256]`.
+
+`--coeff_modulus`: Coefficient modulus (list of primes). The bit-lengths of the primes to be generated.
+
+`--batch_size`: Batch size. 0 = automatic (poly_modulus_degree / 2). Max = poly_modulus_degree / 2.
+
+`--scale`: Scaling parameter defining precision.
 
 ## Data Preparation
 There are two example data preparation ipython notebooks in

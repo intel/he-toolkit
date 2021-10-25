@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
                         // result
     // Get cleartext inference results
     auto lrcleartext_evalout =
-        lrhelper::test(evalData, pretrained_weights, pretrained_bias, true,
+        lrhelper::test(evalData, pretrained_weights, pretrained_bias, !FLAGS_linear_regression,
                        FLAGS_linear_regression);
 
     // Count mismatch
