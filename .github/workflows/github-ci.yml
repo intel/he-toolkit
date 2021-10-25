@@ -73,7 +73,7 @@ jobs:
       # Build toolkit
       - name: Build the repository
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
           cmake --build build --target all -j
 
       # Unit tests and examples
