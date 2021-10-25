@@ -29,6 +29,7 @@ else()
     set(HELIB_DEBUG OFF CACHE BOOL "" FORCE)
     set(ENABLE_TEST OFF CACHE BOOL "" FORCE)
     set(USE_INTEL_HEXL ${ENABLE_INTEL_HEXL})
+    set(HEXL_DIR ${INTEL_HEXL_HINT_DIR})
     set(PEDANTIC_BUILD ON CACHE BOOL "" FORCE)
 
     add_subdirectory(
