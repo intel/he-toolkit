@@ -206,5 +206,5 @@ jobs:
       # Build the toolkit with only HElib and HEXL
       - name: Build HElib
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
+          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DHEXL_DIR=${{ env.HEXL_DIR }}
           cmake --build build --target all -j
