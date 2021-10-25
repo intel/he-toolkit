@@ -31,6 +31,7 @@ else()
     set(USE_INTEL_HEXL ${ENABLE_INTEL_HEXL})
     set(HEXL_DIR ${INTEL_HEXL_HINT_DIR})
     set(PEDANTIC_BUILD ON CACHE BOOL "" FORCE)
+    message("HEXL_DIR ${HEXL_DIR}")
 
     add_subdirectory(
       ${helib_SOURCE_DIR}
