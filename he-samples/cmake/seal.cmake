@@ -21,7 +21,7 @@ else()
 
   if(NOT seal_POPULATED)
     FetchContent_Populate(seal)
-    set(SEAL_SHARED_LIB OFF CACHE BOOL "" FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(SEAL_USE_CXX17 ON CACHE BOOL "" FORCE)
     set(SEAL_USE_INTEL_HEXL ${ENABLE_INTEL_HEXL})
     add_subdirectory(
