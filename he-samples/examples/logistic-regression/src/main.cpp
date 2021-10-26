@@ -93,8 +93,13 @@ int main(int argc, char** argv) {
     LOG<Info>("ERROR: Either model or data (or both) must be encrypted.");
     return EXIT_FAILURE;
   }
-  lrhe::LogisticRegressionHE lrhe(kernel, !FLAGS_data_plain, !FLAGS_model_plain,
-                                  FLAGS_linear_regression, FLAGS_batch_size);
+  std::unique_ptr<lrhe::LRHE> lrhe;
+  if (FLAGS_linear_regression)
+    lrhe = std::make_unique<lrhe::LinearRegressionHE>(
+        kernel, !FLAGS_data_plain, !FLAGS_model_plain, FLAGS_batch_size);
+  else
+    lrhe = std::make_unique<lrhe::LogisticRegressionHE>(
+        kernel, !FLAGS_data_plain, !FLAGS_model_plain, FLAGS_batch_size);
 
   // load eval data for inference
   LOG<Info>("Loading EVAL dataset");
@@ -125,10 +130,10 @@ int main(int argc, char** argv) {
   splitWeights(pretrained_weightsbias, pretrained_weights, pretrained_bias);
   LOG<Info>("Loading Model complete",
             "Elapsed(s):", intel::timer::delta(t_started));
-  lrhe.load_weight(pretrained_weights, pretrained_bias);
+  lrhe->load_weight(pretrained_weights, pretrained_bias);
 
   // perform inference with test data
-  auto lrhe_evalout = lrhe.inference(evalData);
+  auto lrhe_evalout = lrhe->inference(evalData);
 
   // evaluate result and get accuracy and f1 score
   auto eval = lrhelper::get_evalmetrics(evalTarget, lrhe_evalout);
@@ -138,8 +143,8 @@ int main(int argc, char** argv) {
                         // result
     // Get cleartext inference results
     auto lrcleartext_evalout =
-        lrhelper::test(evalData, pretrained_weights, pretrained_bias, !FLAGS_linear_regression,
-                       FLAGS_linear_regression);
+        lrhelper::test(evalData, pretrained_weights, pretrained_bias,
+                       !FLAGS_linear_regression, FLAGS_linear_regression);
 
     // Count mismatch
     int mismatch_ct = 0;

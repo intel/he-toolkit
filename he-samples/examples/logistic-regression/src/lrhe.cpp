@@ -10,31 +10,28 @@
 #include "include/timer.hpp"
 
 namespace lrhe {
-LogisticRegressionHE::LogisticRegressionHE(const kernel::LRHEKernel& lrheKernel,
-                                           const bool encrypt_data,
-                                           const bool encrypt_model,
-                                           const bool linear_regression,
-                                           const size_t batch_size)
+LRHE::LRHE(const kernel::LRHEKernel& lrheKernel, const bool encrypt_data,
+           const bool encrypt_model, const bool linear_regression,
+           const size_t batch_size)
     : m_encrypt_data(encrypt_data),
       m_encrypt_model(encrypt_model),
       m_linear_regression(linear_regression),
       m_batch_size(batch_size) {
   if (!encrypt_data && !encrypt_model) {
-    throw "During construction of LogisticRegressionHE: "
+    throw "During construction of LRHE: "
           "Either model or data (or both) must be encrypted.";
   }
   init(lrheKernel);
 }
 
-void LogisticRegressionHE::init(const kernel::LRHEKernel& lrheKernel) {
+void LRHE::init(const kernel::LRHEKernel& lrheKernel) {
   m_kernel = std::make_unique<kernel::LRHEKernel>(lrheKernel);
   m_isTrained = false;
   m_slot_count = m_kernel->slot_count();
   if (m_batch_size) m_slot_count = m_batch_size;
 }
 
-void LogisticRegressionHE::load_weight(const std::vector<double>& weights,
-                                       const double bias) {
+void LRHE::load_weight(const std::vector<double>& weights, const double bias) {
   if (m_isTrained) LOG<Info>("  Overwriting weights/bias");
 
   m_n_weights = weights.size();
@@ -60,10 +57,9 @@ void LogisticRegressionHE::load_weight(const std::vector<double>& weights,
   m_isTrained = true;
 }
 
-std::vector<double> LogisticRegressionHE::inference(
+std::vector<double> LRHE::inference(
     const std::vector<std::vector<double>>& inputData, bool clipResult) {
-  if (!m_isTrained)
-    throw std::runtime_error("Logistic Regression model not trained");
+  if (!m_isTrained) throw std::runtime_error("LR model not trained");
 
   if (inputData.size() < 1) throw std::invalid_argument("InputData is empty");
 
@@ -71,7 +67,7 @@ std::vector<double> LogisticRegressionHE::inference(
     throw std::invalid_argument("InputData feature size mismatch");
 
   size_t n_samples = inputData.size();
-  LOG<Info>("HE Logistic Regression");
+  LOG<Info>("HE LR");
 
   // Calculate number of batches
   size_t total_batch =
@@ -120,7 +116,7 @@ std::vector<double> LogisticRegressionHE::inference(
   }
 
   // ================================
-  // Logistic Regression HE inference
+  // LR HE inference
   // ================================
   std::vector<seal::Ciphertext> ct_lrhe_inference(total_batch);
   if (m_linear_regression)
@@ -158,7 +154,7 @@ std::vector<double> LogisticRegressionHE::inference(
               m_ct_weights, pt_inputs[i], m_ct_bias);
         }
       } else {
-        throw "During execution of LogisticRegressionHE::inference: "
+        throw "During execution of LRHE::inference: "
               "Either model or data (or both) must be encrypted.";
       }
     }
@@ -185,17 +181,17 @@ std::vector<double> LogisticRegressionHE::inference(
   return std::vector<double>(retval.begin(), retval.begin() + n_samples);
 }
 
-seal::Ciphertext LogisticRegressionHE::encodeEncryptBias(const double bias) {
+seal::Ciphertext LRHE::encodeEncryptBias(const double bias) {
   return m_kernel->encrypt(m_kernel->encode(
       gsl::span(std::vector<double>(m_slot_count, bias).data(), m_slot_count)));
 }
 
-seal::Plaintext LogisticRegressionHE::encodeBias(const double bias) {
+seal::Plaintext LRHE::encodeBias(const double bias) {
   return m_kernel->encode(
       gsl::span(std::vector<double>(m_slot_count, bias).data(), m_slot_count));
 }
 
-std::vector<double> LogisticRegressionHE::decryptDecodeResult(
+std::vector<double> LRHE::decryptDecodeResult(
     const std::vector<seal::Ciphertext> ct_result_batches, size_t n_samples) {
   size_t n_batches = ct_result_batches.size();
   std::vector<double> ret(n_batches * m_slot_count);
@@ -212,8 +208,7 @@ std::vector<double> LogisticRegressionHE::decryptDecodeResult(
   return std::vector<double>(ret.begin(), ret.begin() + n_samples);
 }
 
-std::vector<std::vector<seal::Ciphertext>>
-LogisticRegressionHE::encodeEncryptData(
+std::vector<std::vector<seal::Ciphertext>> LRHE::encodeEncryptData(
     const std::vector<std::vector<std::vector<double>>>& data_T) {
   size_t n_batches = data_T.size();
   size_t n_features = data_T[0].size();
@@ -231,7 +226,7 @@ LogisticRegressionHE::encodeEncryptData(
   return ct_ret;
 }
 
-std::vector<std::vector<seal::Plaintext>> LogisticRegressionHE::encodeData(
+std::vector<std::vector<seal::Plaintext>> LRHE::encodeData(
     const std::vector<std::vector<std::vector<double>>>& data_T) {
   size_t n_batches = data_T.size();
   size_t n_features = data_T[0].size();
@@ -249,7 +244,7 @@ std::vector<std::vector<seal::Plaintext>> LogisticRegressionHE::encodeData(
   return ct_ret;
 }
 
-std::vector<seal::Ciphertext> LogisticRegressionHE::encodeEncryptWeights(
+std::vector<seal::Ciphertext> LRHE::encodeEncryptWeights(
     const std::vector<double>& weights) {
   size_t n_features = weights.size();
   std::vector<seal::Ciphertext> ct_ret(n_features);
@@ -262,7 +257,7 @@ std::vector<seal::Ciphertext> LogisticRegressionHE::encodeEncryptWeights(
   return ct_ret;
 }
 
-std::vector<seal::Plaintext> LogisticRegressionHE::encodeWeights(
+std::vector<seal::Plaintext> LRHE::encodeWeights(
     const std::vector<double>& weights) {
   size_t n_features = weights.size();
   std::vector<seal::Plaintext> ct_ret(n_features);
