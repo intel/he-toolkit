@@ -3,7 +3,7 @@ The logistic regression example provides a fast and scalable implementation of
 SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
 is enabled as part of HE Toolkit build.
 
-This example is also capable of running a linear regression instead of the logistic regression. Logistic regression can be achieved by "wrapping" a mulitiple linear regression model with a sigmoid function. The sigmoid function can be skipped by using the `--linear_regression` option, effectively running a linear regression.
+This example is also capable of running linear regression instead of logistic regression. Logistic regression can be achieved by ["wrapping"](https://philippmuens.com/logistic-regression-from-scratch) a [mulitiple linear regression](https://en.wikipedia.org/wiki/Linear_regression#Simple_and_multiple_linear_regression) model with a [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function). The sigmoid function can be skipped by using the `--linear_regression` option, effectively running a linear regression.
 
 ## Requirements
 ```
