@@ -36,6 +36,27 @@ jobs:
         with:
           extra_args: --all-files
 
+  docker-build:
+    name: Docker build
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+        working-directory: he-toolkit/docker
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate paths
+        run: |
+          whoami
+          echo $HOME
+          echo $GITHUB_WORKSPACE
+          echo "Testing from branch:"
+          echo $GITHUB_REF
+          pwd
+      - name: Setup Docker
+        run: |
+          ./setup_and_run_docker.sh
+
   build-and-test:
     name: Build, test and run kernels
     needs: [format]
