@@ -92,7 +92,7 @@ jobs:
       - name: Run LR example
         run: |
           cd build/examples/logistic-regression
-          ./lr_test --docompare --data lrtest_large | grep "All match!"
+          ./lr_test --compare --data lrtest_large | grep "All match!"
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
@@ -169,7 +169,7 @@ jobs:
       - name: Run LR example
         run: |
           cd build/examples/logistic-regression
-          ./lr_test --docompare --data lrtest_large | grep "All match!"
+          ./lr_test --compare --data lrtest_large | grep "All match!"
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels

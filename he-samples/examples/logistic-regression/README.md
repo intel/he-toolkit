@@ -1,7 +1,9 @@
-# Logistic Regression with Homomorphic Encryption
+# Logistic/Linear Regression with Homomorphic Encryption
 The logistic regression example provides a fast and scalable implementation of
 SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
 is enabled as part of HE Toolkit build.
+
+This example is also capable of running linear regression instead of logistic regression. Logistic regression can be achieved by ["wrapping"](https://philippmuens.com/logistic-regression-from-scratch) a [mulitiple linear regression](https://en.wikipedia.org/wiki/Linear_regression#Simple_and_multiple_linear_regression) model with a [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function). The sigmoid function can be skipped by using the `--linear_regression` option, effectively running a linear regression.
 
 ## Requirements
 ```
@@ -32,14 +34,27 @@ automatically generated during build time.
 | lrtest_large | 120 | 10000 |
 | lrtest_xlarge | 200 | 50000 |
 
-
-`-poly_modulus_degree`: Polynomial modulus degree, which determines the
+`--poly_modulus_degree`: Polynomial modulus degree. Determines the
 encoding slot count (half of the parameter) and encryption security level.
 Default is `8192`, and recommended size is `{4096, 8192, 16384}`, and
 must be a power of 2, with full range of `[1024, 32768]`.
 
-`--docompare`: Compare the HE logistic regression inference result with non-HE
+`--compare`: Compare the HE logistic regression inference result with non-HE
 inference for validation purposes. Default is `false`.
+
+`--data_plain`: Run with the data as plaintext.
+
+`--model_plain`: Run with the model as plaintext.
+
+`--linear_regression`: Calculate linear regression instead of logistic regression.
+
+`--security_level`: Security level. One of `[0, 128, 192, 256]`.
+
+`--coeff_modulus`: Coefficient modulus (list of primes). The bit-lengths of the primes to be generated.
+
+`--batch_size`: Batch size. 0 = automatic (poly_modulus_degree / 2). Max = poly_modulus_degree / 2.
+
+`--scale`: Scaling parameter defining precision.
 
 ## Data Preparation
 There are two example data preparation ipython notebooks in
