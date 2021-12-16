@@ -134,18 +134,25 @@ def parse_cmds():
     parser_remove.add_argument("instance", type=str, help="instance to be removed")
     parser_remove.set_defaults(fn=remove_components)
 
-    return parser.parse_args()
+    return parser.parse_args(), parser.print_help
 
 
 def main():
+    # FIXME
+    toolkit_version = "x.y.z"
+
     # Parse cmdline
-    args = parse_cmds()
+    args, print_help = parse_cmds()
 
     if args.version:
-        print("Intel HE Toolkit version 1.3.0")
+        print(f"Intel HE Toolkit version {toolkit_version}")
         exit(0)
 
     # Run the command
+    if not hasattr(args, "fn"):
+        print("hekit requires a command", file=sys.stderr)
+        print_help(sys.stderr)
+        exit(1)
     args.fn(args)
 
 
