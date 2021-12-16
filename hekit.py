@@ -105,7 +105,7 @@ def remove_components(args):
 def parse_cmds():
     """"""
     # create the top-level parser
-    parser = argparse.ArgumentParser(prog="PROG")
+    parser = argparse.ArgumentParser(prog="hekit")
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolit version"
     )

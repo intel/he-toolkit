@@ -2,16 +2,33 @@
 skip = false
 version = "1.2.1"
 name = "1.2.1"
-fetch = "git clone https://github.com/intel/hexl.git --branch %name%"
-init_fetch_dir = "~/.hekit/hexl/1.2.1/fetch"
-init_build_dir = "~/.hekit/hexl/1.2.1/build"
+fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+init_fetch_dir = "~/.hekit/hexl/%name%/fetch"
+init_build_dir = "~/.hekit/hexl/%name%/build"
 init_install_dir = "%init_build_dir%"
 pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
 build = "cmake --build %init_build_dir% -j"
 post-build = ""
 install = "cmake --install %init_install_dir%"
-export_install_dir = "~/.hekit/hexl/1.2.1/install"
+export_install_dir = "~/.hekit/hexl/%name%/install"
+export_cmake = "%export_install_dir%/lib/cmake/hexl-%version%"
+
+
+[[dependency.hexl]]
+skip = false
+version = "1.2.2"
+name = "1.2.2"
+fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+init_fetch_dir = "~/.hekit/hexl/%name%/fetch"
+init_build_dir = "~/.hekit/hexl/%name%/build"
+init_install_dir = "%init_build_dir%"
+pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+export_install_dir = "~/.hekit/hexl/%name%/install"
 export_cmake = "%export_install_dir%/lib/cmake/hexl-%version%"
 
 
