@@ -9,12 +9,12 @@ import argparse
 
 import os
 import shutil
-import pprint
 import itertools as it
-from component_builder import ComponentBuilder, chain_run, repo_location
+from component_builder import ComponentBuilder, chain_run
+from typing import NamedTuple
 
 
-def components_to_build_from(filename, category):
+def components_to_build_from(filename, category, repo_location):
     """Returns a generator that yields a component to be built and/or installed"""
     toml_dict = toml.load(filename)
     category_objs = toml_dict[category]
@@ -27,9 +27,10 @@ def components_to_build_from(filename, category):
 
 
 def install_components(args):
-    """"""
-    deps = components_to_build_from(args.install_file, "dependency")
-    libs = components_to_build_from(args.install_file, "library")
+    """Install command"""
+    repo_location = args.config.repo_location
+    deps = components_to_build_from(args.install_file, "dependency", repo_location)
+    libs = components_to_build_from(args.install_file, "library", repo_location)
 
     for component in it.chain(deps, libs):
         print(component.category)
@@ -43,13 +44,16 @@ def install_components(args):
 
 def list_dirs(path: str):
     """Just return list of dirs in path."""
-    _, dirs, _ = next(os.walk(path))
-    return dirs
+    try:
+        _, dirs, _ = next(os.walk(path))
+        return dirs
+    except StopIteration:
+        return []
 
 
 def list_components(args):
     """List to stdout info on components."""
-    global repo_location
+    repo_location = args.config.repo_location
     # At the mo, just lists installed.
     width = 10
     print(
@@ -88,6 +92,7 @@ def list_components(args):
 
 def remove_components(args):
     """Remove component instances"""
+    repo_location = args.config.repo_location
     try:
         component = args.component
         instance = args.instance
@@ -102,12 +107,18 @@ def remove_components(args):
         )
 
 
-def parse_cmds():
-    """"""
+def parse_cmdline():
+    """Parse commandline commands"""
     # create the top-level parser
     parser = argparse.ArgumentParser(prog="hekit")
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolit version"
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="~/.hekit/default.config",
+        help="use a non-default configuration file instead",
     )
     subparsers = parser.add_subparsers(help="sub-command help")
 
@@ -137,12 +148,36 @@ def parse_cmds():
     return parser.parse_args(), parser.print_help
 
 
-def main():
-    # FIXME
-    toolkit_version = "x.y.z"
+class Config(NamedTuple):
+    """Represents a config"""
 
-    # Parse cmdline
-    args, print_help = parse_cmds()
+    config_filename: str
+    repo_location: str
+
+
+def load_config(filename: str):
+    """Load a config file in TOML format"""
+    expand = os.path.expanduser  # alias
+    expanded_filename = expand(filename)
+    toml_dict = toml.load(expanded_filename)
+    toml_dict = {k: expand(v) for k, v in toml_dict.items()}
+    # deref kwargs this way, get exceptions unknown key for free
+    return Config(expanded_filename, **toml_dict)
+
+
+def main():
+
+    toolkit_version = "2.0.0"
+    args, print_help = parse_cmdline()
+
+    # Load config file
+    try:
+        # replace the filename with the actual config
+        args.config = load_config(args.config)
+    except Exception as e:
+        # Any exception from config file exit
+        print(f"Error while parsing config file\n  {e!r}")
+        exit(1)
 
     if args.version:
         print(f"Intel HE Toolkit version {toolkit_version}")

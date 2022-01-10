@@ -7,13 +7,9 @@ import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT
 
-# FIXME remove hardcoding and global
-repo_location = os.path.expanduser("~/.hekit")
 
-
-def read_spec(component, name, attrib):
-    """"""
-    global repo_location
+def read_spec(component, name, attrib, repo_location):
+    """Return spec file as a dict"""
     path = f"{repo_location}/{component}/{name}/hekit.spec"
     spec = toml.load(path)
     return spec[attrib]
@@ -39,7 +35,7 @@ def chain_run(funcs):
             )
 
 
-def fill_self_ref_string_dict(d):
+def fill_self_ref_string_dict(d, repo_path):
     """Returns a dict with str values.
     NB. Only works for flat str value dict."""
 
@@ -71,7 +67,7 @@ def fill_self_ref_string_dict(d):
             new_s = s
             for symbol, comp, name, k in symbols:
                 # Assume finalised spec is already expanded
-                sub = read_spec(comp, name, k)
+                sub = read_spec(comp, name, k, repo_path)
                 new_s = new_s.replace(symbol, sub)
 
             return new_s
@@ -116,20 +112,37 @@ def try_run(spec: dict, attrib: str):
 def change_cwd_to(path):
     expanded_path = os.path.expanduser(path)
     os.chdir(expanded_path)
+    print("cwd:", expanded_path)
+
+
+def fill_init_paths(d, repo_location):
+    """Create absolute path for the top-level attribs that begin
+       with 'init_' by prepending repo location"""
+    for k, v in d.items():
+        if k.startswith("init_") or k.startswith("export_"):
+            d[k] = f"{repo_location}/{v}"
+    return d
 
 
 class ComponentBuilder:
+    """Objects of this class can orchestrate the build of a component"""
+
     def __init__(self, category, comp_name, spec, repo_path):
         """"""
         if not isinstance(spec, dict):
             raise TypeError(
                 f"A spec must be type dict, but got '{type(spec).__name__}'"
             )
+        self._repo_path = repo_path
         self._category = category
-        self._spec = fill_self_ref_string_dict(spec)
-        self._comp_instance = self._spec["name"]
+        # FIXME .regression. convoluted code means name cannot be currently back substituted
+        self._comp_instance = spec["name"]
         self._location = f"{repo_path}/{comp_name}/{self._comp_instance}"
-        self._skip = self._spec["skip"] if "skip" in self._spec else False
+        self._skip = spec["skip"] if "skip" in spec else False
+        # FIXME This logic is convoluted. Must update self._spec
+        self._spec = fill_init_paths(spec, self._location)
+        self._spec = fill_self_ref_string_dict(self._spec, repo_path)
+
         if not isinstance(self._skip, bool):
             raise ValueError("Skip must be set to true or false")
 
@@ -192,6 +205,7 @@ class ComponentBuilder:
         if f"post_{stage}" in dir(self):
             fns.append(getattr(self, f"post_{stage}"))
 
+        # The actual directory that is written to
         init_stage_dir = self._spec[f"init_{stage}_dir"]
         change_cwd_to(init_stage_dir)
 

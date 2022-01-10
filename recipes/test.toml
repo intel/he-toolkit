@@ -3,16 +3,15 @@ skip = false
 version = "1.2.1"
 name = "1.2.1"
 fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
-init_fetch_dir = "~/.hekit/hexl/%name%/fetch"
-init_build_dir = "~/.hekit/hexl/%name%/build"
-init_install_dir = "%init_build_dir%"
-pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+post-fetch = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
 build = "cmake --build %init_build_dir% -j"
-post-build = ""
 install = "cmake --install %init_install_dir%"
-export_install_dir = "~/.hekit/hexl/%name%/install"
-export_cmake = "%export_install_dir%/lib/cmake/hexl-%version%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"
 
 
 [[dependency.hexl]]
@@ -20,30 +19,29 @@ skip = false
 version = "1.2.2"
 name = "1.2.2"
 fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
-init_fetch_dir = "~/.hekit/hexl/%name%/fetch"
-init_build_dir = "~/.hekit/hexl/%name%/build"
-init_install_dir = "%init_build_dir%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
 pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
 build = "cmake --build %init_build_dir% -j"
-post-build = ""
 install = "cmake --install %init_install_dir%"
-export_install_dir = "~/.hekit/hexl/%name%/install"
-export_cmake = "%export_install_dir%/lib/cmake/hexl-%version%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"
 
 
 [[dependency.ntl]]
 skip = false
 version = "11.5.1"
-name = "%version%"
-init_fetch_dir = "~/.hekit/ntl/%version%/fetch"
-build_dir_pre = "~/.hekit/ntl/%version%/build"
-init_build_dir = "~/.hekit/ntl/%version%/build/ntl-%version%/src"
-init_install_dir = "%init_build_dir%"
-export_install_dir = "~/.hekit/ntl/%version%/install"
+# At mo, can't back sub on name
+name = "11.5.1"
+init_fetch_dir = "fetch"
+init_pre_build_dir = "build"
+init_build_dir = "build/ntl-%version%/src"
+init_install_dir = "build/ntl-%version%/src"
+export_install_dir = "install"
 fetch = "wget https://libntl.org/ntl-%version%.tar.gz"
-# At mo, some progs can't expand tilde
-post-fetch = "bash -c 'tar -xvf %init_fetch_dir%/ntl-%version%.tar.gz -C %build_dir_pre%'"
+post-fetch = "bash -c 'tar -xvf %init_fetch_dir%/ntl-%version%.tar.gz -C %init_pre_build_dir%'"
 build = "bash -c './configure PREFIX=%export_install_dir% && make -j'"
 install = "make install"
 
@@ -51,12 +49,13 @@ install = "make install"
 [[library.helib]]
 skip = false
 version = "2.2.0"
-name = "v%version%"
-root = "~/.hekit/helib/%name%"
-init_fetch_dir = "%root%/fetch"
-init_build_dir = "%root%/build"
-init_install_dir = "%root%/build"
-export_install_dir = "%root%/install"
+# At mo, can't back sub on name
+name = "v2.2.0"
+root = "%name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
 fetch = "git clone https://github.com/homenc/HElib.git --branch %name%"
 pre-build = """cmake -S %init_fetch_dir%/HElib -B %init_build_dir% \
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%         \
@@ -67,22 +66,3 @@ post-build = ""
 install = "cmake --install %init_install_dir%"
 # Dependencies
 hexl = "hexl/1.2.1"
-
-
-[[library.dummy]]
-skip = true
-name = "dave"
-dependecies = ["hexl/1.2.1", "ntl/11-debug"]
-system_dependencies = [ "libgmp" ]
-
-
-[[dependency.dummy]]
-skip = true
-name = "a"
-fetch = ""
-fetch_dir = "~/.hekit/dummy/a/fetch"
-build_dir = "~/.hekit/dummy/a/build"
-install_dir = "~/.hekit/dummy/a/install"
-pre-build = ""
-build = ""
-install = ""
