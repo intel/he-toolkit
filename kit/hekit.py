@@ -16,6 +16,7 @@ def parse_cmdline():
     """Parse commandline commands"""
     # create the top-level parser
     parser = argparse.ArgumentParser(prog="hekit")
+    parser.set_defaults(fn=None)
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolit version"
     )
@@ -29,7 +30,6 @@ def parse_cmdline():
 
     # create the parser for the "list" command
     parser_list = subparsers.add_parser("list", help="lists installed components")
-    #    parser_list.add_argument('bar', type=int, help='bar help')
     parser_list.set_defaults(fn=list_components)
 
     # create the parser for the "install" command
@@ -58,21 +58,21 @@ def main():
     toolkit_version = "2.0.0"
     args, print_help = parse_cmdline()
 
+    if args.version:
+        print(f"Intel HE Toolkit version {toolkit_version}")
+        exit(0)
+
     # Load config file
     try:
         # replace the filename with the actual config
         args.config = load_config(args.config)
     except Exception as e:
-        # Any exception from config file exit
-        print(f"Error while parsing config file\n  {e!r}")
+        # Exit on any exception from config file
+        print(f"Error while parsing config file\n  {e!r}", file=sys.stderr)
         exit(1)
 
-    if args.version:
-        print(f"Intel HE Toolkit version {toolkit_version}")
-        exit(0)
-
     # Run the command
-    if not hasattr(args, "fn"):
+    if args.fn is None:
         print("hekit requires a command", file=sys.stderr)
         print_help(sys.stderr)
         exit(1)
