@@ -3,104 +3,13 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import toml
 import sys
 import argparse
 
-import os
-import shutil
-from component_builder import ComponentBuilder, chain_run
 from config import load_config
-
-
-def components_to_build_from(filename, repo_location):
-    """Returns a generator that yields a component to be built and/or installed"""
-    components = toml.load(filename)
-    # Extracting specs also flattens 'list of list' to list
-    specs = ((name, spec) for name, specs in components.items() for spec in specs)
-
-    return (ComponentBuilder(name, spec, repo_location) for name, spec in specs)
-
-
-def install_components(args):
-    """Install command"""
-    repo_location = args.config.repo_location
-    components = components_to_build_from(args.install_file, repo_location)
-
-    for component in components:
-        comp_label = f"{component.component_name()}/{component.instance_name()}"
-        print(comp_label)
-        if component.skip():
-            print(f"Skipping", comp_label)
-            continue
-        chain_run(
-            [component.setup, component.fetch, component.build, component.install]
-        )
-
-
-def list_dirs(path: str):
-    """Return list of directories in path."""
-    try:
-        _, dirs, _ = next(os.walk(path))
-        return dirs
-    except StopIteration:
-        return []
-
-
-def list_components(args):
-    """List to stdout info on components."""
-    repo_location = args.config.repo_location
-    # At the mo, just lists installed.
-    width = 10
-    print(
-        f"{'component':{width}} {'instance':{width}} {'fetch':{width}} {'build':{width}} {'install':{width}}"
-    )
-
-    for comp_name in sorted(list_dirs(repo_location)):
-        comp_name_path = f"{repo_location}/{comp_name}"
-        for comp_inst in sorted(list_dirs(comp_name_path)):
-            try:
-                info_filepath = f"{comp_name_path}/{comp_inst}/hekit.info"
-                info_file = toml.load(info_filepath)
-                print(
-                    f"{comp_name:{width}} {comp_inst:{width}}",
-                    f"{info_file['status']['fetch']:{width}}",
-                    f"{info_file['status']['build']:{width}}",
-                    f"{info_file['status']['install']:{width}}",
-                )
-            except FileNotFoundError:
-                print(
-                    f"{comp_name:{width}} {comp_inst:{width}}",
-                    f"{'unknown':{width}}",
-                    f"{'unknown':{width}}",
-                    f"{'unknown':{width}}",
-                    f"'{info_filepath}' not found",
-                )
-            except KeyError as emsg:
-                print(
-                    f"{comp_name:{width}} {comp_inst:{width}}",
-                    f"{'unknown':{width}}",
-                    f"{'unknown':{width}}",
-                    f"{'unknown':{width}}",
-                    f"key {emsg} not found",
-                )
-
-
-def remove_components(args):
-    """Remove component instances"""
-    repo_location = args.config.repo_location
-    try:
-        component = args.component
-        instance = args.instance
-        path = f"{repo_location}/{component}/{instance}"
-        shutil.rmtree(path)
-        print(f"Instance '{instance}' of component '{component}' successfully removed")
-
-    except FileNotFoundError:
-        print(
-            "Nothing to remove",
-            f"Instance '{instance}' of component '{component}' not found.",
-        )
+from command_remove import remove_components
+from command_list import list_components
+from command_install import install_components
 
 
 def parse_cmdline():
