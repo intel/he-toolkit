@@ -9,33 +9,29 @@ import argparse
 
 import os
 import shutil
-import itertools as it
 from component_builder import ComponentBuilder, chain_run
-from typing import NamedTuple
+from config import load_config
 
 
-def components_to_build_from(filename, category, repo_location):
+def components_to_build_from(filename, repo_location):
     """Returns a generator that yields a component to be built and/or installed"""
-    toml_dict = toml.load(filename)
-    category_objs = toml_dict[category]
+    components = toml.load(filename)
     # Extracting specs also flattens 'list of list' to list
-    specs = ((name, spec) for name, specs in category_objs.items() for spec in specs)
+    specs = ((name, spec) for name, specs in components.items() for spec in specs)
 
-    return (
-        ComponentBuilder(category, name, spec, repo_location) for name, spec in specs
-    )
+    return (ComponentBuilder(name, spec, repo_location) for name, spec in specs)
 
 
 def install_components(args):
     """Install command"""
     repo_location = args.config.repo_location
-    deps = components_to_build_from(args.install_file, "dependency", repo_location)
-    libs = components_to_build_from(args.install_file, "library", repo_location)
+    components = components_to_build_from(args.install_file, repo_location)
 
-    for component in it.chain(deps, libs):
-        print(component.category)
+    for component in components:
+        comp_label = f"{component.component_name()}/{component.instance_name()}"
+        print(comp_label)
         if component.skip():
-            print(f"Skipping {component.category}")
+            print(f"Skipping", comp_label)
             continue
         chain_run(
             [component.setup, component.fetch, component.build, component.install]
@@ -43,7 +39,7 @@ def install_components(args):
 
 
 def list_dirs(path: str):
-    """Just return list of dirs in path."""
+    """Return list of directories in path."""
     try:
         _, dirs, _ = next(os.walk(path))
         return dirs
@@ -146,23 +142,6 @@ def parse_cmdline():
     parser_remove.set_defaults(fn=remove_components)
 
     return parser.parse_args(), parser.print_help
-
-
-class Config(NamedTuple):
-    """Represents a config"""
-
-    config_filename: str
-    repo_location: str
-
-
-def load_config(filename: str):
-    """Load a config file in TOML format"""
-    expand = os.path.expanduser  # alias
-    expanded_filename = expand(filename)
-    toml_dict = toml.load(expanded_filename)
-    toml_dict = {k: expand(v) for k, v in toml_dict.items()}
-    # deref kwargs this way, get exceptions unknown key for free
-    return Config(expanded_filename, **toml_dict)
 
 
 def main():

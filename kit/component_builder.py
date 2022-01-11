@@ -127,16 +127,16 @@ def fill_init_paths(d, repo_location):
 class ComponentBuilder:
     """Objects of this class can orchestrate the build of a component"""
 
-    def __init__(self, category, comp_name, spec, repo_path):
+    def __init__(self, comp_name, spec, repo_path):
         """"""
         if not isinstance(spec, dict):
             raise TypeError(
                 f"A spec must be type dict, but got '{type(spec).__name__}'"
             )
         self._repo_path = repo_path
-        self._category = category
         # FIXME .regression. convoluted code means name cannot be currently back substituted
         self._comp_instance = spec["name"]
+        self._comp_name = comp_name
         self._location = f"{repo_path}/{comp_name}/{self._comp_instance}"
         self._skip = spec["skip"] if "skip" in spec else False
         # FIXME This logic is convoluted. Must update self._spec
@@ -156,8 +156,11 @@ class ComponentBuilder:
     def skip(self):
         return self._skip
 
-    def category(self):
-        return self._category
+    def component_name(self):
+        return self._comp_name
+
+    def instance_name(self):
+        return self._comp_instance
 
     def setup(self):
         """Create the layout for the component"""

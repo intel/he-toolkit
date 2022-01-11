@@ -1,4 +1,4 @@
-[[dependency.hexl]]
+[[hexl]]
 skip = false
 version = "1.2.1"
 name = "1.2.1"
@@ -14,7 +14,7 @@ export_install_dir = "install"
 export_cmake = "install/lib/cmake/hexl-%version%"
 
 
-[[dependency.hexl]]
+[[hexl]]
 skip = false
 version = "1.2.2"
 name = "1.2.2"
@@ -30,7 +30,7 @@ export_install_dir = "install"
 export_cmake = "install/lib/cmake/hexl-%version%"
 
 
-[[dependency.ntl]]
+[[ntl]]
 skip = false
 version = "11.5.1"
 # At mo, can't back sub on name
@@ -46,7 +46,7 @@ build = "bash -c './configure PREFIX=%export_install_dir% && make -j'"
 install = "make install"
 
 
-[[library.helib]]
+[[helib]]
 skip = false
 version = "2.2.0"
 # At mo, can't back sub on name
