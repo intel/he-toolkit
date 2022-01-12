@@ -21,15 +21,12 @@ void LRHEKernel::initContext(size_t poly_modulus_degree,
   m_scale = scale;
   m_poly_modulus_degree = poly_modulus_degree;
 
-  coeff_modulus.push_back(60);
-
   m_parms.set_poly_modulus_degree(poly_modulus_degree);
 
   m_parms.set_coeff_modulus(
       seal::CoeffModulus::Create(poly_modulus_degree, coeff_modulus));
 
-  m_context.reset(
-      new seal::SEALContext(m_parms, true, seal::sec_level_type::none));
+  m_context.reset(new seal::SEALContext(m_parms, true, m_sec_level));
   m_keygen = std::make_shared<seal::KeyGenerator>(*m_context);
   m_keygen->create_public_key(m_public_key);
   m_secret_key = m_keygen->secret_key();
@@ -71,6 +68,60 @@ seal::Ciphertext LRHEKernel::vecMatProduct(
   }
 
   evaluator().relinearize_inplace(retval[0], m_relin_keys);
+  evaluator().rescale_to_next_inplace(retval[0]);
+
+  return retval[0];
+}
+
+seal::Ciphertext LRHEKernel::vecMatProduct(
+    const std::vector<seal::Ciphertext>& A_T_extended,
+    const std::vector<seal::Plaintext>& B) {
+  size_t rows = A_T_extended.size();
+
+  std::vector<seal::Ciphertext> retval(rows);
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+  for (size_t r = 0; r < rows; ++r) {
+    evaluator().multiply_plain(A_T_extended[r], B[r], retval[r]);
+  }
+
+  // add all rows
+  size_t step = 2;
+  while ((step / 2) < rows) {
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+    for (size_t i = 0; i < rows; i += step) {
+      if ((i + step / 2) < rows)
+        evaluator().add_inplace(retval[i], retval[i + step / 2]);
+    }
+    step *= 2;
+  }
+
+  evaluator().rescale_to_next_inplace(retval[0]);
+
+  return retval[0];
+}
+
+seal::Ciphertext LRHEKernel::vecMatProduct(
+    const std::vector<seal::Plaintext>& A_T_extended,
+    const std::vector<seal::Ciphertext>& B) {
+  size_t rows = A_T_extended.size();
+
+  std::vector<seal::Ciphertext> retval(rows);
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+  for (size_t r = 0; r < rows; ++r) {
+    evaluator().multiply_plain(B[r], A_T_extended[r], retval[r]);
+  }
+
+  // add all rows
+  size_t step = 2;
+  while ((step / 2) < rows) {
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+    for (size_t i = 0; i < rows; i += step) {
+      if ((i + step / 2) < rows)
+        evaluator().add_inplace(retval[i], retval[i + step / 2]);
+    }
+    step *= 2;
+  }
+
   evaluator().rescale_to_next_inplace(retval[0]);
 
   return retval[0];
@@ -165,9 +216,81 @@ seal::Ciphertext LRHEKernel::evaluateLinearRegressionTransposed(
   return retval;
 }
 
+seal::Ciphertext LRHEKernel::evaluateLinearRegressionTransposed(
+    std::vector<seal::Ciphertext> weights_T_extended,
+    std::vector<seal::Plaintext>& inputs_T, seal::Ciphertext bias_extended) {
+  seal::Ciphertext retval = vecMatProduct(weights_T_extended, inputs_T);
+
+  matchLevel(&retval, &bias_extended);
+  bias_extended.scale() = m_scale;
+  retval.scale() = m_scale;
+
+  evaluator().add_inplace(retval, bias_extended);
+
+  return retval;
+}
+
+seal::Ciphertext LRHEKernel::evaluateLinearRegressionTransposed(
+    std::vector<seal::Plaintext> weights_T_extended,
+    std::vector<seal::Ciphertext>& inputs_T, seal::Plaintext bias_extended) {
+  seal::Ciphertext retval = vecMatProduct(weights_T_extended, inputs_T);
+
+  matchLevel(&retval, &bias_extended);
+  bias_extended.scale() = m_scale;
+  retval.scale() = m_scale;
+
+  evaluator().add_plain_inplace(retval, bias_extended);
+
+  return retval;
+}
+
 seal::Ciphertext LRHEKernel::evaluateLogisticRegressionTransposed(
     std::vector<seal::Ciphertext> weights_T_extended,
     std::vector<seal::Ciphertext>& inputs_T, seal::Ciphertext bias_extended,
+    unsigned int sigmoid_degree) {
+  seal::Ciphertext retval = evaluateLinearRegressionTransposed(
+      weights_T_extended, inputs_T, bias_extended);
+
+  switch (sigmoid_degree) {
+    case 5:
+      retval = sigmoid_vector<5>(retval);
+      break;
+    case 7:
+      retval = sigmoid_vector<7>(retval);
+      break;
+    default:
+      retval = sigmoid_vector<3>(retval);
+      break;
+  }
+
+  return retval;
+}
+
+seal::Ciphertext LRHEKernel::evaluateLogisticRegressionTransposed(
+    std::vector<seal::Ciphertext> weights_T_extended,
+    std::vector<seal::Plaintext>& inputs_T, seal::Ciphertext bias_extended,
+    unsigned int sigmoid_degree) {
+  seal::Ciphertext retval = evaluateLinearRegressionTransposed(
+      weights_T_extended, inputs_T, bias_extended);
+
+  switch (sigmoid_degree) {
+    case 5:
+      retval = sigmoid_vector<5>(retval);
+      break;
+    case 7:
+      retval = sigmoid_vector<7>(retval);
+      break;
+    default:
+      retval = sigmoid_vector<3>(retval);
+      break;
+  }
+
+  return retval;
+}
+
+seal::Ciphertext LRHEKernel::evaluateLogisticRegressionTransposed(
+    std::vector<seal::Plaintext> weights_T_extended,
+    std::vector<seal::Ciphertext>& inputs_T, seal::Plaintext bias_extended,
     unsigned int sigmoid_degree) {
   seal::Ciphertext retval = evaluateLinearRegressionTransposed(
       weights_T_extended, inputs_T, bias_extended);

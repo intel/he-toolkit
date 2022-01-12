@@ -51,7 +51,8 @@ std::map<std::string, double> get_evalmetrics(
 // Performs logistic regression inference in cleartext data
 std::vector<double> test(const std::vector<std::vector<double>>& X,
                          const std::vector<double>& W, const double bias,
-                         bool clipResult = true);
+                         bool clipResult = true,
+                         bool linear_regression = false);
 }  // namespace lrhelper
 
 #endif  // HE_SAMPLES_EXAMPLES_LOGISTIC_REGRESSION_INCLUDE_LR_HELPER_HPP_

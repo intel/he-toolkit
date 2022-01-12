@@ -23,8 +23,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if (TARGET libseal) ## true if doing online/offline he-toolkit build
         target_link_libraries(secure-query PRIVATE libseal)
 else() ## true if building secure query standalone
-        include_directories(${SEAL_PREFIX}/include/SEAL-3.6/)
-        target_link_libraries(secure-query PUBLIC ${SEAL_PREFIX}/lib/libseal-3.6.a)
+        include_directories(${SEAL_PREFIX}/include/SEAL-3.7/)
+        target_link_libraries(secure-query PUBLIC ${SEAL_PREFIX}/lib/libseal-3.7.a)
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)

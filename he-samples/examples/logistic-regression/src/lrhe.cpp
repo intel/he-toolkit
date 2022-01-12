@@ -10,37 +10,56 @@
 #include "include/timer.hpp"
 
 namespace lrhe {
-LogisticRegressionHE::LogisticRegressionHE(
-    const kernel::LRHEKernel& lrheKernel) {
+LRHE::LRHE(const kernel::LRHEKernel& lrheKernel, const bool encrypt_data,
+           const bool encrypt_model, const bool linear_regression,
+           const size_t batch_size)
+    : m_encrypt_data(encrypt_data),
+      m_encrypt_model(encrypt_model),
+      m_linear_regression(linear_regression),
+      m_batch_size(batch_size) {
+  if (!encrypt_data && !encrypt_model) {
+    throw "During construction of LRHE: "
+          "Either model or data (or both) must be encrypted.";
+  }
   init(lrheKernel);
 }
 
-void LogisticRegressionHE::init(const kernel::LRHEKernel& lrheKernel) {
+void LRHE::init(const kernel::LRHEKernel& lrheKernel) {
   m_kernel = std::make_unique<kernel::LRHEKernel>(lrheKernel);
   m_isTrained = false;
   m_slot_count = m_kernel->slot_count();
+  if (m_batch_size) m_slot_count = m_batch_size;
 }
 
-void LogisticRegressionHE::load_weight(const std::vector<double>& weights,
-                                       const double bias) {
+void LRHE::load_weight(const std::vector<double>& weights, const double bias) {
   if (m_isTrained) LOG<Info>("  Overwriting weights/bias");
 
   m_n_weights = weights.size();
   m_weights = weights;
   m_bias = bias;
 
-  LOG<Info>("Encode/encrypt weights and bias");
-  m_ct_weights = encodeEncryptWeights(weights);
-  m_ct_bias = encodeEncryptBias(bias);
-  LOG<Info>("Encode/encrypt weights and bias", "complete");
+  if (m_encrypt_model) {
+    LOG<Info>("Encode/encrypt weights and bias");
+    auto t_started = intel::timer::now();
+    m_ct_weights = encodeEncryptWeights(weights);
+    m_ct_bias = encodeEncryptBias(bias);
+    LOG<Info>("Encode/encrypt weights and bias", "complete",
+              "Elapsed(s):", intel::timer::delta(t_started));
+  } else {
+    LOG<Info>("Encode weights and bias");
+    auto t_started = intel::timer::now();
+    m_pt_weights = encodeWeights(weights);
+    m_pt_bias = encodeBias(bias);
+    LOG<Info>("Encode weights and bias", "complete",
+              "Elapsed(s):", intel::timer::delta(t_started));
+  }
 
   m_isTrained = true;
 }
 
-std::vector<double> LogisticRegressionHE::inference(
+std::vector<double> LRHE::inference(
     const std::vector<std::vector<double>>& inputData, bool clipResult) {
-  if (!m_isTrained)
-    throw std::runtime_error("Logistic Regression model not trained");
+  if (!m_isTrained) throw std::runtime_error("LR model not trained");
 
   if (inputData.size() < 1) throw std::invalid_argument("InputData is empty");
 
@@ -48,7 +67,7 @@ std::vector<double> LogisticRegressionHE::inference(
     throw std::invalid_argument("InputData feature size mismatch");
 
   size_t n_samples = inputData.size();
-  LOG<Info>("HE Logistic Regression");
+  LOG<Info>("HE LR");
 
   // Calculate number of batches
   size_t total_batch =
@@ -58,6 +77,7 @@ std::vector<double> LogisticRegressionHE::inference(
   LOG<Info>("  # of batches:", total_batch, " Batch size:", m_slot_count);
 
   LOG<Info>("  Transpose data");
+  auto t_started = intel::timer::now();
   std::vector<std::vector<std::vector<double>>> batched_data_T(total_batch);
 
 #pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
@@ -68,30 +88,77 @@ std::vector<double> LogisticRegressionHE::inference(
         std::vector<std::vector<double>>(first, first + batchsize);
     batched_data_T[i] = transpose(batched_data_T[i]);
   }
-  LOG<Info>("  - Transpose data complete");
+  LOG<Info>("  - Transpose data complete",
+            "Elapsed(s):", intel::timer::delta(t_started));
 
   // ============================
   // Encode/encrypt inputs
   // ============================
-  LOG<Info>("  Encode/encrypt data");
-  auto t_started = intel::timer::now();
+  std::vector<std::vector<seal::Ciphertext>> ct_inputs;
+  std::vector<std::vector<seal::Plaintext>> pt_inputs;
+  t_started = intel::timer::now();
+  if (m_encrypt_data) {
+    LOG<Info>("  Encode/encrypt data");
+    t_started = intel::timer::now();
 
-  std::vector<std::vector<seal::Ciphertext>> ct_inputs =
-      encodeEncryptData(batched_data_T);
+    ct_inputs = encodeEncryptData(batched_data_T);
 
-  LOG<Info>("  - Encode/encrypt data complete!",
-            "Elapsed(s):", intel::timer::delta(t_started));
+    LOG<Info>("  - Encode/encrypt data complete!",
+              "Elapsed(s):", intel::timer::delta(t_started));
+  } else {
+    LOG<Info>("  Encode data");
+    t_started = intel::timer::now();
+
+    pt_inputs = encodeData(batched_data_T);
+
+    LOG<Info>("  - Encode data complete!",
+              "Elapsed(s):", intel::timer::delta(t_started));
+  }
 
   // ================================
-  // Logistic Regression HE inference
+  // LR HE inference
   // ================================
   std::vector<seal::Ciphertext> ct_lrhe_inference(total_batch);
-  LOG<Info>("  LR HE:", total_batch, "batch(es)");
+  if (m_linear_regression)
+    LOG<Info>("  Linear Regression HE:", total_batch, "batch(es)");
+  else
+    LOG<Info>("  Logistic Regression HE:", total_batch, "batch(es)");
   t_started = intel::timer::now();
 #pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
-  for (size_t i = 0; i < total_batch; ++i)
-    ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
-        m_ct_weights, ct_inputs[i], m_ct_bias);
+  for (size_t i = 0; i < total_batch; ++i) {
+    if (m_encrypt_data) {
+      if (m_encrypt_model) {
+        if (m_linear_regression) {
+          ct_lrhe_inference[i] = m_kernel->evaluateLinearRegressionTransposed(
+              m_ct_weights, ct_inputs[i], m_ct_bias);
+        } else {
+          ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
+              m_ct_weights, ct_inputs[i], m_ct_bias);
+        }
+      } else {
+        if (m_linear_regression) {
+          ct_lrhe_inference[i] = m_kernel->evaluateLinearRegressionTransposed(
+              m_pt_weights, ct_inputs[i], m_pt_bias);
+        } else {
+          ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
+              m_pt_weights, ct_inputs[i], m_pt_bias);
+        }
+      }
+    } else {
+      if (m_encrypt_model) {
+        if (m_linear_regression) {
+          ct_lrhe_inference[i] = m_kernel->evaluateLinearRegressionTransposed(
+              m_ct_weights, pt_inputs[i], m_ct_bias);
+        } else {
+          ct_lrhe_inference[i] = m_kernel->evaluateLogisticRegressionTransposed(
+              m_ct_weights, pt_inputs[i], m_ct_bias);
+        }
+      } else {
+        throw "During execution of LRHE::inference: "
+              "Either model or data (or both) must be encrypted.";
+      }
+    }
+  }
   LOG<Info>("  - LR HE complete!",
             "Elapsed(s):", intel::timer::delta(t_started));
 
@@ -114,12 +181,17 @@ std::vector<double> LogisticRegressionHE::inference(
   return std::vector<double>(retval.begin(), retval.begin() + n_samples);
 }
 
-seal::Ciphertext LogisticRegressionHE::encodeEncryptBias(const double bias) {
+seal::Ciphertext LRHE::encodeEncryptBias(const double bias) {
   return m_kernel->encrypt(m_kernel->encode(
       gsl::span(std::vector<double>(m_slot_count, bias).data(), m_slot_count)));
 }
 
-std::vector<double> LogisticRegressionHE::decryptDecodeResult(
+seal::Plaintext LRHE::encodeBias(const double bias) {
+  return m_kernel->encode(
+      gsl::span(std::vector<double>(m_slot_count, bias).data(), m_slot_count));
+}
+
+std::vector<double> LRHE::decryptDecodeResult(
     const std::vector<seal::Ciphertext> ct_result_batches, size_t n_samples) {
   size_t n_batches = ct_result_batches.size();
   std::vector<double> ret(n_batches * m_slot_count);
@@ -136,8 +208,7 @@ std::vector<double> LogisticRegressionHE::decryptDecodeResult(
   return std::vector<double>(ret.begin(), ret.begin() + n_samples);
 }
 
-std::vector<std::vector<seal::Ciphertext>>
-LogisticRegressionHE::encodeEncryptData(
+std::vector<std::vector<seal::Ciphertext>> LRHE::encodeEncryptData(
     const std::vector<std::vector<std::vector<double>>>& data_T) {
   size_t n_batches = data_T.size();
   size_t n_features = data_T[0].size();
@@ -155,7 +226,25 @@ LogisticRegressionHE::encodeEncryptData(
   return ct_ret;
 }
 
-std::vector<seal::Ciphertext> LogisticRegressionHE::encodeEncryptWeights(
+std::vector<std::vector<seal::Plaintext>> LRHE::encodeData(
+    const std::vector<std::vector<std::vector<double>>>& data_T) {
+  size_t n_batches = data_T.size();
+  size_t n_features = data_T[0].size();
+
+  std::vector<std::vector<seal::Plaintext>> ct_ret(
+      n_batches, std::vector<seal::Plaintext>(n_features));
+
+#pragma omp parallel for collapse(2) \
+    num_threads(OMPUtilitiesS::getThreadsAtLevel())
+  for (size_t i = 0; i < n_batches; ++i)
+    for (size_t j = 0; j < n_features; ++j)
+      ct_ret[i][j] =
+          m_kernel->encode(gsl::span(data_T[i][j].data(), data_T[i][j].size()));
+
+  return ct_ret;
+}
+
+std::vector<seal::Ciphertext> LRHE::encodeEncryptWeights(
     const std::vector<double>& weights) {
   size_t n_features = weights.size();
   std::vector<seal::Ciphertext> ct_ret(n_features);
@@ -164,6 +253,19 @@ std::vector<seal::Ciphertext> LogisticRegressionHE::encodeEncryptWeights(
   for (size_t i = 0; i < n_features; ++i)
     ct_ret[i] = m_kernel->encrypt(m_kernel->encode(gsl::span(
         std::vector<double>(m_slot_count, weights[i]).data(), m_slot_count)));
+
+  return ct_ret;
+}
+
+std::vector<seal::Plaintext> LRHE::encodeWeights(
+    const std::vector<double>& weights) {
+  size_t n_features = weights.size();
+  std::vector<seal::Plaintext> ct_ret(n_features);
+
+#pragma omp parallel for num_threads(OMPUtilitiesS::getThreadsAtLevel())
+  for (size_t i = 0; i < n_features; ++i)
+    ct_ret[i] = m_kernel->encode(gsl::span(
+        std::vector<double>(m_slot_count, weights[i]).data(), m_slot_count));
 
   return ct_ret;
 }
