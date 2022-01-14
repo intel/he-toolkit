@@ -1,7 +1,7 @@
 ## How it works
 PSI example uses [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with BGV scheme, so it will return all the elements that are common to both sets.
 
-The program reads words from client and server set and computes a hash value for each word. The hash value, an integer binary representation is encoded as a polynomial with the coefficients in binary {0,1}. 
+The program reads words from client and server sets and computes a hash value for each word. The hash value, an integer binary representation is encoded as a polynomial with the coefficients in binary {0,1}. 
 
 The encoded set for the client is encrypted, then intersection is computed and finally, the result is decrypted. The program keeps a translation table for the client set of which hashes goes with which word, so that returned hashes can be translated back to words.
 
@@ -26,7 +26,7 @@ Then, to run the example program execute
 
 `--server`: Server set. Default is `./datasets/fruits.set`.
 
-`--bits`: Number of big Q bits. Default is `60`.
+`--bits`: Number of big Q bits. Default is `100`.
 
 `--ptxt`: Keep Client set in encoded plaintext. Default is `false`.
 
@@ -39,7 +39,7 @@ Although optional, it is a good idea to run the example with multiple threads us
 
 There are three sets to choose from of differing sizes under [datasets](https://github.com/intel/he-toolkit/tree/new-example/he-samples/examples/psi/datasets) folder. The default is `fruits.set`, but it can be changed executing:
 ```bash
-./psi client.txt --server dataset/us_states.set
+./psi client.txt --server datasets/us_states.set
 ```
   
 The default order of the cyclotomic polynomial used in the BGV scheme is 771 which gives a ord(p) = 16. You can change the default m by running:

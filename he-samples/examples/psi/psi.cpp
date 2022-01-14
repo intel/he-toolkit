@@ -15,9 +15,9 @@ using Ptxt = helib::Ptxt<helib::BGV>;
 
 static inline NTL::ZZX long_to_poly(long x, long N) {
   NTL::ZZX poly;
-
   unsigned long bits = static_cast<unsigned long>(x);
   unsigned long mask = 1;
+
   for (long i = 0; i < N; ++i, mask <<= 1) {
     SetCoeff(poly, i, (bits & mask) > 0);
   }
@@ -29,6 +29,7 @@ static inline long poly_to_long(const NTL::ZZX& poly, long N) {
   unsigned long bits = 0, bit;
   long poly_deg = NTL::deg(poly);
   N = (poly_deg < N) ? poly_deg : N - 1;
+
   for (long i = N; i >= 0; --i) {
     bit = NTL::conv<long>(coeff(poly, i));
     bits = (bits << 1) | bit;
@@ -52,8 +53,7 @@ TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
     TranslationTable* translation_table = new TranslationTable;
     while (std::getline(file, line)) {
       hashed_value = std::hash<std::string>{}(line) % (1 << N);
-      translation_table->try_emplace(hashed_value,
-                                     line);  // First come, first served.
+      translation_table->try_emplace(hashed_value, line);  // First come, first served.
       out.emplace_back(long_to_poly(hashed_value, N));
     }
     return translation_table;
@@ -78,7 +78,7 @@ struct CmdLineOpts {
   std::string client_set_path;
   std::string server_set_path = "./datasets/fruits.set";
   long m = 771;
-  long bits = 60;
+  long bits = 100;
   long nthreads = 1;
   bool ptxt = false;  // Default value
 };
@@ -105,8 +105,7 @@ int main(int argc, char** argv) {
   // clang-format on
 
   if (cmdline_opts.nthreads < 1) {
-    std::cerr << "Number of threads must be a positive integer. Setting n = 1."
-              << std::endl;
+    std::cerr << "Number of threads must be a positive integer. Setting n = 1." << std::endl;
     cmdline_opts.nthreads = 1;
   }
 
@@ -137,8 +136,8 @@ int main(int argc, char** argv) {
   // create client set
   std::vector<NTL::ZZX> client_set;
   std::unique_ptr<TranslationTable> translation_table{
-      read_in_set(client_set, cmdline_opts.client_set_path, N,
-                  /*translation table=*/true)};
+      read_in_set(client_set, cmdline_opts.client_set_path, N, /*translation table=*/true)
+      };
   printVector(client_set);
 
   // Encode the client set into a Ptxt
@@ -160,8 +159,7 @@ int main(int argc, char** argv) {
       helib::Ctxt encrypted_client_set(publicKey);
       publicKey.Encrypt(encrypted_client_set, client_set_in_ptxt);
       // Set intersect
-      auto encrypted_result =
-          helib::calculateSetIntersection(encrypted_client_set, server_set);
+      auto encrypted_result = helib::calculateSetIntersection(encrypted_client_set, server_set);
       // Decrypt result
       secretKey.Decrypt(result, encrypted_result);
     }
@@ -172,8 +170,7 @@ int main(int argc, char** argv) {
 
   std::cout << "The following were found in both sets" << std::endl;
   for (long i = 0; i < result.lsize(); ++i) {
-    const auto it =
-        translation_table->find(poly_to_long(result[i].getData(), N));
+    const auto it = translation_table->find(poly_to_long(result[i].getData(), N));
     if (it != translation_table->end()) std::cout << it->second << "\n";
   }
 

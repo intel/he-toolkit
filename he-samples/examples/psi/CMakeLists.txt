@@ -19,5 +19,5 @@ add_executable(psi psi.cpp)
 find_package(helib HINTS ${HELIB_PREFIX}/share/cmake/helib/ REQUIRED)
 target_link_libraries(psi PRIVATE helib)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/datasets/
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/datasets
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
