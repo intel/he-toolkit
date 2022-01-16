@@ -39,10 +39,15 @@ pthread
 patchelf
 m4
 g++ >= 10.0 or clang >= 10.0
-python >= 3.5
+python >= 3.8
 virtualenv
 ```
 
+Further Python dependencies include:
+```
+toml
+pytest (optional, for tests)
+```
 
 Dependencies required per library include:
 ```
