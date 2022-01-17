@@ -2,7 +2,69 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import toml
+import re
 from dataclasses import dataclass
+
+
+def read_spec(component, name, attrib, repo_location):
+    """Return hekit.spec file as a dict"""
+    path = f"{repo_location}/{component}/{name}/hekit.spec"
+    spec = toml.load(path)
+    return spec[attrib]
+
+
+def fill_self_ref_string_dict(d, repo_path):
+    """Returns a dict with str values.
+    NB. Only works for flat str value dict."""
+
+    def fill_str(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = re.findall(r"(%(.*?)%)", s)
+            if not symbols:
+                return s
+
+            new_s = s
+            for symbol, k in symbols:
+                new_s = new_s.replace(symbol, fill_str(d[k]))
+
+            return new_s
+        elif isinstance(s, list):
+            return [fill_str(e) for e in s]
+        else:
+            # Not str or list
+            return s
+
+    def fill_dep_str(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = re.findall(r"(\$(.*?)/(.*?)/(.*?)\$)", s)
+            if not symbols:
+                return s
+
+            new_s = s
+            for symbol, comp, name, k in symbols:
+                # Assume finalised spec is already expanded
+                sub = read_spec(comp, name, k, repo_path)
+                new_s = new_s.replace(symbol, sub)
+
+            return new_s
+        elif isinstance(s, list):
+            return [fill_dep_str(e) for e in s]
+        else:
+            # Not str or list
+            return s
+
+    return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
+
+
+def fill_init_paths(d, repo_location):
+    """Create absolute path for the top-level attribs that begin
+       with 'init_' by prepending repo location"""
+    for k, v in d.items():
+        if k.startswith("init_") or k.startswith("export_"):
+            d[k] = f"{repo_location}/{v}"
+    return d
 
 
 class InvalidSpec(Exception):
@@ -44,10 +106,10 @@ class Spec:
             for instance_spec in instance_specs:
                 yield cls.from_instance_spec(component, instance_spec)
 
-    @classmethod
-    def _expand_instance(cls, instance):
+    @staticmethod
+    def _expand_instance(instance: dict):
         """Expansion operations"""
-        # TODO imported funcs?
+        instance = fill_self_ref_string_dict(instance, "/")
         return instance
 
     @classmethod
@@ -86,6 +148,10 @@ class Spec:
     def to_toml_dict(self):
         """Transform to TOML structure as a Python dict"""
         return {self.component: self._instance_spec}
+
+    def __getitem__(self, key: str):
+        """Return value from key. Raises KeyError if key does not exist"""
+        return self._instance_spec[key]
 
 
 # Require func to create a non-local

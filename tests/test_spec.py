@@ -29,9 +29,23 @@ def test_when_name_not_given():
     assert "'name' was not provided for instance" == str(execinfo.value)
 
 
-def test_init_and_export_paths_are_expanded():
+def test_basic_substitutions_are_expanded():
     """The init_ and export_ attribs need to have expanded paths"""
-    assert False
+    # Purposely put 'another' before 'something'.
+    expected = {
+        "hexl": {
+            "name": "bob",
+            "another": "start-%something%-end",
+            "something": "/bla/%name%/bla",
+        }
+    }
+    spec = Spec.from_instance_spec("hexl", expected["hexl"])
+    assert spec["something"] == "/bla/bob/bla"
+    assert spec["another"] == "start-/bla/bob/bla-end"
+
+
+# def test_dependency_substitutions_are_expanded():
+# assert False
 
 
 @pytest.fixture
