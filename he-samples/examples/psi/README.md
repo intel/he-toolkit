@@ -1,7 +1,7 @@
 ## How it works
-PSI example uses [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with BGV scheme, so it will return all the elements that are common to both sets.
+PSI example uses the [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
 
-The program reads words from client and server sets and computes a hash value for each word. The hash value, an integer binary representation is encoded as a polynomial with the coefficients in binary {0,1}. 
+The program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}. 
 
 The encoded set for the client is encrypted, then intersection is computed and finally, the result is decrypted. The program keeps a translation table for the client set of which hashes goes with which word, so that returned hashes can be translated back to words.
 
@@ -10,11 +10,19 @@ The plaintext prime in this example is always 2 and the maximum size of these po
 The maximum number of entries that the client set supports is the number of slots in the plaintext/ciphertext.
   
 ## Usage
-Create a text file and fill it with data for the client set. For example, create a file called `client.txt` and write some fruits. Add one item per line and make sure they are lower case and no whitespace either side.
+The client set is a mandatory parameter, therefore before executing the example, the user must create this input file and write some items, one per line and no whitespace either side. Be aware that the program is case sensitive, so the words in the client set must be defined with the same format as they are in the server set.
+
+For instance, if the program uses the defaut server set, [fruits.set](./datasets/fruits.set), create a file called `client.txt` under `/home/$USER/` and add some fruits in lower case, as shown in the following example:
+```
+apple
+tomato
+orange
+mango
+```
 
 Then, to run the example program execute
 ```bash
-./psi client.txt 
+./psi /home/$USER/client.txt 
 ```
 
 ## Flags
@@ -22,7 +30,7 @@ Then, to run the example program execute
 
 `-n`: Number of threads. Default is `1`.
 
-`--m`: Order of the cyclotomic polynomial. Default is `771`.
+`-m`: Order of the cyclotomic polynomial. Default is `771`.
 
 `--server`: Server set. Default is `./datasets/fruits.set`.
 
@@ -34,17 +42,17 @@ Then, to run the example program execute
 
 Although optional, it is a good idea to run the example with multiple threads using the `-n` flag and specifying the number of threads.
 ```bash
-./psi client.txt -n 64
+./psi /home/$USER/client.txt -n 64
 ```
 
-There are three sets to choose from of differing sizes under [datasets](https://github.com/intel/he-toolkit/tree/new-example/he-samples/examples/psi/datasets) folder. The default is `fruits.set`, but it can be changed executing:
+There are three sets to choose from of differing sizes under [datasets](./datasets) folder. The default is `fruits.set`, but it can be changed executing:
 ```bash
-./psi client.txt --server datasets/us_states.set
+./psi /home/$USER/client.txt --server datasets/us_states.set
 ```
-  
-The default order of the cyclotomic polynomial used in the BGV scheme is 771 which gives a ord(p) = 16. You can change the default m by running:
+
+The default order of the cyclotomic polynomial used in the BGV scheme is 771 which gives a ord(p) = 16. You can change the default `m` by running:
 ```bash
-./psi client.txt --m 21845 --bits 100
+./psi /home/$USER/client.txt -m 21845 --bits 100
 ```
 Although this usually means increasing the number of bits for HElib to handle noise at larger m values.
 
