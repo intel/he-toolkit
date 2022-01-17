@@ -1,18 +1,18 @@
 ## How it works
 PSI example uses the [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
 
-The program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}. 
+The program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}.
 
 The encoded set for the client is encrypted, then intersection is computed and finally, the result is decrypted. The program keeps a translation table for the client set of which hashes goes with which word, so that returned hashes can be translated back to words.
 
 The plaintext prime in this example is always 2 and the maximum size of these polynomials are the order of p in Z_{m}^{\*}/\<p\> quotient group.
 
 The maximum number of entries that the client set supports is the number of slots in the plaintext/ciphertext.
-  
+
 ## Usage
 The client set is a mandatory parameter, therefore before executing the example, the user must create this input file and write some items, one per line and no whitespace either side. Be aware that the program is case sensitive, so the words in the client set must be defined with the same format as they are in the server set.
 
-For instance, if the program uses the defaut server set, [fruits.set](./datasets/fruits.set), create a file called `client.txt` under `/home/$USER/` and add some fruits in lower case, as shown in the following example:
+For instance, if the program uses the default server set, [fruits.set](./datasets/fruits.set), create a file called `client.txt` under `/home/$USER/` and add some fruits in lower case, as shown in the following example:
 ```
 apple
 tomato
@@ -22,7 +22,7 @@ mango
 
 Then, to run the example program execute
 ```bash
-./psi /home/$USER/client.txt 
+./psi /home/$USER/client.txt
 ```
 
 ## Flags
