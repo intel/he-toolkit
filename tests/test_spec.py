@@ -9,14 +9,14 @@ def test_transform_spec_to_toml_dict():
     """This method happens to be useful in other tests.
     Avoids having to write to files."""
     expected = {"hexl": {"name": "bob"}}
-    spec = Spec.from_instance_spec("hexl", expected["hexl"])
+    spec = Spec.from_instance_spec("hexl", expected["hexl"], rloc="")
     assert spec.to_toml_dict() == expected
 
 
 def test_parse_basic_spec(create_basic_spec_file):
     """The most basic test to check that a spec object is created"""
     filepath, expected_dict = create_basic_spec_file
-    spec_generator = Spec.from_toml_file(filepath)
+    spec_generator = Spec.from_toml_file(filepath, rloc="")
     spec = next(spec_generator)
     assert spec.to_toml_dict() == expected_dict
 
@@ -25,7 +25,7 @@ def test_when_name_not_given():
     """The name attribute for a component must always be provided."""
     expected = {"hexl": {}}
     with pytest.raises(InvalidSpec) as execinfo:
-        Spec.from_instance_spec("hexl", expected["hexl"])
+        Spec.from_instance_spec("hexl", expected["hexl"], rloc="")
     assert "'name' was not provided for instance" == str(execinfo.value)
 
 
@@ -34,18 +34,38 @@ def test_basic_substitutions_are_expanded():
     # Purposely put 'another' before 'something'.
     expected = {
         "hexl": {
-            "name": "bob",
+            "version": "2",
+            "name": "bob%version%",
             "another": "start-%something%-end",
-            "something": "/bla/%name%/bla",
+            "something": "bla/%name%/bla",
         }
     }
-    spec = Spec.from_instance_spec("hexl", expected["hexl"])
-    assert spec["something"] == "/bla/bob/bla"
-    assert spec["another"] == "start-/bla/bob/bla-end"
+    spec = Spec.from_instance_spec("hexl", expected["hexl"], rloc="")
+    assert spec["name"] == "bob2"
+    assert spec["something"] == "bla/bob2/bla"
+    assert spec["another"] == "start-bla/bob2/bla-end"
 
 
 # def test_dependency_substitutions_are_expanded():
 # assert False
+
+
+def test_add_component_repo_location_to_inits_and_exports():
+    """Components are built in a component repo, a dedicated space
+    that can be changed"""
+    expected = {
+        "hexl": {
+            "name": "bob",
+            "something": "bla/%name%/bla",
+            "init_something": "bla/%name%/bla",
+            "export_something": "blu/%name%/blu",
+        }
+    }
+    rloc = "/home/some_user"
+    spec = Spec.from_instance_spec("hexl", expected["hexl"], rloc)
+    assert spec["something"] == "bla/bob/bla"
+    assert spec["init_something"] == f"{rloc}/bla/bob/bla"
+    assert spec["export_something"] == f"{rloc}/blu/bob/blu"
 
 
 @pytest.fixture

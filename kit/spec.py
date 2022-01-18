@@ -58,7 +58,7 @@ def fill_self_ref_string_dict(d, repo_path):
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
-def fill_init_paths(d, repo_location):
+def fill_rloc_paths(d, repo_location):
     """Create absolute path for the top-level attribs that begin
        with 'init_' by prepending repo location"""
     for k, v in d.items():
@@ -77,6 +77,7 @@ class Spec:
 
     component: str
     _instance_spec: dict
+    repo_location: str
 
     # These will be turned into property methods
     _fixed_attribs = {
@@ -96,7 +97,7 @@ class Spec:
 
     # Factory from TOML file
     @classmethod
-    def from_toml_file(cls, filename: str):
+    def from_toml_file(cls, filename: str, rloc: str):
         """Generator. Process spec file. Expand paths.
         Populate the fixed attribs
         and place others in dictionary."""
@@ -104,12 +105,13 @@ class Spec:
         toml_specs = toml.load(filename)
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
-                yield cls.from_instance_spec(component, instance_spec)
+                yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod
-    def _expand_instance(instance: dict):
+    def _expand_instance(instance: dict, rloc: str):
         """Expansion operations"""
         instance = fill_self_ref_string_dict(instance, "/")
+        instance = fill_rloc_paths(instance, rloc)
         return instance
 
     @classmethod
@@ -132,12 +134,12 @@ class Spec:
 
     # Factory given parsed TOML python dict
     @classmethod
-    def from_instance_spec(cls, component: str, instance_spec: dict):
+    def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str):
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        expanded_instance_spec = cls._expand_instance(instance_spec)
-        return cls(component, expanded_instance_spec)
+        expanded_instance_spec = cls._expand_instance(instance_spec, rloc)
+        return cls(component, expanded_instance_spec, rloc)
 
     def to_toml_file(self, filename: str):
         """Write spec object to toml file"""
