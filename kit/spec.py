@@ -6,11 +6,13 @@ import re
 from dataclasses import dataclass
 
 
-def read_spec(component, name, attrib, repo_location):
+def read_spec(component, instance, attrib, repo_location):
     """Return hekit.spec file as a dict"""
-    path = f"{repo_location}/{component}/{name}/hekit.spec"
+    path = f"{repo_location}/{component}/{instance}/hekit.spec"
     spec = toml.load(path)
-    return spec[attrib]
+    # There should only be one instance
+    inst_obj = spec[component][0]
+    return inst_obj[attrib]
 
 
 def fill_self_ref_string_dict(d, repo_path):
@@ -45,6 +47,7 @@ def fill_self_ref_string_dict(d, repo_path):
             new_s = s
             for symbol, comp, name, k in symbols:
                 # Assume finalised spec is already expanded
+                # The dependency has already been installed
                 sub = read_spec(comp, name, k, repo_path)
                 new_s = new_s.replace(symbol, sub)
 
@@ -62,7 +65,7 @@ def fill_rloc_paths(d, repo_location):
     """Create absolute path for the top-level attribs that begin
        with 'init_' by prepending repo location"""
     for k, v in d.items():
-        if k.startswith("init_") or k.startswith("export_"):
+        if k.startswith("init_"):
             d[k] = f"{repo_location}/{v}"
     return d
 
@@ -110,8 +113,9 @@ class Spec:
     @staticmethod
     def _expand_instance(instance: dict, rloc: str):
         """Expansion operations"""
-        instance = fill_self_ref_string_dict(instance, "/")
-        instance = fill_rloc_paths(instance, rloc)
+        instance = fill_self_ref_string_dict(instance, rloc)
+        if rloc != "":
+            instance = fill_rloc_paths(instance, rloc)
         return instance
 
     @classmethod
@@ -141,18 +145,21 @@ class Spec:
         expanded_instance_spec = cls._expand_instance(instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)
 
+    def to_toml_dict(self):
+        """Transform to TOML structure as a Python dict"""
+        # transformation for TOML
+        # {'component': [instance]} -> [[component]]
+        return {self.component: [self._instance_spec]}
+
     def to_toml_file(self, filename: str):
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
         with open(filename, "w") as f:
             toml.dump(obj_as_dict, f)
 
-    def to_toml_dict(self):
-        """Transform to TOML structure as a Python dict"""
-        return {self.component: self._instance_spec}
-
     def __getitem__(self, key: str):
-        """Return value from key. Raises KeyError if key does not exist"""
+        """Return value from key.
+        Raises KeyError if key does not exist"""
         return self._instance_spec[key]
 
 

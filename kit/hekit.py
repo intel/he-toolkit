@@ -18,7 +18,7 @@ def parse_cmdline():
     parser = argparse.ArgumentParser(prog="hekit")
     parser.set_defaults(fn=None)
     parser.add_argument(
-        "--version", action="store_true", help="display Intel HE toolit version"
+        "--version", action="store_true", help="display Intel HE toolkit version"
     )
     parser.add_argument(
         "--config",
