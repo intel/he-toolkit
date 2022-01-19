@@ -33,7 +33,6 @@ export_cmake = "install/lib/cmake/hexl-%version%"
 [[ntl]]
 skip = false
 version = "11.5.1"
-# At mo, can't back sub on name
 name = "11.5.1"
 init_fetch_dir = "fetch"
 init_pre_build_dir = "build"
@@ -49,7 +48,6 @@ install = "make install"
 [[helib]]
 skip = false
 version = "2.2.0"
-# At mo, can't back sub on name
 name = "v2.2.0"
 root = "%name%"
 init_fetch_dir = "fetch"

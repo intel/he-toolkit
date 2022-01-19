@@ -63,9 +63,9 @@ def fill_self_ref_string_dict(d, repo_path):
 
 def fill_rloc_paths(d, repo_location):
     """Create absolute path for the top-level attribs that begin
-       with 'init_' by prepending repo location"""
+       with 'init_' or '_export_' by prepending repo location"""
     for k, v in d.items():
-        if k.startswith("init_"):
+        if k.startswith("init_") or k.startswith("export_"):
             d[k] = f"{repo_location}/{v}"
     return d
 
@@ -101,21 +101,21 @@ class Spec:
     # Factory from TOML file
     @classmethod
     def from_toml_file(cls, filename: str, rloc: str):
-        """Generator. Process spec file. Expand paths.
-        Populate the fixed attribs
-        and place others in dictionary."""
-
+        """Generator yield Spec objects.
+        Process spec file: perform substitutions and expand paths."""
         toml_specs = toml.load(filename)
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
                 yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod
-    def _expand_instance(instance: dict, rloc: str):
+    def _expand_instance(component: str, instance: dict, rloc: str):
         """Expansion operations"""
-        instance = fill_self_ref_string_dict(instance, rloc)
         if rloc != "":
-            instance = fill_rloc_paths(instance, rloc)
+            instance_name = instance["name"]
+            instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
+        # Substitution must come after rloc expansion
+        instance = fill_self_ref_string_dict(instance, rloc)
         return instance
 
     @classmethod
@@ -142,7 +142,7 @@ class Spec:
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        expanded_instance_spec = cls._expand_instance(instance_spec, rloc)
+        expanded_instance_spec = cls._expand_instance(component, instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)
 
     def to_toml_dict(self):

@@ -31,7 +31,7 @@ def test_when_name_not_given():
 
 
 def test_basic_substitutions_are_expanded():
-    """The init_ and export_ attribs need to have expanded paths"""
+    """The attribs need to have substitution keys expanded"""
     # Purposely put 'another' before 'something'.
     expected = {
         "hexl": [
@@ -83,10 +83,10 @@ def test_dependency_substitutions_are_expanded(tmp_path):
         ]
     }
     spec = Spec.from_instance_spec("somelib", expected["somelib"][0], rloc)
-    assert spec["something"] == f"bla/alice/bla --dep=someinfo"
+    assert spec["something"] == f"bla/alice/bla --dep={dep_loc}/someinfo"
 
 
-def test_add_component_repo_location_to_inits():
+def test_add_component_repo_location_to_inits_and_exports():
     """Components are built in a component repo, a dedicated space
     that can be changed"""
     expected = {
@@ -95,13 +95,16 @@ def test_add_component_repo_location_to_inits():
                 "name": "bob",
                 "something": "bla/%name%/bla",
                 "init_something": "bla/%name%/bla",
+                "export_something": "blu/%name%/blu",
             }
         ]
     }
     rloc = "/home/some_user"
     spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc)
     assert spec["something"] == "bla/bob/bla"
-    assert spec["init_something"] == f"{rloc}/bla/bob/bla"
+    # rloc/component/instance
+    assert spec["init_something"] == f"{rloc}/hexl/bob/bla/bob/bla"
+    assert spec["export_something"] == f"{rloc}/hexl/bob/blu/bob/blu"
 
 
 @pytest.fixture

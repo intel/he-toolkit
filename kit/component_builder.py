@@ -1,18 +1,13 @@
 # Copyright (C) 2020-2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import re
 import toml
+from spec import Spec
+
+import re
 import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT
-
-
-def read_spec(component, name, attrib, repo_location):
-    """Return spec file as a dict"""
-    path = f"{repo_location}/{component}/{name}/hekit.spec"
-    spec = toml.load(path)
-    return spec[attrib]
 
 
 class BuildError(Exception):
@@ -33,51 +28,6 @@ def chain_run(funcs):
                 f"Function '{fn.__name__}' failed to execute external process",
                 return_code,
             )
-
-
-def fill_self_ref_string_dict(d, repo_path):
-    """Returns a dict with str values.
-    NB. Only works for flat str value dict."""
-
-    def fill_str(s):
-        """s can be a string or a list of strings"""
-        if isinstance(s, str):
-            symbols = re.findall(r"(%(.*?)%)", s)
-            if not symbols:
-                return s
-
-            new_s = s
-            for symbol, k in symbols:
-                new_s = new_s.replace(symbol, fill_str(d[k]))
-
-            return new_s
-        elif isinstance(s, list):
-            return [fill_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
-
-    def fill_dep_str(s):
-        """s can be a string or a list of strings"""
-        if isinstance(s, str):
-            symbols = re.findall(r"(\$(.*?)/(.*?)/(.*?)\$)", s)
-            if not symbols:
-                return s
-
-            new_s = s
-            for symbol, comp, name, k in symbols:
-                # Assume finalised spec is already expanded
-                sub = read_spec(comp, name, k, repo_path)
-                new_s = new_s.replace(symbol, sub)
-
-            return new_s
-        elif isinstance(s, list):
-            return [fill_dep_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
-
-    return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
 def run(cmd_and_args):
@@ -115,36 +65,24 @@ def change_cwd_to(path):
     print("cwd:", expanded_path)
 
 
-def fill_init_paths(d, repo_location):
-    """Create absolute path for the top-level attribs that begin
-       with 'init_' by prepending repo location"""
-    for k, v in d.items():
-        if k.startswith("init_") or k.startswith("export_"):
-            d[k] = f"{repo_location}/{v}"
-    return d
+def components_to_build_from(filename, repo_location):
+    """Returns a generator that yields a component to be built and/or installed"""
+    specs = Spec.from_toml_file(filename, repo_location)
+    return (ComponentBuilder(spec) for spec in specs)
 
 
 class ComponentBuilder:
     """Objects of this class can orchestrate the build of a component"""
 
-    def __init__(self, comp_name, spec, repo_path):
-        """"""
-        if not isinstance(spec, dict):
+    def __init__(self, spec: Spec):
+        """Initialise a ComponentBuilder from a Spec object"""
+        if not isinstance(spec, Spec):
             raise TypeError(
-                f"A spec must be type dict, but got '{type(spec).__name__}'"
+                f"A spec must be type Spec, but got '{type(spec).__name__}'"
             )
-        self._repo_path = repo_path
-        # FIXME .regression. convoluted code means name cannot be currently back substituted
-        self._comp_instance = spec["name"]
-        self._comp_name = comp_name
-        self._location = f"{repo_path}/{comp_name}/{self._comp_instance}"
-        self._skip = spec["skip"] if "skip" in spec else False
-        # FIXME This logic is convoluted. Must update self._spec
-        self._spec = fill_init_paths(spec, self._location)
-        self._spec = fill_self_ref_string_dict(self._spec, repo_path)
 
-        if not isinstance(self._skip, bool):
-            raise ValueError("Skip must be set to true or false")
+        self._spec = spec
+        self._location = f"{spec.repo_location}/{spec.component}/{spec.name}"
 
         # load previous from info file
         try:
@@ -154,13 +92,13 @@ class ComponentBuilder:
             self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
 
     def skip(self):
-        return self._skip
+        return self._spec.skip
 
     def component_name(self):
-        return self._comp_name
+        return self._spec.component
 
     def instance_name(self):
-        return self._comp_instance
+        return self._spec.name
 
     def setup(self):
         """Create the layout for the component"""
@@ -172,15 +110,15 @@ class ComponentBuilder:
                 pass  # nothing to do
 
         # Save expanded copy on disk
-        with open(f"{root}/hekit.spec", "w") as f:
-            toml.dump(self._spec, f)
+        filename = f"{root}/hekit.spec"
+        self._spec.to_toml_file(filename)
 
         # Should return successful
         return True, 0
 
     def already_successful(self, stage):
         """Returns True if stage already recorded in info file
-           as successul"""
+           as successful"""
         return self._info_file["status"][stage] == "success"
 
     def update_info_file(self, stage, success):

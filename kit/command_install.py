@@ -2,16 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import toml
-from component_builder import ComponentBuilder, chain_run
-
-
-def components_to_build_from(filename, repo_location):
-    """Returns a generator that yields a component to be built and/or installed"""
-    components = toml.load(filename)
-    # Extracting specs also flattens 'list of list' to list
-    specs = ((name, spec) for name, specs in components.items() for spec in specs)
-
-    return (ComponentBuilder(name, spec, repo_location) for name, spec in specs)
+from component_builder import components_to_build_from, chain_run
 
 
 def install_components(args):
