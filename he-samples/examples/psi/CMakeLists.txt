@@ -16,8 +16,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(psi psi.cpp)
 
-find_package(helib HINTS ${HELIB_PREFIX}/share/cmake/helib/ REQUIRED)
-target_link_libraries(psi PRIVATE helib)
+if (TARGET libhelib) # Check if HElib has been built by the toolkit
+  target_link_libraries(psi PUBLIC libhelib)
+else()
+  find_package(helib HINTS ${HELIB_PREFIX}/share/cmake/helib/ REQUIRED)
+  target_link_libraries(psi PRIVATE helib)
+endif()
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/datasets
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
