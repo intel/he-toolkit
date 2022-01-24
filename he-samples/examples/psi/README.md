@@ -1,7 +1,7 @@
 ## Introduction
 PSI example uses the [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
 
-The program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}.
+The PSI program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}.
 
 The encoded set for the client is encrypted, then intersection is computed and finally, the result is decrypted. The program keeps a translation table for the client set of which hashes goes with which word, so that returned hashes can be translated back to words.
 
