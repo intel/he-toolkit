@@ -7,7 +7,7 @@ The encoded set for the client is encrypted, then the intersection is computed a
 
 The plaintext prime in this example is always 2 and the maximum size of these polynomials are the order of p in Z_{m}^{\*}/\<p\> quotient group.
 
-The maximum number of entries that the client set supports is the number of slots in the plaintext/ciphertext.
+The maximum number of entries that the client set supports is the number of slots in the plaintext.
 
 ## Usage
 The client set is a mandatory parameter, therefore before executing the example, the user must create this input file and write some items, one per line and no whitespace either side. Be aware that the program is case sensitive, so the words in the client set must be defined with the same format as they are in the server set.
