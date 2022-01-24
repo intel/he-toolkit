@@ -1,5 +1,6 @@
 ## Introduction
-PSI example uses the [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
+The Private Set Intersection (PSI) example uses the [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
+
 ## How It Works
 The PSI program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}.
 
