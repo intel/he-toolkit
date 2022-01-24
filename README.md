@@ -25,7 +25,7 @@ applications.
   - [Examples](#examples)
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
-    - [Psi](#psi)
+    - [Private Set Intersection](#private-set-intersection)
 - [Contributing](#contributing)
 - [Contributors](#contributors)
 
