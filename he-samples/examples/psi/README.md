@@ -3,7 +3,7 @@ PSI example uses the [HElib library](https://github.com/homenc/HElib) to compute
 ## How It Works
 The PSI program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}.
 
-The encoded set for the client is encrypted, then intersection is computed and finally, the result is decrypted. The program keeps a translation table for the client set of which hashes goes with which word, so that returned hashes can be translated back to words.
+The encoded set for the client is encrypted, then the intersection is computed and finally the resultant set intersection is decrypted. The program keeps a translation table for the client set of which hash goes with which word, so that the returned hashes can be translated back to words.
 
 The plaintext prime in this example is always 2 and the maximum size of these polynomials are the order of p in Z_{m}^{\*}/\<p\> quotient group.
 
