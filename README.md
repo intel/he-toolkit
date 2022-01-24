@@ -152,7 +152,7 @@ all within the HE domain. See the
 [README](he-samples/examples/logistic-regression/README.md) for usage
 information.
 
-### Psi
+### Private Set Intersection
 The [psi](he-samples/examples/psi) example computes the intersection of two
 given sets. The program computes a hash value for each entry of both the client
 and the server sets, then using the HELib BGV scheme, it encrypts the client
