@@ -16,9 +16,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(psi psi.cpp)
 
-if (TARGET libhelib) # Check if HElib has been built by the toolkit
-  target_link_libraries(psi PUBLIC libhelib)
-else()
+if (TARGET libhelib) # True if HElib was built by toolkit or linked via HELIB_PREBUILT=ON
+  target_link_libraries(psi PRIVATE libhelib)
+else() # Build example as a standalone program
   find_package(helib HINTS ${HELIB_PREFIX}/share/cmake/helib/ REQUIRED)
   target_link_libraries(psi PRIVATE helib)
 endif()

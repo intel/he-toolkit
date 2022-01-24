@@ -84,9 +84,9 @@ else()
   target_include_directories(libhelib INTERFACE ${HELIB_PREFIX}/include/)
 
   if (HELIB_SHARED_LIB)
-    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.so)
+    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.so ${NTL_DIR}libntl.so ${GMP_DIR}libgmp.so)
   else()
-    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.a)
+    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.a ${NTL_DIR}libntl.a ${GMP_DIR}libgmp.so)
   endif()
 
 endif()
