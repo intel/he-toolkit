@@ -155,8 +155,8 @@ information.
 ### Private Set Intersection
 The [Private Set Intersection (PSI)](he-samples/examples/psi) example computes the intersection of two
 given sets. The program computes a hash value for each entry of both the client
-and the server sets, then using the HELib BGV scheme, it encrypts the client
-set and computes the intersation, so it returns all the encryted elements that
+and the server sets, then using the HElib BGV scheme, it encrypts the client
+set and computes the intersection, returning all the encrypted elements that
 are common to both sets. See the [README](he-samples/examples/psi/README.md)
 for usage information.
 
