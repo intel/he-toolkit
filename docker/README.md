@@ -151,7 +151,7 @@ HE-Samples consists of three different sub-components:
   kernels to provide a peek into what a real-world example may look like.
   Currently three examples are implemented:
   [Secure Query](../he-samples/examples/secure-query)
-  [PSI](../he-samples/examples/psi).
+  [Private Set Intersection](../he-samples/examples/psi).
   [Logistic Regression](../he-samples/examples/logistic-regression).
 
 ## Common Issues
