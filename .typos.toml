@@ -6,6 +6,6 @@
 parms = "parms"
 # It would be best to ignore the dataset file.
 # However, known issue https://github.com/crate-ci/typos/issues/347
-# typos cannot ignore specidfied files when used with pre-commit
+# typos cannot ignore specified files when used with pre-commit
 # Ancient Egyption God
 Ba = "Ba"
