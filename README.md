@@ -174,6 +174,8 @@ pre-commit run --all-files
 ```
 and make sure all pre-commit checks pass.
 
+**NOTE:** Please ensure you are using clang-format version >= 10
+
 # Contributors
 The Intel contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)

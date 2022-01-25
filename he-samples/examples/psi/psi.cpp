@@ -13,6 +13,7 @@
 using TranslationTable = std::unordered_map<long, std::string>;
 using Ptxt = helib::Ptxt<helib::BGV>;
 
+// Given an long, returns its binary polynomial representation
 static inline NTL::ZZX long_to_poly(long x, long N) {
   NTL::ZZX poly;
   unsigned long bits = static_cast<unsigned long>(x);
@@ -25,6 +26,7 @@ static inline NTL::ZZX long_to_poly(long x, long N) {
   return poly;
 }
 
+// Given a binary polynomial, returns its long representation
 static inline long poly_to_long(const NTL::ZZX& poly, long N) {
   unsigned long bits = 0, bit;
   long poly_deg = NTL::deg(poly);
@@ -38,6 +40,12 @@ static inline long poly_to_long(const NTL::ZZX& poly, long N) {
   return static_cast<long>(bits);
 }
 
+// Reads each line of a file (specified by parameter) with the
+// data of the client set and computes a hash value for each item.
+// The resulting hash values are stored in a vector (specified
+// by parameter). If parameter translation is true, the elements
+// are also inserted into a map, in that way the hashes can be
+// translated back to words.
 TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
                               const std::string& filename, long N,
                               bool translation = false) {
@@ -66,6 +74,7 @@ TranslationTable* read_in_set(std::vector<NTL::ZZX>& out,
   }
 }
 
+// Prints in a readable way the elements of a vector
 template <typename T>
 void printVector(const std::vector<T>& v) {
   for (long i = 0; i < long(v.size()); ++i) {
@@ -74,6 +83,7 @@ void printVector(const std::vector<T>& v) {
   std::cout << std::endl;
 }
 
+// Options of the program and their default values
 struct CmdLineOpts {
   std::string client_set_path;
   std::string server_set_path = "./datasets/fruits.set";

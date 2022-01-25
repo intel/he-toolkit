@@ -15,7 +15,7 @@ on:
 # Define env vars #
 ###################
 env:
-  HEXL_VER: 1.2.1
+  HEXL_VER: 1.2.3
   HEXL_DIR: ${GITHUB_WORKSPACE}/hexl-install/lib/cmake/hexl-${HEXL_VER}
 
 ################
@@ -65,7 +65,7 @@ jobs:
           sudo apt-get install -y libgmp-dev
           sudo apt-get install -y libntl-dev
 
-      # Build and install HEXL 1.2.1 for HElib
+      # Build and install HEXL 1.2.3 for HElib
       - name: Install HEXL (for HElib)
         run: |
           git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
