@@ -1,12 +1,12 @@
 ## Introduction
-The Private Set Intersection (PSI) example uses the [HElib library](https://github.com/homenc/HElib) to compute intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
+The Private Set Intersection (PSI) example uses the [HElib library](https://github.com/homenc/HElib) to compute the intersection of two given sets that were encrypted with the BGV scheme, so it will return all the elements that are common to both sets.
 
 ## How It Works
 The PSI program reads words from the client and the server sets and computes a hash value for each word. The hash value, an integer binary representation, is encoded as a polynomial with the coefficients in binary {0,1}.
 
 The encoded set for the client is encrypted, then the intersection is computed and finally the resultant set intersection is decrypted. The program keeps a translation table for the client set of which hash goes with which word, so that the returned hashes can be translated back to words.
 
-The plaintext prime in this example is always 2 and the maximum size of these polynomials are the order of p in Z_{m}^{\*}/\<p\> quotient group.
+The plaintext prime in this example is always 2 and the maximum size of these polynomials are the order of p in the Z_{m}^{\*}/\<p\> quotient group.
 
 The maximum number of entries that the client set supports is the number of slots in the plaintext.
 
@@ -46,16 +46,16 @@ Although optional, it is a good idea to run the example with multiple threads us
 ./psi /home/$USER/client.txt -n 64
 ```
 
-There are three sets to choose from of differing sizes under [datasets](./datasets) folder. The default is `fruits.set`, but it can be changed executing:
+There are three sets to choose from of differing sizes under the [datasets](./datasets) folder. The default is `fruits.set`, but it can be changed executing:
 ```bash
 ./psi /home/$USER/client.txt --server datasets/us_states.set
 ```
 
-The default order of the cyclotomic polynomial used in the BGV scheme is 771 which gives a ord(p) = 16. You can change the default `m` by running:
+The default order of the cyclotomic polynomial used in the BGV scheme is 771 which gives ord(p) = 16, where p = 2. You can change the default `m` by running:
 ```bash
 ./psi /home/$USER/client.txt -m 21845 --bits 100
 ```
-Although this usually means increasing the number of bits for HElib to handle noise at larger m values.
+Although, this usually coincides with needing to increase the number of bits for HElib to handle the increased noise level at larger m values.
 
 For more options see
 ```bash
