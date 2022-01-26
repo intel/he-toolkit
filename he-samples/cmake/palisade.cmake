@@ -48,6 +48,8 @@ else()
       GIT_REPOSITORY ${PALISADE_REPO_URL}
       GIT_TAG ${PALISADE_GIT_TAG}
       PREFIX ${PALISADE_PREFIX}
+      # Patch Palisade v1.11.5 to use HEXL 1.2.3 (currently uses 1.2.1)
+      PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/patches/palisade-hexl.patch
       CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${PALISADE_PREFIX}
       -DCMAKE_CXX_FLAGS=${SINGLE_THREAD_CMAKE_CXX_FLAGS}
@@ -79,6 +81,8 @@ else()
       GIT_REPOSITORY ${PALISADE_REPO_URL}
       GIT_TAG ${PALISADE_GIT_TAG}
       PREFIX ${PALISADE_PREFIX}
+      # Patch Palisade v1.11.5 to use HEXL 1.2.3 (currently uses 1.2.1)
+      PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/patches/palisade-hexl.patch
       CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${PALISADE_PREFIX}
       -DCMAKE_CXX_FLAGS=${SINGLE_THREAD_CMAKE_CXX_FLAGS}
