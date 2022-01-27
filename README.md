@@ -25,6 +25,7 @@ applications.
   - [Examples](#examples)
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
+    - [Private Set Intersection](#private-set-intersection)
 - [Contributing](#contributing)
 - [Contributors](#contributors)
 
@@ -151,6 +152,13 @@ all within the HE domain. See the
 [README](he-samples/examples/logistic-regression/README.md) for usage
 information.
 
+### Private Set Intersection
+The [Private Set Intersection (PSI)](he-samples/examples/psi) example computes the intersection of two
+given sets. The program computes a hash value for each entry of both the client
+and the server sets, then using the HElib BGV scheme, it encrypts the client
+set and computes the intersection, returning all the encrypted elements that
+are common to both sets. See the [README](he-samples/examples/psi/README.md)
+for usage information.
 
 # Contributing
 At this time, Intel HE Toolkit does not accept external contributions. We
@@ -165,6 +173,8 @@ pre-commit install
 pre-commit run --all-files
 ```
 and make sure all pre-commit checks pass.
+
+**NOTE:** Please ensure you are using clang-format version >= 10
 
 # Contributors
 The Intel contributors to this project, sorted by last name, are

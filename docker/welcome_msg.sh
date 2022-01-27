@@ -22,6 +22,10 @@ In the current directory, you will find 3 scripts:
      to see a faster and more scalable method for LR in HE. Unlike the LR code available
      before in the sample-kernels, this version takes extra steps to utilize as many slots
      as possible in the ciphertexts.
+  6. run_psi_example.sh: this will execute an example that uses the HElib library and the
+     BGV scheme to compute the intersection of two given sets. The program requires as input,
+     a file with the client set, this is mandatory parameter, so the user must create this
+     file before executing the example. Use the flag "-h" for usage information.
 
 The scripts are run as would be expected (e.g. ./run_sample_kernels_[palisade|seal].sh). When
 done testing, feel free to terminate the docker with the "exit" command or temporarily leave
