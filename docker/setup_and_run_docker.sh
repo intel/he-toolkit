@@ -43,10 +43,10 @@ source utils/gitops.sh
 
 if [ ! -f "parts.tar.gz" ]; then
   echo -e "\nPACKAGING HE-SAMPLES CODE..."
-  tar -cvzf parts.tar.gz \
+  tar -cvz --exclude he-samples/build \
+    -f parts.tar.gz \
     runners \
     -C "$ROOT" \
-    --exclude he-samples/build \
     he-samples
 fi
 
@@ -80,7 +80,7 @@ if [ -z "$(docker images -q "$base_label")" ]; then
     --build-arg ftp_proxy \
     --build-arg no_proxy \
     --build-arg UID="$(id -u)" \
-    --build-arg GID="$(id -g)" \
+    --build-arg GID="1000" \
     --build-arg UNAME="$user" \
     -t "$base_label" \
     -f Dockerfile.base .
