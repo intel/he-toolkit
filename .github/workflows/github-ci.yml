@@ -63,7 +63,12 @@ jobs:
       - name: Install GMP and NTL
         run: |
           sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libntl-dev
+          wget https://libntl.org/ntl-11.5.1.tar.gz
+          tar xzvf ntl-11.5.1.tar.gz
+          cd ntl-11.5.1/src
+          ./configure NTL_GMP_LIP=on SHARED=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic
+          make
+          sudo make install
 
       # Build and install HEXL 1.2.3 for HElib
       - name: Install HEXL (for HElib)
