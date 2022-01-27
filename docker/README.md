@@ -64,6 +64,8 @@ container.
   it is recommended to use a processor with at least Intel AVX512DQ support.
   For best performance, it is recommended to use processors supporting
   AVX512-IFMA52.
+- The docker build has been tested on Ubuntu 20.04 and MacOS Catalina
+  (10.15.7).
 
 ### Steps
 To build and run the Intel HE Toolkit container, from `he-toolkit/docker` run
@@ -90,6 +92,11 @@ This directory will contain the following scripts:
   allowing users to see a faster, more scalable method for LR in HE. Unlike the
   LR code available in the sample-kernels, this version takes extra steps to
   utilize as many slots as possible in the ciphertexts.
+- ***run_psi_example.sh***: This will run a PSI example allowing users to
+  perform a set intersection between a user-defined "client set" and a "server
+  set" (example server sets provided). The program encrypts the client set,
+  computes the intersection, and returns encrypted elements that are common to
+  both sets.
 - ***run_query_example.sh***: This will run a Secure Query example allowing
   users to query on a database of the 50 U.S. States while controlling
   (optionally) the crypto-parameters used. When prompted, enter a State and, if
