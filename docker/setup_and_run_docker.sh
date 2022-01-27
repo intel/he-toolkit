@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020-2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
@@ -67,7 +67,7 @@ if ! docker run -v \
 fi
 
 readonly user="$(whoami)"
-readonly version=1.3
+readonly version=1.4
 readonly base_label="$user/ubuntu_he_base:$version"
 readonly derived_label="$user/ubuntu_he_test"
 
@@ -91,12 +91,12 @@ libs_dir=libs
 (# Start subshell
   mkdir -p "$libs_dir" && cd "$libs_dir"
   # HEXL
-  git_clone "https://github.com/intel/hexl.git" "v1.2.1"
+  git_clone "https://github.com/intel/hexl.git" "v1.2.3"
 
   # HE libs
-  git_clone "https://github.com/microsoft/SEAL.git" "v3.7.0"
+  git_clone "https://github.com/microsoft/SEAL.git" "v3.7.2"
   git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.5"
-  git_clone "https://github.com/homenc/HElib.git" "v2.2.0"
+  git_clone "https://github.com/homenc/HElib.git" "v2.2.1"
 
   # SEAL dependencies
   git_clone "https://github.com/microsoft/GSL.git"
