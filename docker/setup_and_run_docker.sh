@@ -71,6 +71,22 @@ readonly version=1.4
 readonly base_label="$user/ubuntu_he_base:$version"
 readonly derived_label="$user/ubuntu_he_test"
 
+USERID="$(id -u)"
+GROUPID="$(id -g)"
+
+# Check for Mac OSX
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  if [ $# -eq 0 ]; then
+    echo -e "\nWARNING: Detected Mac OSX... Changing UID/GID of docker user to 1000"
+    USERID=1000
+    GROUPID=1000
+  else
+    echo -e "\nWARNING: Changing UID/GID of docker user to $1"
+    GROUPID="$1"
+    GROUPID="$1"
+  fi
+fi
+
 if [ -z "$(docker images -q "$base_label")" ]; then
   echo -e "\nBUILDING BASE DOCKERFILE..."
   docker build \
@@ -79,8 +95,8 @@ if [ -z "$(docker images -q "$base_label")" ]; then
     --build-arg socks_proxy \
     --build-arg ftp_proxy \
     --build-arg no_proxy \
-    --build-arg UID="$(id -u)" \
-    --build-arg GID="1000" \
+    --build-arg UID="$USERID" \
+    --build-arg GID="$GROUPID" \
     --build-arg UNAME="$user" \
     -t "$base_label" \
     -f Dockerfile.base .

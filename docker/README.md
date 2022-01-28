@@ -82,6 +82,14 @@ installation then you can install Docker directly from the official
 [instructions](https://docs.docker.com/engine/install/ubuntu/) to install on
 Ubuntu.
 
+**Note on macOS:** If running the docker build on Mac OSX, the UID and GID of
+the user created in the docker container will both be set to 1000 by default.
+To override this value the user can simply pass in the desired UID/GID as
+follows
+```bash
+./setup_and_run_docker.sh 1234
+```
+
 ## Running the Examples
 After a successful install and build of the docker container, the user should
 be greeted with  welcome message and be inside the container as their user in
