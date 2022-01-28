@@ -29,11 +29,13 @@ def parse_cmdline():
     subparsers = parser.add_subparsers(help="sub-command help")
 
     # create the parser for the "list" command
-    parser_list = subparsers.add_parser("list", help="lists installed components")
+    parser_list = subparsers.add_parser(
+        "list", description="lists installed components"
+    )
     parser_list.set_defaults(fn=list_components)
 
     # create the parser for the "install" command
-    parser_install = subparsers.add_parser("install", help="installs components")
+    parser_install = subparsers.add_parser("install", description="installs components")
     parser_install.add_argument(
         "install_file",
         metavar="install-file",
@@ -44,7 +46,7 @@ def parse_cmdline():
 
     # create the parser for the "remove" command
     parser_remove = subparsers.add_parser(
-        "remove", help="removes/uninstalls components"
+        "remove", description="removes/uninstalls components"
     )
     parser_remove.add_argument("component", type=str, help="component to be removed")
     parser_remove.add_argument("instance", type=str, help="instance to be removed")
