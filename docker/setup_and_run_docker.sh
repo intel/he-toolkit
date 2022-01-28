@@ -90,7 +90,7 @@ echo -e "\nCLONING REPOS..."
 libs_dir=libs
 (# Start subshell
   mkdir -p "$libs_dir" && cd "$libs_dir"
-  # HEXL
+  # Intel HE Acceleration Library
   git_clone "https://github.com/intel/hexl.git" "v1.2.1"
 
   # HE libs

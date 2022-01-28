@@ -1,7 +1,7 @@
 # Intel Homomorphic Encryption Toolkit
 The Intel Homomorphic Encryption (HE) toolkit is designed to make it fast and
 easy to evaluate homomorphic encryption technology on Intel® Processors using
-libraries, such as [Intel HEXL](https://github.com/intel/hexl), optimized to
+libraries, such as [Intel HE Acceleration Library](https://github.com/intel/hexl), optimized to
 take advantage of the newest Intel hardware features.  Additionally, the Intel
 HE-Toolkit is a great starting point for people new to homomorphic encryption,
 offering sample kernels showing multiple examples of how the libraries can be
@@ -72,7 +72,7 @@ cmake --build build -j
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
-download and build all three HE libraries automatically with HEXL enabled.
+download and build all three HE libraries automatically with Intel HE Acceleration Library enabled.
 
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
@@ -91,7 +91,7 @@ contains the current CMake options, default values are in bold.
 |`ENABLE_PALISADE`         |**ON**/OFF|Enable PALISADE|
 |`ENABLE_SEAL`             |**ON**/OFF|Enable SEAL|
 |`ENABLE_HELIB`            |**ON**/OFF|Enable HElib|
-|`ENABLE_INTEL_HEXL`       |**ON**/OFF|Enable Intel HEXL|
+|`ENABLE_INTEL_HEXL`       |**ON**/OFF|Enable Intel HE Acceleration Library|
 |`ENABLE_ADDRESS_SANITIZER`|ON/**OFF**|Compiles and link with Address Sanitizer|
 |`ENABLE_THREAD_SANITIZER` |ON/**OFF**|Compiles and link with Thread Sanitizer|
 |`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|

@@ -13,7 +13,7 @@ LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 COPY libs.tar.gz /
 
 RUN tar -zxvf libs.tar.gz && \
-    # Build and install HEXL \
+    # Build and install Intel HE Acceleration Library \
     cd /libs/hexl && \
     cmake -S . -B build && \
     cmake --build build -j && \
@@ -66,7 +66,7 @@ RUN mv /runners /home/$UNAME/ && \
              -DENABLE_PALISADE=ON \
              -DENABLE_SEAL=ON \
              -DENABLE_HELIB=ON \
-    # FIXME: HEXL cmake logic requires re-think \
+    # FIXME: Intel HE Acceleration Library cmake logic requires re-think \
              -DENABLE_INTEL_HEXL=ON \
              -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.1/ \
              -DCMAKE_CXX_COMPILER=clang++-10 \
