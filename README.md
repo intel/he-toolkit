@@ -103,6 +103,12 @@ contains the current CMake options, default values are in bold.
 `-D<SEAL|PALISADE|HELIB>_HINT_DIR=<path-to-installation>` if you have installed
 them in a non-default location.
 
+**Note:** If opting to use HElib with HEXL enabled, the user must have a
+pre-installed version of HEXL due to HElib currently only supports linking to a
+pre-installed HEXL. See
+[here](https://github.com/homenc/HElib/blob/master/INSTALL.md) for more
+details.
+
 
 ## Kernels
 Located in [he-samples](he-samples) is a collection of software components
@@ -182,6 +188,7 @@ The Intel contributors to this project, sorted by last name, are
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
+  - Dennis Calderon Vega
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
