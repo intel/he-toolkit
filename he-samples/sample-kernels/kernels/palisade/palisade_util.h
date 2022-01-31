@@ -32,11 +32,12 @@ inline auto generatePalisadeCKKSContext(int poly_modulus_degree,
 
   // Get CKKS crypto context and generate encryption keys.
   auto palisade_context = lbcrypto::CryptoContextFactory<lbcrypto::DCRTPoly>::
-      genCryptoContextCKKSWithParamsGen(
-          poly_modulus_degree * 2, numPrimes, scaleExp, relinWindow, batch_size,
-          MODE::OPTIMIZED, depth, maxDepth, firstModSize,
-          lbcrypto::KeySwitchTechnique::BV,
-          lbcrypto::RescalingTechnique::APPROXRESCALE, numLargeDigits);
+      genCryptoContextCKKSWithParamsGen(poly_modulus_degree * 2, numPrimes,
+                                        scaleExp, relinWindow, batch_size,
+                                        MODE::OPTIMIZED);
+  // , depth, maxDepth, firstModSize,
+  //         lbcrypto::KeySwitchTechnique::GHS,
+  //         lbcrypto::RescalingTechnique::APPROXRESCALE, numLargeDigits);
 
   palisade_context->Enable(PKESchemeFeature::ENCRYPTION);
   palisade_context->Enable(PKESchemeFeature::SHE);
