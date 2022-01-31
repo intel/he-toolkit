@@ -54,3 +54,8 @@ repos:
             - bash
             - -e
             - SC1091
+        - id: black
+          name: black
+          entry: black
+          language: system
+          files: \.py$
