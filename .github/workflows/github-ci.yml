@@ -70,7 +70,7 @@ jobs:
           make
           sudo make install
 
-      # Build and install HEXL 1.2.3 for HElib
+      # Build and install Intel HE Acceleration Library 1.2.3 for HElib
       - name: Install HEXL (for HElib)
         run: |
           git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
@@ -209,7 +209,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Build and install HEXL
+      # Build and install Intel HE Acceleration Library
       - name: Build and install HEXL
         run: |
           git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
@@ -218,7 +218,7 @@ jobs:
           cmake --build build -j
           cmake --install build
 
-      # Build the toolkit with only HElib and HEXL
+      # Build the toolkit with only HElib and Intel HE Acceleration Library
       - name: Build HElib
         run: |
           cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}

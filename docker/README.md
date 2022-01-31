@@ -25,13 +25,13 @@ built using various Homomorphic Encryption libraries, including
 [PALISADE](https://gitlab.com/palisade/palisade-release), and
 [HElib](https://github.com/homenc/HElib).
 All of which use the
-[Intel HEXL](https://github.com/intel/hexl) library to take advantage of the
+[Intel HE Acceleration Library](https://github.com/intel/hexl) library to take advantage of the
 newest Intel hardware features.
 
 ## Components
 The `he-toolkit/docker` directory currently contains:
 - ***setup_and_run_docker.sh***: Script for building and running a docker
-  container containing all HE libraries with HEXL enabled. This will be the
+  container containing all HE libraries with Intel HE Acceleration Library enabled. This will be the
   main entry point for most users.
 - ***basic-docker-test.sh***: Script for testing in-docker connectivity.
 - ***check_dependencies.sh***: Script for checking if all required dependencies
@@ -59,8 +59,8 @@ container.
   connectivity.  If this is not already set up then you can install Docker
   following these
   [instructions](https://docs.docker.com/engine/install/ubuntu/).
-- **Supported Underlying Hardware** (Recommended): Intel HEXL will be enabled
-  by default. Although Intel HEXL does not require any AVX512-enabled hardware,
+- **Supported Underlying Hardware** (Recommended): Intel HE Acceleration Library will be enabled
+  by default. Although Intel HE Acceleration Library does not require any AVX512-enabled hardware,
   it is recommended to use a processor with at least Intel AVX512DQ support.
   For best performance, it is recommended to use processors supporting
   AVX512-IFMA52.
