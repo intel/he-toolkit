@@ -111,7 +111,7 @@ libs_dir=libs
 
   # HE libs
   git_clone "https://github.com/microsoft/SEAL.git" "v3.7.2"
-  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.5"
+  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.6"
   git_clone "https://github.com/homenc/HElib.git" "v2.2.1"
 
   # SEAL dependencies
