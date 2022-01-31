@@ -63,7 +63,7 @@ std::vector<double> testDotPlainBatchAxis(const std::vector<double>& input1,
                                           const std::vector<double>& input2,
                                           size_t dim1, size_t dim2,
                                           size_t dim3) {
-  auto cc = generatePalisadeCKKSContext(8192, std::vector<int>(3, 60));
+  auto cc = generatePalisadeCKKSContext(8192, std::vector<int>(4, 60));
 
   size_t batch_size = 1;
 
@@ -105,7 +105,7 @@ std::vector<std::vector<double>> testMatMulEIP(
     const std::vector<std::vector<double>>& my_trans_b, size_t dim1,
     size_t dim2, size_t dim3) {
   size_t poly_mod = 4096;
-  auto cc = generatePalisadeCKKSContext(poly_mod, std::vector<int>(3));
+  auto cc = generatePalisadeCKKSContext(poly_mod, std::vector<int>(4));
   std::vector<int32_t> vec(dim2);
   std::iota(std::begin(vec), std::end(vec), 1);
 
@@ -156,7 +156,7 @@ std::vector<std::vector<double>> testMatMulVal(
     size_t dim2, size_t dim3) {
   int poly_modulus_degree = 4096;
   auto cc =
-      generatePalisadeCKKSContext(poly_modulus_degree, std::vector<int>(3));
+      generatePalisadeCKKSContext(poly_modulus_degree, std::vector<int>(4));
   std::vector<int32_t> vec(dim2);
   std::iota(std::begin(vec), std::end(vec), 1);
 
@@ -203,7 +203,7 @@ std::vector<std::vector<double>> testMatMulRow(
   int poly_modulus_degree = 4096;
   int slots = poly_modulus_degree / 2;
   auto cc =
-      generatePalisadeCKKSContext(poly_modulus_degree, std::vector<int>(3));
+      generatePalisadeCKKSContext(poly_modulus_degree, std::vector<int>(4));
 
   int64_t spacers = slots / dim2;
 
