@@ -22,25 +22,25 @@ env:
 # Ubuntu 20.04 #
 ################
 jobs:
-  format:
-    name: Format
-    runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
-    steps:
-      - uses: actions/checkout@v2
-      # Required for pre-commit
-      - run: pip3 install cpplint
-      - run: sudo snap install shfmt
-      - run: sudo apt install shellcheck
-      # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
-        with:
-          extra_args: --all-files
-
+  #  format:
+  #    name: Format
+  #    runs-on: ubuntu-20.04
+  #    # Use environment protection (require review)
+  #    environment: intel_workflow
+  #    steps:
+  #      - uses: actions/checkout@v2
+  #      # Required for pre-commit
+  #      - run: pip3 install cpplint
+  #      - run: sudo snap install shfmt
+  #      - run: sudo apt install shellcheck
+  #      # NOTE: This is deprecated in favor of pre-commit.ci
+  #      - uses: pre-commit/action@v2.0.2
+  #        with:
+  #          extra_args: --all-files
+  #
   build-and-test:
     name: Build, test and run kernels
-    needs: [format]
+    #    needs: [format]
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
