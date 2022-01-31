@@ -121,7 +121,7 @@ def create_basic_spec_file(tmp_path):
 
     expected_dict = {
         "hexl": [
-            {"name": "x.y.z", "skip": True, "fetch": "some-url", "build": "some-cmd",}
+            {"name": "x.y.z", "skip": True, "fetch": "some-url", "build": "some-cmd"}
         ]
     }
 
