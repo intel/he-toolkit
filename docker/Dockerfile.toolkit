@@ -46,8 +46,6 @@ RUN tar -zxvf libs.tar.gz && \
     cmake --install build && \
     # Build and install PALISADE \
     cd /libs/palisade-release && \
-    # Apply patch to PALISADE 1.11.5 to allow for use of HEXL 1.2.3 \
-    git apply /he-samples/patches/palisade-hexl.patch && \
     cmake -S . -B build -DWITH_INTEL_HEXL=ON \
                         -DINTEL_HEXL_PREBUILT=ON \
                         -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
