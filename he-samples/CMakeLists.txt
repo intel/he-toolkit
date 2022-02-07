@@ -51,7 +51,7 @@ set(BENCHMARK_FORWARD_CMAKE_ARGS
 option(ENABLE_HELIB "Enable HElib library" ON)
 option(ENABLE_PALISADE "Enable PALISADE library" ON)
 option(ENABLE_SEAL "Enable SEAL library" ON)
-option(ENABLE_INTEL_HEXL "Enable Intel HEXL library" ON)
+option(ENABLE_INTEL_HEXL "Enable Intel HE Acceleration Library" ON)
 
 # Sanitizers
 option(ENABLE_ADDRESS_SANITIZER "Compiles and links with Address Sanitizer" OFF)
