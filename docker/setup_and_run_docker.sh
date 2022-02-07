@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020-2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
@@ -43,10 +43,10 @@ source utils/gitops.sh
 
 if [ ! -f "parts.tar.gz" ]; then
   echo -e "\nPACKAGING HE-SAMPLES CODE..."
-  tar -cvzf parts.tar.gz \
+  tar -cvz --exclude he-samples/build \
+    -f parts.tar.gz \
     runners \
     -C "$ROOT" \
-    --exclude he-samples/build \
     he-samples
 fi
 
@@ -67,9 +67,25 @@ if ! docker run -v \
 fi
 
 readonly user="$(whoami)"
-readonly version=1.3
+readonly version=1.4
 readonly base_label="$user/ubuntu_he_base:$version"
 readonly derived_label="$user/ubuntu_he_test"
+
+USERID="$(id -u)"
+GROUPID="$(id -g)"
+
+# Check for Mac OSX
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  if [ $# -eq 0 ]; then
+    echo -e "\nWARNING: Detected Mac OSX... Changing UID/GID of docker user to 1000"
+    USERID=1000
+    GROUPID=1000
+  else
+    echo -e "\nWARNING: Changing UID/GID of docker user to $1"
+    GROUPID="$1"
+    GROUPID="$1"
+  fi
+fi
 
 if [ -z "$(docker images -q "$base_label")" ]; then
   echo -e "\nBUILDING BASE DOCKERFILE..."
@@ -79,8 +95,8 @@ if [ -z "$(docker images -q "$base_label")" ]; then
     --build-arg socks_proxy \
     --build-arg ftp_proxy \
     --build-arg no_proxy \
-    --build-arg UID="$(id -u)" \
-    --build-arg GID="$(id -g)" \
+    --build-arg UID="$USERID" \
+    --build-arg GID="$GROUPID" \
     --build-arg UNAME="$user" \
     -t "$base_label" \
     -f Dockerfile.base .
@@ -90,18 +106,18 @@ echo -e "\nCLONING REPOS..."
 libs_dir=libs
 (# Start subshell
   mkdir -p "$libs_dir" && cd "$libs_dir"
-  # HEXL
-  git_clone "https://github.com/intel/hexl.git" "v1.2.1"
+  # Intel HE Acceleration Library
+  git_clone "https://github.com/intel/hexl.git" "v1.2.3"
 
   # HE libs
-  git_clone "https://github.com/microsoft/SEAL.git" "v3.7.0"
-  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.5"
-  git_clone "https://github.com/homenc/HElib.git" "v2.2.0"
+  git_clone "https://github.com/microsoft/SEAL.git" "v3.7.2"
+  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.6"
+  git_clone "https://github.com/homenc/HElib.git" "v2.2.1"
 
   # SEAL dependencies
-  git_clone "https://github.com/microsoft/GSL.git"
-  git_clone "https://github.com/madler/zlib.git"
-  git_clone "https://github.com/facebook/zstd.git"
+  git_clone "https://github.com/microsoft/GSL.git" "v3.1.0"
+  git_clone "https://github.com/madler/zlib.git" "v1.2.11"
+  git_clone "https://github.com/facebook/zstd.git" "v1.4.5"
 ) # End subshell
 
 echo -e "\nPACKAGING LIBS..."
