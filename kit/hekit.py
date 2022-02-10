@@ -37,12 +37,23 @@ def parse_cmdline():
     # create the parser for the "install" command
     parser_install = subparsers.add_parser("install", description="installs components")
     parser_install.add_argument(
-        "install_file",
-        metavar="install-file",
-        type=str,
-        help="TOML file for installations",
+        "recipe_file", metavar="recipe-file", type=str, help="TOML file for install"
     )
-    parser_install.set_defaults(fn=install_components)
+    parser_install.set_defaults(fn=install_components, upto_stage="install")
+
+    # create the parser for the "build" command
+    parser_build = subparsers.add_parser("build", description="builds components")
+    parser_build.add_argument(
+        "recipe_file", metavar="recipe-file", type=str, help="TOML file for build"
+    )
+    parser_build.set_defaults(fn=install_components, upto_stage="build")
+
+    # create the parser for the "fetch" command
+    parser_fetch = subparsers.add_parser("fetch", description="fetches components")
+    parser_fetch.add_argument(
+        "recipe_file", metavar="recipe-file", type=str, help="TOML file for fetch"
+    )
+    parser_fetch.set_defaults(fn=install_components, upto_stage="fetch")
 
     # create the parser for the "remove" command
     parser_remove = subparsers.add_parser(
