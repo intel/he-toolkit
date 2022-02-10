@@ -39,86 +39,43 @@ jobs:
         with:
           extra_args: --all-files
 
-  build-and-test:
-    name: Build, test and run kernels
-    needs: [format]
+  test-hekit:
+    name: Test hekit commands
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
+        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
-      - name: Validate paths
+      - run: pip3 install pytest
+      - name: Run pytests
         run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REF
-          pwd
+          cd tests
+          pytest .
 
-      # Install GMP and NTL
-      - name: Install GMP and NTL
+  build-and-test-toolkit:
+    name: Build, test and run components
+    runs-on: ubuntu-20.04
+    # Use environment protection (require review)
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+        working-directory: he-toolkit
+    steps:
+      - uses: actions/checkout@v2
+      - name: Init hekit
         run: |
-          sudo apt-get install -y libgmp-dev
-          wget https://libntl.org/ntl-11.5.1.tar.gz
-          tar xzvf ntl-11.5.1.tar.gz
-          cd ntl-11.5.1/src
-          ./configure NTL_GMP_LIP=on SHARED=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic
-          make
-          sudo make install
+          mkdir ~/.hekit
+          cp default.config ~/.hekit
 
-      # Build and install Intel HE Acceleration Library 1.2.3 for HElib
-      - name: Install HEXL (for HElib)
+      - name: Build and install default recipe
         run: |
-          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
-          cd hexl
-          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
-          cmake --build build -j
-          cmake --install build
-
-      # Build toolkit
-      - name: Build the repository
-        run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
-          cmake --build build --target all -j
-
-      # Unit tests and examples
-      - name: Run the unit tests
-        run: ./build/sample-kernels/test/unit-test
-      - name: Run secure query example
-        run: |
-          cd build/examples/secure-query
-          echo -n "Input: Arkansas, " && ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
-          echo -n "Input: New Mexico, " && ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
-          echo -n "Input: California, " && ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
-      - name: Run LR example
-        run: |
-          cd build/examples/logistic-regression
-          ./lr_test --compare --data lrtest_large | grep "All match!"
-
-      # PALISADE sample kernels
-      - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
-      - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          retention-days: 90 # Maximum for free version
-
-      # SEAL sample kernels
-      - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
-      - name: Archive SEAL sample kernel results
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          retention-days: 90 # Maximum for free version
+          ./hekit install recipes/default.toml
+          ./hekit list
 
 ##############
 # IceLake CI #
@@ -136,91 +93,212 @@ jobs:
       - name: pre-commit
         run: pre-commit run --all-files
 
-  build-and-test-icelake:
-    name: Build, test and run kernels (IceLake - Excl. HElib)
-    needs: [format-icelake]
+  test-hekit-icelake:
+    name: Test hekit commands (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
     environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
+        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
-      - name: Validate paths
+      - run: pip3 install pytest
+      - name: Run pytests
         run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REF
-          pwd
+          cd tests
+          pytest .
 
-      # Build toolkit (Excl. HElib)
-      - name: Build the repository
-        run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_HELIB=OFF
-          cmake --build build --target all -j
-
-      # Unit tests and examples
-      - name: Run the unit tests
-        run: ./build/sample-kernels/test/unit-test
-      - name: Run secure query example
-        run: |
-          cd build/examples/secure-query
-          echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
-          echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
-          echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
-      - name: Run LR example
-        run: |
-          cd build/examples/logistic-regression
-          ./lr_test --compare --data lrtest_large | grep "All match!"
-
-      # PALISADE sample kernels
-      - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
-      - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          retention-days: 90 # Maximum for free version
-
-      # SEAL sample kernels
-      - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
-      - name: Archive SEAL sample kernel results
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          retention-days: 90 # Maximum for free version
-
-  build-helib-icelake:
-    name: Build HElib with HEXL (Icelake)
-    needs: [format-icelake]
+  build-and-test-toolkit-icelake:
+    name: Build, test and run components (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
     environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
+        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
-
-      # Build and install Intel HE Acceleration Library
-      - name: Build and install HEXL
+      - name: Init hekit
         run: |
-          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
-          cd hexl
-          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
-          cmake --build build -j
-          cmake --install build
+          mkdir ~/.hekit
+          cp default.config ~/.hekit
 
-      # Build the toolkit with only HElib and Intel HE Acceleration Library
-      - name: Build HElib
+      - name: Build and install default recipe
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
-          cmake --build build --target all -j
+          ./hekit install recipes/default.toml
+          ./hekit list
+
+######################################################
+###################### OLD CODE ######################
+          #  build-and-test:
+          #    name: Build, test and run kernels
+          #    needs: [format]
+          #    runs-on: ubuntu-20.04
+          #    # Use environment protection (require review)
+          #    environment: intel_workflow
+          #    defaults:
+          #      run:
+          #        shell: bash
+          #        working-directory: he-samples
+          #    steps:
+          #      - uses: actions/checkout@v2
+          #      - name: Validate paths
+          #        run: |
+          #          whoami
+          #          echo $HOME
+          #          echo $GITHUB_WORKSPACE
+          #          echo "Testing from branch:"
+          #          echo $GITHUB_REF
+          #          pwd
+          #
+          #      # Install GMP and NTL
+          #      - name: Install GMP and NTL
+          #        run: |
+          #          sudo apt-get install -y libgmp-dev
+          #          wget https://libntl.org/ntl-11.5.1.tar.gz
+          #          tar xzvf ntl-11.5.1.tar.gz
+          #          cd ntl-11.5.1/src
+          #          ./configure NTL_GMP_LIP=on SHARED=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic
+          #          make
+          #          sudo make install
+          #
+          #      # Build and install Intel HE Acceleration Library 1.2.3 for HElib
+          #      - name: Install HEXL (for HElib)
+          #        run: |
+          #          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
+          #          cd hexl
+          #          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
+          #          cmake --build build -j
+          #          cmake --install build
+          #
+          #      # Build toolkit
+          #      - name: Build the repository
+          #        run: |
+          #          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
+          #          cmake --build build --target all -j
+          #
+          #      # Unit tests and examples
+          #      - name: Run the unit tests
+          #        run: ./build/sample-kernels/test/unit-test
+          #      - name: Run secure query example
+          #        run: |
+          #          cd build/examples/secure-query
+          #          echo -n "Input: Arkansas, " && ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
+          #          echo -n "Input: New Mexico, " && ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
+          #          echo -n "Input: California, " && ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
+          #      - name: Run LR example
+          #        run: |
+          #          cd build/examples/logistic-regression
+          #          ./lr_test --compare --data lrtest_large | grep "All match!"
+          #
+          #      # PALISADE sample kernels
+          #      - name: Run PALISADE sample kernels
+          #        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+          #      - name: Archive PALISADE sample kernel results
+          #        uses: actions/upload-artifact@v2
+          #        with:
+          #          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          #          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          #          retention-days: 90 # Maximum for free version
+          #
+          #      # SEAL sample kernels
+          #      - name: Run SEAL sample kernels
+          #        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+          #      - name: Archive SEAL sample kernel results
+          #        uses: actions/upload-artifact@v2
+          #        with:
+          #          name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          #          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          #          retention-days: 90 # Maximum for free version
+          #
+        #  build-and-test-icelake:
+        #    name: Build, test and run kernels (IceLake - Excl. HElib)
+        #    needs: [format-icelake]
+        #    runs-on: [self-hosted, Linux, X64, ice-lake]
+        #    # Use environment protection (require review)
+        #    environment: intel_workflow
+        #    defaults:
+        #      run:
+        #        shell: bash
+        #        working-directory: he-samples
+        #    steps:
+        #      - uses: actions/checkout@v2
+        #      - name: Validate paths
+        #        run: |
+        #          whoami
+        #          echo $HOME
+        #          echo $GITHUB_WORKSPACE
+        #          echo "Testing from branch:"
+        #          echo $GITHUB_REF
+        #          pwd
+        #
+        #      # Build toolkit (Excl. HElib)
+        #      - name: Build the repository
+        #        run: |
+        #          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_HELIB=OFF
+        #          cmake --build build --target all -j
+        #
+        #      # Unit tests and examples
+        #      - name: Run the unit tests
+        #        run: ./build/sample-kernels/test/unit-test
+        #      - name: Run secure query example
+        #        run: |
+        #          cd build/examples/secure-query
+        #          echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
+        #          echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
+        #          echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
+        #      - name: Run LR example
+        #        run: |
+        #          cd build/examples/logistic-regression
+        #          ./lr_test --compare --data lrtest_large | grep "All match!"
+        #
+        #      # PALISADE sample kernels
+        #      - name: Run PALISADE sample kernels
+        #        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        #      - name: Archive PALISADE sample kernel results
+        #        uses: actions/upload-artifact@v2
+        #        with:
+        #          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+        #          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+        #          retention-days: 90 # Maximum for free version
+        #
+        #      # SEAL sample kernels
+        #      - name: Run SEAL sample kernels
+        #        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        #      - name: Archive SEAL sample kernel results
+        #        uses: actions/upload-artifact@v2
+        #        with:
+        #          name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+        #          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+        #          retention-days: 90 # Maximum for free version
+        #
+        #  build-helib-icelake:
+        #    name: Build HElib with HEXL (Icelake)
+        #    needs: [format-icelake]
+        #    runs-on: [self-hosted, Linux, X64, ice-lake]
+        #    # Use environment protection (require review)
+        #    environment: intel_workflow
+        #    defaults:
+        #      run:
+        #        shell: bash
+        #        working-directory: he-samples
+        #    steps:
+        #      - uses: actions/checkout@v2
+        #
+        #      # Build and install Intel HE Acceleration Library
+        #      - name: Build and install HEXL
+        #        run: |
+        #          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
+        #          cd hexl
+        #          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
+        #          cmake --build build -j
+        #          cmake --install build
+        #
+        #      # Build the toolkit with only HElib and Intel HE Acceleration Library
+        #      - name: Build HElib
+        #        run: |
+        #          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
+        #          cmake --build build --target all -j
