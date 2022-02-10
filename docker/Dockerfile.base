@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # Pull base image.
@@ -67,7 +67,13 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2
     cp -rf cmake_files/bin/* /bin/ && \
     rm -rf cmake_files
     # Install NTL and GMP \
-RUN apt-get install -y libgmp-dev libntl-dev
+RUN apt-get install -y libgmp-dev && \
+    wget https://libntl.org/ntl-11.5.1.tar.gz && \
+    tar xzvf ntl-11.5.1.tar.gz && \
+    cd ntl-11.5.1/src && \
+    ./configure NTL_GMP_LIP=on SHARED=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic && \
+    make -j && \
+    make install
     # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \

@@ -20,7 +20,7 @@ else()
   set(HELIB_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_helib)
   set(HELIB_SRC_DIR ${HELIB_PREFIX}/src/ext_helib/)
   set(HELIB_REPO_URL https://github.com/homenc/HElib.git)
-  set(HELIB_GIT_TAG v2.2.0)
+  set(HELIB_GIT_TAG v2.2.1)
 
   set(HELIB_CXX_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
 
@@ -81,12 +81,12 @@ else()
 
   add_library(libhelib INTERFACE)
   add_dependencies(libhelib ext_helib)
-  target_include_directories(libhelib INTERFACE ${HELIB_PREFIX}/include/helib)
+  target_include_directories(libhelib INTERFACE ${HELIB_PREFIX}/include/)
 
   if (HELIB_SHARED_LIB)
-    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.so)
+    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.so ${NTL_DIR}libntl.so ${GMP_DIR}libgmp.so)
   else()
-    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.a)
+    target_link_libraries(libhelib INTERFACE ${HELIB_PREFIX}/lib/libhelib.a ${NTL_DIR}libntl.a ${GMP_DIR}libgmp.so)
   endif()
 
 endif()

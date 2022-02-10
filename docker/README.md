@@ -25,13 +25,13 @@ built using various Homomorphic Encryption libraries, including
 [PALISADE](https://gitlab.com/palisade/palisade-release), and
 [HElib](https://github.com/homenc/HElib).
 All of which use the
-[Intel HEXL](https://github.com/intel/hexl) library to take advantage of the
+[Intel HE Acceleration Library](https://github.com/intel/hexl) library to take advantage of the
 newest Intel hardware features.
 
 ## Components
 The `he-toolkit/docker` directory currently contains:
 - ***setup_and_run_docker.sh***: Script for building and running a docker
-  container containing all HE libraries with HEXL enabled. This will be the
+  container containing all HE libraries with Intel HE Acceleration Library enabled. This will be the
   main entry point for most users.
 - ***basic-docker-test.sh***: Script for testing in-docker connectivity.
 - ***check_dependencies.sh***: Script for checking if all required dependencies
@@ -59,11 +59,13 @@ container.
   connectivity.  If this is not already set up then you can install Docker
   following these
   [instructions](https://docs.docker.com/engine/install/ubuntu/).
-- **Supported Underlying Hardware** (Recommended): Intel HEXL will be enabled
-  by default. Although Intel HEXL does not require any AVX512-enabled hardware,
+- **Supported Underlying Hardware** (Recommended): Intel HE Acceleration Library will be enabled
+  by default. Although Intel HE Acceleration Library does not require any AVX512-enabled hardware,
   it is recommended to use a processor with at least Intel AVX512DQ support.
   For best performance, it is recommended to use processors supporting
   AVX512-IFMA52.
+- The docker build has been tested on Ubuntu 20.04 and MacOS Catalina
+  (10.15.7).
 
 ### Steps
 To build and run the Intel HE Toolkit container, from `he-toolkit/docker` run
@@ -80,6 +82,14 @@ installation then you can install Docker directly from the official
 [instructions](https://docs.docker.com/engine/install/ubuntu/) to install on
 Ubuntu.
 
+**Note on macOS:** If running the docker build on Mac OSX, the UID and GID of
+the user created in the docker container will both be set to 1000 by default.
+To override this value the user can simply pass in the desired UID/GID as
+follows
+```bash
+./setup_and_run_docker.sh 1234
+```
+
 ## Running the Examples
 After a successful install and build of the docker container, the user should
 be greeted with  welcome message and be inside the container as their user in
@@ -90,6 +100,11 @@ This directory will contain the following scripts:
   allowing users to see a faster, more scalable method for LR in HE. Unlike the
   LR code available in the sample-kernels, this version takes extra steps to
   utilize as many slots as possible in the ciphertexts.
+- ***run_psi_example.sh***: This will run a PSI example allowing users to
+  perform a set intersection between a user-defined "client set" and a "server
+  set" (example server sets provided). The program encrypts the client set,
+  computes the intersection, and returns encrypted elements that are common to
+  both sets.
 - ***run_query_example.sh***: This will run a Secure Query example allowing
   users to query on a database of the 50 U.S. States while controlling
   (optionally) the crypto-parameters used. When prompted, enter a State and, if
@@ -149,8 +164,9 @@ HE-Samples consists of three different sub-components:
   same operation in the non-HE space.
 3. **Examples**: A collection of high-level examples that utilize the sample
   kernels to provide a peek into what a real-world example may look like.
-  Currently two examples are implemented:
-  [Secure Query](../he-samples/examples/secure-query) and
+  Currently three examples are implemented:
+  [Secure Query](../he-samples/examples/secure-query)
+  [Private Set Intersection](../he-samples/examples/psi).
   [Logistic Regression](../he-samples/examples/logistic-regression).
 
 ## Common Issues

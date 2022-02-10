@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 include(ExternalProject)
@@ -40,7 +40,7 @@ else()
   set(PALISADE_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_palisade)
   set(PALISADE_SRC_DIR ${PALISADE_PREFIX}/src/ext_palisade/)
   set(PALISADE_REPO_URL https://gitlab.com/palisade/palisade-release.git)
-  set(PALISADE_GIT_TAG v1.11.5)
+  set(PALISADE_GIT_TAG v1.11.6)
 
   if (ENABLE_INTEL_HEXL)
     ExternalProject_Add(

@@ -1,10 +1,10 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # Username
 ARG UNAME
 
-FROM $UNAME/ubuntu_he_base:1.3
+FROM $UNAME/ubuntu_he_base:1.4
 
 ARG UNAME
 
@@ -13,7 +13,7 @@ LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 COPY libs.tar.gz /
 
 RUN tar -zxvf libs.tar.gz && \
-    # Build and install HEXL \
+    # Build and install Intel HE Acceleration Library \
     cd /libs/hexl && \
     cmake -S . -B build && \
     cmake --build build -j && \
@@ -41,20 +41,20 @@ RUN tar -zxvf libs.tar.gz && \
     cd /libs/SEAL && \
     cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
                         -DSEAL_USE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.1/ && \
+                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install PALISADE \
     cd /libs/palisade-release && \
     cmake -S . -B build -DWITH_INTEL_HEXL=ON \
                         -DINTEL_HEXL_PREBUILT=ON \
-                        -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.1/ && \
+                        -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
     cmake --build build -j && \
     cmake --install build && \
     # Build and install HElib \
     cd /libs/HElib && \
     cmake -S . -B build -DUSE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.1/ && \
+                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
     cmake --build build -j && \
     cmake --install build
 
@@ -66,9 +66,9 @@ RUN mv /runners /home/$UNAME/ && \
              -DENABLE_PALISADE=ON \
              -DENABLE_SEAL=ON \
              -DENABLE_HELIB=ON \
-    # FIXME: HEXL cmake logic requires re-think \
+    # FIXME: Intel HE Acceleration Library cmake logic requires re-think \
              -DENABLE_INTEL_HEXL=ON \
-             -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.1/ \
+             -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ \
              -DCMAKE_CXX_COMPILER=clang++-10 \
              -DCMAKE_C_COMPILER=clang-10 \
              -DCMAKE_BUILD_TYPE=Release \

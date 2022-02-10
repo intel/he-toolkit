@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 include(ExternalProject)
@@ -8,7 +8,7 @@ message(STATUS "SEAL_PREBUILT: ${SEAL_PREBUILT}")
 
 if (SEAL_PREBUILT) # Skip download from gitlab
   if (ENABLE_INTEL_HEXL)
-    find_package(HEXL 1.2.1 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
+    find_package(HEXL 1.2.3 HINTS ${INTEL_HEXL_HINT_DIR} REQUIRED)
   endif()
   find_package(SEAL 3.7
     HINTS ${SEAL_HINT_DIR}
@@ -19,7 +19,7 @@ else()
   set(SEAL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ext_seal)
   set(SEAL_SRC_DIR ${SEAL_PREFIX}/src/ext_seal/)
   set(SEAL_REPO_URL https://github.com/microsoft/SEAL.git)
-  set(SEAL_GIT_TAG v3.7.0)
+  set(SEAL_GIT_TAG v3.7.2)
 
   set(SEAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
 
