@@ -3,8 +3,8 @@
 # Copyright (C) 2020-2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
-import argparse
+from sys import stderr
+from argparse import ArgumentParser
 
 from config import load_config
 from command_remove import remove_components
@@ -15,7 +15,7 @@ from command_install import install_components
 def parse_cmdline():
     """Parse commandline commands"""
     # create the top-level parser
-    parser = argparse.ArgumentParser(prog="hekit")
+    parser = ArgumentParser(prog="hekit")
     parser.set_defaults(fn=None)
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolkit version"
@@ -70,13 +70,13 @@ def main():
         args.config = load_config(args.config)
     except Exception as e:
         # Exit on any exception from config file
-        print(f"Error while parsing config file\n  {e!r}", file=sys.stderr)
+        print(f"Error while parsing config file\n  {e!r}", file=stderr)
         exit(1)
 
     # Run the command
     if args.fn is None:
-        print("hekit requires a command", file=sys.stderr)
-        print_help(sys.stderr)
+        print("hekit requires a command", file=stderr)
+        print_help(stderr)
         exit(1)
     args.fn(args)
 

@@ -1,7 +1,7 @@
 # Copyright (C) 2020-2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import shutil
+from shutil import rmtree
 
 
 def remove_components(args):
@@ -11,7 +11,7 @@ def remove_components(args):
         component = args.component
         instance = args.instance
         path = f"{repo_location}/{component}/{instance}"
-        shutil.rmtree(path)
+        rmtree(path)
         print(f"Instance '{instance}' of component '{component}' successfully removed")
 
     except FileNotFoundError:
