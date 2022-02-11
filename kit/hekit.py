@@ -7,6 +7,7 @@ import sys
 import argparse
 
 from config import load_config
+from command_init import init_hekit
 from command_remove import remove_components
 from command_list import list_components
 from command_install import install_components
@@ -27,6 +28,10 @@ def parse_cmdline():
         help="use a non-default configuration file instead",
     )
     subparsers = parser.add_subparsers(help="sub-command help")
+
+    # create the parser for the "init" command
+    parser_init = subparsers.add_parser("init", description="initialize hekit")
+    parser_init.set_defaults(fn=init_hekit)
 
     # create the parser for the "list" command
     parser_list = subparsers.add_parser(

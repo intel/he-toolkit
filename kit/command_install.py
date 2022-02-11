@@ -4,19 +4,31 @@
 from component_builder import components_to_build_from, chain_run
 
 
+def _stages(upto_stage: str):
+    """Return a generator"""
+    if upto_stage not in ("fetch, build, install"):
+        raise ValueError(f"Not a valid stage value '{upto_stage}'")
+
+    def the_stages(component):
+        yield component.setup
+        yield component.fetch
+        if upto_stage == "fetch":
+            return
+        yield component.build
+        if upto_stage == "build":
+            return
+        yield component.install
+        return
+
+    return the_stages
+
+
 def install_components(args):
     """Install command"""
     repo_location = args.config.repo_location
     components = components_to_build_from(args.recipe_file, repo_location)
 
-    if args.upto_stage == "install":
-        upto = 4
-    elif args.upto_stage == "build":
-        upto = 3
-    elif args.upto_stage == "fetch":
-        upto = 2
-    else:
-        raise ValueError(f"Not a valid stage value '{args.upto_stage}'")
+    the_stages = _stages(args.upto_stage)
 
     for component in components:
         comp_label = f"{component.component_name()}/{component.instance_name()}"
@@ -25,4 +37,4 @@ def install_components(args):
             print(f"Skipping", comp_label)
             continue
         chain = [component.setup, component.fetch, component.build, component.install]
-        chain_run(chain[:upto])
+        chain_run(the_stages(component))
