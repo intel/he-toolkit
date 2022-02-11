@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2022 Intel Corporation
+# Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 import toml
@@ -7,8 +7,10 @@ from spec import Spec
 import re
 import shlex
 import os
+from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from collections.abc import Iterable, Callable
+from typing import Union
 
 
 class BuildError(Exception):
@@ -31,7 +33,7 @@ def chain_run(funcs: Iterable[Callable]):
             )
 
 
-def run(cmd_and_args):
+def run(cmd_and_args: Union[str, list[str]]):
     """Takes either a string or list of strings and runs as command."""
     if not cmd_and_args:
         return True, 0
@@ -42,7 +44,7 @@ def run(cmd_and_args):
     else:
         cmd_and_args_list = cmd_and_args
         print(" ".join(cmd_and_args))
-    basename = os.path.basename(cmd_and_args_list[0]).upper()  # Capitalized
+    basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
             print(f"[{basename}]", line.decode("utf-8"), end="")
@@ -60,13 +62,12 @@ def try_run(spec: dict, attrib: str):
         return True, 0
 
 
-def change_cwd_to(path):
-    expanded_path = os.path.expanduser(path)
-    os.chdir(expanded_path)
-    print("cwd:", expanded_path)
+def change_cwd_to(path: str):
+    os.chdir(Path(path).expanduser())
+    print("cwd:", Path.cwd())
 
 
-def components_to_build_from(filename, repo_location):
+def components_to_build_from(filename: str, repo_location: str):
     """Returns a generator that yields a component to be built and/or installed"""
     specs = Spec.from_toml_file(filename, repo_location)
     return (ComponentBuilder(spec) for spec in specs)
@@ -103,16 +104,12 @@ class ComponentBuilder:
 
     def setup(self):
         """Create the layout for the component"""
-        root = self._location
+        root = Path(self._location)
         for dirname in ("fetch", "build", "install"):
-            try:
-                os.makedirs(f"{root}/{dirname}")
-            except FileExistsError:
-                pass  # nothing to do
+            (root / dirname).makedirs(exists_ok=True)
 
         # Save expanded copy on disk
-        filename = f"{root}/hekit.spec"
-        self._spec.to_toml_file(filename)
+        self._spec.to_toml_file(root / "hekit.spec")
 
         # Should return successful
         return True, 0
