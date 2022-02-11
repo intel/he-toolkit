@@ -122,46 +122,46 @@ int main(int argc, char** argv) {
 
   NTL::SetNumThreads(cmdline_opts.nthreads);
 
-  std::cout << "Creating context and keys" << std::endl;
-  // clang-format off
-  const helib::Context context = helib::ContextBuilder<helib::BGV>()
-                             .m(cmdline_opts.m)
-                             .p(2)
-                             .r(1)
-                             .bits(cmdline_opts.bits)
-                             .build();
-  // clang-format on
-
-  // Number of bits in slot given by order of p
-  const long N = context.getOrdP();
-
-  helib::SecKey secretKey(context);
-  secretKey.GenSecKey();
-
-  const helib::PubKey& publicKey = secretKey;  // In HElib pk is a child of sk
-  helib::addSome1DMatrices(secretKey);
-  helib::addFrbMatrices(secretKey);
-  const helib::EncryptedArray& ea = context.getEA();
-
-  std::cout << "Reading in client set" << std::endl;
-  // create client set
-  std::vector<NTL::ZZX> client_set;
-  std::unique_ptr<TranslationTable> translation_table{
-      read_in_set(client_set, cmdline_opts.client_set_path, N, true)};
-  printVector(client_set);
-
-  // Encode the client set into a Ptxt
-  Ptxt client_set_in_ptxt(context, client_set);
-
-  std::cout << "Reading in server set" << std::endl;
-  // Create server set - simple array
-  std::vector<NTL::ZZX> server_set;
-  read_in_set(server_set, cmdline_opts.server_set_path, N);
-  printVector(server_set);
-
-  std::cout << "Performing the set intersection" << std::endl;
-  Ptxt result(context);
   try {
+    std::cout << "Creating context and keys" << std::endl;
+    // clang-format off
+    const helib::Context context = helib::ContextBuilder<helib::BGV>()
+      .m(cmdline_opts.m)
+      .p(2)
+      .r(1)
+      .bits(cmdline_opts.bits)
+      .build();
+    // clang-format on
+
+    // Number of bits in slot given by order of p
+    const long N = context.getOrdP();
+
+    helib::SecKey secretKey(context);
+    secretKey.GenSecKey();
+
+    const helib::PubKey& publicKey = secretKey;  // In HElib pk is a child of sk
+    helib::addSome1DMatrices(secretKey);
+    helib::addFrbMatrices(secretKey);
+    const helib::EncryptedArray& ea = context.getEA();
+
+    std::cout << "Reading in client set" << std::endl;
+    // create client set
+    std::vector<NTL::ZZX> client_set;
+    std::unique_ptr<TranslationTable> translation_table{
+        read_in_set(client_set, cmdline_opts.client_set_path, N, true)};
+    printVector(client_set);
+
+    // Encode the client set into a Ptxt
+    Ptxt client_set_in_ptxt(context, client_set);
+
+    std::cout << "Reading in server set" << std::endl;
+    // Create server set - simple array
+    std::vector<NTL::ZZX> server_set;
+    read_in_set(server_set, cmdline_opts.server_set_path, N);
+    printVector(server_set);
+
+    std::cout << "Performing the set intersection" << std::endl;
+    Ptxt result(context);
     if (cmdline_opts.ptxt) {
       // Set intersect
       result = helib::calculateSetIntersection(client_set_in_ptxt, server_set);
@@ -174,19 +174,32 @@ int main(int argc, char** argv) {
       // Decrypt result
       secretKey.Decrypt(result, encrypted_result);
     }
-  } catch (std::runtime_error e) {
-    std::cout << e.what() << std::endl;
-    std::exit(1);
-  }
 
-  std::cout << "The following were found in both sets" << std::endl;
-  for (long i = 0; i < result.lsize(); ++i) {
-    const auto it =
-        translation_table->find(poly_to_long(result[i].getData(), N));
-    if (it != translation_table->end()) {
-      std::cout << it->second << "\n";
+    std::cout << "The following were found in both sets" << std::endl;
+    for (long i = 0; i < result.lsize(); ++i) {
+      const auto it =
+          translation_table->find(poly_to_long(result[i].getData(), N));
+      if (it != translation_table->end()) {
+        std::cout << it->second << "\n";
+      }
     }
+  } catch (const std::invalid_argument& e) {
+    std::cerr << "\nExit due to invalid argument thrown:\n\t" << e.what()
+              << std::endl;
+    return EXIT_FAILURE;
+  } catch (const std::runtime_error& e) {
+    std::cerr << "\nExit due to runtime error thrown:\n\t" << e.what()
+              << std::endl;
+    return EXIT_FAILURE;
+  } catch (const std::logic_error& e) {
+    std::cerr << "\nExit due to logic error thrown:\n\t" << e.what()
+              << std::endl;
+    return EXIT_FAILURE;
+  } catch (const std::exception& e) {
+    std::cerr << "\nExit due to unkown exception thrown:\n\t" << e.what()
+              << std::endl;
+    return EXIT_FAILURE;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
