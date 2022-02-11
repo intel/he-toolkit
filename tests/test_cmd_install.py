@@ -2,12 +2,67 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from unittest.mock import patch
-
-from .context import command_install, spec, component_builder
+from .context import command_install
 from command_install import install_components
-from spec import Spec
-from component_builder import ComponentBuilder
+
+
+def test_install_components_all_unskipped(mocker, args, unskipped_components):
+    """Arrange"""
+    """chain_run function is executed because skip is equal to False"""
+    mock_component = mocker.patch("command_install.components_to_build_from")
+    mock_component.return_value = unskipped_components
+    mock_chain_run = mocker.patch("command_install.chain_run")
+
+    """Act"""
+    install_components(args)
+
+    """assert"""
+    mock_component.assert_called_once()
+    mock_component.assert_called_with(args.install_file, args.config.repo_location)
+    assert 3 == mock_chain_run.call_count
+
+
+def test_install_components_all_skipped(mocker, args, skipped_components):
+    """Arrange"""
+    """chain_run function is not executed because skip is equal to True"""
+    mock_component = mocker.patch("command_install.components_to_build_from")
+    mock_component.return_value = skipped_components
+    mock_chain_run = mocker.patch("command_install.chain_run")
+
+    """Act"""
+    install_components(args)
+
+    """assert"""
+    mock_component.assert_called_once()
+    mock_component.assert_called_with(args.install_file, args.config.repo_location)
+    mock_chain_run.assert_not_called()
+
+
+def test_install_components_one_unskipped(mocker, args, one_unskipped_component):
+    """Arrange"""
+    """chain_run function is executed once when skip is equal to False"""
+    mock_component = mocker.patch("command_install.components_to_build_from")
+    mock_component.return_value = one_unskipped_component
+    mock_chain_run = mocker.patch("command_install.chain_run")
+
+    """Act"""
+    install_components(args)
+
+    """assert"""
+    mock_component.assert_called_once()
+    mock_component.assert_called_with(args.install_file, args.config.repo_location)
+    mock_chain_run.assert_called_once()
+    mock_chain_run.assert_called_with(
+        [
+            one_unskipped_component[1].setup,
+            one_unskipped_component[1].fetch,
+            one_unskipped_component[1].build,
+            one_unskipped_component[1].install,
+        ]
+    )
+
+
+"""Utilities used by the tests"""
 
 
 class MockArgs:
@@ -21,9 +76,9 @@ class MockArgs:
 
 
 class MockComponent:
-    def __init__(self, skip, result):
+    def __init__(self, skip):
         self._skip = skip
-        self._result = result
+        self._result = (True, 0)
 
     def skip(self):
         return self._skip
@@ -47,67 +102,21 @@ class MockComponent:
         return self._result
 
 
-def test_install_components_all_unskipped():
-    with patch("command_install.components_to_build_from") as mock_component:
-        """chain_run function is executed because skip is equal to False"""
-        exp_skip = False
-        exp_result = True, 0
-        exp_comp1 = MockComponent(exp_skip, exp_result)
-        exp_comp2 = MockComponent(exp_skip, exp_result)
-        exp_comp3 = MockComponent(exp_skip, exp_result)
-        mock_component.return_value = [exp_comp1, exp_comp2, exp_comp3]
-
-        with patch("command_install.chain_run") as mock_chain_run:
-            mockargs = MockArgs()
-            install_components(mockargs)
-
-        mock_chain_run.assert_called()
-        assert 3 == mock_chain_run.call_count
-    mock_component.assert_called_once()
-    mock_component.assert_called_with(
-        mockargs.install_file, mockargs.config.repo_location
-    )
+@pytest.fixture
+def args():
+    return MockArgs()
 
 
-def test_install_components_all_skipped():
-    with patch("command_install.components_to_build_from") as mock_component:
-        """chain_run function is not executed because skip is equal to True"""
-        exp_skip = True
-        exp_result = False, 568
-        exp_comp1 = MockComponent(exp_skip, exp_result)
-        exp_comp2 = MockComponent(exp_skip, exp_result)
-        exp_comp3 = MockComponent(exp_skip, exp_result)
-        mock_component.return_value = [exp_comp1, exp_comp2, exp_comp3]
-
-        with patch("command_install.chain_run") as mock_chain_run:
-            mockargs = MockArgs()
-            install_components(mockargs)
-
-        mock_chain_run.assert_not_called()
-    mock_component.assert_called_once()
-    mock_component.assert_called_with(
-        mockargs.install_file, mockargs.config.repo_location
-    )
+@pytest.fixture
+def unskipped_components():
+    return [MockComponent(False), MockComponent(False), MockComponent(False)]
 
 
-def test_install_components_some_skipped():
-    with patch("command_install.components_to_build_from") as mock_component:
-        """chain_run function is executed once when skip is equal to True"""
-        exp_result = True, 0
-        exp_comp1 = MockComponent(True, exp_result)
-        exp_comp2 = MockComponent(False, exp_result)
-        exp_comp3 = MockComponent(True, exp_result)
-        mock_component.return_value = [exp_comp1, exp_comp2, exp_comp3]
+@pytest.fixture
+def skipped_components():
+    return [MockComponent(True), MockComponent(True), MockComponent(True)]
 
-        with patch("command_install.chain_run") as mock_chain_run:
-            mockargs = MockArgs()
-            install_components(mockargs)
 
-        mock_chain_run.assert_called_once()
-        mock_chain_run.assert_called_with(
-            [exp_comp2.setup, exp_comp2.fetch, exp_comp2.build, exp_comp2.install]
-        )
-    mock_component.assert_called_once()
-    mock_component.assert_called_with(
-        mockargs.install_file, mockargs.config.repo_location
-    )
+@pytest.fixture
+def one_unskipped_component():
+    return [MockComponent(True), MockComponent(False), MockComponent(True)]
