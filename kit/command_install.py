@@ -6,7 +6,7 @@ from component_builder import components_to_build_from, chain_run
 
 def _stages(upto_stage: str):
     """Return a generator"""
-    if upto_stage not in ("fetch, build, install"):
+    if upto_stage not in ("fetch", "build", "install"):
         raise ValueError(f"Not a valid stage value '{upto_stage}'")
 
     def the_stages(component):

@@ -8,6 +8,7 @@ import re
 import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT
+from collections.abc import Iterable, Callable
 
 
 class BuildError(Exception):
@@ -18,7 +19,7 @@ class BuildError(Exception):
         self.error = error
 
 
-def chain_run(funcs):
+def chain_run(funcs: Iterable[Callable]):
     """Run functions sequentially. Fail at first function with failed
        return value."""
     for fn in funcs:
