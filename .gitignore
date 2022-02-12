@@ -11,6 +11,12 @@ build/
 __pycache__
 he-benchmarks-venv/
 
+# MyPy
+.mypy_cache/
+
+# vim
+**.swp
+
 # MacOS
 .DS_Store
 

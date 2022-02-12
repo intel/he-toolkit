@@ -6,11 +6,10 @@ from spec import Spec
 
 import re
 import shlex
-import os
+from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
-from collections.abc import Iterable, Callable
-from typing import Union
+from typing import Iterable, Callable, Union, List
 
 
 class BuildError(Exception):
@@ -33,7 +32,7 @@ def chain_run(funcs: Iterable[Callable]):
             )
 
 
-def run(cmd_and_args: Union[str, list[str]]):
+def run(cmd_and_args: Union[str, List[str]]):
     """Takes either a string or list of strings and runs as command."""
     if not cmd_and_args:
         return True, 0
@@ -60,11 +59,6 @@ def try_run(spec: dict, attrib: str):
         return run(spec[attrib])
     except KeyError:
         return True, 0
-
-
-def change_cwd_to(path: str):
-    os.chdir(Path(path).expanduser())
-    print("cwd:", Path.cwd())
 
 
 def components_to_build_from(filename: str, repo_location: str):
@@ -106,7 +100,7 @@ class ComponentBuilder:
         """Create the layout for the component"""
         root = Path(self._location)
         for dirname in ("fetch", "build", "install"):
-            (root / dirname).makedirs(exists_ok=True)
+            (root / dirname).mkdir(exist_ok=True, parents=True)
 
         # Save expanded copy on disk
         self._spec.to_toml_file(root / "hekit.spec")
@@ -146,7 +140,8 @@ class ComponentBuilder:
 
         # The actual directory that is written to
         init_stage_dir = self._spec[f"init_{stage}_dir"]
-        change_cwd_to(init_stage_dir)
+        change_directory_to(Path(init_stage_dir).expanduser())
+        print("cwd:", Path.cwd())
 
         try:
             chain_run(fns)

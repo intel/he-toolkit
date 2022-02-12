@@ -8,8 +8,7 @@ import os
 def list_dirs(path: str):
     """Return list of directories in path."""
     try:
-        _, dirs, _ = next(os.walk(path))
-        return dirs
+        return next(os.walk(path))[1]  # dirs in a list
     except StopIteration:
         return []
 
