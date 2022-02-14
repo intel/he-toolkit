@@ -118,7 +118,7 @@ class ComponentBuilder:
             self._info_file["status"][stage] = "success" if success else "failure"
             toml.dump(self._info_file, info_file)
 
-    def _stage(self, stage):
+    def _stage(self, stage: str):
         print(stage)
         if self.already_successful(stage):
             return True, 0
@@ -126,17 +126,7 @@ class ComponentBuilder:
         def closure():
             return run(self._spec[stage])
 
-        fns = []
-        # Will need run add a pre_method if it exists
-        if f"pre_{stage}" in dir(self):
-            fns.append(getattr(self, f"pre_{stage}"))
-
-        # Now run the stage
-        fns.append(closure)
-
-        # And same again for post_method if it exists
-        if f"post_{stage}" in dir(self):
-            fns.append(getattr(self, f"post_{stage}"))
+        fns = [getattr(self, f"pre_{stage}"), closure, getattr(self, f"post_{stage}")]
 
         # The actual directory that is written to
         init_stage_dir = self._spec[f"init_{stage}_dir"]
@@ -150,6 +140,11 @@ class ComponentBuilder:
         except BuildError as be:
             self.update_info_file(stage, success=False)
             return False, be.error
+
+    def pre_fetch(self):
+        """Any steps after a fetch"""
+        print("pre-fetch")
+        return try_run(self._spec, "pre-fetch")
 
     def fetch(self):
         """Fetch the source"""
@@ -174,6 +169,16 @@ class ComponentBuilder:
         print("post-build")
         return try_run(self._spec, "post-build")
 
+    def pre_install(self):
+        """Any steps after a install"""
+        print("pre-install")
+        return try_run(self._spec, "pre-install")
+
     def install(self):
         """Installation of the component, ready to use"""
         return self._stage("install")
+
+    def post_install(self):
+        """Any steps after a install"""
+        print("post-install")
+        return try_run(self._spec, "post-install")
