@@ -23,7 +23,7 @@ def create_backup(path: str, ext: str = ".hekit.bak") -> str:
     return backup
 
 
-def remove_from_rc(path: str):
+def remove_from_rc(path: str) -> None:
     """Remove hekit section"""
     with Path(path).open() as f:
         lines = f.readlines()  # slurp
@@ -34,11 +34,11 @@ def remove_from_rc(path: str):
     if start_tag_count == 0 and end_tag_count == 0:
         return  # nothing to do
     elif start_tag_count == 1 and end_tag_count == 1:
-        start_index, end_index = lines.index(_start_tag), lines.index(_end_tag)
+        start_index, end_index = lines.index(Tags.start_tag), lines.index(Tags.end_tag)
         lines_to_write = (
-            line for line in enumerate(lines) if not start_index <= i <= end_index
+            line for i, line in enumerate(lines) if not start_index <= i <= end_index
         )
-        with Path(path).open() as f:
+        with Path(path).open("w") as f:
             for line in lines_to_write:
                 f.write(line)
     elif start_tag_count > 1 or end_tag_count > 1:
@@ -49,13 +49,13 @@ def remove_from_rc(path: str):
         )
 
 
-def append_to_rc(path: str):
+def append_to_rc(path: str, contents: str) -> None:
     """Config bash init file to know about hekit"""
     shell_rc_path = Path(path)
     with shell_rc_path.open() as rc_file:
         lines = rc_file.readlines()  # slurp
 
-    lines = [start_tag, end_tag]
+    lines = [start_tag, contents, end_tag]
     with shell_rc_path.open("a") as rc_file:
         for line in lines:
             rc_file.write(line)

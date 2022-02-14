@@ -12,18 +12,40 @@ def file_not_empty(path: str) -> bool:
     return Path(path).stat().st_size > 0
 
 
-def test_create_backup(file_with_some_data):
+@pytest.mark.parametrize(
+    "file_with_data", ["The cat\nsat on\nthe mat\n"], indirect=True
+)
+def test_create_backup(file_with_data):
     """"""
-    backup = create_backup(file_with_some_data)
+    backup = create_backup(file_with_data)
 
-    assert file_not_empty(file_with_some_data)
+    assert file_not_empty(file_with_data)
     assert file_not_empty(backup)
-    assert compare_files(file_with_some_data, backup)
+    assert compare_files(file_with_data, backup)
 
 
-def test_remove_from_rc():
+@pytest.mark.parametrize(
+    "file_with_data",
+    [
+        (
+            "ipsum\n"
+            "\n"
+            "# >>> hekit start >>>\n"
+            "a\n"
+            "b\n"
+            "c\n"
+            "# <<<  hekit end  <<<\n"
+            "\n"
+            "lorum\n"
+        )
+    ],
+    indirect=True,
+)
+def test_remove_from_rc(file_with_data):
     """"""
-    assert False
+    f = file_with_data
+    remove_from_rc(f)
+    assert f.read_text() == "ipsum\n\n\nlorum\n"
 
 
 def test_append_to_rc():
@@ -32,7 +54,7 @@ def test_append_to_rc():
 
 
 @pytest.fixture
-def file_with_some_data(tmp_path: Path) -> Path:
+def file_with_data(tmp_path, request) -> Path:
     path = tmp_path / "test.txt"
-    path.write_text("The cat\nsat on\nthe mat\n")
+    path.write_text(request.param)
     return path
