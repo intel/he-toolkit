@@ -4,23 +4,32 @@
 import os
 from pathlib import Path
 from shutil import copyfile
-
-_start_tag = "# >>> hekit start >>>\n"
-_end_tag = "# <<<  hekit end  <<<\n"
+from filecmp import cmp as compare_files
 
 
-def create_backup(path: str, ext: str = ".hekit.bak"):
+class Tags:
+    start_tag: str = "# >>> hekit start >>>\n"
+    end_tag: str = "# <<<  hekit end  <<<\n"
+
+
+def create_backup(path: str, ext: str = ".hekit.bak") -> str:
     """"""
-    copyfile(path, f"{path}.{ext}")
+    backup = f"{path}.{ext}"
+    copyfile(path, backup)
+    # Sanity check - we really need to guarantee we copied the file
+    if compare_files(path, backup, shallow=False) == False:
+        # TODO Use a more appropriate exception error
+        raise ValueError("Backup file does not match original")
+    return backup
 
 
-def remove_from_bash_profile(path: str):
+def remove_from_rc(path: str):
     """Remove hekit section"""
     with Path(path).open() as f:
         lines = f.readlines()  # slurp
 
-    start_tag_count = lines.count(_start_tag)
-    end_tag_count = lines.count(_end_tag)
+    start_tag_count = lines.count(Tags.start_tag)
+    end_tag_count = lines.count(Tags.end_tag)
 
     if start_tag_count == 0 and end_tag_count == 0:
         return  # nothing to do
@@ -40,7 +49,7 @@ def remove_from_bash_profile(path: str):
         )
 
 
-def write_to_rc(path: str):
+def append_to_rc(path: str):
     """Config bash init file to know about hekit"""
     shell_rc_path = Path(path)
     with shell_rc_path.open() as rc_file:

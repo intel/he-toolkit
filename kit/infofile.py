@@ -10,7 +10,7 @@ from enum import Enum
 #            with open(f"{self._location}/hekit.info") as info_file:
 #                self._info_file = toml.load(info_file)
 #        except FileNotFoundError:
-#            self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
+#            self._info_file =
 
 
 class StageStatus(Enum):
@@ -26,7 +26,10 @@ class StageStatus(Enum):
 class InfoFile:
     """"""
 
-    _status: dict
+    # Default is all uninitialized
+    _status: dict = {
+        "status": {"fetch": "uninit", "build": "uninit", "install": "uninit"}
+    }
 
     def load_toml(filepath: str) -> None:
         """"""
