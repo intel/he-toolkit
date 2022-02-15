@@ -48,9 +48,25 @@ def test_remove_from_rc(file_with_data):
     assert f.read_text() == "ipsum\n\n\nlorum\n"
 
 
-def test_append_to_rc():
+@pytest.mark.parametrize("file_with_data", ["the beginning\n"], indirect=True)
+def test_append_to_rc(file_with_data):
     """"""
-    assert False
+    append_to_rc(file_with_data, content="the contents")
+    with file_with_data.open() as f:
+        lines = f.readlines()
+
+    assert lines == [
+        "the beginning\n",
+        "# >>> hekit start >>>\n",
+        "the contents\n",
+        "# <<<  hekit end  <<<\n",
+    ]
+
+
+def test_append_to_rc_when_file_does_not_exist():
+    """"""
+    with pytest.raises(FileNotFoundError) as execinfo:
+        append_to_rc("notlikelyfile.txt", content="")
 
 
 @pytest.fixture

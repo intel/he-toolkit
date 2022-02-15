@@ -49,13 +49,16 @@ def remove_from_rc(path: str) -> None:
         )
 
 
-def append_to_rc(path: str, contents: str) -> None:
+def append_to_rc(path: str, content: str) -> None:
     """Config bash init file to know about hekit"""
     shell_rc_path = Path(path)
     with shell_rc_path.open() as rc_file:
         lines = rc_file.readlines()  # slurp
 
-    lines = [start_tag, contents, end_tag]
+    if content[:-1] != "\n":  # add newline if not there
+        content += "\n"
+
+    lines = [Tags.start_tag, content, Tags.end_tag]
     with shell_rc_path.open("a") as rc_file:
         for line in lines:
             rc_file.write(line)
