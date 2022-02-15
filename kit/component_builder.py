@@ -4,7 +4,6 @@
 import toml
 from spec import Spec
 
-import re
 import shlex
 import os
 from subprocess import Popen, PIPE, STDOUT

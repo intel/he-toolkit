@@ -16,7 +16,7 @@ def test_install_components_all_unskipped(mocker, args, unskipped_components):
     """Act"""
     install_components(args)
 
-    """assert"""
+    """Assert"""
     mock_component.assert_called_once()
     mock_component.assert_called_with(args.install_file, args.config.repo_location)
     assert 3 == mock_chain_run.call_count
@@ -32,7 +32,7 @@ def test_install_components_all_skipped(mocker, args, skipped_components):
     """Act"""
     install_components(args)
 
-    """assert"""
+    """Assert"""
     mock_component.assert_called_once()
     mock_component.assert_called_with(args.install_file, args.config.repo_location)
     mock_chain_run.assert_not_called()
@@ -48,7 +48,7 @@ def test_install_components_one_unskipped(mocker, args, one_unskipped_component)
     """Act"""
     install_components(args)
 
-    """assert"""
+    """Assert"""
     mock_component.assert_called_once()
     mock_component.assert_called_with(args.install_file, args.config.repo_location)
     mock_chain_run.assert_called_once()
