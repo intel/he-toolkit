@@ -14,18 +14,19 @@ class Tags:
 
 def create_backup(path: str, ext: str = ".hekit.bak") -> str:
     """"""
-    backup = f"{path}.{ext}"
+    path = Path(path).expanduser().resolve()
+    backup = path.with_suffix(ext)
     copyfile(path, backup)
     # Sanity check - we really need to guarantee we copied the file
     if compare_files(path, backup, shallow=False) == False:
-        # TODO Use a more appropriate exception error
         raise ValueError("Backup file does not match original")
     return backup
 
 
 def remove_from_rc(path: str) -> None:
     """Remove hekit section"""
-    with Path(path).open() as f:
+    path = Path(path).expanduser().resolve()
+    with path.open() as f:
         lines = f.readlines()  # slurp
 
     start_tag_count = lines.count(Tags.start_tag)
@@ -38,7 +39,7 @@ def remove_from_rc(path: str) -> None:
         lines_to_write = (
             line for i, line in enumerate(lines) if not start_index <= i <= end_index
         )
-        with Path(path).open("w") as f:
+        with path.open("w") as f:
             for line in lines_to_write:
                 f.write(line)
     elif start_tag_count > 1 or end_tag_count > 1:
@@ -51,22 +52,22 @@ def remove_from_rc(path: str) -> None:
 
 def append_to_rc(path: str, content: str) -> None:
     """Config bash init file to know about hekit"""
-    shell_rc_path = Path(path)
-    with shell_rc_path.open() as rc_file:
-        lines = rc_file.readlines()  # slurp
+    shell_rc_path = Path(path).expanduser().resolve()
 
     if content[:-1] != "\n":  # add newline if not there
         content += "\n"
 
-    lines = [Tags.start_tag, content, Tags.end_tag]
+    # newline to not accidentally mix with existing content
+    # newline to end as courtesy to space our code
+    lines = ["\n", Tags.start_tag, content, Tags.end_tag, "\n"]
     with shell_rc_path.open("a") as rc_file:
         for line in lines:
             rc_file.write(line)
 
 
-def init_hekit(args, rc_path: str):
+def init_hekit(args):
     """Initialize hekit"""
-    active_shell_path = Path(os.environ["SHELL"])
+    active_shell_path = Path(os.environ["SHELL"]).name
 
     if active_shell_path == "bash":
         rc_file = "~/.bash_profile"
@@ -74,3 +75,9 @@ def init_hekit(args, rc_path: str):
         rc_file = ""
     else:
         raise ValueError(f"Unknown shell '{active_shell_path}'")
+
+    rc_backup_file = create_backup(rc_file)
+    print("Backup file created at", rc_backup_file)
+    remove_from_rc(rc_file)
+    append_to_rc(rc_file, content=f"PATH={Path(__file__).parent}:$PATH")
+    print("Please, source your shell init file as follows,\n" f"source {rc_file}")
