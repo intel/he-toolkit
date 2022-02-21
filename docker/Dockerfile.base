@@ -67,7 +67,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2
     cp -rf cmake_files/bin/* /bin/ && \
     rm -rf cmake_files
     # Install GMP \
-RUN apt-get install -y libgmp-dev 
+RUN apt-get install -y libgmp-dev
     # Install TOML
 RUN apt install -y python3-pip && \
     pip install toml
