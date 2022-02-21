@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Intel Corporation
+# Copyright (C) 2020-2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # Pull base image.
@@ -68,7 +68,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2
     rm -rf cmake_files
     # Install GMP \
 RUN apt-get install -y libgmp-dev
-    # Install TOML
+    # Install TOML \
 RUN apt install -y python3-pip && \
     pip install toml
     # Set timezone to UTC \

@@ -1,0 +1,139 @@
+# Copyright (C) 2020-2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[hexl]]
+skip = false
+version = "1.2.3"
+name = "1.2.3"
+fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"
+
+
+[[ntl]]
+skip = false
+version = "11.5.1"
+name = "11.5.1"
+init_fetch_dir = "fetch"
+init_pre_build_dir = "build"
+init_build_dir = "build/ntl-%version%/src"
+init_install_dir = "build/ntl-%version%/src"
+export_install_dir = "install"
+fetch = "wget https://libntl.org/ntl-%version%.tar.gz"
+post-fetch = "bash -c 'tar -xvf %init_fetch_dir%/ntl-%version%.tar.gz -C %init_pre_build_dir%'"
+build = "bash -c './configure NTL_GMP_LIP=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic PREFIX=%export_install_dir% && make -j'"
+install = "make install"
+
+
+[[gsl]]
+skip = false
+version = "3.1.0"
+name = "v3.1.0"
+fetch = "git clone https://github.com/microsoft/GSL.git --branch %name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/GSL -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DGSL_TEST=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/share/cmake/Microsoft.GSL"
+
+
+[[zstd]]
+skip = false
+version = "1.4.5"
+name = "v1.4.5"
+fetch = "git clone https://github.com/facebook/zstd.git --branch %name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/zstd/build/cmake -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DZSTD_BUILD_PROGRAMS=OFF
+               -DZSTD_BUILD_SHARED=OFF
+               -DZSTD_BUILD_STATIC=ON
+               -DZSTD_BUILD_TESTS=OFF
+               -DZSTD_MULTITHREAD_SUPPORT=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/zstd"
+
+
+[[helib]]
+skip = false
+version = "2.2.1"
+name = "v2.2.1"
+root = "%name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
+fetch = "git clone https://github.com/homenc/HElib.git --branch %name%"
+pre-build = """cmake -S %init_fetch_dir%/HElib -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DUSE_INTEL_HEXL=ON
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+# Dependencies
+hexl = "hexl/1.2.3"
+
+
+[[seal]]
+skip = false
+version = "3.7.2"
+name = "v3.7.2"
+root = "%name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
+fetch = "git clone https://github.com/microsoft/SEAL.git --branch %name%"
+pre-build = """cmake -S %init_fetch_dir%/SEAL -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DSEAL_BUILD_DEPS=OFF
+               -DSEAL_USE_INTEL_HEXL=ON
+               -DHEXL_DIR=$%hexl%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+# Dependencies
+hexl = "hexl/1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"
+
+
+[[palisade]]
+skip = false
+version = "1.11.6"
+name = "v1.11.6"
+root = "%name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
+fetch = "git clone https://gitlab.com/palisade/palisade-release.git --branch %name%"
+pre-build = """cmake -S %init_fetch_dir%/palisade-release -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DWITH_INTEL_HEXL=ON
+               -DINTEL_HEXL_PREBUILT=ON
+               -DINTEL_HEXL_HINT_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+# Dependencies
+hexl = "hexl/1.2.3"
