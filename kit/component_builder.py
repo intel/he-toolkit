@@ -1,12 +1,14 @@
-# Copyright (C) 2020-2022 Intel Corporation
+# Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 import toml
 from spec import Spec
 
 import shlex
-import os
+from os import chdir as change_directory_to
+from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
+from typing import Iterable, Callable, Union, List
 
 
 class BuildError(Exception):
@@ -17,7 +19,7 @@ class BuildError(Exception):
         self.error = error
 
 
-def chain_run(funcs):
+def chain_run(funcs: Iterable[Callable]):
     """Run functions sequentially. Fail at first function with failed
        return value."""
     for fn in funcs:
@@ -29,7 +31,7 @@ def chain_run(funcs):
             )
 
 
-def run(cmd_and_args):
+def run(cmd_and_args: Union[str, List[str]]):
     """Takes either a string or list of strings and runs as command."""
     if not cmd_and_args:
         return True, 0
@@ -40,7 +42,7 @@ def run(cmd_and_args):
     else:
         cmd_and_args_list = cmd_and_args
         print(" ".join(cmd_and_args))
-    basename = os.path.basename(cmd_and_args_list[0]).upper()  # Capitalized
+    basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
             print(f"[{basename}]", line.decode("utf-8"), end="")
@@ -58,13 +60,7 @@ def try_run(spec: dict, attrib: str):
         return True, 0
 
 
-def change_cwd_to(path):
-    expanded_path = os.path.expanduser(path)
-    os.chdir(expanded_path)
-    print("cwd:", expanded_path)
-
-
-def components_to_build_from(filename, repo_location):
+def components_to_build_from(filename: str, repo_location: str):
     """Returns a generator that yields a component to be built and/or installed"""
     specs = Spec.from_toml_file(filename, repo_location)
     return (ComponentBuilder(spec) for spec in specs)
@@ -101,16 +97,12 @@ class ComponentBuilder:
 
     def setup(self):
         """Create the layout for the component"""
-        root = self._location
+        root = Path(self._location)
         for dirname in ("fetch", "build", "install"):
-            try:
-                os.makedirs(f"{root}/{dirname}")
-            except FileExistsError:
-                pass  # nothing to do
+            (root / dirname).mkdir(exist_ok=True, parents=True)
 
         # Save expanded copy on disk
-        filename = f"{root}/hekit.spec"
-        self._spec.to_toml_file(filename)
+        self._spec.to_toml_file(root / "hekit.spec")
 
         # Should return successful
         return True, 0
@@ -125,7 +117,7 @@ class ComponentBuilder:
             self._info_file["status"][stage] = "success" if success else "failure"
             toml.dump(self._info_file, info_file)
 
-    def _stage(self, stage):
+    def _stage(self, stage: str):
         print(stage)
         if self.already_successful(stage):
             return True, 0
@@ -133,21 +125,12 @@ class ComponentBuilder:
         def closure():
             return run(self._spec[stage])
 
-        fns = []
-        # Will need run add a pre_method if it exists
-        if f"pre_{stage}" in dir(self):
-            fns.append(getattr(self, f"pre_{stage}"))
-
-        # Now run the stage
-        fns.append(closure)
-
-        # And same again for post_method if it exists
-        if f"post_{stage}" in dir(self):
-            fns.append(getattr(self, f"post_{stage}"))
+        fns = [getattr(self, f"pre_{stage}"), closure, getattr(self, f"post_{stage}")]
 
         # The actual directory that is written to
         init_stage_dir = self._spec[f"init_{stage}_dir"]
-        change_cwd_to(init_stage_dir)
+        change_directory_to(Path(init_stage_dir).expanduser())
+        print("cwd:", Path.cwd())
 
         try:
             chain_run(fns)
@@ -156,6 +139,11 @@ class ComponentBuilder:
         except BuildError as be:
             self.update_info_file(stage, success=False)
             return False, be.error
+
+    def pre_fetch(self):
+        """Any steps after a fetch"""
+        print("pre-fetch")
+        return try_run(self._spec, "pre-fetch")
 
     def fetch(self):
         """Fetch the source"""
@@ -180,6 +168,16 @@ class ComponentBuilder:
         print("post-build")
         return try_run(self._spec, "post-build")
 
+    def pre_install(self):
+        """Any steps after a install"""
+        print("pre-install")
+        return try_run(self._spec, "pre-install")
+
     def install(self):
         """Installation of the component, ready to use"""
         return self._stage("install")
+
+    def post_install(self):
+        """Any steps after a install"""
+        print("post-install")
+        return try_run(self._spec, "post-install")

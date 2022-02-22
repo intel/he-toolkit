@@ -7,6 +7,7 @@ from sys import stderr
 from argparse import ArgumentParser
 
 from config import load_config
+from command_init import init_hekit
 from command_remove import remove_components
 from command_list import list_components
 from command_install import install_components
@@ -28,6 +29,10 @@ def parse_cmdline():
     )
     subparsers = parser.add_subparsers(help="sub-command help")
 
+    # create the parser for the "init" command
+    parser_init = subparsers.add_parser("init", description="initialize hekit")
+    parser_init.set_defaults(fn=init_hekit)
+
     # create the parser for the "list" command
     parser_list = subparsers.add_parser(
         "list", description="lists installed components"
@@ -37,12 +42,23 @@ def parse_cmdline():
     # create the parser for the "install" command
     parser_install = subparsers.add_parser("install", description="installs components")
     parser_install.add_argument(
-        "install_file",
-        metavar="install-file",
-        type=str,
-        help="TOML file for installations",
+        "recipe_file", metavar="recipe-file", type=str, help="TOML file for install"
     )
-    parser_install.set_defaults(fn=install_components)
+    parser_install.set_defaults(fn=install_components, upto_stage="install")
+
+    # create the parser for the "build" command
+    parser_build = subparsers.add_parser("build", description="builds components")
+    parser_build.add_argument(
+        "recipe_file", metavar="recipe-file", type=str, help="TOML file for build"
+    )
+    parser_build.set_defaults(fn=install_components, upto_stage="build")
+
+    # create the parser for the "fetch" command
+    parser_fetch = subparsers.add_parser("fetch", description="fetches components")
+    parser_fetch.add_argument(
+        "recipe_file", metavar="recipe-file", type=str, help="TOML file for fetch"
+    )
+    parser_fetch.set_defaults(fn=install_components, upto_stage="fetch")
 
     # create the parser for the "remove" command
     parser_remove = subparsers.add_parser(

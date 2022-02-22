@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2022 Intel Corporation
+# Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 from toml import load
@@ -8,8 +8,7 @@ from os import walk
 def list_dirs(path: str):
     """Return list of directories in path."""
     try:
-        _, dirs, _ = next(walk(path))
-        return dirs
+        return next(walk(path))[1]  # dirs in a list
     except StopIteration:
         return []
 
