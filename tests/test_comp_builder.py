@@ -18,9 +18,9 @@ def test_chain_run_all_success(mocker, funcs_success):
         assert False, f"'chain_run' raised an exception {exc}"
 
 
-def test_chain_run_all_failure(mocker, funcs_failire):
+def test_chain_run_all_failure(mocker, funcs_failure):
     """Arrange"""
-    exp_error, funcs = funcs_failire
+    exp_error, funcs = funcs_failure
     exp_value = f"Function '{funcs[0].__name__}' failed to execute external process"
 
     """Act"""
@@ -109,7 +109,7 @@ def funcs_success():
 
 
 @pytest.fixture
-def funcs_failire():
+def funcs_failure():
     exp_error = 56
 
     def func_failire():
