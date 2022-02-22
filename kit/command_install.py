@@ -36,5 +36,5 @@ def install_components(args):
         if component.skip():
             print(f"Skipping", comp_label)
             continue
-        chain = [component.setup, component.fetch, component.build, component.install]
+
         chain_run(the_stages(component))
