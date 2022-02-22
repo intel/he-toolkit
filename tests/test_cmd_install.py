@@ -1,9 +1,9 @@
-# Copyright (C) 2020-2022 Intel Corporation
+# Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
 from .context import command_install
-from command_install import install_components
+from command_install import install_components, _stages
 
 
 def test_install_components_all_unskipped(mocker, args, unskipped_components):
@@ -18,7 +18,7 @@ def test_install_components_all_unskipped(mocker, args, unskipped_components):
 
     """Assert"""
     mock_component.assert_called_once()
-    mock_component.assert_called_with(args.install_file, args.config.repo_location)
+    mock_component.assert_called_with(args.recipe_file, args.config.repo_location)
     assert 3 == mock_chain_run.call_count
 
 
@@ -34,7 +34,7 @@ def test_install_components_all_skipped(mocker, args, skipped_components):
 
     """Assert"""
     mock_component.assert_called_once()
-    mock_component.assert_called_with(args.install_file, args.config.repo_location)
+    mock_component.assert_called_with(args.recipe_file, args.config.repo_location)
     mock_chain_run.assert_not_called()
 
 
@@ -50,16 +50,53 @@ def test_install_components_one_unskipped(mocker, args, one_unskipped_component)
 
     """Assert"""
     mock_component.assert_called_once()
-    mock_component.assert_called_with(args.install_file, args.config.repo_location)
+    mock_component.assert_called_with(args.recipe_file, args.config.repo_location)
     mock_chain_run.assert_called_once()
-    mock_chain_run.assert_called_with(
-        [
-            one_unskipped_component[1].setup,
-            one_unskipped_component[1].fetch,
-            one_unskipped_component[1].build,
-            one_unskipped_component[1].install,
-        ]
-    )
+
+
+def test_stages_fecth(mocker, unskipped_components):
+    """Arrange"""
+    comp = unskipped_components[0]
+    upto_stage = "fetch"
+
+    """Act"""
+    the_stages = _stages(upto_stage)
+    act_result = the_stages(comp)
+
+    """Assert"""
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+
+
+def test_stages_build(mocker, unskipped_components):
+    """Arrange"""
+    comp = unskipped_components[1]
+    upto_stage = "build"
+
+    """Act"""
+    the_stages = _stages(upto_stage)
+    act_result = the_stages(comp)
+
+    """Assert"""
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+    assert next(act_result) == comp.build
+
+
+def test_stages_install(mocker, unskipped_components):
+    """Arrange"""
+    comp = unskipped_components[2]
+    upto_stage = "install"
+
+    """Act"""
+    the_stages = _stages(upto_stage)
+    act_result = the_stages(comp)
+
+    """Assert"""
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+    assert next(act_result) == comp.build
+    assert next(act_result) == comp.install
 
 
 """Utilities used by the tests"""
@@ -72,7 +109,8 @@ class MockArgs:
 
     def __init__(self):
         self.config = MockArgs.Config()
-        self.install_file = "file_test"
+        self.recipe_file = "file_test"
+        self.upto_stage = "install"
 
 
 class MockComponent:

@@ -1,3 +1,6 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 from os import getcwd, chdir
 
@@ -13,50 +16,131 @@ from command_install import install_components
 cwd_test = getcwd()
 
 
-def test_command_install_execution(mocker, args_install):
+def test_command_install_fetch(mocker, args_fetch):
     """Arrange"""
-    """chain_run function is executed because skip is equal to False"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_install, ""
+    mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("command_install.print")
+
+    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
     """Act"""
     main()
 
     """Assert"""
-    arg1 = f"{args_install.component}/{args_install.instance}"
     mock_print.assert_any_call(arg1)
 
 
-def test_command_list_execution(mocker, args_list, restore_pwd):
+def test_command_list_after_fetch(mocker, args_list, restore_pwd):
     """Arrange"""
-    """chain_run function is executed because skip is equal to False"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
+    width = 10
+    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    arg2 = f"{'success':{width}}"
+    arg34 = f"{'':{width}}"
+
     """Act"""
     main()
 
     """Assert"""
+    mock_print.assert_any_call(arg1, arg2, arg34, arg34)
+
+
+def test_command_install_build(mocker, args_build):
+    """Arrange"""
+    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_build, ""
+    mock_print = mocker.patch("command_install.print")
+
+    arg1 = f"{args_build.component}/{args_build.instance}"
+
+    """Act"""
+    main()
+
+    """Assert"""
+    mock_print.assert_any_call(arg1)
+
+
+def test_command_list_after_build(mocker, args_list, restore_pwd):
+    """Arrange"""
+    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_list, ""
+    mock_print = mocker.patch("command_list.print")
+
     width = 10
     arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
-    arg234 = f"{'success':{width}}"
-    mock_print.assert_any_call(arg1, arg234, arg234, arg234)
+    arg23 = f"{'success':{width}}"
+    arg4 = f"{'':{width}}"
+
+    """Act"""
+    main()
+
+    """Assert"""
+    mock_print.assert_any_call(arg1, arg23, arg23, arg4)
 
 
-def test_command_remove_execution(mocker, args_remove, restore_pwd):
+def test_command_remove_after_build(mocker, args_remove, restore_pwd):
     """Arrange"""
-    """chain_run function is executed because skip is equal to False"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
     mock_print = mocker.patch("command_remove.print")
 
+    arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
+
     """Act"""
     main()
 
     """Assert"""
+    mock_print.assert_any_call(arg1)
+
+
+def test_command_install_execution(mocker, args_install):
+    """Arrange"""
+    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_install, ""
+    mock_print = mocker.patch("command_install.print")
+
+    arg1 = f"{args_install.component}/{args_install.instance}"
+
+    """Act"""
+    main()
+
+    """Assert"""
+    mock_print.assert_any_call(arg1)
+
+
+def test_command_list_after_install(mocker, args_list, restore_pwd):
+    """Arrange"""
+    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_list, ""
+    mock_print = mocker.patch("command_list.print")
+
+    width = 10
+    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    arg234 = f"{'success':{width}}"
+
+    """Act"""
+    main()
+
+    """Assert"""
+    mock_print.assert_any_call(arg1, arg234, arg234, arg234)
+
+
+def test_command_remove_after_install(mocker, args_remove, restore_pwd):
+    """Arrange"""
+    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_remove, ""
+    mock_print = mocker.patch("command_remove.print")
+
     arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
+
+    """Act"""
+    main()
+
+    """Assert"""
     mock_print.assert_any_call(arg1)
 
 
@@ -64,28 +148,39 @@ def test_command_remove_execution(mocker, args_remove, restore_pwd):
 
 
 class MockArgs:
-    def __init__(self, fn):
+    def __init__(self, fn, upto_stage):
         self.version = False
         self.component = "hexl"
         self.instance = "1.2.3"
         self.config = "tests/config/default.config"
-        self.install_file = "tests/config/test.toml"
+        self.recipe_file = "tests/config/test.toml"
         self.fn = fn
+        self.upto_stage = upto_stage
+
+
+@pytest.fixture
+def args_fetch():
+    return MockArgs(install_components, "fetch")
+
+
+@pytest.fixture
+def args_build():
+    return MockArgs(install_components, "build")
 
 
 @pytest.fixture
 def args_install():
-    return MockArgs(install_components)
+    return MockArgs(install_components, "install")
 
 
 @pytest.fixture
 def args_list():
-    return MockArgs(list_components)
+    return MockArgs(list_components, "")
 
 
 @pytest.fixture
 def args_remove():
-    return MockArgs(remove_components)
+    return MockArgs(remove_components, "")
 
 
 @pytest.fixture
