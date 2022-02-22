@@ -83,10 +83,8 @@ RUN groupadd -g $GID $UNAME && \
     echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 COPY parts.tar.gz /
-COPY kit.tar.gz /
 COPY welcome_msg.sh /home/$UNAME/
 
 RUN tar -zxvf parts.tar.gz
-RUN tar -zxvf kit.tar.gz
 
 CMD cd /home/$UNAME && /bin/bash

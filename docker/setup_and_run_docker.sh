@@ -47,15 +47,7 @@ if [ ! -f "parts.tar.gz" ]; then
     -f parts.tar.gz \
     runners \
     -C "$ROOT" \
-    he-samples
-fi
-
-if [ ! -f "kit.tar.gz" ]; then
-  echo -e "\nPACKAGING KIT CODE..."
-  tar -cvzf kit.tar.gz \
-    runners \
-    -C "$ROOT" \
-    kit recipes default.config
+    he-samples kit recipes default.config
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
