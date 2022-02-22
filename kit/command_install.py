@@ -34,7 +34,7 @@ def install_components(args):
         comp_label = f"{component.component_name()}/{component.instance_name()}"
         print(comp_label)
         if component.skip():
-            print(f"Skipping", comp_label)
+            print("Skipping", comp_label)
             continue
 
         chain_run(the_stages(component))
