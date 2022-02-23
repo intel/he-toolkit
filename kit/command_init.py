@@ -58,7 +58,7 @@ def append_to_rc(path: str, content: str) -> None:
         content += "\n"
 
     if not shell_rc_path.exists():
-        raise FileNotFoundError
+        raise FileNotFoundError(shell_rc_path)
 
     # newline to not accidentally mix with existing content
     # newline to end as courtesy to space our code
