@@ -1,14 +1,14 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import toml
-import os
+from toml import load
+from os import walk
 
 
 def list_dirs(path: str):
     """Return list of directories in path."""
     try:
-        return next(os.walk(path))[1]  # dirs in a list
+        return next(walk(path))[1]  # dirs in a list
     except StopIteration:
         return []
 
@@ -27,7 +27,7 @@ def list_components(args):
         for comp_inst in sorted(list_dirs(comp_name_path)):
             try:
                 info_filepath = f"{comp_name_path}/{comp_inst}/hekit.info"
-                info_file = toml.load(info_filepath)
+                info_file = load(info_filepath)
                 print(
                     f"{comp_name:{width}} {comp_inst:{width}}",
                     f"{info_file['status']['fetch']:{width}}",

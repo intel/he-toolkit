@@ -4,7 +4,6 @@
 import toml
 from spec import Spec
 
-import re
 import shlex
 from os import chdir as change_directory_to
 from pathlib import Path

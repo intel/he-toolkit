@@ -3,7 +3,9 @@
 
 import pytest
 from filecmp import cmp as compare_files
-from kit.spec import Spec, InvalidSpec
+
+from .context import spec
+from spec import Spec, InvalidSpec
 
 
 def test_transform_spec_to_toml_dict():

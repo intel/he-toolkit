@@ -57,6 +57,9 @@ def append_to_rc(path: str, content: str) -> None:
     if content[:-1] != "\n":  # add newline if not there
         content += "\n"
 
+    if not shell_rc_path.exists():
+        raise FileNotFoundError(shell_rc_path)
+
     # newline to not accidentally mix with existing content
     # newline to end as courtesy to space our code
     lines = ["\n", Tags.start_tag, content, Tags.end_tag, "\n"]

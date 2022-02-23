@@ -1,15 +1,15 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import toml
-import re
+from toml import load, dump
+from re import findall
 from dataclasses import dataclass
 
 
 def read_spec(component, instance, attrib, repo_location):
     """Return hekit.spec file as a dict"""
     path = f"{repo_location}/{component}/{instance}/hekit.spec"
-    spec = toml.load(path)
+    spec = load(path)
     # There should only be one instance
     inst_obj = spec[component][0]
     return inst_obj[attrib]
@@ -22,7 +22,7 @@ def fill_self_ref_string_dict(d, repo_path):
     def fill_str(s):
         """s can be a string or a list of strings"""
         if isinstance(s, str):
-            symbols = re.findall(r"(%(.*?)%)", s)
+            symbols = findall(r"(%(.*?)%)", s)
             if not symbols:
                 return s
 
@@ -40,7 +40,7 @@ def fill_self_ref_string_dict(d, repo_path):
     def fill_dep_str(s):
         """s can be a string or a list of strings"""
         if isinstance(s, str):
-            symbols = re.findall(r"(\$(.*?)/(.*?)/(.*?)\$)", s)
+            symbols = findall(r"(\$(.*?)/(.*?)/(.*?)\$)", s)
             if not symbols:
                 return s
 
@@ -103,7 +103,7 @@ class Spec:
     def from_toml_file(cls, filename: str, rloc: str):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
-        toml_specs = toml.load(filename)
+        toml_specs = load(filename)
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
                 yield cls.from_instance_spec(component, instance_spec, rloc)
@@ -155,7 +155,7 @@ class Spec:
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
         with open(filename, "w") as f:
-            toml.dump(obj_as_dict, f)
+            dump(obj_as_dict, f)
 
     def __getitem__(self, key: str):
         """Return value from key.
