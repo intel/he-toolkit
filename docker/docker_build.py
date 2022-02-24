@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import docker
-
+from docker.error import DockerException
 import tarfile
 from sys import stderr, argv
 from getpass import getuser
@@ -14,9 +14,9 @@ from platform import system as os_name
 from pathlib import Path
 from dataclasses import dataclass
 
-ROOT : Path = Path("..").resolve()
+ROOT: Path = Path("..").resolve()
 
-INSTRUCTIONS : str = """
+INSTRUCTIONS: str = """
 
 PLEASE READ ALL OF THE FOLLOWING INSTRUCTIONS:
 
@@ -42,6 +42,7 @@ if geteuid() == 0:
     exit(1)
 
 try:
+
     def exclude_build_directory(tarinfo):
         if tarinfo.name.startswith("he-samples/build"):
             return None
@@ -61,7 +62,6 @@ except FileExistsError as file_exists_error:
     # then continue
 
 
-
 try:
     print("\nCHECKING DOCKER FUNCTIONALITY...")
     client = docker.from_env()
@@ -69,64 +69,77 @@ except DockerException as docker_exception:
     print("Docker Error\n", docker_exception, file=stderr)
     exit(1)
 
-# TODO
 print("\nCHECKING IN-DOCKER CONNECTIVITY...")
-if not docker.run -v \
-  "$PWD"/basic-docker-test.sh:/basic-docker-test.sh \
-  --env-file ./env.list \
-  ubuntu:bionic \
-  /bin/bash \
-  /basic-docker-test.sh:
-  print("In-docker connectivity failing.", file=stderr)
-  exit(1)
+check_conn = client.containers.run(
+    volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
+    environment={
+        "http_proxy": "http_proxy",
+        "https_proxy": "https_proxy",
+        "socks_proxy": "socks_proxy",
+        "ftp_proxy": "ftp_proxy",
+        "no_proxy": "no_proxy",
+        "USER": "USER",
+    },
+    image="ubuntu:20.04",
+    command="/bin/bash /basic-docker-test.sh",
+)
+if not check_conn:
+    print("In-docker connectivity failing.", file=stderr)
+    exit(1)
+
 
 @dataclass(frozen=True, init=False)
-class NS:
+class Constants:
     user: str = getuser()
     # TODO remove hardcoding of version
-    version : int = 2.0.0
-    base_label: str = f"{user}/ubuntu_he_base:{version}"
-    derived_label: str = f"{user}/ubuntu_he_test"
+    version: str = "2.0.0"
+    base_label: str = f"{self.user}/ubuntu_he_base:{self.version}"
+    derived_label: str = f"{self.user}/ubuntu_he_test"
+
+
+constants = Constants()
 
 USERID = getuid()
 GROUPID = getguid()
 
 # Check for Mac OSX
 if os_name() == "Darwin":
-  if argv[1] == 0:
-      print("\nWARNING: Detected Mac OSX... Changing UID/GID of docker user to 1000")
-      USERID = 1000
-      GROUPID = 1000
-  else
-      print(f"\nWARNING: Changing UID/GID of docker user to '{argv[1]}'")
-      GROUPID = argv[1]
-      GROUPID = argv[1]
+    if argv[1] == 0:
+        print("\nWARNING: Detected Mac OSX... Changing UID/GID of docker user to 1000")
+        USERID, GROUPID = 1000, 1000
+    else:
+        print(f"\nWARNING: Changing UID/GID of docker user to '{argv[1]}'")
+        USERID, GROUPID = argv[1], argv[1]
 
-#TODO
-images : list = client.images.list(name=base_label)
+
+images: list = client.images.list(name=constants.base_label)
 if images:
     print("\nBUILDING BASE DOCKERFILE...")
     client.images.build(
-      buildargs={"http_proxy":"",
-                 "https_proxy":"",
-                 "socks_proxy":"",
-                 "ftp_proxy":"" ,
-                 "no_proxy":"",
-                 "UID":USERID,
-                 "GID":GROUPID,
-                 "UNAME"=user},
-      tag=base_label,
-      dockerfile="Dockerfile.base",
-      path=getcwd())
+        buildargs={
+            "http_proxy": "",
+            "https_proxy": "",
+            "socks_proxy": "",
+            "ftp_proxy": "",
+            "no_proxy": "",
+            "UID": USERID,
+            "GID": GROUPID,
+            "UNAME": constants.user,
+        },
+        tag=constants.base_label,
+        dockerfile="Dockerfile.base",
+        path=getcwd(),
+    )
+
 
 print("\nBUILDING TOOLKIT DOCKERFILE...")
-#TODO
 client.images.build(
-  buildargs={"UNAME":user},
-  tag=derived_label,
-  dockerfile=Dockerfile.toolkit,
-  path=getcwd())
+    buildargs={"UNAME": constants.user},
+    tag=constants.derived_label,
+    dockerfile="Dockerfile.toolkit",
+    path=getcwd(),
+)
 
 print("\nRUN DOCKER CONTAINER...")
 # Python cannot relinquish control therefore advise
-print("Run container with\n", f"docker run -it {derived_label}")
+print("Run container with\n", f"docker run -it {constants.derived_label}")
