@@ -72,16 +72,7 @@ container.
 In order to successfully run the docker build on MacOS you may be required to
 run the following steps if not done so already.
 
-1. Ensure you have `realpath` which can be installed via `brew` using
-```bash
-brew install coreutils
-```
-or `macports` via
-```bash
-sudo port install realpath
-```
-
-2. If using Docker Desktop and you see an error such as
+1. If using Docker Desktop and you see an error such as
 ```bash
 => ERROR [internal] load metadata for docker.io/$USER/ubuntu_he_base:1.4
 ```
@@ -89,7 +80,7 @@ then open Docker Desktop, got to `Preferences`, navigate to the `Docker Engine`
 tab, set the `buildkit` variable to `false`, and save this change by clicking
 on `Apply & Restart`.
 
-3. Also ensure that you allocate the docker container with at least 16GB of
+2. Also ensure that you allocate the docker container with at least 16GB of
   memory. This can be done via the `Resources` tab under `Preferences`.
 
 ### Steps

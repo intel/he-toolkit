@@ -5,6 +5,7 @@
 
 import docker
 from docker.errors import DockerException
+from docker import APIClient
 import tarfile
 from sys import stderr, argv
 from getpass import getuser
@@ -13,6 +14,8 @@ from os import chdir as change_directory_to
 from platform import system as os_name
 from pathlib import Path
 from dataclasses import dataclass
+from time import sleep
+from typing import Dict
 
 ROOT: Path = Path("..").resolve()
 
@@ -69,32 +72,35 @@ except DockerException as docker_exception:
     print("Docker Error\n", docker_exception, file=stderr)
     exit(1)
 
-print("\nCHECKING IN-DOCKER CONNECTIVITY...")
-check_conn = client.containers.run(
-    volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
-    detach=True,
-    stream=True,
-    environment={
-        "http_proxy": environ.get("http_proxy", ""),
-        "https_proxy": environ.get("https_proxy", ""),
-        "socks_proxy": environ.get("socks_proxy", ""),
-        "ftp_proxy": environ.get("ftp_proxy", ""),
-        "no_proxy": environ.get("no_proxy", ""),
-        "USER": getuser(),
-    },
-    image="ubuntu:20.04",
-    command="/bin/bash ./basic-docker-test.sh",
-)
-for stream in check_conn.logs(stream=True):
-    print("[CONTAINER]", stream)
-status_code = check_conn.wait()["StatusCode"]
-if status_code != 0:
-    print(
-        "In-docker connectivity failing.",
-        f"Return code was '{status_code}'",
-        file=stderr,
-    )
-    exit(1)
+environment: Dict[str, str] = {
+    "http_proxy": environ.get("http_proxy", ""),
+    "https_proxy": environ.get("https_proxy", ""),
+    "socks_proxy": environ.get("socks_proxy", ""),
+    "ftp_proxy": environ.get("ftp_proxy", ""),
+    "no_proxy": environ.get("no_proxy", ""),
+    "USER": getuser(),
+}
+
+# print("\nCHECKING IN-DOCKER CONNECTIVITY...")
+# check_conn = client.containers.run(
+#    volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
+#    detach=True,
+#    stream=True,
+#    environment=environment,
+#    image="ubuntu:20.04",
+#    command="/bin/bash ./basic-docker-test.sh",
+# )
+# for stream in check_conn.logs(stream=True):
+#    print("[CONTAINER]", stream)
+# status_code = check_conn.wait()["StatusCode"]
+# if status_code != 0:
+#    print(
+#        "In-docker connectivity failing.",
+#        f"Return code was '{status_code}'",
+#        file=stderr,
+#    )
+#    exit(1)
+#
 
 
 @dataclass(frozen=True, init=False)
@@ -119,34 +125,41 @@ if os_name() == "Darwin":
         print(f"\nWARNING: Changing UID/GID of docker user to '{argv[1]}'")
         USERID, GROUPID = argv[1], argv[1]
 
+buildargs: Dict[str, str] = {
+    **environment,
+    "UID": str(USERID),
+    "GID": str(GROUPID),
+    "UNAME": environment["USER"],
+}
+del buildargs["USER"]
+print("buildargs", buildargs)
 
 images: list = client.images.list(name=constants.base_label)
-if images:
+print(images)
+cli = APIClient(base_url="unix://var/run/docker.sock")
+if len(images) == 0:
     print("\nBUILDING BASE DOCKERFILE...")
-    client.images.build(
-        buildargs={
-            "http_proxy": "",
-            "https_proxy": "",
-            "socks_proxy": "",
-            "ftp_proxy": "",
-            "no_proxy": "",
-            "UID": USERID,
-            "GID": GROUPID,
-            "UNAME": constants.user,
-        },
-        tag=constants.base_label,
+    response = cli.build(
         dockerfile="Dockerfile.base",
+        rm=True,  # remove intermediates
+        buildargs=buildargs,
+        tag=constants.base_label,
         path=getcwd(),
     )
+    for out in response:
+        print(out)
 
 
 print("\nBUILDING TOOLKIT DOCKERFILE...")
-client.images.build(
-    buildargs={"UNAME": constants.user},
-    tag=constants.derived_label,
+response = cli.build(
     dockerfile="Dockerfile.toolkit",
+    rm=True,  # remove intermediates
+    buildargs=buildargs,  # {"UNAME": constants.user},
+    tag=constants.derived_label,
     path=getcwd(),
 )
+for out in response:
+    print(out)
 
 print("\nRUN DOCKER CONTAINER...")
 # Python cannot relinquish control therefore advise
