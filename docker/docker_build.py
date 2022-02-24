@@ -4,11 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import docker
-from docker.error import DockerException
+from docker.errors import DockerException
 import tarfile
 from sys import stderr, argv
 from getpass import getuser
-from os import geteuid, getcwd, getuid, getguid
+from os import geteuid, getcwd, getuid, getgid, environ
 from os import chdir as change_directory_to
 from platform import system as os_name
 from pathlib import Path
@@ -72,19 +72,28 @@ except DockerException as docker_exception:
 print("\nCHECKING IN-DOCKER CONNECTIVITY...")
 check_conn = client.containers.run(
     volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
+    detach=True,
+    stream=True,
     environment={
-        "http_proxy": "http_proxy",
-        "https_proxy": "https_proxy",
-        "socks_proxy": "socks_proxy",
-        "ftp_proxy": "ftp_proxy",
-        "no_proxy": "no_proxy",
-        "USER": "USER",
+        "http_proxy": environ.get("http_proxy", ""),
+        "https_proxy": environ.get("https_proxy", ""),
+        "socks_proxy": environ.get("socks_proxy", ""),
+        "ftp_proxy": environ.get("ftp_proxy", ""),
+        "no_proxy": environ.get("no_proxy", ""),
+        "USER": getuser(),
     },
     image="ubuntu:20.04",
-    command="/bin/bash /basic-docker-test.sh",
+    command="/bin/bash ./basic-docker-test.sh",
 )
-if not check_conn:
-    print("In-docker connectivity failing.", file=stderr)
+for stream in check_conn.logs(stream=True):
+    print("[CONTAINER]", stream)
+status_code = check_conn.wait()["StatusCode"]
+if status_code != 0:
+    print(
+        "In-docker connectivity failing.",
+        f"Return code was '{status_code}'",
+        file=stderr,
+    )
     exit(1)
 
 
@@ -92,15 +101,14 @@ if not check_conn:
 class Constants:
     user: str = getuser()
     # TODO remove hardcoding of version
-    version: str = "2.0.0"
-    base_label: str = f"{self.user}/ubuntu_he_base:{self.version}"
-    derived_label: str = f"{self.user}/ubuntu_he_test"
+    base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
+    derived_label: str = f"{getuser()}/ubuntu_he_test"
 
 
 constants = Constants()
 
 USERID = getuid()
-GROUPID = getguid()
+GROUPID = getgid()
 
 # Check for Mac OSX
 if os_name() == "Darwin":
