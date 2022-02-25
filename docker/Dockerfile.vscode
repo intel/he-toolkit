@@ -36,7 +36,7 @@ RUN cp -rp /home/$UNAME/he-samples /opt/Intel-HE-Toolkit/HE-Workspace && \
     rm -rf /opt/Intel-HE-Toolkit/HE-Workspace/he-samples/build
 
 # Install code-server extensions
-RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools; do \
+RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
       code-server --user-data-dir=/opt/Intel-HE-Toolkit/HE-Workspace/ --install-extension $e; \
     done
 
