@@ -5,7 +5,7 @@
 # linking non-global imports requires >= 3.13
 cmake_minimum_required(VERSION 3.13)
 
-project(he-benchmarks LANGUAGES C CXX)
+project(he-toolkit LANGUAGES C CXX)
 
 if(CMAKE_BUILD_TYPE)
   set(RELEASE_TYPES
@@ -52,6 +52,7 @@ option(ENABLE_HELIB "Enable HElib library" ON)
 option(ENABLE_PALISADE "Enable PALISADE library" ON)
 option(ENABLE_SEAL "Enable SEAL library" ON)
 option(ENABLE_INTEL_HEXL "Enable Intel HE Acceleration Library" ON)
+set(HEKIT_DIR ~/.hekit CACHE PATH "Location of hekit directory")
 
 # Sanitizers
 option(ENABLE_ADDRESS_SANITIZER "Compiles and links with Address Sanitizer" OFF)
@@ -65,6 +66,7 @@ message(STATUS "ENABLE_ADDRESS_SANITIZER: ${ENABLE_ADDRESS_SANITIZER}")
 message(STATUS "ENABLE_THREAD_SANITIZER:  ${ENABLE_THREAD_SANITIZER}")
 message(STATUS "ENABLE_UB_SANITIZER:      ${ENABLE_UB_SANITIZER}")
 message(STATUS "ENABLE_INTEL_HEXL:        ${ENABLE_INTEL_HEXL}")
+message(STATUS "HEKIT_DIR:                ${HEKIT_DIR}")
 
 #--------------------------------------------------------------------
 # Compiler logic
@@ -131,6 +133,10 @@ endif()
 #------------------------------------------------------------------------------
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+
+if (${ENABLE_INTEL_HEXL})
+  include(cmake/hexl.cmake)
+endif()
 
 if (${ENABLE_SEAL})
   include(cmake/seal.cmake)
