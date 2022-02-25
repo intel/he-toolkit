@@ -34,6 +34,4 @@ RUN cd /home/$UNAME/he-samples && \
     -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd && \
     cmake --build build -j
 
-ENTRYPOINT cd /home/$UNAME/runners && \
-           /home/$UNAME/welcome_msg.sh && \
-           /bin/bash
+ENTRYPOINT source runners.sh && welcome_message && /bin/bash

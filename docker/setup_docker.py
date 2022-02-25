@@ -54,7 +54,7 @@ try:
             return tarinfo
 
     with tarfile.open("parts.tar.gz", "x:gz") as tar:
-        tar.add("runners")
+        tar.add("runners.sh")
         old_directory = getcwd()
         change_directory_to(ROOT)
         tar.add("he-samples", filter=exclude_build_directory)
