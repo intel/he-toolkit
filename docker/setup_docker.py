@@ -1,11 +1,12 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 import docker
 from docker.errors import DockerException
-from docker import APIClient
+
+# from docker import APIClient
 import tarfile
 from sys import stderr, argv
 from getpass import getuser
@@ -36,7 +37,7 @@ Do note that this script has a few usage requirements:
 """
 
 try:
-    input("If understood, press enter to continue. Otherwise, exit with Ctrl+C")
+    input("If understood, press enter to continue. Otherwise, exit with Ctrl+C ")
 except KeyboardInterrupt:
     exit(1)
 
@@ -81,26 +82,25 @@ environment: Dict[str, str] = {
     "USER": getuser(),
 }
 
-# print("\nCHECKING IN-DOCKER CONNECTIVITY...")
-# check_conn = client.containers.run(
-#    volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
-#    detach=True,
-#    stream=True,
-#    environment=environment,
-#    image="ubuntu:20.04",
-#    command="/bin/bash ./basic-docker-test.sh",
-# )
-# for stream in check_conn.logs(stream=True):
-#    print("[CONTAINER]", stream)
-# status_code = check_conn.wait()["StatusCode"]
-# if status_code != 0:
-#    print(
-#        "In-docker connectivity failing.",
-#        f"Return code was '{status_code}'",
-#        file=stderr,
-#    )
-#    exit(1)
-#
+print("\nCHECKING IN-DOCKER CONNECTIVITY...")
+check_conn = client.containers.run(
+    volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
+    detach=True,
+    stream=True,
+    environment=environment,
+    image="ubuntu:20.04",
+    command="/bin/bash ./basic-docker-test.sh",
+)
+for stream in check_conn.logs(stream=True):
+    print("[CONTAINER]", stream)
+status_code = check_conn.wait()["StatusCode"]
+if status_code != 0:
+    print(
+        "In-docker connectivity failing.",
+        f"Return code was '{status_code}'",
+        file=stderr,
+    )
+    exit(1)
 
 
 @dataclass(frozen=True, init=False)
@@ -113,8 +113,7 @@ class Constants:
 
 constants = Constants()
 
-USERID = getuid()
-GROUPID = getgid()
+USERID, GROUPID = getuid(), getgid()
 
 # Check for Mac OSX
 if os_name() == "Darwin":
@@ -131,15 +130,13 @@ buildargs: Dict[str, str] = {
     "GID": str(GROUPID),
     "UNAME": environment["USER"],
 }
-del buildargs["USER"]
+
 print("buildargs", buildargs)
 
 images: list = client.images.list(name=constants.base_label)
-print(images)
-cli = APIClient(base_url="unix://var/run/docker.sock")
 if len(images) == 0:
     print("\nBUILDING BASE DOCKERFILE...")
-    response = cli.build(
+    response = client.api.build(
         dockerfile="Dockerfile.base",
         rm=True,  # remove intermediates
         buildargs=buildargs,
@@ -150,16 +147,18 @@ if len(images) == 0:
         print(out)
 
 
-print("\nBUILDING TOOLKIT DOCKERFILE...")
-response = cli.build(
-    dockerfile="Dockerfile.toolkit",
-    rm=True,  # remove intermediates
-    buildargs=buildargs,  # {"UNAME": constants.user},
-    tag=constants.derived_label,
-    path=getcwd(),
-)
-for out in response:
-    print(out)
+images: list = client.images.list(name=constants.derived_label)
+if len(images) == 0:
+    print("\nBUILDING TOOLKIT DOCKERFILE...")
+    response = client.api.build(
+        dockerfile="Dockerfile.toolkit",
+        rm=True,  # remove intermediates
+        buildargs=buildargs,
+        tag=constants.derived_label,
+        path=getcwd(),
+    )
+    for out in response:
+        print(out)
 
 print("\nRUN DOCKER CONTAINER...")
 # Python cannot relinquish control therefore advise
