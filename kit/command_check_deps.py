@@ -8,6 +8,7 @@ from re import search
 from shutil import which
 from enum import Enum, auto
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Tuple
 
 
@@ -106,12 +107,25 @@ def check_dependency(dep: Dep) -> None:
                     )
 
 
-def check_dependencies(deps: List[str]) -> None:
+def check_dependencies_list(deps: List[str]) -> None:
     """Check list of dependencies and prints out if found"""
     for dep in map(parse_dependencies, deps):
         check_dependency(dep)
 
 
-check_dependencies(
-    ["python", "python==3.8.10", "python >= 3.7", "pytho", "pytho == 3.2", "p =="]
-)
+def check_dependencies(args) -> None:
+    """"""
+    path = Path(args.dependencies_file)
+    with path.open() as f:
+        lines = f.readlines()
+
+    # filter out comment lines and empty lines
+    filtered_lines = (line for line in lines if not search("^\s*#|^\s*$", line))
+
+    # At the mo, dependencies file is very constrained
+    check_dependencies_list(filtered_lines)
+
+
+# check_dependencies(
+#    ["python", "python==3.8.10", "python >= 3.7", "pytho", "pytho == 3.2", "p =="]
+# )

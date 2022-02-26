@@ -12,6 +12,7 @@ from command_init import init_hekit
 from command_remove import remove_components
 from command_list import list_components
 from command_install import install_components
+from command_check_deps import check_dependencies
 
 
 def parse_cmdline():
@@ -73,11 +74,23 @@ def parse_cmdline():
     parser_remove.add_argument("instance", type=str, help="instance to be removed")
     parser_remove.set_defaults(fn=remove_components)
 
+    # create the parser for the "check_dependencies" command
+    parser_check_dependencies = subparsers.add_parser(
+        "check_dependencies", description="check_dependencies"
+    )
+    parser_check_dependencies.add_argument(
+        "dependencies_file",
+        metavar="dependencies-file",
+        type=str,
+        help="dependencies file",
+    )
+    parser_check_dependencies.set_defaults(fn=check_dependencies)
+
     return parser.parse_args(), parser.print_help
 
 
 def main():
-
+    """"""
     toolkit_version = "2.0.0"
     args, print_help = parse_cmdline()
 
