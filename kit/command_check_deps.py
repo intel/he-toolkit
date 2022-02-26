@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -124,8 +122,3 @@ def check_dependencies(args) -> None:
 
     # At the mo, dependencies file is very constrained
     check_dependencies_list(filtered_lines)
-
-
-# check_dependencies(
-#    ["python", "python==3.8.10", "python >= 3.7", "pytho", "pytho == 3.2", "p =="]
-# )
