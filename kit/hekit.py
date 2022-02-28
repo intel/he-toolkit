@@ -76,7 +76,7 @@ def parse_cmdline():
 
     # create the parser for the "check_dependencies" command
     parser_check_dependencies = subparsers.add_parser(
-        "check_dependencies", description="check_dependencies"
+        "check-dependencies", description="check system dependencies"
     )
     parser_check_dependencies.add_argument(
         "dependencies_file",

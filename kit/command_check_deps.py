@@ -114,8 +114,12 @@ def check_dependencies_list(deps: List[str]) -> None:
 def check_dependencies(args) -> None:
     """"""
     path = Path(args.dependencies_file)
-    with path.open() as f:
-        lines = f.readlines()
+    try:
+        with path.open() as f:
+            lines = f.readlines()
+    except FileNotFoundError as file_not_found:
+        print(f"File '{path}' does not exist")
+        exit(1)
 
     # filter out comment lines and empty lines
     filtered_lines = (line for line in lines if not search("^\s*#|^\s*$", line))
