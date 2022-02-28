@@ -3,6 +3,7 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from os import geteuid
 from sys import stderr
 from argparse import ArgumentParser
 from pathlib import Path
@@ -116,4 +117,8 @@ def main():
 
 
 if __name__ == "__main__":
+    if geteuid() == 0:
+        print("You cannot run hekit as root (a.k.a. superuser)")
+        exit(1)
+
     main()
