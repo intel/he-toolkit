@@ -41,6 +41,8 @@ RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do
     done
 
 # Update code-server user settings
-RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /opt/Intel-HE-Toolkit/HE-Workspace/User/settings.json
+RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /opt/Intel-HE-Toolkit/HE-Workspace/User/settings.json && \
+    # Create a randomly generated self-signed certificate for code-server \
+    sed -i.bak 's/cert: false/cert: true/' /home/$UNAME/.config/code-server/config.yaml
 
 ENTRYPOINT ["code-server", "/opt/Intel-HE-Toolkit/HE-Workspace", "--bind-addr", "0.0.0.0:8888", "--user-data-dir", "/opt/Intel-HE-Toolkit/HE-Workspace", "--auth", "none", "--disable-telemetry"]
