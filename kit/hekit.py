@@ -9,8 +9,29 @@ from argparse import ArgumentParser
 from config import load_config
 from command_init import init_hekit
 from command_remove import remove_components
-from command_list import list_components
+from command_list import list_components, get_components, get_instances
 from command_install import install_components
+
+
+def autocomplete_cmdline(parser):
+    try:
+        from argcomplete import autocomplete
+
+        autocomplete(parser)
+    except ImportError:
+        # ignore error if not installed
+        pass
+
+
+def parse_components(prefix, parsed_args, **kwargs):
+    parsed_args.config = load_config(parsed_args.config)
+    return get_components(parsed_args.config.repo_location)
+
+
+def parse_instances(prefix, parsed_args, **kwargs):
+    parsed_args.config = load_config(parsed_args.config)
+    comp_name_path = f"{parsed_args.config.repo_location}/{parsed_args.component}"
+    return get_instances(comp_name_path)
 
 
 def parse_cmdline():
@@ -64,9 +85,15 @@ def parse_cmdline():
     parser_remove = subparsers.add_parser(
         "remove", description="removes/uninstalls components"
     )
-    parser_remove.add_argument("component", type=str, help="component to be removed")
-    parser_remove.add_argument("instance", type=str, help="instance to be removed")
+    parser_remove.add_argument(
+        "component", type=str, help="component to be removed"
+    ).completer = parse_components
+    parser_remove.add_argument(
+        "instance", type=str, help="instance to be removed"
+    ).completer = parse_instances
     parser_remove.set_defaults(fn=remove_components)
+
+    autocomplete_cmdline(parser)
 
     return parser.parse_args(), parser.print_help
 

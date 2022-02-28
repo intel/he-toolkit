@@ -13,6 +13,14 @@ def list_dirs(path: str):
         return []
 
 
+def get_components(repo_location):
+    return sorted(list_dirs(repo_location))
+
+
+def get_instances(comp_name_path):
+    return sorted(list_dirs(comp_name_path))
+
+
 def list_components(args):
     """List to stdout info on components."""
     repo_location = args.config.repo_location
@@ -22,9 +30,9 @@ def list_components(args):
         f"{'component':{width}} {'instance':{width}} {'fetch':{width}} {'build':{width}} {'install':{width}}"
     )
 
-    for comp_name in sorted(list_dirs(repo_location)):
+    for comp_name in get_components(repo_location):
         comp_name_path = f"{repo_location}/{comp_name}"
-        for comp_inst in sorted(list_dirs(comp_name_path)):
+        for comp_inst in get_instances(comp_name_path):
             try:
                 info_filepath = f"{comp_name_path}/{comp_inst}/hekit.info"
                 info_file = load(info_filepath)
