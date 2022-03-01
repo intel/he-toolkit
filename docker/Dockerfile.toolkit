@@ -10,8 +10,7 @@ ARG UNAME
 
 LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 
-RUN mv /runners /home/$UNAME/ && \
-    mv /he-samples /home/$UNAME
+RUN mv /he-samples /home/$UNAME
 
 # Switch user to $UNAME
 USER $UNAME
@@ -34,4 +33,4 @@ RUN cd /home/$UNAME/he-samples && \
     -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd && \
     cmake --build build -j
 
-ENTRYPOINT source runners.sh && welcome_message && /bin/bash
+ENTRYPOINT . /runners.sh && welcome_message && cd $HOME && /bin/bash
