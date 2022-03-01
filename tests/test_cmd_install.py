@@ -54,7 +54,7 @@ def test_install_components_one_unskipped(mocker, args, one_unskipped_component)
     mock_chain_run.assert_called_once()
 
 
-def test_stages_fecth(mocker, unskipped_components):
+def test_stages_fetch(mocker, unskipped_components):
     """Arrange"""
     comp = unskipped_components[0]
     upto_stage = "fetch"

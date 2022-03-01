@@ -5,6 +5,7 @@
 
 from sys import stderr
 from argparse import ArgumentParser
+from pathlib import Path
 
 from config import load_config
 from command_init import init_hekit
@@ -31,7 +32,7 @@ def parse_cmdline():
 
     # create the parser for the "init" command
     parser_init = subparsers.add_parser("init", description="initialize hekit")
-    parser_init.set_defaults(fn=init_hekit)
+    parser_init.set_defaults(fn=init_hekit, hekit_root_dir=Path(__file__).parent.parent)
 
     # create the parser for the "list" command
     parser_list = subparsers.add_parser(

@@ -82,5 +82,5 @@ def init_hekit(args):
     rc_backup_file = create_backup(rc_file)
     print("Backup file created at", rc_backup_file)
     remove_from_rc(rc_file)
-    append_to_rc(rc_file, content=f"PATH={Path(__file__).parent}:$PATH")
+    append_to_rc(rc_file, content=f"PATH={args.hekit_root_dir}:$PATH")
     print("Please, source your shell init file as follows,\n" f"source {rc_file}")
