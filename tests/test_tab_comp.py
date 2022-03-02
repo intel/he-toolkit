@@ -41,15 +41,9 @@ def test_get_instances_after_fetch(mocker, args_fetch, args_tab, comp_data):
     exp_comp = [comp_data["comp"]]
     exp_inst = [comp_data["inst_v1"], comp_data["inst_v2"]]
 
-    print(exp_comp)
-    print(exp_inst)
-
     """Act"""
     act_comp = components_completer("", args_tab)
     act_inst = instances_completer("", args_tab)
-
-    print(act_comp)
-    print(act_inst)
 
     """Assert"""
     assert act_comp == exp_comp
