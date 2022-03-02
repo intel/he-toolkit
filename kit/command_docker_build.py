@@ -12,7 +12,7 @@ from platform import system as os_name
 from pathlib import Path
 from dataclasses import dataclass
 from shutil import copyfile
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Optional
 
 
 @dataclass(frozen=True, init=False)
@@ -23,21 +23,18 @@ class Constants:
     derived_label: str = f"{getuser()}/ubuntu_he_test"
 
 
-def copyfiles(files: Iterable[str], src_dir, dst_dir) -> None:
-    src_dir = Path(src_dir)
-    dst_dir = Path(dst_dir)
+def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
+    src_dir, dst_dir = Path(src_dir), Path(dst_dir)
     for filename in files:
         copyfile(src_dir / filename, dst_dir / filename)
 
 
-def setup_docker(args):
-    """Build the docker for the toolkit"""
-
+def print_preamble() -> None:
     INSTRUCTIONS: str = """
 
 PLEASE READ ALL OF THE FOLLOWING:
 
-The following script packages the he-samples code, confirms Docker functionality,
+The program packages the he-samples code, confirms Docker functionality,
 and builds a Docker image for testing several homomorphic encryption workloads.
 
 Please note that if you are located behind a firewall (corporate or otherwise),
@@ -45,6 +42,7 @@ make sure you have the proxies setup accordingly, i.e. environment variables
 http_proxy and https_proxy are set.
 
 """
+    print(INSTRUCTIONS)
     try:
         input(
             "If you want to proceed, press enter to continue. "
@@ -54,10 +52,47 @@ http_proxy and https_proxy are set.
         print()
         exit(1)
 
+
+def archive_and_compress(
+    name: str, filepaths: Iterable[str], root: Optional[str] = None
+) -> None:
+    """"""
+    root = Path(root if root else ".")
+    try:
+        with tarfile.open(name, "x:gz") as tar:
+            for filepath in filepaths:
+                tar.add(root / filepath)
+    except FileExistsError as file_exists_error:
+        print(f"Error: The file '{root / filepath}' already exists")
+        # then continue
+
+
+def setup_docker(args):
+    """Build the docker for the toolkit"""
+
+    if args.y:
+        print_preamble()
+
     ROOT = args.hekit_root_dir
 
     # set_stagging_area
-    stagging_path = (Path(ROOT) / "__stagging__").mkdir(exist_ok=True)
+    stagging_path = Path(ROOT) / "__stagging__"
+    stagging_path.mkdir(exist_ok=True)
+
+    parts_tar_gz = stagging_path / "parts.tar.gz"
+    if not parts_tar_gz.exists():
+        archive_and_compress(
+            parts_tar_gz,
+            (
+                "docker/runners.sh",
+                "he-samples/cmake",
+                "he-samples/CMakeLists.txt",
+                "he-samples/examples/",
+                "he-samples/sample-kernels/",
+            ),
+            root=ROOT,
+        )
+
     copyfiles(
         ("Dockerfile.base", "Dockerfile.toolkit"),
         src_dir=(ROOT / "docker"),
@@ -67,31 +102,11 @@ http_proxy and https_proxy are set.
     # check docker connectivity
 
     # build base image
+
     # build toolkit image
 
 
 def old_stuff():
-
-    try:
-
-        def exclude_build_directory(tarinfo):
-            if tarinfo.name.startswith("he-samples/build"):
-                return None
-            else:
-                return tarinfo
-
-        # TODO refactor this into a func
-        with tarfile.open("parts.tar.gz", "x:gz") as tar:
-            tar.add("runners.sh")
-            old_directory = getcwd()
-            change_directory_to(ROOT)
-            tar.add("he-samples", filter=exclude_build_directory)
-            for directory in ("kit", "recipes", "default.config"):
-                tar.add(directory)
-            change_directory_to(old_directory)
-    except FileExistsError as file_exists_error:
-        print(file_exists_error)
-        # then continue
 
     try:
         print("\nCHECKING DOCKER FUNCTIONALITY...")

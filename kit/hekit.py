@@ -19,6 +19,10 @@ from command_docker_build import setup_docker
 
 def parse_cmdline():
     """Parse commandline commands"""
+
+    # resolve first to follow the symlink, if any
+    hekit_root_dir = Path(__file__).resolve().parent.parent
+
     # create the top-level parser
     parser = ArgumentParser(prog="hekit")
     parser.set_defaults(fn=None)
@@ -35,11 +39,7 @@ def parse_cmdline():
 
     # create the parser for the "init" command
     parser_init = subparsers.add_parser("init", description="initialize hekit")
-    parser_init.set_defaults(
-        # resolve first to follow the symlink, if any
-        fn=init_hekit,
-        hekit_root_dir=Path(__file__).resolve().parent.parent,
-    )
+    parser_init.set_defaults(fn=init_hekit, hekit_root_dir=hekit_root_dir)
 
     # create the parser for the "list" command
     parser_list = subparsers.add_parser(
@@ -93,7 +93,10 @@ def parse_cmdline():
         "docker-build", description="docker build of the toolkit"
     )
     parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
-    parser_docker_build.set_defaults(fn=setup_docker)
+    parser_docker_build.add_argument(
+        "-y", action="store_false", help="say yes to prompts"
+    )
+    parser_docker_build.set_defaults(fn=setup_docker, hekit_root_dir=hekit_root_dir)
 
     return parser.parse_args(), parser.print_help
 
