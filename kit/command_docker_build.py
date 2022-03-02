@@ -94,26 +94,12 @@ def setup_docker(args):
         )
 
     copyfiles(
-        ("Dockerfile.base", "Dockerfile.toolkit"),
+        ("Dockerfile.base", "Dockerfile.toolkit", "basic-docker-test.sh"),
         src_dir=(ROOT / "docker"),
         dst_dir=stagging_path,
     )
 
-    # check docker connectivity
-
-    # build base image
-
-    # build toolkit image
-
-
-def old_stuff():
-
-    try:
-        print("\nCHECKING DOCKER FUNCTIONALITY...")
-        client = docker.from_env()
-    except DockerException as docker_exception:
-        print("Docker Error\n", docker_exception, file=stderr)
-        exit(1)
+    change_directory_to(stagging_path)
 
     environment: Dict[str, str] = {
         "http_proxy": environ.get("http_proxy", ""),
@@ -124,7 +110,24 @@ def old_stuff():
         "USER": getuser(),
     }
 
-    print("\nCHECKING IN-DOCKER CONNECTIVITY...")
+    # check docker connectivity
+    client = docker_checks(environment)
+
+    # build base image
+    # build toolkit image
+    build_toolkit_images(client, args, environment)
+
+
+def docker_checks(environment):
+
+    try:
+        print("CHECKING DOCKER FUNCTIONALITY...")
+        client = docker.from_env()
+    except DockerException as docker_exception:
+        print("Docker Error\n", docker_exception, file=stderr)
+        exit(1)
+
+    print("CHECKING IN-DOCKER CONNECTIVITY...")
     check_conn = client.containers.run(
         volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
         detach=True,
@@ -144,18 +147,23 @@ def old_stuff():
         )
         exit(1)
 
+    return client
+
+
+def build_toolkit_images(client, args, environment):
+
     constants = Constants()
 
     if args.id:
         USERID, GROUPID = args.id, args.id
     elif os_name() == "Darwin":
         # Check for Mac OS
-        print("\nWARNING: Detected Mac OSX ... ")
+        print("WARNING: Detected Mac OSX ... ")
         USERID, GROUPID = 1000, 1000
     else:
         USERID, GROUPID = getuid(), getgid()
 
-    print(f"\nWARNING: Setting UID/GID of docker user to '{USERID}/{GROUPID}'")
+    print(f"WARNING: Setting UID/GID of docker user to '{USERID}/{GROUPID}'")
 
     buildargs: Dict[str, str] = {
         **environment,
@@ -168,7 +176,7 @@ def old_stuff():
 
     images: list = client.images.list(name=constants.base_label)
     if len(images) == 0:
-        print("\nBUILDING BASE DOCKERFILE...")
+        print("BUILDING BASE DOCKERFILE...")
         response = client.api.build(
             dockerfile="Dockerfile.base",
             rm=True,  # remove intermediates
@@ -181,7 +189,7 @@ def old_stuff():
 
     images: list = client.images.list(name=constants.derived_label)
     if len(images) == 0:
-        print("\nBUILDING TOOLKIT DOCKERFILE...")
+        print("BUILDING TOOLKIT DOCKERFILE...")
         response = client.api.build(
             dockerfile="Dockerfile.toolkit",
             rm=True,  # remove intermediates
@@ -192,6 +200,6 @@ def old_stuff():
         for out in response:
             print(out)
 
-    print("\nRUN DOCKER CONTAINER...")
+    print("RUN DOCKER CONTAINER...")
     # Python cannot relinquish control therefore advise
     print("Run container with\n", f"docker run -it {constants.derived_label}")

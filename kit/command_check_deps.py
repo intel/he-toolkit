@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from __future__ import annotations
+
 import subprocess
 from re import search
 from shutil import which
@@ -24,7 +26,7 @@ class Dep:
     ver_str: str
 
     @classmethod
-    def make_from_triple(cls, dep_str: str, op_str: str, ver_str: str) -> "Dep":
+    def make_from_triple(cls, dep_str: str, op_str: str, ver_str: str) -> Dep:
         """Factory that transforms from strings"""
         if op_str == "==":
             op = Op.EXACT
@@ -37,7 +39,7 @@ class Dep:
         return cls(dep_str, op, ver, ver_str)
 
     @classmethod
-    def make_from_str(cls, dep_str: str) -> "Dep":
+    def make_from_str(cls, dep_str: str) -> Dep:
         return cls(dep_str, Op.ANY, tuple(), "")
 
 
