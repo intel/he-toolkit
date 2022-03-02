@@ -33,7 +33,9 @@ def parse_cmdline():
     # create the parser for the "init" command
     parser_init = subparsers.add_parser("init", description="initialize hekit")
     parser_init.set_defaults(
-        fn=init_hekit, hekit_root_dir=Path(__file__).parent.resolve()
+        # resolve first to follow the symlink, if any
+        fn=init_hekit,
+        hekit_root_dir=Path(__file__).resolve().parent.parent,
     )
 
     # create the parser for the "list" command
