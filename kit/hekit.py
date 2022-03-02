@@ -1,10 +1,11 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 from sys import stderr
 from argparse import ArgumentParser
+from pathlib import Path
 
 from config import load_config
 from command_init import init_hekit
@@ -31,7 +32,11 @@ def parse_cmdline():
 
     # create the parser for the "init" command
     parser_init = subparsers.add_parser("init", description="initialize hekit")
-    parser_init.set_defaults(fn=init_hekit)
+    parser_init.set_defaults(
+        # resolve first to follow the symlink, if any
+        fn=init_hekit,
+        hekit_root_dir=Path(__file__).resolve().parent.parent,
+    )
 
     # create the parser for the "list" command
     parser_list = subparsers.add_parser(

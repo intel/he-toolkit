@@ -1,7 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os
+from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as compare_files
@@ -70,7 +70,7 @@ def append_to_rc(path: str, content: str) -> None:
 
 def init_hekit(args):
     """Initialize hekit"""
-    active_shell_path = Path(os.environ["SHELL"]).name
+    active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
         rc_file = "~/.bash_profile"
@@ -82,5 +82,5 @@ def init_hekit(args):
     rc_backup_file = create_backup(rc_file)
     print("Backup file created at", rc_backup_file)
     remove_from_rc(rc_file)
-    append_to_rc(rc_file, content=f"PATH={Path(__file__).parent}:$PATH")
+    append_to_rc(rc_file, content=f"PATH={args.hekit_root_dir}:$PATH")
     print("Please, source your shell init file as follows,\n" f"source {rc_file}")
