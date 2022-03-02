@@ -17,11 +17,11 @@ def enable_tab_completion(parser):
 
 
 def components_completer(prefix, parsed_args, **kwargs):
-    parsed_args.config = load_config(parsed_args.config)
-    return get_components(parsed_args.config.repo_location)
+    config = load_config(parsed_args.config)
+    return get_components(config.repo_location)
 
 
 def instances_completer(prefix, parsed_args, **kwargs):
-    parsed_args.config = load_config(parsed_args.config)
-    comp_name_path = f"{parsed_args.config.repo_location}/{parsed_args.component}"
+    config = load_config(parsed_args.config)
+    comp_name_path = f"{config.repo_location}/{parsed_args.component}"
     return get_instances(comp_name_path)
