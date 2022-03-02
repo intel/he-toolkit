@@ -8,28 +8,35 @@ HE_SAMPLES_EXAMPLES="$HE_SAMPLES_BUILD/examples"
 HE_SAMPLES_KERNELS="$HE_SAMPLES_BUILD/sample-kernels"
 HE_SAMPLES_TESTS="$HE_SAMPLES_BUILD/sample-kernels/test"
 
+__run_cmd() {
+  (
+    set -e
+    "$@"
+  )
+}
+
 run_lr_example() {
-  OMP_NUM_THREADS="$(nproc)" "$HE_SAMPLES_EXAMPLES"/logistic-regression/lr_test "$@"
+  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HE_SAMPLES_EXAMPLES"/logistic-regression/lr_test "$@"
 }
 
 run_psi_example() {
-  "$HE_SAMPLES_EXAMPLES"/psi/psi "$@"
+  __run_cmd "$HE_SAMPLES_EXAMPLES"/psi/psi "$@"
 }
 
 run_query_example() {
-  OMP_NUM_THREADS=$(nproc) "$HE_SAMPLES_EXAMPLES"/secure-query/secure-query
+  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HE_SAMPLES_EXAMPLES"/secure-query/secure-query
 }
 
 run_sample_kernels_palisade() {
-  KMP_WARNINGS=0 OMP_NUM_THREADS=$(nproc) "$HE_SAMPLES_KERNELS"/sample-kernels-palisade --benchmark_min_time=2
+  __run_cmd KMP_WARNINGS=0 OMP_NUM_THREADS="$(nproc)" "$HE_SAMPLES_KERNELS"/sample-kernels-palisade --benchmark_min_time=2
 }
 
 run_sample_kernels_seal() {
-  KMP_WARNINGS=0 OMP_NUM_THREADS=$(nproc) "$HE_SAMPLES_KERNELS"/sample-kernels-seal --benchmark_min_time=2
+  __run_cmd KMP_WARNINGS=0 OMP_NUM_THREADS="$(nproc)" "$HE_SAMPLES_KERNELS"/sample-kernels-seal --benchmark_min_time=2
 }
 
 run_tests() {
-  OMP_NUM_THREADS=$(nproc) "$HE_SAMPLES_TESTS"/unit-test
+  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HE_SAMPLES_TESTS"/unit-test
 }
 
 welcome_message() {

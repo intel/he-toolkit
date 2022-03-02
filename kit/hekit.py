@@ -14,6 +14,7 @@ from command_remove import remove_components
 from command_list import list_components
 from command_install import install_components
 from command_check_deps import check_dependencies
+from command_docker_build import setup_docker
 
 
 def parse_cmdline():
@@ -75,7 +76,7 @@ def parse_cmdline():
     parser_remove.add_argument("instance", type=str, help="instance to be removed")
     parser_remove.set_defaults(fn=remove_components)
 
-    # create the parser for the "check_dependencies" command
+    # create the parser for the "check-dependencies" command
     parser_check_dependencies = subparsers.add_parser(
         "check-dependencies", description="check system dependencies"
     )
@@ -87,15 +88,22 @@ def parse_cmdline():
     )
     parser_check_dependencies.set_defaults(fn=check_dependencies)
 
+    # create the parser for the "docker-build" command
+    parser_docker_build = subparsers.add_parser(
+        "docker-build", description="docker build of the toolkit"
+    )
+    parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
+    parser_docker_build.set_defaults(fn=setup_docker)
+
     return parser.parse_args(), parser.print_help
 
 
 def main():
     """"""
-    toolkit_version = "2.0.0"
     args, print_help = parse_cmdline()
 
     if args.version:
+        toolkit_version = "2.0.0"
         print(f"Intel HE Toolkit version {toolkit_version}")
         exit(0)
 
@@ -105,7 +113,7 @@ def main():
         args.config = load_config(args.config)
     except Exception as e:
         # Exit on any exception from config file
-        print(f"Error while parsing config file\n  {e!r}", file=stderr)
+        print("Error while parsing config file\n", f"{e!r}", file=stderr)
         exit(1)
 
     # Run the command
