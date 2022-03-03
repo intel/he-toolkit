@@ -11,13 +11,13 @@ where the options are explained in the following section:
 
 ### Flags
 
-`-h, --help`: Show the help message.
+`-h, --help`: Shows the help message.
 
-`--version`: Display Intel HE toolkit version.
+`--version`: Displays Intel HE toolkit version.
 
-`--config CONFIG_FILE`: Define a configuration file. Default is `~/.hekit/default.config`.
+`--config CONFIG_FILE`: Defines a configuration file. Default is `~/.hekit/default.config`.
 
-`init`: Initialize hekit.
+`init`: Initializes hekit.
 
 `list`: Lists installed components.
 
@@ -27,7 +27,7 @@ where the options are explained in the following section:
 
 `fetch RECIPE_FILE`: Fetches components defined in RECIPE_FILE.
 
-`remove component instance`: Uninstall a speciifc component.
+`remove component instance`: Uninstalls a speciifc component.
 
 ### Input Files
 
