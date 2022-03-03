@@ -1,14 +1,7 @@
 # Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-#FIXME: Need logic for setting HINT DIR
-set(PALISADE_HINT_DIR ${HEKIT_DIR}/components/palisade/v1.11.6/install
-  CACHE PATH "Location of PALISADE install")
-message(STATUS "PALISADE_HINT_DIR: ${PALISADE_HINT_DIR}")
-
-find_package(Palisade
-  HINTS ${PALISADE_HINT_DIR}
-  REQUIRED)
+find_package(Palisade HINTS ${PALISADE_PREFIX}/lib/Palisade/ REQUIRED)
 
 message(STATUS "PALISADE_INCLUDE ${PALISADE_INCLUDE}")
 message(STATUS "PALISADE_LIBRARIES ${PALISADE_LIBRARIES}")
