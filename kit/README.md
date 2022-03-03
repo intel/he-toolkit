@@ -1,5 +1,5 @@
 ## Introduction
-The kit tool is a collection of python scripts that can be used by the user to set-up easily the required enviroment to evaluate homomorphic encryption technology.
+The kit tool is a collection of python scripts that can be used by the user to set-up easily the required environment to evaluate homomorphic encryption technology.
 
 ## Usage
 The hekit can be executed using the following options:
@@ -27,7 +27,7 @@ where the options are explained in the following section:
 
 `fetch RECIPE_FILE`: Fetches components defined in RECIPE_FILE.
 
-`remove component instance`: Uninstalls a speciifc component.
+`remove component instance`: Uninstalls a specific component.
 
 ### Input Files
 
@@ -56,7 +56,7 @@ The install command can be used to fetch, build and install the required librari
 ./hekit.py --config ../default.config install ../recipes/default.toml
 ```
 
-Using fetch and build commands, the user has access to perfom specfic actions. For example, for fetching libraries:
+Using fetch and build commands, the user has access to perform specific actions. For example, for fetching libraries:
 ```bash
 ./hekit.py --config ../default.config fetch ../recipes/default.toml
 ```
@@ -66,11 +66,11 @@ In order to uninstall a specific component, execute the remove command
 ./hekit.py --config ../default.config remove hexl 1.2.3
 ```
 
-## Tab completion 
+## Tab completion
 As an optional feature, the user is able to enable tab completion feature using [argcomplete](https://kislyuk.github.io/argcomplete/) library.
 
-As it is described in its documentation, the following actions are required to enable this functionality 
-- Install argcomplete: 
+As it is described in its documentation, the following actions are required to enable this functionality
+- Install argcomplete:
 ```
 pip install argcomplete
 ```
@@ -79,5 +79,3 @@ pip install argcomplete
 ```
 eval "$(register-python-argcomplete hekit.py)"
 ```
-
-

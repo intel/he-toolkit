@@ -68,8 +68,8 @@ self-contained docker container running Ubuntu 20.04. See [here](docker) for a
 detailed description on the usage and components of this build.
 
 ### Hekit Build
-The [kit](kit) tool is a collection of python scripts that can be used by the 
-user to set-up easily the required enviroment to evaluate homomorphic encryption 
+The [kit](kit) tool is a collection of python scripts that can be used by the
+user to set-up easily the required environment to evaluate homomorphic encryption
 technology. See the [README](kit/README.md) for instructions.
 
 ### Native Build
