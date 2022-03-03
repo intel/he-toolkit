@@ -69,7 +69,7 @@ In order to uninstall a specific component, execute the remove command
 ## Tab completion 
 As an optional feature, the user is able to enable tab completion feature using [argcomplete](https://kislyuk.github.io/argcomplete/) library.
 
-As it is stated in its documentation, the following actions are required to enable this functionality 
+As it is described in its documentation, the following actions are required to enable this functionality 
 - Install argcomplete: 
 ```
 pip install argcomplete
