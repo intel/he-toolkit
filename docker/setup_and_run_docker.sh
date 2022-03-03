@@ -47,7 +47,7 @@ if [ ! -f "parts.tar.gz" ]; then
     -f parts.tar.gz \
     runners \
     -C "$ROOT" \
-    he-samples kit recipes default.config
+    he-samples kit recipes default.config hekit
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."

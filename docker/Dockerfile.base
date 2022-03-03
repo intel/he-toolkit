@@ -68,7 +68,8 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2
     rm -rf cmake_files
     # Install GMP, pip and python dependencies \
 RUN apt install -y libgmp-dev python3-pip && \
-    pip install toml
+    pip install toml && \
+    pip install argcomplete
     # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \

@@ -5,6 +5,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as compare_files
+from importlib import util
 
 
 class Tags:
@@ -98,10 +99,13 @@ def init_hekit(args):
 
     # New lines that will be added in the rc_file:
     # 1-Add hekit directory as part of environmental variable PATH
-    path_to_add = f"PATH={args.hekit_root_dir}:$PATH"
-    # 2-Register hekit.py script to enable tab completion
-    register_to_add = f'eval "$(register-python-argcomplete hekit.py)"'
-    content = "\n".join([path_to_add, register_to_add])
+    content = f"PATH={args.hekit_root_dir}:$PATH"
+
+    # 2-Register hekit link and hekit.py script to enable tab completion
+    if not util.find_spec("argcomplete") == None:
+        register_py = f'eval "$(register-python-argcomplete hekit.py)"'
+        register_link = f'eval "$(register-python-argcomplete hekit)"'
+        content = "\n".join([content, register_py, register_link])
 
     append_to_rc(rc_file, content)
     print("Please, source your shell init file as follows,\n" f"source {rc_file}")
