@@ -12,9 +12,17 @@ class Tags:
     end_tag: str = "# <<<  hekit end  <<<\n"
 
 
+def check_file_exist(path: str):
+    path_file = Path(path).expanduser().resolve()
+    if not path_file.exists():
+        raise FileNotFoundError(path_file)
+
+    return path_file
+
+
 def create_backup(path: str, ext: str = ".hekit.bak") -> str:
     """"""
-    path = Path(path).expanduser().resolve()
+    path = check_file_exist(path)
     backup = path.with_suffix(ext)
     copyfile(path, backup)
     # Sanity check - we really need to guarantee we copied the file
@@ -25,7 +33,7 @@ def create_backup(path: str, ext: str = ".hekit.bak") -> str:
 
 def remove_from_rc(path: str) -> None:
     """Remove hekit section"""
-    path = Path(path).expanduser().resolve()
+    path = check_file_exist(path)
     with path.open() as f:
         lines = f.readlines()  # slurp
 
@@ -52,13 +60,10 @@ def remove_from_rc(path: str) -> None:
 
 def append_to_rc(path: str, content: str) -> None:
     """Config bash init file to know about hekit"""
-    shell_rc_path = Path(path).expanduser().resolve()
+    shell_rc_path = check_file_exist(path)
 
     if content[:-1] != "\n":  # add newline if not there
         content += "\n"
-
-    if not shell_rc_path.exists():
-        raise FileNotFoundError(shell_rc_path)
 
     # newline to not accidentally mix with existing content
     # newline to end as courtesy to space our code
@@ -68,19 +73,35 @@ def append_to_rc(path: str, content: str) -> None:
             rc_file.write(line)
 
 
-def init_hekit(args):
-    """Initialize hekit"""
+def get_rc_file():
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
+        # if bash_profile file does not exist, try bashrc file
         rc_file = "~/.bash_profile"
+        if not Path(rc_file).expanduser().resolve().exists():
+            rc_file = "~/.bashrc"
     elif active_shell_path == "zsh":
         rc_file = ""
     else:
         raise ValueError(f"Unknown shell '{active_shell_path}'")
 
+    return rc_file
+
+
+def init_hekit(args):
+    """Initialize hekit"""
+    rc_file = get_rc_file()
     rc_backup_file = create_backup(rc_file)
     print("Backup file created at", rc_backup_file)
     remove_from_rc(rc_file)
-    append_to_rc(rc_file, content=f"PATH={args.hekit_root_dir}:$PATH")
+
+    # New lines that will be added in the rc_file:
+    # 1-Add hekit directory as part of environmental variable PATH
+    path_to_add = f"PATH={args.hekit_root_dir}:$PATH"
+    # 2-Register hekit.py script to enable tab completion
+    register_to_add = f'eval "$(register-python-argcomplete hekit.py)"'
+    content = "\n".join([path_to_add, register_to_add])
+
+    append_to_rc(rc_file, content)
     print("Please, source your shell init file as follows,\n" f"source {rc_file}")
