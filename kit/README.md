@@ -5,7 +5,7 @@ The kit tool is a collection of python scripts that can be used by the user to s
 The hekit can be executed using the following options:
 ```
 cd kit
-./hekit.py [--config CONFIGFILE] {init, list, install, build, fetch, remove}
+./hekit.py [--config CONFIG_FILE] {init, list, install, build, fetch, remove}
 ```
 where the options are explained in the following section:
 
