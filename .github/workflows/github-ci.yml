@@ -17,7 +17,15 @@ on:
 ###################
 env:
   HEXL_VER: 1.2.3
-  HEXL_DIR: ${GITHUB_WORKSPACE}/hexl-install/lib/cmake/hexl-${HEXL_VER}
+  SEAL_VER: 3.7.2
+  PALISADE_VER: 1.11.6
+  HELIB_VER: 2.2.1
+  HEXL_DIR: ~/.hekit/components/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
+  SEAL_DIR: ~/.hekit/components/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
+  PALISADE_DIR: ~/.hekit/components/palisade/v${PALISADE_VER}/install/lib/Palisade
+  HELIB_DIR: ~/.hekit/components/helib/v${HELIB_VER}/share/cmake/helib
+  GSL_DIR: ~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
+  ZSTD_DIR: ~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
 
 ################
 # Ubuntu 20.04 #
@@ -39,70 +47,92 @@ jobs:
         with:
           extra_args: --all-files
 
-  build-and-test:
-    name: Build, test and run kernels
-    needs: [format]
+  test-hekit:
+    name: Test hekit commands
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
     steps:
       - uses: actions/checkout@v2
-      - name: Validate paths
+      - name: Setup
         run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REF
-          pwd
+          pip3 install pytest pytest-mock toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Run pytests
+        run: pytest tests/
 
-      # Install GMP and NTL
-      - name: Install GMP and NTL
+  build-and-test-toolkit:
+    if: ${{ false }} # FIXME: Disable this job for now
+    name: Build, test and run components
+    runs-on: ubuntu-20.04
+    # Use environment protection (require review)
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup
         run: |
-          sudo apt-get install -y libgmp-dev
-          wget https://libntl.org/ntl-11.5.1.tar.gz
-          tar xzvf ntl-11.5.1.tar.gz
-          cd ntl-11.5.1/src
-          ./configure NTL_GMP_LIP=on SHARED=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic
-          make
-          sudo make install
+          pip3 install toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Build and install Intel HE Acceleration Library 1.2.3 for HElib
-      - name: Install HEXL (for HElib)
+      - name: Init hekit
         run: |
-          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
-          cd hexl
-          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
+          mkdir -p ~/.hekit
+          cp default.config ~/.hekit/default.config
+
+      - name: Build and install default recipe
+        run: |
+          ./hekit install recipes/default.toml
+          ./hekit list
+
+      - name: Build and run PSI example
+        # TODO: Refactor to use hekit build recipes/examples.toml
+        run: |
+          cd he-samples/examples/psi
+          cmake -S . -B build -Dhelib_DIR=${{ env.HELIB_DIR }}
           cmake --build build -j
-          cmake --install build
+          cd build
+          echo "apple\nBanana\ncat" > client.set
+          ./psi client.set | grep -B 1 "apple"
 
-      # Build toolkit
-      - name: Build the repository
+      - name: Build and run Secure Query example
+        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
-          cmake --build build --target all -j
+          cd he-samples/examples/secure-query
+          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
+          cmake --build build -j
+          cd build
+          echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
+          echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
+          echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
-      # Unit tests and examples
-      - name: Run the unit tests
-        run: ./build/sample-kernels/test/unit-test
-      - name: Run secure query example
+      - name: Build and run LR example
+        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
-          cd build/examples/secure-query
-          echo -n "Input: Arkansas, " && ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
-          echo -n "Input: New Mexico, " && ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
-          echo -n "Input: California, " && ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
-      - name: Run LR example
-        run: |
-          cd build/examples/logistic-regression
+          cd he-samples/examples/logistic-regression
+          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
+          cmake --build build -j
+          cd build
           ./lr_test --compare --data lrtest_large | grep "All match!"
+
+      - name: Build sample kernels
+        # TODO: Refactor to use hekit build recipes/sample-kernels.toml
+        run: |
+          cd he-samples/sample-kernels
+          cmake -S . -B build -DENABLE_SEAL=ON -DENABLE_PALISADE=ON -DSEAL_DIR=${{ env.SEAL_DIR }} -DPalisade_DIR=${{ env.PALISADE_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
+          cmake --build build -j
+
+      - name: Run unit tests
+        run: ./he-samples/sample-kernels/build/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -112,13 +142,14 @@ jobs:
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
+
 
 ##############
 # IceLake CI #
@@ -136,50 +167,90 @@ jobs:
       - name: pre-commit
         run: pre-commit run --all-files
 
-  build-and-test-icelake:
-    name: Build, test and run kernels (IceLake - Excl. HElib)
-    needs: [format-icelake]
+  test-hekit-icelake:
+    name: Test hekit commands (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
     environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
     steps:
       - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REF
-          pwd
+        # Add local bin for pytest
+      - name: Setup
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Run pytests
+        run: pytest tests/
 
-      # Build toolkit (Excl. HElib)
-      - name: Build the repository
-        run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_HELIB=OFF
-          cmake --build build --target all -j
+  build-and-test-toolkit-icelake:
+    if: ${{ false }} # FIXME: Disable this job for now
+    name: Build, test and run components (IceLake)
+    runs-on: [self-hosted, Linux, X64, ice-lake]
+    # Use environment protection (require review)
+    environment: intel_workflow
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+        # Add local bin for pip modules
+      - name: Setup
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Unit tests and examples
-      - name: Run the unit tests
-        run: ./build/sample-kernels/test/unit-test
-      - name: Run secure query example
+      - name: Init hekit
         run: |
-          cd build/examples/secure-query
+          mkdir -p ~/.hekit
+          cp default.config ~/.hekit
+
+      - name: Build and install default recipe
+        run: |
+          ./hekit install recipes/default.toml
+          ./hekit list
+
+      - name: Build and run PSI example
+        # TODO: Refactor to use hekit build recipes/examples.toml
+        run: |
+          cd he-samples/examples/psi
+          cmake -S . -B build -Dhelib_DIR=${{ env.HELIB_DIR }}
+          cmake --build build -j
+          cd build
+          echo "apple\nBanana\ncat" > client.set
+          ./psi client.set | grep -B 1 "apple"
+
+      - name: Build and run Secure Query example
+        # TODO: Refactor to use hekit build recipes/examples.toml
+        run: |
+          cd he-samples/examples/secure-query
+          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
+          cmake --build build -j
+          cd build
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
-      - name: Run LR example
+
+      - name: Build and run LR example
+        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
-          cd build/examples/logistic-regression
+          cd he-samples/examples/logistic-regression
+          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
+          cmake --build build -j
+          cd build
           ./lr_test --compare --data lrtest_large | grep "All match!"
+
+      - name: Build sample kernels
+        # TODO: Refactor to use hekit build recipes/sample-kernels.toml
+        run: |
+          cd he-samples/sample-kernels
+          cmake -S . -B build -DENABLE_SEAL=ON -DENABLE_PALISADE=ON -DSEAL_DIR=${{ env.SEAL_DIR }} -DPalisade_DIR=${{ env.PALISADE_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
+          cmake --build build -j
+
+      - name: Run unit tests
+        run: ./he-samples/sample-kernels/build/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -189,7 +260,7 @@ jobs:
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -197,30 +268,12 @@ jobs:
           path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
-  build-helib-icelake:
-    name: Build HElib with HEXL (Icelake)
-    needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-        working-directory: he-samples
-    steps:
-      - uses: actions/checkout@v2
-
-      # Build and install Intel HE Acceleration Library
-      - name: Build and install HEXL
+      - name: Remove components
         run: |
-          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
-          cd hexl
-          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
-          cmake --build build -j
-          cmake --install build
-
-      # Build the toolkit with only HElib and Intel HE Acceleration Library
-      - name: Build HElib
-        run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
-          cmake --build build --target all -j
+          ./hekit remove seal v${{ env.SEAL_VER }}
+          ./hekit remove gsl v3.1.0
+          ./hekit remove zstd v1.4.5
+          ./hekit remove helib v${{ env.HELIB_VER }}
+          ./hekit remove ntl 11.5.1
+          ./hekit remove palisade v${{ env.PALISADE_VER }}
+          ./hekit remove hexl ${{ env.HEXL_VER }}

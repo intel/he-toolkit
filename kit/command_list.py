@@ -8,7 +8,8 @@ from os import walk
 def list_dirs(path: str):
     """Return list of directories in path."""
     try:
-        return next(walk(path))[1]  # dirs in a list
+        dirs = next(walk(path))[1]  # dirs in a list
+        return sorted(dirs)
     except StopIteration:
         return []
 
@@ -22,9 +23,9 @@ def list_components(args):
         f"{'component':{width}} {'instance':{width}} {'fetch':{width}} {'build':{width}} {'install':{width}}"
     )
 
-    for comp_name in sorted(list_dirs(repo_location)):
+    for comp_name in list_dirs(repo_location):
         comp_name_path = f"{repo_location}/{comp_name}"
-        for comp_inst in sorted(list_dirs(comp_name_path)):
+        for comp_inst in list_dirs(comp_name_path):
             try:
                 info_filepath = f"{comp_name_path}/{comp_inst}/hekit.info"
                 info_file = load(info_filepath)

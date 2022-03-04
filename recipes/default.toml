@@ -25,11 +25,11 @@ init_fetch_dir = "fetch"
 init_pre_build_dir = "build"
 init_build_dir = "build/ntl-%version%/src"
 init_install_dir = "build/ntl-%version%/src"
-export_install_dir = "install"
 fetch = "wget https://libntl.org/ntl-%version%.tar.gz"
 post-fetch = "bash -c 'tar -xvf %init_fetch_dir%/ntl-%version%.tar.gz -C %init_pre_build_dir%'"
 build = "bash -c './configure NTL_GMP_LIP=on NTL_THREADS=on NTL_THREAD_BOOST=on TUNE=generic PREFIX=%export_install_dir% && make -j'"
 install = "make install"
+export_install_dir = "install"
 
 
 [[gsl]]
@@ -82,6 +82,7 @@ export_install_dir = "install"
 fetch = "git clone https://github.com/homenc/HElib.git --branch %name%"
 pre-build = """cmake -S %init_fetch_dir%/HElib -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DNTL_DIR=$%ntl%/export_install_dir$
                -DUSE_INTEL_HEXL=ON
                -DNTL_DIR=$%ntl%/export_install_dir$
                -DHEXL_DIR=$%hexl%/export_cmake$"""
@@ -89,6 +90,7 @@ build = "cmake --build %init_build_dir% -j"
 post-build = ""
 install = "cmake --install %init_install_dir%"
 # Dependencies
+ntl = "ntl/11.5.1"
 hexl = "hexl/1.2.3"
 ntl = "ntl/11.5.1"
 

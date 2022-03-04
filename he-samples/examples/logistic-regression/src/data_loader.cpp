@@ -1,11 +1,11 @@
 // Copyright (C) 2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "include/data_loader.hpp"
+#include "data_loader.hpp"
 
-#include "include/logger.hpp"
-#include "include/timer.hpp"
-#include "kernels/omp_utils.h"
+#include "logger.hpp"
+#include "omp_utils.h"
+#include "timer.hpp"
 
 std::vector<std::string> readCSVRow(const std::string& row) {
   CSVState state = CSVState::UnquotedField;

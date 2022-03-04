@@ -9,6 +9,12 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from config import load_config
+from tab_completion import (
+    enable_tab_completion,
+    components_completer,
+    instances_completer,
+)
+
 from command_init import init_hekit
 from command_remove import remove_components
 from command_list import list_components
@@ -80,8 +86,12 @@ def parse_cmdline():
     parser_remove = subparsers.add_parser(
         "remove", description="removes/uninstalls components"
     )
-    parser_remove.add_argument("component", type=str, help="component to be removed")
-    parser_remove.add_argument("instance", type=str, help="instance to be removed")
+    parser_remove.add_argument(
+        "component", type=str, help="component to be removed"
+    ).completer = components_completer
+    parser_remove.add_argument(
+        "instance", type=str, help="instance to be removed"
+    ).completer = instances_completer
     parser_remove.set_defaults(fn=remove_components)
 
     # create the parser for the "check-dependencies" command
@@ -108,6 +118,8 @@ def parse_cmdline():
         "-y", action="store_false", help="say yes to prompts"
     )
     parser_docker_build.set_defaults(fn=setup_docker, hekit_root_dir=hekit_root_dir)
+
+    enable_tab_completion(parser)
 
     return parser.parse_args(), parser.print_help
 
