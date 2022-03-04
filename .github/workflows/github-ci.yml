@@ -62,9 +62,7 @@ jobs:
           pip3 install pytest pytest-mock toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
-        run: |
-          cd tests
-          pytest .
+        run: pytest tests/
 
   build-and-test-toolkit:
     if: ${{ false }} # FIXME: Disable this job for now
@@ -183,9 +181,7 @@ jobs:
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
-        run: |
-          cd tests
-          pytest .
+        run: pytest tests/
 
   build-and-test-toolkit-icelake:
     if: ${{ false }} # FIXME: Disable this job for now
