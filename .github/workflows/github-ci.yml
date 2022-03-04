@@ -85,8 +85,8 @@ jobs:
           ./hekit install recipes/default.toml
           ./hekit list
 
+      # TODO: Refactor to use hekit build recipes/examples.toml
       - name: Build and run PSI example
-        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
           cd he-samples/examples/psi
           cmake -S . -B build -Dhelib_DIR=${{ env.HELIB_DIR }}
@@ -95,8 +95,8 @@ jobs:
           echo "apple\nBanana\ncat" > client.set
           ./psi client.set | grep -B 1 "apple"
 
+      # TODO: Refactor to use hekit build recipes/examples.toml
       - name: Build and run Secure Query example
-        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
           cd he-samples/examples/secure-query
           cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
@@ -106,8 +106,8 @@ jobs:
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
+      # TODO: Refactor to use hekit build recipes/examples.toml
       - name: Build and run LR example
-        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
           cd he-samples/examples/logistic-regression
           cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
@@ -115,8 +115,8 @@ jobs:
           cd build
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
+      # TODO: Refactor to use hekit build recipes/sample-kernels.toml
       - name: Build sample kernels
-        # TODO: Refactor to use hekit build recipes/sample-kernels.toml
         run: |
           cd he-samples/sample-kernels
           cmake -S . -B build -DENABLE_SEAL=ON -DENABLE_PALISADE=ON -DSEAL_DIR=${{ env.SEAL_DIR }} -DPalisade_DIR=${{ env.PALISADE_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
@@ -200,8 +200,8 @@ jobs:
           ./hekit install recipes/default.toml
           ./hekit list
 
+      # TODO: Refactor to use hekit build recipes/examples.toml
       - name: Build and run PSI example
-        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
           cd he-samples/examples/psi
           cmake -S . -B build -Dhelib_DIR=${{ env.HELIB_DIR }}
@@ -210,8 +210,8 @@ jobs:
           echo "apple\nBanana\ncat" > client.set
           ./psi client.set | grep -B 1 "apple"
 
+      # TODO: Refactor to use hekit build recipes/examples.toml
       - name: Build and run Secure Query example
-        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
           cd he-samples/examples/secure-query
           cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
@@ -221,8 +221,8 @@ jobs:
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
+      # TODO: Refactor to use hekit build recipes/examples.toml
       - name: Build and run LR example
-        # TODO: Refactor to use hekit build recipes/examples.toml
         run: |
           cd he-samples/examples/logistic-regression
           cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
@@ -230,8 +230,8 @@ jobs:
           cd build
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
+      # TODO: Refactor to use hekit build recipes/sample-kernels.toml
       - name: Build sample kernels
-        # TODO: Refactor to use hekit build recipes/sample-kernels.toml
         run: |
           cd he-samples/sample-kernels
           cmake -S . -B build -DENABLE_SEAL=ON -DENABLE_PALISADE=ON -DSEAL_DIR=${{ env.SEAL_DIR }} -DPalisade_DIR=${{ env.PALISADE_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
