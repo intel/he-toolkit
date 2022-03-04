@@ -3,6 +3,8 @@
 
 include(ExternalProject)
 
+# If user has not specified an install path, override the default usr/local to
+# be the build directory of the original target.
 if (NOT ${CMAKE_INSTALL_PREFIX})
   set (CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
 endif()
