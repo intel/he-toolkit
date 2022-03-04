@@ -1,5 +1,5 @@
 ## Introduction
-The kit tool is a collection of python scripts that can be used by the user to set-up easily the required environment to evaluate homomorphic encryption technology.
+The hekit tool can be used by the user to easily set up the required environment to evaluate homomorphic encryption technology.
 
 ## Usage
 The hekit can be executed using the following options:
