@@ -67,6 +67,7 @@ jobs:
           pytest .
 
   build-and-test-toolkit:
+    if: ${{ false }} # FIXME: Disable this job for now
     name: Build, test and run components
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
@@ -187,6 +188,7 @@ jobs:
           pytest .
 
   build-and-test-toolkit-icelake:
+    if: ${{ false }} # FIXME: Disable this job for now
     name: Build, test and run components (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
