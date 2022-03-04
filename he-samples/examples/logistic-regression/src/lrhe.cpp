@@ -1,13 +1,13 @@
 // Copyright (C) 2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "include/lrhe.hpp"
+#include "lrhe.hpp"
 
 #include <chrono>
 
-#include "include/data_loader.hpp"
-#include "include/logger.hpp"
-#include "include/timer.hpp"
+#include "data_loader.hpp"
+#include "logger.hpp"
+#include "timer.hpp"
 
 namespace lrhe {
 LRHE::LRHE(const kernel::LRHEKernel& lrheKernel, const bool encrypt_data,

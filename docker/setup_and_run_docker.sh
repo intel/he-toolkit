@@ -67,7 +67,7 @@ if ! docker run -v \
 fi
 
 readonly user="$(whoami)"
-readonly version=1.4
+readonly version=2.0
 readonly base_label="$user/ubuntu_he_base:$version"
 readonly derived_label="$user/ubuntu_he_test"
 
@@ -82,7 +82,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     GROUPID=1000
   else
     echo -e "\nWARNING: Changing UID/GID of docker user to $1"
-    GROUPID="$1"
+    USERID="$1"
     GROUPID="$1"
   fi
 fi

@@ -1,0 +1,46 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[examples]]
+skip = false
+name = "logistic-regression"
+fetch = ""
+init_fetch_dir = ""
+# FIXME: Change path to location of HE-Toolkit
+src_dir = "~/git/public-toolkit/v2-prep/he-samples/examples/logistic-regression"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+            -DSEAL_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7
+            -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
+            -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
+            -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+build = "cmake --build %init_build_dir% -j"
+
+
+[[examples]]
+skip = false
+name = "secure-query"
+fetch = ""
+init_fetch_dir = ""
+# FIXME: Change path to location of HE-Toolkit
+src_dir = "~/git/public-toolkit/v2-prep/he-samples/examples/secure-query"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+            -DSEAL_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7
+            -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
+            -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
+            -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+build = "cmake --build %init_build_dir% -j"
+
+
+[[examples]]
+skip = false
+name = "psi"
+fetch = ""
+init_fetch_dir = ""
+# FIXME: Change path to location of HE-Toolkit
+src_dir = "~/git/public-toolkit/v2-prep/he-samples/examples/psi"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+            -Dhelib_DIR=~/.hekit/components/helib/v2.2.1/install/share/cmake/helib"""
+build = "cmake --build %init_build_dir% -j"
