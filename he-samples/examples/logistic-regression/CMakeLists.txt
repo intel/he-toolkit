@@ -18,7 +18,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include(../../cmake/gflags.cmake)
 
-find_package(SEAL HINTS ${SEAL_PREFIX}/lib/cmake/SEAL-3.7 REQUIRED)
+find_package(SEAL REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

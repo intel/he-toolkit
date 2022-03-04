@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-find_package(Palisade HINTS ${PALISADE_PREFIX}/lib/Palisade/ REQUIRED)
+find_package(Palisade REQUIRED)
 
 message(STATUS "PALISADE_INCLUDE ${PALISADE_INCLUDE}")
 message(STATUS "PALISADE_LIBRARIES ${PALISADE_LIBRARIES}")

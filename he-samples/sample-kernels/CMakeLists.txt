@@ -25,53 +25,50 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+# Download gbenchmark and gtest libraries
 include(../cmake/gbenchmark.cmake)
 include(../cmake/gtest.cmake)
 
 if (${ENABLE_SEAL})
-    # SEAL sample kernel
+  # SEAL sample kernel
 
-    find_package(SEAL HINTS ${SEAL_PREFIX}/lib/cmake/SEAL-3.7/ REQUIRED)
+  find_package(SEAL REQUIRED)
 
-    set(SAMPLE_KERNEL_SEAL_SRC main.cpp
-	    seal/seal_ckks_sample.cpp
-	    seal/seal_bfv_sample.cpp
+  set(SAMPLE_KERNEL_SEAL_SRC main.cpp
+    seal/seal_ckks_sample.cpp
+    seal/seal_bfv_sample.cpp
     )
 
-    add_executable(sample-kernels-seal ${SAMPLE_KERNEL_SEAL_SRC})
+  add_executable(sample-kernels-seal ${SAMPLE_KERNEL_SEAL_SRC})
 
-    target_include_directories(sample-kernels-seal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-    # FIXME: BENCHMARKS_COMPILE_FLAGS is never set
-    target_compile_options(sample-kernels-seal PRIVATE ${BENCHMARKS_COMPILE_FLAGS})
+  target_include_directories(sample-kernels-seal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-    target_link_libraries(sample-kernels-seal PRIVATE SEAL::seal seal_kernel_executor)
-    target_link_libraries(sample-kernels-seal PRIVATE libgbenchmark)
-    target_link_libraries(sample-kernels-seal PRIVATE Threads::Threads)
+  target_link_libraries(sample-kernels-seal PRIVATE SEAL::seal seal_kernel_executor)
+  target_link_libraries(sample-kernels-seal PRIVATE libgbenchmark)
+  target_link_libraries(sample-kernels-seal PRIVATE Threads::Threads)
 endif()
 
 if (${ENABLE_PALISADE})
-    # PALISADE sample kernel
+  # PALISADE sample kernel
 
-    # Find HEXL (optional)
-    find_package(HEXL)
+  # Find HEXL (optional)
+  find_package(HEXL)
 
-    # Find package Palisade and create library libpalisade
-    include(../cmake/palisade.cmake)
+  # Find package Palisade and create library libpalisade
+  include(../cmake/palisade.cmake)
 
-    set(SAMPLE_KERNEL_PALISADE_SRC main.cpp
-    	palisade/palisade_ckks_sample.cpp
-	    palisade/palisade_bfv_sample.cpp
+  set(SAMPLE_KERNEL_PALISADE_SRC main.cpp
+    palisade/palisade_ckks_sample.cpp
+    palisade/palisade_bfv_sample.cpp
     )
 
-    add_executable(sample-kernels-palisade ${SAMPLE_KERNEL_PALISADE_SRC})
+  add_executable(sample-kernels-palisade ${SAMPLE_KERNEL_PALISADE_SRC})
 
-    target_include_directories(sample-kernels-palisade PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-    # FIXME: BENCHMARKS_COMPILE_FLAGS is never set
-    target_compile_options(sample-kernels-palisade PRIVATE ${BENCHMARKS_COMPILE_FLAGS})
+  target_include_directories(sample-kernels-palisade PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-    target_link_libraries(sample-kernels-palisade PRIVATE libpalisade palisade_kernel_executor)
-    target_link_libraries(sample-kernels-palisade PRIVATE libgbenchmark)
-    target_link_libraries(sample-kernels-palisade PRIVATE Threads::Threads)
+  target_link_libraries(sample-kernels-palisade PRIVATE libpalisade palisade_kernel_executor)
+  target_link_libraries(sample-kernels-palisade PRIVATE libgbenchmark)
+  target_link_libraries(sample-kernels-palisade PRIVATE Threads::Threads)
 
 endif()
 
