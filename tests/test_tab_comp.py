@@ -16,28 +16,17 @@ from command_install import install_components
 cwd_test = getcwd()
 
 
-def restore_pwd():
+def execute_action(mocker, args_action):
     global cwd_test
+    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_action, ""
+    main()
     chdir(cwd_test)
-
-
-def execute_fetch(mocker, args_fetch):
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    main()
-    restore_pwd()
-
-
-def execute_remove(mocker, args_remove):
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_remove, ""
-    main()
-    restore_pwd()
 
 
 def test_get_instances_after_fetch(mocker, args_fetch, args_tab, comp_data):
     """Arrange"""
-    execute_fetch(mocker, args_fetch)
+    execute_action(mocker, args_fetch)
     exp_comp = [comp_data["comp"]]
     exp_inst = [comp_data["inst_v1"], comp_data["inst_v2"]]
 
@@ -52,7 +41,7 @@ def test_get_instances_after_fetch(mocker, args_fetch, args_tab, comp_data):
 
 def test_get_instances_after_remove_v1(mocker, args_remove_v1, args_tab, comp_data):
     """Arrange"""
-    execute_fetch(mocker, args_remove_v1)
+    execute_action(mocker, args_remove_v1)
     exp_comp = [comp_data["comp"]]
     exp_inst = [comp_data["inst_v2"]]
 
@@ -67,7 +56,7 @@ def test_get_instances_after_remove_v1(mocker, args_remove_v1, args_tab, comp_da
 
 def test_get_instances_after_remove_v2(mocker, args_remove_v2, args_tab):
     """Arrange"""
-    execute_fetch(mocker, args_remove_v2)
+    execute_action(mocker, args_remove_v2)
     exp_comp = []
     exp_inst = []
 
@@ -80,13 +69,16 @@ def test_get_instances_after_remove_v2(mocker, args_remove_v2, args_tab):
     assert act_inst == exp_inst
 
 
+"""Utilities used by the tests"""
+
+
 class MockArgs:
     def __init__(self, fn, component, instance, upto_stage):
         self.version = False
         self.component = component
         self.instance = instance
         self.config = "tests/config/default.config"
-        self.recipe_file = "tests/config/test_two_intances.toml"
+        self.recipe_file = "tests/config/test_two_instances.toml"
         self.fn = fn
         self.upto_stage = upto_stage
 

@@ -14,6 +14,8 @@ class Tags:
 
 
 def check_file_exist(path: str):
+    """Return the expanded path of a file if it exists,
+    otherwise it rises an exception"""
     path_file = Path(path).expanduser().resolve()
     if not path_file.exists():
         raise FileNotFoundError(path_file)
@@ -22,7 +24,7 @@ def check_file_exist(path: str):
 
 
 def create_backup(path: str, ext: str = ".hekit.bak") -> str:
-    """"""
+    """Create a backup of the input file"""
     path = check_file_exist(path)
     backup = path.with_suffix(ext)
     copyfile(path, backup)
@@ -75,6 +77,7 @@ def append_to_rc(path: str, content: str) -> None:
 
 
 def get_rc_file():
+    """ Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
