@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2020-2022 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
@@ -47,7 +47,7 @@ if [ ! -f "parts.tar.gz" ]; then
     -f parts.tar.gz \
     runners \
     -C "$ROOT" \
-    he-samples
+    he-samples kit recipes default.config
 fi
 
 echo -e "\nCHECKING DOCKER FUNCTIONALITY..."
@@ -67,7 +67,7 @@ if ! docker run -v \
 fi
 
 readonly user="$(whoami)"
-readonly version=1.4
+readonly version=2.0
 readonly base_label="$user/ubuntu_he_base:$version"
 readonly derived_label="$user/ubuntu_he_test"
 
@@ -82,7 +82,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     GROUPID=1000
   else
     echo -e "\nWARNING: Changing UID/GID of docker user to $1"
-    GROUPID="$1"
+    USERID="$1"
     GROUPID="$1"
   fi
 fi
@@ -101,27 +101,6 @@ if [ -z "$(docker images -q "$base_label")" ]; then
     -t "$base_label" \
     -f Dockerfile.base .
 fi
-
-echo -e "\nCLONING REPOS..."
-libs_dir=libs
-(# Start subshell
-  mkdir -p "$libs_dir" && cd "$libs_dir"
-  # Intel HE Acceleration Library
-  git_clone "https://github.com/intel/hexl.git" "v1.2.3"
-
-  # HE libs
-  git_clone "https://github.com/microsoft/SEAL.git" "v3.7.2"
-  git_clone "https://gitlab.com/palisade/palisade-release.git" "v1.11.6"
-  git_clone "https://github.com/homenc/HElib.git" "v2.2.1"
-
-  # SEAL dependencies
-  git_clone "https://github.com/microsoft/GSL.git" "v3.1.0"
-  git_clone "https://github.com/madler/zlib.git" "v1.2.11"
-  git_clone "https://github.com/facebook/zstd.git" "v1.4.5"
-) # End subshell
-
-echo -e "\nPACKAGING LIBS..."
-tar -cvzf libs.tar.gz "$libs_dir"
 
 echo -e "\nBUILDING TOOLKIT DOCKERFILE..."
 docker build \

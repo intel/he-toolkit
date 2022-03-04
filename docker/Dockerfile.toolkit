@@ -1,84 +1,38 @@
-# Copyright (C) 2020-2022 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # Username
 ARG UNAME
 
-FROM $UNAME/ubuntu_he_base:1.4
+FROM $UNAME/ubuntu_he_base:2.0
 
 ARG UNAME
 
 LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 
-COPY libs.tar.gz /
-
-RUN tar -zxvf libs.tar.gz && \
-    # Build and install Intel HE Acceleration Library \
-    cd /libs/hexl && \
-    cmake -S . -B build && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install GSL \
-    cd /libs/GSL && \
-    cmake -S . -B build -DGSL_TEST=OFF && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install zlib \
-    cd /libs/zlib && \
-    cmake -S . -B build && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install zstd \
-    cd /libs/zstd/build/cmake && \
-    cmake -S . -B build -DZSTD_BUILD_PROGRAMS=OFF \
-                        -DZSTD_BUILD_SHARED=OFF \
-                        -DZSTD_BUILD_STATIC=ON \
-                        -DZSTD_BUILD_TESTS=OFF \
-                        -DZSTD_MULTITHREAD_SUPPORT=OFF && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install SEAL \
-    cd /libs/SEAL && \
-    cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
-                        -DSEAL_USE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install PALISADE \
-    cd /libs/palisade-release && \
-    cmake -S . -B build -DWITH_INTEL_HEXL=ON \
-                        -DINTEL_HEXL_PREBUILT=ON \
-                        -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install HElib \
-    cd /libs/HElib && \
-    cmake -S . -B build -DUSE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
-    cmake --build build -j && \
-    cmake --install build
-
-# Build he-samples and link to SEAL and PALISADE
 RUN mv /runners /home/$UNAME/ && \
-    mv /he-samples /home/$UNAME/ && \
-    cd /home/$UNAME/he-samples && \
-    cmake -S . -B build \
-             -DENABLE_PALISADE=ON \
-             -DENABLE_SEAL=ON \
-             -DENABLE_HELIB=ON \
-    # FIXME: Intel HE Acceleration Library cmake logic requires re-think \
-             -DENABLE_INTEL_HEXL=ON \
-             -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ \
-             -DCMAKE_CXX_COMPILER=clang++-10 \
-             -DCMAKE_C_COMPILER=clang-10 \
-             -DCMAKE_BUILD_TYPE=Release \
-             -DPALISADE_PREBUILT=ON \
-             -DSEAL_PREBUILT=ON \
-             -DHELIB_PREBUILT=ON && \
-    cmake --build build -j
+    mv /he-samples /home/$UNAME
 
 # Switch user to $UNAME
 USER $UNAME
+
+# fetch, build and install all the libraries
+RUN  /kit/hekit.py --config /default.config install /recipes/default.toml
+
+# Build he-samples and link them to the libraries
+# TODO: this needs to be refactored
+RUN cd /home/$UNAME/he-samples && \
+    cmake -S . -B build \
+    -DSEAL_PREBUILT=ON \
+    -DPALISADE_PREBUILT=ON \
+    -DHELIB_PREBUILT=ON \
+    -DSEAL_HINT_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7/ \
+    -DPALISADE_HINT_DIR=~/.hekit/components/palisade/v1.11.6/install/lib/Palisade/ \
+    -DHELIB_HINT_DIR=~/.hekit/components/helib/v2.2.1/install/share/cmake/helib/ \
+    -DINTEL_HEXL_HINT_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3/ \
+    -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL \
+    -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd && \
+    cmake --build build -j
 
 ENTRYPOINT cd /home/$UNAME/runners && \
            /home/$UNAME/welcome_msg.sh && \

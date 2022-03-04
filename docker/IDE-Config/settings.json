@@ -1,0 +1,16 @@
+{
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "cmake.sourceDirectory": "${workspaceFolder}/he-samples",
+  "cmake.configureOnOpen": true,
+  "cmake.configureSettings": {
+    "SEAL_PREBUILT": "ON",
+    "PALISADE_PREBUILT": "ON",
+    "HELIB_PREBUILT": "ON",
+    "SEAL_HINT_DIR": "~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7/",
+    "PALISADE_HINT_DIR": "~/.hekit/components/palisade/v1.11.6/install/lib/Palisade/",
+    "HELIB_HINT_DIR": "~/.hekit/components/helib/v2.2.1/install/share/cmake/helib/",
+    "INTEL_HEXL_HINT_DIR": "~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3/",
+    "Microsoft.GSL_DIR": "~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL",
+    "zstd_DIR": "~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd"
+  }
+}

@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021 Intel Corporation
+// Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef HE_SAMPLES_EXAMPLES_SECURE_QUERY_INCLUDE_SQ_HELPER_FUNCTIONS_H_

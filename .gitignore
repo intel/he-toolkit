@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # Visual Studio
@@ -10,6 +10,12 @@
 build/
 __pycache__
 he-benchmarks-venv/
+
+# MyPy
+.mypy_cache/
+
+# vim
+**.swp
 
 # MacOS
 .DS_Store
