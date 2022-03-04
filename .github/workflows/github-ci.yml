@@ -58,8 +58,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup
-        run: pip3 install pytest toml
-             echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: |
+          pip3 install pytest toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
         run: |
           cd tests
@@ -76,8 +77,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup
-        run: pip3 install toml
-             echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: |
+          pip3 install toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Init hekit
         run: |
@@ -176,7 +178,6 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
-      - run: pip3 install pytest
         # Add local bin for pytest
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -195,6 +196,10 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v2
+        # Add local bin for pip modules
+      - name: Setup
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Init hekit
         run: |
           mkdir -p ~/.hekit
