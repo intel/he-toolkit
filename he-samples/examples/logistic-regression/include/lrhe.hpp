@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "kernels/lrhe_kernel.hpp"
+#include "lrhe_kernel.hpp"
 
 namespace lrhe {
 class LRHE {

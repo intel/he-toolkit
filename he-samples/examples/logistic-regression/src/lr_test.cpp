@@ -7,12 +7,12 @@
 #include <random>
 #include <vector>
 
+#include "data_loader.hpp"
 #include "gflags/gflags.h"
-#include "include/data_loader.hpp"
-#include "include/logger.hpp"
-#include "include/lr_helper.hpp"
-#include "include/lrhe.hpp"
-#include "include/timer.hpp"
+#include "logger.hpp"
+#include "lr_helper.hpp"
+#include "lrhe.hpp"
+#include "timer.hpp"
 
 DEFINE_string(
     data, "lrtest_mid",
