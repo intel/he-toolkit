@@ -126,7 +126,6 @@ def setup_docker(args):
             (
                 FileToTar("docker/runners.sh", dst="/runners.sh"),
                 "he-samples/cmake",
-                "he-samples/CMakeLists.txt",
                 "he-samples/examples/",
                 "he-samples/sample-kernels/",
                 "hekit",

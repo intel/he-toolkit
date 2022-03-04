@@ -26,9 +26,9 @@ try:
     from command_docker_build import setup_docker
 except ImportError:
 
-    def setup_docker():
+    def setup_docker(arg):
         print("This command is disabled. To enable it install the docker-py dependency")
-        print("  pip install docker-py")
+        print("  pip install docker")
 
 
 def parse_cmdline():
