@@ -49,21 +49,39 @@ http_proxy and https_proxy are set.
             "Otherwise, exit with Ctrl+C "
         )
     except KeyboardInterrupt:
-        print()
+        print()  # newline
         exit(1)
+
+
+@dataclass
+class FileToTar:
+    """class to facilitate passing optional info to tarfile"""
+
+    src: str
+    dst: str = None
+
+    def __post_init__(self):
+        """If a FileToTar is passed in use its settings and
+        set dst to equal src if not previously given"""
+        if isinstance(self.src, FileToTar):
+            other = self.src
+            self.src, self.dst = other.src, other.dst
+
+        if self.dst is None:
+            self.dst = self.src
 
 
 def archive_and_compress(
     name: str, filepaths: Iterable[str], root: Optional[str] = None
 ) -> None:
-    """"""
+    """Archive and compress files and directories into tar.gz file"""
     root = Path(root if root else ".")
     try:
         with tarfile.open(name, "x:gz") as tar:
-            for filepath in filepaths:
-                tar.add(root / filepath)
+            for filepath in map(FileToTar, filepaths):
+                tar.add(root / filepath.src, arcname=filepath.dst)
     except FileExistsError as file_exists_error:
-        print(f"Error: The file '{root / filepath}' already exists")
+        print(f"Error: The file '{root / filepath.src}' already exists")
         # then continue
 
 
@@ -72,34 +90,6 @@ def setup_docker(args):
 
     if args.y:
         print_preamble()
-
-    ROOT = args.hekit_root_dir
-
-    # set_stagging_area
-    stagging_path = Path(ROOT) / "__stagging__"
-    stagging_path.mkdir(exist_ok=True)
-
-    parts_tar_gz = stagging_path / "parts.tar.gz"
-    if not parts_tar_gz.exists():
-        archive_and_compress(
-            parts_tar_gz,
-            (
-                "docker/runners.sh",
-                "he-samples/cmake",
-                "he-samples/CMakeLists.txt",
-                "he-samples/examples/",
-                "he-samples/sample-kernels/",
-            ),
-            root=ROOT,
-        )
-
-    copyfiles(
-        ("Dockerfile.base", "Dockerfile.toolkit", "basic-docker-test.sh"),
-        src_dir=(ROOT / "docker"),
-        dst_dir=stagging_path,
-    )
-
-    change_directory_to(stagging_path)
 
     environment: Dict[str, str] = {
         "http_proxy": environ.get("http_proxy", ""),
@@ -110,31 +100,85 @@ def setup_docker(args):
         "USER": getuser(),
     }
 
-    # check docker connectivity
-    client = docker_checks(environment)
+    if args.check_only:
+        try:
+            print("CHECKING DOCKER FUNCTIONALITY ...")
+            client = docker.from_env()
+        except DockerException as docker_exception:
+            print("Docker Error\n", docker_exception, file=stderr)
+            exit(1)
+
+        print("CHECKING IN-DOCKER CONNECTIVITY ...")
+        docker_checks(client, environment)
+        exit(0)
+
+    ROOT = args.hekit_root_dir
+
+    # set_stagging_area
+    stagging_path = Path(ROOT) / "__stagging__"
+    stagging_path.mkdir(exist_ok=True)
+
+    parts_tar_gz = stagging_path / "parts.tar.gz"
+    if not parts_tar_gz.exists():
+        print("MAKING PARTS.TAR.GZ ...")
+        archive_and_compress(
+            parts_tar_gz,
+            (
+                FileToTar("docker/runners.sh", dst="/runners.sh"),
+                "he-samples/cmake",
+                "he-samples/CMakeLists.txt",
+                "he-samples/examples/",
+                "he-samples/sample-kernels/",
+                "hekit",
+                "kit/",
+                "recipes/",
+                "default.config",
+            ),
+            root=ROOT,
+        )
+
+    copyfiles(
+        ("Dockerfile.base", "Dockerfile.toolkit"),
+        src_dir=(ROOT / "docker"),
+        dst_dir=stagging_path,
+    )
+
+    change_directory_to(stagging_path)
+
+    try:
+        print("CHECKING DOCKER FUNCTIONALITY ...")
+        client = docker.from_env()
+    except DockerException as docker_exception:
+        print("Docker Error\n", docker_exception, file=stderr)
+        exit(1)
 
     # build base image
     # build toolkit image
     build_toolkit_images(client, args, environment)
 
 
-def docker_checks(environment):
-
-    try:
-        print("CHECKING DOCKER FUNCTIONALITY...")
-        client = docker.from_env()
-    except DockerException as docker_exception:
-        print("Docker Error\n", docker_exception, file=stderr)
-        exit(1)
-
-    print("CHECKING IN-DOCKER CONNECTIVITY...")
-    check_conn = client.containers.run(
-        volumes=[f"{getcwd()}/basic-docker-test.sh:/basic-docker-test.sh"],
+def run_script_in_container(
+    containers, environment, scriptpath, image="ubuntu:20.04"
+) -> int:
+    scriptsrc = Path(scriptpath).expanduser().resolve()
+    print(f"ssrc and sdst {scriptsrc}, {scriptdst}")
+    return containers.run(
+        volumes=[f"{scriptsrc}:/script"],
         detach=True,
         stream=True,
         environment=environment,
-        image="ubuntu:20.04",
-        command="/bin/bash ./basic-docker-test.sh",
+        image=image,
+        command="/bin/bash /script",
+    )
+
+
+def docker_checks(client, environment) -> None:
+
+    check_conn = run_script_in_container(
+        # Assume we are in he-toolkit directory
+        client.containers,
+        environment,
+        "./docker/basic-docker-test.sh",
     )
     for stream in check_conn.logs(stream=True):
         print("[CONTAINER]", stream)
@@ -147,24 +191,48 @@ def docker_checks(environment):
         )
         exit(1)
 
-    return client
+
+def image_exists(client, image_name: str) -> bool:
+    """Returns True if image already exists otherwise False"""
+    images = client.images.list(name=image_name)
+    return len(images) > 0
 
 
-def build_toolkit_images(client, args, environment):
+def check_build(image):
+    """For use as a decorator.
+    Forward the build info, but check for error in build.
+    If found raise exception"""
+    # TODO atm, only forwards
 
-    constants = Constants()
+    return image
+
+
+@check_build
+def build_image(client, dockerfile: str, tag: str, buildargs):
+    """Build images as we like them built"""
+    return client.api.build(
+        dockerfile=dockerfile,
+        rm=True,  # remove intermediates
+        buildargs=buildargs,
+        tag=tag,
+        path=getcwd(),
+    )
+
+
+def build_toolkit_images(client, args, environment) -> None:
 
     if args.id:
         USERID, GROUPID = args.id, args.id
     elif os_name() == "Darwin":
         # Check for Mac OS
-        print("WARNING: Detected Mac OSX ... ")
+        print("WARNING: DETECTED MAC OS ... ")
         USERID, GROUPID = 1000, 1000
     else:
         USERID, GROUPID = getuid(), getgid()
 
     print(f"WARNING: Setting UID/GID of docker user to '{USERID}/{GROUPID}'")
 
+    # TODO could buildargs and environment be single obj?
     buildargs: Dict[str, str] = {
         **environment,
         "UID": str(USERID),
@@ -173,33 +241,31 @@ def build_toolkit_images(client, args, environment):
     }
 
     print("buildargs", buildargs)
+    constants = Constants()
 
-    images: list = client.images.list(name=constants.base_label)
-    if len(images) == 0:
-        print("BUILDING BASE DOCKERFILE...")
-        response = client.api.build(
+    if not image_exists(client, constants.base_label):
+        print("BUILDING BASE DOCKERFILE ...")
+        response = build_image(
+            client,
             dockerfile="Dockerfile.base",
-            rm=True,  # remove intermediates
-            buildargs=buildargs,
             tag=constants.base_label,
-            path=getcwd(),
+            buildargs=buildargs,
         )
         for out in response:
             print(out)
 
-    images: list = client.images.list(name=constants.derived_label)
-    if len(images) == 0:
+    if not image_exists(client, constants.derived_label):
         print("BUILDING TOOLKIT DOCKERFILE...")
-        response = client.api.build(
+        response = build_image(
+            client,
             dockerfile="Dockerfile.toolkit",
-            rm=True,  # remove intermediates
-            buildargs=buildargs,
             tag=constants.derived_label,
-            path=getcwd(),
+            buildargs=buildargs,
         )
         for out in response:
             print(out)
 
     print("RUN DOCKER CONTAINER...")
     # Python cannot relinquish control therefore advise
-    print("Run container with\n", f"docker run -it {constants.derived_label}")
+    print("Run container with")
+    print(f"docker run -it {constants.derived_label}")

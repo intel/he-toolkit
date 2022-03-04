@@ -10,6 +10,9 @@ ARG UNAME
 
 LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
 
+# ADD copies and untars for us
+ADD parts.tar.gz /
+
 RUN mv /he-samples /home/$UNAME
 
 # Switch user to $UNAME

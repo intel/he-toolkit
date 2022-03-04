@@ -82,8 +82,4 @@ RUN groupadd -g $GID $UNAME && \
     useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
     echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-COPY parts.tar.gz /
-
-RUN tar -zxvf parts.tar.gz
-
 CMD cd /home/$UNAME && /bin/bash

@@ -14,7 +14,15 @@ from command_remove import remove_components
 from command_list import list_components
 from command_install import install_components
 from command_check_deps import check_dependencies
-from command_docker_build import setup_docker
+
+try:
+    """docker-py is optional and definitely won't be used form within a docker container"""
+    from command_docker_build import setup_docker
+except ImportError:
+
+    def setup_docker():
+        print("This command is disabled. To enable it install the docker-py dependency")
+        print("  pip install docker-py")
 
 
 def parse_cmdline():
@@ -93,6 +101,9 @@ def parse_cmdline():
         "docker-build", description="docker build of the toolkit"
     )
     parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
+    parser_docker_build.add_argument(
+        "--check-only", action="store_true", help="only run container for proxy checks"
+    )
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"
     )
