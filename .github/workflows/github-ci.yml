@@ -55,7 +55,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
       - run: pip3 install pytest
@@ -72,7 +71,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
       - name: Init hekit
@@ -170,7 +168,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
       - run: pip3 install pytest
@@ -187,7 +184,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: he-toolkit
     steps:
       - uses: actions/checkout@v2
       - name: Init hekit
