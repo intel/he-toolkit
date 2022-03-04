@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from shutil import rmtree
+from os import listdir
 
 
 def remove_components(args):
@@ -13,6 +14,11 @@ def remove_components(args):
         path = f"{repo_location}/{component}/{instance}"
         rmtree(path)
         print(f"Instance '{instance}' of component '{component}' successfully removed")
+
+        # Delete the component directory if all its instances were deleted
+        path = f"{repo_location}/{component}"
+        if len(listdir(path)) == 0:
+            rmtree(path)
 
     except FileNotFoundError:
         print(

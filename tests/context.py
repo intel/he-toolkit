@@ -14,3 +14,4 @@ import spec
 import tsort
 import hekit
 import config
+import tab_completion

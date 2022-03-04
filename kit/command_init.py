@@ -5,6 +5,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as compare_files
+from importlib import util
 
 
 class Tags:
@@ -12,9 +13,19 @@ class Tags:
     end_tag: str = "# <<<  hekit end  <<<\n"
 
 
+def check_file_exist(path: str):
+    """Return the expanded path of a file if it exists,
+    otherwise it rises an exception"""
+    path_file = Path(path).expanduser().resolve()
+    if not path_file.exists():
+        raise FileNotFoundError(path_file)
+
+    return path_file
+
+
 def create_backup(path: str, ext: str = ".hekit.bak") -> str:
-    """"""
-    path = Path(path).expanduser().resolve()
+    """Create a backup of the input file"""
+    path = check_file_exist(path)
     backup = path.with_suffix(ext)
     copyfile(path, backup)
     # Sanity check - we really need to guarantee we copied the file
@@ -25,7 +36,7 @@ def create_backup(path: str, ext: str = ".hekit.bak") -> str:
 
 def remove_from_rc(path: str) -> None:
     """Remove hekit section"""
-    path = Path(path).expanduser().resolve()
+    path = check_file_exist(path)
     with path.open() as f:
         lines = f.readlines()  # slurp
 
@@ -52,13 +63,10 @@ def remove_from_rc(path: str) -> None:
 
 def append_to_rc(path: str, content: str) -> None:
     """Config bash init file to know about hekit"""
-    shell_rc_path = Path(path).expanduser().resolve()
+    shell_rc_path = check_file_exist(path)
 
     if content[:-1] != "\n":  # add newline if not there
         content += "\n"
-
-    if not shell_rc_path.exists():
-        raise FileNotFoundError(shell_rc_path)
 
     # newline to not accidentally mix with existing content
     # newline to end as courtesy to space our code
@@ -68,19 +76,43 @@ def append_to_rc(path: str, content: str) -> None:
             rc_file.write(line)
 
 
-def init_hekit(args):
-    """Initialize hekit"""
+def get_rc_file():
+    """ Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
+        # if bash_profile file does not exist, try bashrc file
         rc_file = "~/.bash_profile"
+        if not Path(rc_file).expanduser().resolve().exists():
+            rc_file = "~/.bashrc"
     elif active_shell_path == "zsh":
         rc_file = ""
     else:
         raise ValueError(f"Unknown shell '{active_shell_path}'")
 
+    return rc_file
+
+
+def init_hekit(args):
+    """Initialize hekit"""
+    rc_file = get_rc_file()
     rc_backup_file = create_backup(rc_file)
     print("Backup file created at", rc_backup_file)
     remove_from_rc(rc_file)
-    append_to_rc(rc_file, content=f"PATH={args.hekit_root_dir}:$PATH")
+
+    # New lines that will be added in the rc_file:
+    # 1-Add hekit directory as part of environmental variable PATH
+    path_line = f"PATH={args.hekit_root_dir}:$PATH"
+    # 2-Register hekit link and hekit.py script to enable tab completion
+    eval_lines = "\n".join(
+        [
+            f"if [ -n $(type -p register-python-argcomplete) ]; then",
+            f'  eval "$(register-python-argcomplete hekit.py)"',
+            f'  eval "$(register-python-argcomplete hekit)"',
+            f"fi",
+        ]
+    )
+    content = "\n".join([path_line, eval_lines])
+
+    append_to_rc(rc_file, content)
     print("Please, source your shell init file as follows,\n" f"source {rc_file}")

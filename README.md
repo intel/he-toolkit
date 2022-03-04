@@ -18,6 +18,7 @@ applications.
   - [Dependencies](#dependencies)
   - [Instructions](#instructions)
     - [Docker Build (Recommended)](#docker-build-recommended)
+    - [Hekit Build](#hekit-build)
     - [Native Build](#native-build)
   - [Kernels](#kernels)
     - [Sample kernels](#sample-kernels)
@@ -65,6 +66,11 @@ The **recommended** method is to use the Docker build and installation which
 builds the toolkit in its entirety including all HE libraries in a
 self-contained docker container running Ubuntu 20.04. See [here](docker) for a
 detailed description on the usage and components of this build.
+
+### Hekit Build
+The [kit](kit) tool is a collection of python scripts that can be used by the
+user to set-up easily the required environment to evaluate homomorphic encryption
+technology. See the [README](kit/README.md) for instructions.
 
 ### Native Build
 Alternatively, one can build the toolkit natively using the following commands
@@ -114,7 +120,6 @@ pre-installed HEXL. See
 [here](https://github.com/homenc/HElib/blob/master/INSTALL.md) for more
 details.
 
-
 ## Kernels
 Located in [he-samples](he-samples) is a collection of software components
 built on Microsoft SEAL and PALISADE comprising sample kernels for operations
@@ -127,7 +132,7 @@ technology for different use cases.
 ### Sample kernels
 The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
 requiring multiple API calls such as Matrix Multiplication and Vector Dot
-Product. See the [README](he-samples/sample-kernels/README.md) for
+Product.  See the [README](he-samples/sample-kernels/README.md) for
 instructions.
 
 ### Test sample kernels
@@ -193,7 +198,7 @@ The Intel contributors to this project, sorted by last name, are
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
-  - Dennis Calderon Vega
+  - [Dennis Calderon Vega](https://www.linkedin.com/in/dennis-calderon-996840a9/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)

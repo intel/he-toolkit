@@ -6,7 +6,6 @@ from os import getcwd, chdir
 
 from .context import hekit, config, command_list, command_remove, command_install
 from hekit import main
-from config import load_config
 from command_list import list_components
 from command_remove import remove_components
 from command_install import install_components
