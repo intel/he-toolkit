@@ -104,15 +104,13 @@ def init_hekit(args):
     # 1-Add hekit directory as part of environmental variable PATH
     path_line = f"PATH={args.hekit_root_dir}:$PATH"
     # 2-Register hekit link and hekit.py script to enable tab completion
-    eval_lines = "\n".join(
-        [
-            f"if [ -n $(type -p register-python-argcomplete) ]; then",
-            f'  eval "$(register-python-argcomplete hekit.py)"',
-            f'  eval "$(register-python-argcomplete hekit)"',
-            f"fi",
-        ]
+    eval_lines = (
+        "if [ -n $(type -p register-python-argcomplete) ]; then\n",
+        '  eval "$(register-python-argcomplete hekit.py hekit)"\n',
+        "fi\n",
     )
     content = "\n".join([path_line, eval_lines])
 
     append_to_rc(rc_file, content)
-    print("Please, source your shell init file as follows,\n" f"source {rc_file}")
+    print("Please, source your shell init file as follows")
+    print(f"source {rc_file}")

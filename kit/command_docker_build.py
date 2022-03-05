@@ -5,6 +5,7 @@ import docker
 from docker.errors import DockerException
 
 import tarfile
+from re import search
 from sys import stderr
 from getpass import getuser
 from os import geteuid, getcwd, getuid, getgid, environ, chdir as change_directory_to
@@ -53,24 +54,6 @@ http_proxy and https_proxy are set.
         exit(1)
 
 
-@dataclass
-class FileToTar:
-    """class to facilitate passing optional info to tarfile"""
-
-    src: str
-    dst: str = None
-
-    def __post_init__(self):
-        """If a FileToTar is passed in use its settings and
-        set dst to equal src if not previously given"""
-        if isinstance(self.src, FileToTar):
-            other = self.src
-            self.src, self.dst = other.src, other.dst
-
-        if self.dst is None:
-            self.dst = self.src
-
-
 def archive_and_compress(
     name: str, filepaths: Iterable[str], root: Optional[str] = None
 ) -> None:
@@ -78,11 +61,19 @@ def archive_and_compress(
     root = Path(root if root else ".")
     try:
         with tarfile.open(name, "x:gz") as tar:
-            for filepath in map(FileToTar, filepaths):
-                tar.add(root / filepath.src, arcname=filepath.dst)
+            for filepath in filepaths:
+                tar.add(root / filepath, arcname=filepath)
     except FileExistsError as file_exists_error:
-        print(f"Error: The file '{root / filepath.src}' already exists")
+        print(f"Error: The file '{root / filepath}' already exists")
         # then continue
+
+
+def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
+    """"""
+    for filename in file_list:
+        # filter out comment lines and empty lines
+        if not search("^\s*#|^\s*$", filename):
+            yield filename.rstrip()
 
 
 def setup_docker(args):
@@ -121,20 +112,8 @@ def setup_docker(args):
     parts_tar_gz = stagging_path / "parts.tar.gz"
     if not parts_tar_gz.exists():
         print("MAKING PARTS.TAR.GZ ...")
-        archive_and_compress(
-            parts_tar_gz,
-            (
-                FileToTar("docker/runners.sh", dst="/runners.sh"),
-                "he-samples/cmake",
-                "he-samples/examples/",
-                "he-samples/sample-kernels/",
-                "hekit",
-                "kit/",
-                "recipes/",
-                "default.config",
-            ),
-            root=ROOT,
-        )
+        with open(ROOT / "docker/which_files.txt") as f:
+            archive_and_compress(parts_tar_gz, filter_file_list(f), root=ROOT)
 
     copyfiles(
         ("Dockerfile.base", "Dockerfile.toolkit"),
