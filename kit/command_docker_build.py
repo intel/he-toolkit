@@ -5,6 +5,8 @@ import docker
 from docker.errors import DockerException
 
 import tarfile
+import json
+from pprint import pprint
 from re import search
 from sys import stderr
 from getpass import getuser
@@ -14,6 +16,14 @@ from pathlib import Path
 from dataclasses import dataclass
 from shutil import copyfile
 from typing import Dict, Iterable, Optional
+
+
+class DockerBuildError(Exception):
+    """Exception for something wrong with the docker build."""
+
+    def __init__(self, message, error):
+        super().__init__(message)
+        self.error = error
 
 
 @dataclass(frozen=True, init=False)
@@ -132,15 +142,32 @@ def setup_docker(args):
 
     constants = Constants()
 
-    buildargs = create_buildargs(environment)
+    buildargs = create_buildargs(environment, args.id)
     print(
-        f"WARNING: Setting UID/GID of docker user to '{buildargs.USERID}/{buildargs.GROUPID}'"
+        f"WARNING: Setting UID/GID of docker user to '{buildargs['UID']}/{buildargs['GID']}'"
     )
 
-    # build base image
-    build_base_image(client, constants.base_label, buildargs)
-    # build toolkit image
-    build_toolkit_image(client, constants.derived_label, buildargs)
+    if not image_exists(client, constants.base_label):
+        print("BUILDING BASE DOCKERFILE ...")
+        response = build_image(
+            client,
+            dockerfile="Dockerfile.base",
+            tag=constants.base_label,
+            buildargs=buildargs,
+        )
+        for out in response:
+            print(out, file=outstream)
+
+    if not image_exists(client, constants.derived_label):
+        print("BUILDING TOOLKIT DOCKERFILE...")
+        response = build_image(
+            client,
+            dockerfile="Dockerfile.toolkit",
+            tag=constants.derived_label,
+            buildargs=buildargs,
+        )
+        for out in response:
+            print(out)
 
     print("RUN DOCKER CONTAINER...")
     # Python cannot relinquish control therefore advise
@@ -193,9 +220,18 @@ def check_build(image):
     """For use as a decorator.
     Forward the build info, but check for error in build.
     If found raise exception"""
-    # TODO atm, only forwards
 
-    return image
+    def inner(*args, **kwargs):
+        responses = image(*args, **kwargs)
+        for response in map(json.loads, responses):
+            if "stream" in response.keys():
+                yield response["stream"]
+            elif "error" in response.keys():
+                raise DockerBuildError("Docker build failed", response)
+            else:
+                raise DockerBuildError("Unrecognised stream property", response)
+
+    return inner
 
 
 @check_build
@@ -210,9 +246,9 @@ def build_image(client, dockerfile: str, tag: str, buildargs):
     )
 
 
-def create_buildargs(environment: Dict[str, str]) -> Dict[str, str]:
-    if args.id:
-        USERID, GROUPID = args.id, args.id
+def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
+    if ID:
+        USERID, GROUPID = ID, ID
     elif os_name() == "Darwin":
         # Check for Mac OS
         print("WARNING: DETECTED MAC OS ... ")
@@ -227,26 +263,3 @@ def create_buildargs(environment: Dict[str, str]) -> Dict[str, str]:
         "GID": str(GROUPID),
         "UNAME": environment["USER"],
     }
-
-
-def build_base_image(client, base_label, buildargs) -> None:
-    if not image_exists(client, base_label):
-        print("BUILDING BASE DOCKERFILE ...")
-        response = build_image(
-            client, dockerfile="Dockerfile.base", tag=base_label, buildargs=buildargs
-        )
-        for out in response:
-            print(out)
-
-
-def build_toolkit_image(client, derived_label, buildargs) -> None:
-    if not image_exists(client, derived_label):
-        print("BUILDING TOOLKIT DOCKERFILE...")
-        response = build_image(
-            client,
-            dockerfile="Dockerfile.toolkit",
-            tag=derived_label,
-            buildargs=buildargs,
-        )
-        for out in response:
-            print(out)
