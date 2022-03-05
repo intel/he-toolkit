@@ -130,9 +130,22 @@ def setup_docker(args):
         print("Docker Error\n", docker_exception, file=stderr)
         exit(1)
 
+    constants = Constants()
+
+    buildargs = create_buildargs(environment)
+    print(
+        f"WARNING: Setting UID/GID of docker user to '{buildargs.USERID}/{buildargs.GROUPID}'"
+    )
+
     # build base image
+    build_base_image(client, constants.base_label, buildargs)
     # build toolkit image
-    build_toolkit_images(client, args, environment)
+    build_toolkit_image(client, constants.derived_label, buildargs)
+
+    print("RUN DOCKER CONTAINER...")
+    # Python cannot relinquish control therefore advise
+    print("Run container with")
+    print(f"docker run -it {constants.derived_label}")
 
 
 def run_script_in_container(
@@ -197,8 +210,7 @@ def build_image(client, dockerfile: str, tag: str, buildargs):
     )
 
 
-def build_toolkit_images(client, args, environment) -> None:
-
+def create_buildargs(environment: Dict[str, str]) -> Dict[str, str]:
     if args.id:
         USERID, GROUPID = args.id, args.id
     elif os_name() == "Darwin":
@@ -208,42 +220,33 @@ def build_toolkit_images(client, args, environment) -> None:
     else:
         USERID, GROUPID = getuid(), getgid()
 
-    print(f"WARNING: Setting UID/GID of docker user to '{USERID}/{GROUPID}'")
-
     # TODO could buildargs and environment be single obj?
-    buildargs: Dict[str, str] = {
+    return {
         **environment,
         "UID": str(USERID),
         "GID": str(GROUPID),
         "UNAME": environment["USER"],
     }
 
-    print("buildargs", buildargs)
-    constants = Constants()
 
-    if not image_exists(client, constants.base_label):
+def build_base_image(client, base_label, buildargs) -> None:
+    if not image_exists(client, base_label):
         print("BUILDING BASE DOCKERFILE ...")
         response = build_image(
-            client,
-            dockerfile="Dockerfile.base",
-            tag=constants.base_label,
-            buildargs=buildargs,
+            client, dockerfile="Dockerfile.base", tag=base_label, buildargs=buildargs
         )
         for out in response:
             print(out)
 
-    if not image_exists(client, constants.derived_label):
+
+def build_toolkit_image(client, derived_label, buildargs) -> None:
+    if not image_exists(client, derived_label):
         print("BUILDING TOOLKIT DOCKERFILE...")
         response = build_image(
             client,
             dockerfile="Dockerfile.toolkit",
-            tag=constants.derived_label,
+            tag=derived_label,
             buildargs=buildargs,
         )
         for out in response:
             print(out)
-
-    print("RUN DOCKER CONTAINER...")
-    # Python cannot relinquish control therefore advise
-    print("Run container with")
-    print(f"docker run -it {constants.derived_label}")
