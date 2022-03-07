@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""Provides utility function to archive and compress directories and files"""
+
 import tarfile
 from pathlib import Path
 from typing import Iterable

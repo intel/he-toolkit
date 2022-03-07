@@ -114,8 +114,15 @@ def parse_cmdline():
     parser_docker_build.add_argument(
         "--clean", action="store_true", help="delete stagging"
     )
+    # FIXME should this be its own subcommand?
     parser_docker_build.add_argument(
         "--check-only", action="store_true", help="only run container for proxy checks"
+    )
+    # In future change to accept several strings
+    parser_docker_build.add_argument(
+        "--enable",
+        type=str,
+        help="add/enable extra features in docker build of toolkit",
     )
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"

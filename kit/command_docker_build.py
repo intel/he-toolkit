@@ -21,6 +21,7 @@ class Constants:
     # TODO remove hardcoding of version
     base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
     derived_label: str = f"{getuser()}/ubuntu_he_test"
+    vscode_label: str = f"{getuser()}/ubuntu_he_vscode"
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
@@ -184,7 +185,22 @@ def setup_docker(args):
         for out in response:
             print(out)
 
+    if args.enable == "vscode" and not docker_tools.image_exists(
+        constants.vscode_label
+    ):
+        print("BUILDING VSCODE DOCKERFILE ...")
+        response = docker_tools.build_image(
+            dockerfile="Dockerfile.vscode",
+            tag=constants.vscode_label,
+            buildargs=buildargs,
+        )
+        for out in response:
+            print(out)
+
     print("RUN DOCKER CONTAINER ...")
-    # Python cannot relinquish control therefore advise
     print("Run container with")
-    print(f"docker run -it {constants.derived_label}")
+    if args.enable == "vscode":
+        print(f"docker run -d -p 8888:8888 {constants.vscode_label}")
+        print("Then to open vscode navigate to localhost:8888 in your chosen browser")
+    else:
+        print(f"docker run -it {constants.derived_label}")
