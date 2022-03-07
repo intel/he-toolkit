@@ -71,6 +71,7 @@ jobs:
         run: pytest tests/
 
   build-and-test-toolkit:
+    if: ${{ false }} # FIXME: Disable this job for now
     name: Build, test and run HE Toolkit
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
