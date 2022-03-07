@@ -15,6 +15,33 @@ def read_spec(component, instance, attrib, repo_location):
     return inst_obj[attrib]
 
 
+def fill_user_string_dict(d):
+    """Returns a dict with str values written by the user.
+    NB. Only works for flat str value dict."""
+
+    def fill_user_str(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = findall(r"(!(.*?)!)", s)
+            if not symbols:
+                return s
+
+            new_s = s
+            for symbol, k in symbols:
+                message = f"Please enter {k}: "
+                value = input(message)
+                new_s = new_s.replace(symbol, value)
+
+            return new_s
+        elif isinstance(s, list):
+            return [fill_user_str(e) for e in s]
+        else:
+            # Not str or list
+            return s
+
+    return {k: fill_user_str(v) for k, v in d.items()}
+
+
 def fill_self_ref_string_dict(d, repo_path):
     """Returns a dict with str values.
     NB. Only works for flat str value dict."""
@@ -113,6 +140,9 @@ class Spec:
         """Expansion operations"""
         if rloc != "":
             instance_name = instance["name"]
+            # substitution from user must come before rloc expansion
+            # to avoid asking for the same data several times
+            instance = fill_user_string_dict(instance)
             instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
         # Substitution must come after rloc expansion
         instance = fill_self_ref_string_dict(instance, rloc)
