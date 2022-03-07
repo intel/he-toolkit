@@ -98,9 +98,8 @@ jobs:
       # TODO: Remove this once there is !! substitution
       - name: Modify paths in recipe files
         run: |
-          echo ${GITHUB_WORKSPACE}
-          sed -i -e "s/\(src_dir = \"\)~\/git\/public-toolkit\/v2-prep\/he-toolkit/\1${GITHUB_WORKSPACE}/g" recipes/examples.toml
-          sed -i -e "s/\(src_dir = \"\)~\/git\/public-toolkit\/v2-prep\/he-toolkit/\1${GITHUB_WORKSPACE}/g" recipes/sample-kernels.toml
+          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/examples.toml
+          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/sample-kernels.toml
 
       - name: Build examples
         run: ./hekit build recipes/examples.toml
@@ -208,8 +207,9 @@ jobs:
       # TODO: Remove this once there is !! substitution
       - name: Modify paths in recipe files
         run: |
-          sed -i -e "s/\(src_dir = \"\)~\/git\/public-toolkit\/v2-prep\/he-toolkit/\1${GITHUB_WORKSPACE}/g" recipes/examples.toml
-          sed -i -e "s/\(src_dir = \"\)~\/git\/public-toolkit\/v2-prep\/he-toolkit/\1${GITHUB_WORKSPACE}/g" recipes/sample-kernels.toml
+          echo ${GITHUB_WORKSPACE}
+          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/examples.toml
+          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/sample-kernels.toml
 
       - name: Build examples
         run: ./hekit build recipes/examples.toml
