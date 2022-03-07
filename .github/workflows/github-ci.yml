@@ -20,7 +20,7 @@ env:
   SEAL_VER: 3.7.2
   PALISADE_VER: 1.11.6
   HELIB_VER: 2.2.1
-  HEKIT_DIR: ~/.hekit/components
+  HEKIT_DIR: $HOME/.hekit/components
   HEXL_DIR: ${HEKIT_DIR}/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
   SEAL_DIR: ${HEKIT_DIR}/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
   PALISADE_DIR: ${HEKIT_DIR}/palisade/v${PALISADE_VER}/install/lib/Palisade
@@ -217,15 +217,14 @@ jobs:
           ./hekit build recipes/examples.toml
           ./hekit list
 
-          #- name: Run PSI example
-          #  run: |
-          #    echo "apple\nBanana\ncat" > client.set
-          #    ${{ env.PSI_DIR }}/build/psi client.set --server ${{ env.PSI_DIR }}/build/datasets/fruits.set | grep -B 1 "apple"
+      - name: Run PSI example
+        run: |
+          echo "apple\nBanana\ncat" > client.set
+          ${{ env.PSI_DIR }}/build/psi client.set --server ${{ env.PSI_DIR }}/build/datasets/fruits.set | grep -B 1 "apple"
 
       - name: Run Secure Query example
         run: |
-          #cd ${{ env.QUERY_DIR }}/build
-          cd $HOME/.hekit/components/examples/secure-query/build
+          cd ${{ env.QUERY_DIR }}/build
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
