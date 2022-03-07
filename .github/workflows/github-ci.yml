@@ -213,12 +213,14 @@ jobs:
           sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/sample-kernels.toml
 
       - name: Build examples
-        run: ./hekit build recipes/examples.toml
-
-      - name: Run PSI example
         run: |
-          echo "apple\nBanana\ncat" > client.set
-          ${{ env.PSI_DIR }}/build/psi client.set --server ${{ env.PSI_DIR }}/build/datasets/fruits.set | grep -B 1 "apple"
+          ./hekit build recipes/examples.toml
+          ./hekit list
+
+          #- name: Run PSI example
+          #  run: |
+          #    echo "apple\nBanana\ncat" > client.set
+          #    ${{ env.PSI_DIR }}/build/psi client.set --server ${{ env.PSI_DIR }}/build/datasets/fruits.set | grep -B 1 "apple"
 
       - name: Run Secure Query example
         run: |
@@ -231,7 +233,9 @@ jobs:
         run: ${{ env.LR_DIR }}/build/lr_test --compare --data lrtest_large | grep "All match!"
 
       - name: Build sample kernels
-        run: ./hekit build recipes/sample-kernels.toml
+        run: |
+          ./hekit build recipes/sample-kernels.toml
+          ./hekit list
 
       - name: Run unit tests
         run: |
