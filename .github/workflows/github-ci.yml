@@ -20,18 +20,13 @@ env:
   SEAL_VER: 3.7.2
   PALISADE_VER: 1.11.6
   HELIB_VER: 2.2.1
-  HEKIT_DIR: $HOME/.hekit/components
+  HEKIT_DIR: ~/.hekit/components
   HEXL_DIR: ${HEKIT_DIR}/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
   SEAL_DIR: ${HEKIT_DIR}/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
   PALISADE_DIR: ${HEKIT_DIR}/palisade/v${PALISADE_VER}/install/lib/Palisade
   HELIB_DIR: ${HEKIT_DIR}/helib/v${HELIB_VER}/share/cmake/helib
   GSL_DIR: ${HEKIT_DIR}/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
   ZSTD_DIR: ${HEKIT_DIR}/zstd/v1.4.5/install/lib/cmake/zstd
-  PSI_DIR: ${HEKIT_DIR}/examples/psi
-  QUERY_DIR: ${HEKIT_DIR}/examples/secure-query
-  LR_DIR: ${HEKIT_DIR}/examples/logistic-regression
-  SEAL_KERNELS_DIR: ${HEKIT_DIR}/sample-kernels/seal
-  PALISADE_KERNELS_DIR: ${HEKIT_DIR/sample-kernels/palisade
 
 ################
 # Ubuntu 20.04 #
@@ -216,35 +211,42 @@ jobs:
         run: |
           ./hekit build recipes/examples.toml
           ./hekit list
+          echo "EXAMPLES_DIR=$HOME/.hekit/components/examples >> $GITHUB_ENV"
+          echo "PSI_BUILD_DIR=$EXAMPLES_DIR/psi/build >> $GITHUB_ENV"
+          echo "QUERY_BUILD_DIR=$EXAMPLES_DIR/secure-query/build >> $GITHUB_ENV"
+          echo "LR_BUILD_DIR=$EXAMPLES_DIR/logitic-regression/build >> $GITHUB_ENV"
 
       - name: Run PSI example
         run: |
           echo "apple\nBanana\ncat" > client.set
-          ${{ env.PSI_DIR }}/build/psi client.set --server ${{ env.PSI_DIR }}/build/datasets/fruits.set | grep -B 1 "apple"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
 
       - name: Run Secure Query example
         run: |
-          cd ${{ env.QUERY_DIR }}/build
+          cd ${QUERY_BUILD_DIR}
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
       - name: Run LR example
-        run: ${{ env.LR_DIR }}/build/lr_test --compare --data lrtest_large | grep "All match!"
+        run: ${LR_BUILD_DIR}/lr_test --compare --data lrtest_large | grep "All match!"
 
       - name: Build sample kernels
         run: |
           ./hekit build recipes/sample-kernels.toml
           ./hekit list
+          echo "KERNELS_DIR=$HOME/.hekit/components/sample-kernels >> $GITHUB_ENV"
+          echo "SEAL_KERNELS_BUILD_DIR=$KERNELS_DIR/seal/build >> $GITHUB_ENV"
+          echo "PALISADE_KERNELS_BUILD_DIR=$KERNELS_DIR/palisade/build >> $GITHUB_ENV"
 
       - name: Run unit tests
         run: |
-          ${{ env.SEAL_KERNELS_DIR }}/build/test/unit-test
-          ${{ env.PALISADE_KERNELS_DIR }}/build test/unit-test
+          ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
+          ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${{ env.PALISADE_KERNELS_DIR }}/build/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
@@ -254,7 +256,7 @@ jobs:
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${{ env.SEAL_KERNELS_DIR }}/build/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
