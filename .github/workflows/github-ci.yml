@@ -224,7 +224,8 @@ jobs:
 
       - name: Run Secure Query example
         run: |
-          cd ${{ env.QUERY_DIR }}/build
+          #cd ${{ env.QUERY_DIR }}/build
+          cd $HOME/.hekit/components/examples/secure-query/build
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
