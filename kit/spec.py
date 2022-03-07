@@ -139,10 +139,10 @@ class Spec:
     def _expand_instance(component: str, instance: dict, rloc: str):
         """Expansion operations"""
         if rloc != "":
-            instance_name = instance["name"]
             # substitution from user must come before rloc expansion
             # to avoid asking for the same data several times
             instance = fill_user_string_dict(instance)
+            instance_name = instance["name"]
             instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
         # Substitution must come after rloc expansion
         instance = fill_self_ref_string_dict(instance, rloc)

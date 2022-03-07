@@ -109,6 +109,32 @@ def test_add_component_repo_location_to_inits_and_exports():
     assert spec["export_something"] == f"{rloc}/hexl/bob/blu/bob/blu"
 
 
+def test_user_substitutions_are_expanded(mocker):
+    """Components are built in a component repo, a dedicated space
+    that can be changed"""
+    exp_name = "bob"
+    mock_input = mocker.patch("spec.input")
+    mock_input.return_value = exp_name
+
+    expected = {
+        "hexl": [
+            {
+                "name": "!name!",
+                "something": "bla/%name%/bla",
+                "init_something": "bla/%name%/bla",
+                "export_something": "blu/%name%/blu",
+            }
+        ]
+    }
+    rloc = "/home/some_user"
+    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc)
+    mock_input.assert_called_once()
+    assert spec["something"] == f"bla/{exp_name}/bla"
+    # rloc/component/instance
+    assert spec["init_something"] == f"{rloc}/hexl/{exp_name}/bla/{exp_name}/bla"
+    assert spec["export_something"] == f"{rloc}/hexl/{exp_name}/blu/{exp_name}/blu"
+
+
 @pytest.fixture
 def create_basic_spec_file(tmp_path):
     """Create TOML file of one instance"""
