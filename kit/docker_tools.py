@@ -5,7 +5,6 @@ import docker
 from docker.errors import DockerException
 
 import json
-from os import getcwd
 from sys import stderr
 from pathlib import Path
 from typing import Dict
@@ -19,13 +18,13 @@ class DockerBuildError(Exception):
         self.error = error
 
 
-def check_build(image):
+def check_build(func):
     """For use as a decorator.
     Forward the build info, but check for error in build.
     If found raise exception"""
 
     def inner(*args, **kwargs):
-        responses = image(*args, **kwargs)
+        responses = func(*args, **kwargs)
         for response in map(json.loads, responses):
             if "stream" in response.keys():
                 yield response["stream"]
@@ -37,29 +36,22 @@ def check_build(image):
     return inner
 
 
+def simple_container_logs(func):
+    """Simplifies a container output to give logs and when exahsted
+    provide the status code on exit"""
+
+    def inner(*args, **kwargs):
+        container = func(*args, **kwargs)
+        for log in container.logs(stream=True):
+            yield log, None
+        yield None, container.wait()["StatusCode"]
+
+    return inner
+
+
 class DockerTools:
     def __init__(self):
         self.client = docker.from_env()
-
-    # TODO remove printing out to command file
-    # Or move this method back into command file
-    def checks(self, environment) -> None:
-
-        check_conn = self.run_script_in_container(
-            # Assume we are in he-toolkit directory
-            environment,
-            "./docker/basic-docker-test.sh",
-        )
-        for stream in check_conn.logs(stream=True):
-            print("[CONTAINER]", stream)
-        status_code = check_conn.wait()["StatusCode"]
-        if status_code != 0:
-            print(
-                "In-docker connectivity failing.",
-                f"Return code was '{status_code}'",
-                file=stderr,
-            )
-            exit(1)
 
     def image_exists(self, image_name: str) -> bool:
         """Returns True if image already exists otherwise False"""
@@ -74,9 +66,10 @@ class DockerTools:
             rm=True,  # remove intermediates
             buildargs=buildargs,
             tag=tag,
-            path=getcwd(),
+            path=".",
         )
 
+    @simple_container_logs
     def run_script_in_container(
         self, environment, scriptpath, image="ubuntu:20.04"
     ) -> int:

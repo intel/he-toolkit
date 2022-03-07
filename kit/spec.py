@@ -1,9 +1,10 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from toml import load, dump
 from re import findall
 from dataclasses import dataclass
+
+from toml import dump, load
 
 
 def read_spec(component, instance, attrib, repo_location):

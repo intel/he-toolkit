@@ -17,6 +17,7 @@ docker/README.md
 docker/basic-docker-test.sh
 docker/runners.sh
 docker/vscode.sh
+docker/which_files.txt
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
 he-samples/cmake/gtest.cmake
@@ -107,6 +108,7 @@ he-samples/sample-kernels/test/test_util.h
 hekit
 kit/README.md
 kit/__init__.py
+kit/archive.py
 kit/command_check_deps.py
 kit/command_docker_build.py
 kit/command_init.py
@@ -115,6 +117,7 @@ kit/command_list.py
 kit/command_remove.py
 kit/component_builder.py
 kit/config.py
+kit/docker_tools.py
 kit/hekit.py
 kit/spec.py
 kit/tab_completion.py

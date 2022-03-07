@@ -84,6 +84,7 @@ def setup_docker(args):
     """Build the docker for the toolkit"""
 
     ROOT = args.hekit_root_dir
+    docker_filepaths = ROOT / "docker"
 
     # set_stagging_area
     stagging_path = Path(ROOT) / "__stagging__"
@@ -115,22 +116,37 @@ def setup_docker(args):
             exit(1)
 
         print("CHECKING IN-DOCKER CONNECTIVITY ...")
-        docker_tools.checks(environment)
+        # proxy checks
+        check_conn = docker_tools.run_script_in_container(
+            # Assume we are in he-toolkit directory
+            environment,
+            docker_filepaths / "basic-docker-test.sh",
+        )
+        # refactor for better output
+        for log, status_code in check_conn:
+            print("[CONTAINER]", log)
+        if status_code != 0:
+            print(
+                "In-docker connectivity failing.",
+                f"Return code was '{status_code}'",
+                file=stderr,
+            )
+            exit(1)
         exit(0)
 
-    parts_tar_gz = stagging_path / "parts.tar.gz"
-    if not parts_tar_gz.exists():
-        print("MAKING PARTS.TAR.GZ ...")
-        with open(ROOT / "docker/which_files.txt") as f:
+    toolkit_tar_gz = stagging_path / "toolkit.tar.gz"
+    if not toolkit_tar_gz.exists():
+        print("MAKING TOOLKIT.TAR.GZ ...")
+        with open(docker_filepaths / "which_files.txt") as f:
             try:
-                archive_and_compress(parts_tar_gz, filter_file_list(f), root=ROOT)
+                archive_and_compress(toolkit_tar_gz, filter_file_list(f), root=ROOT)
             except FileExistsError as file_exists_error:
                 print(f"Error: The file '{root / filepath}' already exists")
                 # then continue
 
     copyfiles(
         ("Dockerfile.base", "Dockerfile.toolkit"),
-        src_dir=(ROOT / "docker"),
+        src_dir=docker_filepaths,
         dst_dir=stagging_path,
     )
 
