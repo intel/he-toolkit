@@ -230,7 +230,9 @@ jobs:
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
       - name: Run LR example
-        run: ${LR_BUILD_DIR}/lr_test --compare --data lrtest_large | grep "All match!"
+        run: |
+          cd ${LR_BUILD_DIR}
+          ./lr_test --compare --data lrtest_large | grep "All match!"
 
       - name: Build sample kernels
         run: |
