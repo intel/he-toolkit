@@ -217,9 +217,9 @@ jobs:
 
       - name: Run PSI example
         run: |
-          echo -e "apple\nBanana\ncat\nRa\nCalifornia" > client.set
+          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
-          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ra"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
 
       - name: Run Secure Query example
