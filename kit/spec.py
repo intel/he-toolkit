@@ -15,9 +15,25 @@ def read_spec(component, instance, attrib, repo_location):
     return inst_obj[attrib]
 
 
-def fill_user_string_dict(d):
+def get_recipe_arg_dict(recipe_arg: str):
+    """Returns a dictionary filled with recipe_arg string"""
+    recipe_arg_dict = {}
+
+    if isinstance(recipe_arg, str):
+        for value in recipe_arg.strip().split(","):
+            key_value = value.split("=")
+            if len(key_value) == 2:
+                recipe_arg_dict[key_value[0]] = key_value[1]
+            else:
+                raise InvalidSpec(f"Wrong format for {key_value}. Expected key=value")
+
+    return recipe_arg_dict
+
+
+def fill_user_string_dict(d, recipe_arg):
     """Returns a dict with str values written by the user.
     NB. Only works for flat str value dict."""
+    recipe_arg_dict = get_recipe_arg_dict(recipe_arg)
 
     def fill_user_str(s):
         """s can be a string or a list of strings"""
@@ -28,8 +44,12 @@ def fill_user_string_dict(d):
 
             new_s = s
             for symbol, k in symbols:
-                message = f"Please enter {k}: "
-                value = input(message)
+                value = ""
+                if k in recipe_arg_dict:
+                    value = recipe_arg_dict[k]
+                else:
+                    message = f"Please enter {k}: "
+                    value = input(message)
                 new_s = new_s.replace(symbol, value)
 
             return new_s
@@ -127,20 +147,20 @@ class Spec:
 
     # Factory from TOML file
     @classmethod
-    def from_toml_file(cls, filename: str, rloc: str):
+    def from_toml_file(cls, filename: str, rloc: str, recipe_arg: str):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
         toml_specs = load(filename)
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
-                yield cls.from_instance_spec(component, instance_spec, rloc)
+                yield cls.from_instance_spec(component, instance_spec, rloc, recipe_arg)
 
     @staticmethod
-    def _expand_instance(component: str, instance: dict, rloc: str):
+    def _expand_instance(component: str, instance: dict, rloc: str, recipe_arg: str):
         """Expansion operations"""
         # substitution from user must come before rloc expansion
         # to avoid asking for the same data several times
-        instance = fill_user_string_dict(instance)
+        instance = fill_user_string_dict(instance, recipe_arg)
         if rloc != "":
             instance_name = instance["name"]
             instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
@@ -168,11 +188,15 @@ class Spec:
 
     # Factory given parsed TOML python dict
     @classmethod
-    def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str):
+    def from_instance_spec(
+        cls, component: str, instance_spec: dict, rloc: str, recipe_arg: str
+    ):
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        expanded_instance_spec = cls._expand_instance(component, instance_spec, rloc)
+        expanded_instance_spec = cls._expand_instance(
+            component, instance_spec, rloc, recipe_arg
+        )
         return cls(component, expanded_instance_spec, rloc)
 
     def to_toml_dict(self):

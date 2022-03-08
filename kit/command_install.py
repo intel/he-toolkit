@@ -25,8 +25,9 @@ def _stages(upto_stage: str):
 
 def install_components(args):
     """Install command"""
-    repo_location = args.config.repo_location
-    components = components_to_build_from(args.recipe_file, repo_location)
+    components = components_to_build_from(
+        args.recipe_file, args.config.repo_location, args.recipe_arg
+    )
 
     the_stages = _stages(args.upto_stage)
 

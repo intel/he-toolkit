@@ -54,6 +54,11 @@ def parse_cmdline():
     parser_install.add_argument(
         "recipe_file", metavar="recipe-file", type=str, help="TOML file for install"
     )
+    parser_install.add_argument(
+        "--recipe_arg",
+        type=str,
+        help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
+    )
     parser_install.set_defaults(fn=install_components, upto_stage="install")
 
     # create the parser for the "build" command
@@ -61,12 +66,22 @@ def parse_cmdline():
     parser_build.add_argument(
         "recipe_file", metavar="recipe-file", type=str, help="TOML file for build"
     )
+    parser_build.add_argument(
+        "--recipe_arg",
+        type=str,
+        help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
+    )
     parser_build.set_defaults(fn=install_components, upto_stage="build")
 
     # create the parser for the "fetch" command
     parser_fetch = subparsers.add_parser("fetch", description="fetches components")
     parser_fetch.add_argument(
         "recipe_file", metavar="recipe-file", type=str, help="TOML file for fetch"
+    )
+    parser_fetch.add_argument(
+        "--recipe_arg",
+        type=str,
+        help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
     parser_fetch.set_defaults(fn=install_components, upto_stage="fetch")
 

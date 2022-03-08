@@ -60,9 +60,9 @@ def try_run(spec: dict, attrib: str):
         return True, 0
 
 
-def components_to_build_from(filename: str, repo_location: str):
+def components_to_build_from(filename: str, repo_location: str, recipe_arg: str):
     """Returns a generator that yields a component to be built and/or installed"""
-    specs = Spec.from_toml_file(filename, repo_location)
+    specs = Spec.from_toml_file(filename, repo_location, recipe_arg)
     return (ComponentBuilder(spec) for spec in specs)
 
 

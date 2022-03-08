@@ -79,7 +79,7 @@ def test_run_without_arguments(mocker):
 
 def test_components_to_build_from_(mocker, specs_data):
     """Arrange"""
-    exp_filename, exp_repo, exp_spec = specs_data
+    exp_filename, exp_repo, exp_recipe_arg, exp_spec = specs_data
     mock_Spec = mocker.patch("component_builder.Spec.from_toml_file")
     mock_Spec.return_value = exp_spec
     mock_ComponentBuilder = mocker.patch.object(
@@ -88,13 +88,13 @@ def test_components_to_build_from_(mocker, specs_data):
     mock_ComponentBuilder.return_value = None
 
     """Act"""
-    act_result = components_to_build_from(exp_filename, exp_repo)
+    act_result = components_to_build_from(exp_filename, exp_repo, exp_recipe_arg)
 
     """Assert"""
     for result in act_result:
         assert type(result) == component_builder.ComponentBuilder
     assert mock_ComponentBuilder.call_count == 3
-    mock_Spec.assert_called_with(exp_filename, exp_repo)
+    mock_Spec.assert_called_with(exp_filename, exp_repo, exp_recipe_arg)
 
 
 """Utilities used by the tests"""
@@ -137,6 +137,7 @@ def Popen_failure():
 def specs_data():
     filename = "hexl"
     repo = "/home/test/components"
+    recipe_arg = "version=2.3.1"
 
     class Spec:
         def __init__(self):
@@ -157,4 +158,4 @@ def specs_data():
             }
             self.repo_location = repo
 
-    return filename, repo, [Spec(), Spec(), Spec()]
+    return filename, repo, recipe_arg, [Spec(), Spec(), Spec()]

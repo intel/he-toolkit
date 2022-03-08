@@ -164,6 +164,7 @@ class MockArgs:
         self.recipe_file = "tests/config/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        self.recipe_arg = f"name={self.instance}"
 
 
 @pytest.fixture
