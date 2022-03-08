@@ -217,7 +217,7 @@ jobs:
 
       - name: Run PSI example
         run: |
-          echo "apple\nBanana\ncat" > client.set
+          echo -e "apple\nBanana\ncat" > client.set
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
 
       - name: Run Secure Query example
