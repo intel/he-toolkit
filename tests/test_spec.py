@@ -109,6 +109,29 @@ def test_add_component_repo_location_to_inits_and_exports():
     assert spec["export_something"] == f"{rloc}/hexl/bob/blu/bob/blu"
 
 
+def test_basic_user_substitutions_are_expanded(mocker):
+    """The attribs need to have substitution keys expanded"""
+    # Purposely put 'another' before 'something'.
+    exp_version = "2.3.6"
+    mock_input = mocker.patch("spec.input")
+    mock_input.return_value = exp_version
+
+    expected = {
+        "hexl": [
+            {
+                "version": "!version!",
+                "name": "bob%version%",
+                "another": "start-%init_something%-end",
+                "init_something": "bla/%name%/bla",
+            }
+        ]
+    }
+    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+    assert spec["name"] == f"bob{exp_version}"
+    assert spec["init_something"] == f"bla/bob{exp_version}/bla"
+    assert spec["another"] == f"start-bla/bob{exp_version}/bla-end"
+
+
 def test_user_substitutions_are_expanded(mocker):
     """Components are built in a component repo, a dedicated space
     that can be changed"""
