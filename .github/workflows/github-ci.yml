@@ -211,10 +211,9 @@ jobs:
         run: |
           ./hekit build recipes/examples.toml
           ./hekit list
-          echo "EXAMPLES_DIR=$HOME/.hekit/components/examples" >> $GITHUB_ENV
-          echo "PSI_BUILD_DIR=$EXAMPLES_DIR/psi/build" >> $GITHUB_ENV
-          echo "QUERY_BUILD_DIR=$EXAMPLES_DIR/secure-query/build" >> $GITHUB_ENV
-          echo "LR_BUILD_DIR=$EXAMPLES_DIR/logitic-regression/build" >> $GITHUB_ENV
+          echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
+          echo "QUERY_BUILD_DIR=$HOME/.hekit/components/example/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HOME/.hekit/components/example/logitic-regression/build" >> $GITHUB_ENV
 
       - name: Run PSI example
         run: |
@@ -235,9 +234,8 @@ jobs:
         run: |
           ./hekit build recipes/sample-kernels.toml
           ./hekit list
-          echo "KERNELS_DIR=$HOME/.hekit/components/sample-kernels" >> $GITHUB_ENV
-          echo "SEAL_KERNELS_BUILD_DIR=$KERNELS_DIR/seal/build" >> $GITHUB_ENV
-          echo "PALISADE_KERNELS_BUILD_DIR=$KERNELS_DIR/palisade/build" >> $GITHUB_ENV
+          echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run unit tests
         run: |
