@@ -16,9 +16,10 @@ def read_spec(component, instance, attrib, repo_location):
 
 
 def get_recipe_arg_dict(recipe_arg: str):
-    """Returns a dictionary filled with recipe_arg string"""
+    """Returns a dictionary filled with recipe_arg values"""
     recipe_arg_dict = {}
 
+    # Fill the dict if the user defined recipe_arg
     if isinstance(recipe_arg, str):
         for value in recipe_arg.strip().split(","):
             key_value = value.split("=")
@@ -30,10 +31,9 @@ def get_recipe_arg_dict(recipe_arg: str):
     return recipe_arg_dict
 
 
-def fill_user_string_dict(d, recipe_arg):
+def fill_user_string_dict(d, recipe_arg_dict: dict):
     """Returns a dict with str values written by the user.
     NB. Only works for flat str value dict."""
-    recipe_arg_dict = get_recipe_arg_dict(recipe_arg)
 
     def fill_user_str(s):
         """s can be a string or a list of strings"""
@@ -145,22 +145,28 @@ class Spec:
         "post_install",
     }
 
+    recipe_arg_dict = {}
+
     # Factory from TOML file
     @classmethod
     def from_toml_file(cls, filename: str, rloc: str, recipe_arg: str):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
+
+        # Dictionary filled with recipe_arg values
+        cls.recipe_arg_dict = get_recipe_arg_dict(recipe_arg)
+
         toml_specs = load(filename)
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
-                yield cls.from_instance_spec(component, instance_spec, rloc, recipe_arg)
+                yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod
-    def _expand_instance(component: str, instance: dict, rloc: str, recipe_arg: str):
+    def _expand_instance(component: str, instance: dict, rloc: str):
         """Expansion operations"""
         # substitution from user must come before rloc expansion
         # to avoid asking for the same data several times
-        instance = fill_user_string_dict(instance, recipe_arg)
+        instance = fill_user_string_dict(instance, Spec.recipe_arg_dict)
         if rloc != "":
             instance_name = instance["name"]
             instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
@@ -188,15 +194,11 @@ class Spec:
 
     # Factory given parsed TOML python dict
     @classmethod
-    def from_instance_spec(
-        cls, component: str, instance_spec: dict, rloc: str, recipe_arg: str
-    ):
+    def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str):
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        expanded_instance_spec = cls._expand_instance(
-            component, instance_spec, rloc, recipe_arg
-        )
+        expanded_instance_spec = cls._expand_instance(component, instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)
 
     def to_toml_dict(self):
