@@ -91,16 +91,9 @@ jobs:
           ./hekit install recipes/default.toml
           ./hekit list
 
-      # TODO: Remove this once there is !! substitution
-      - name: Modify paths in recipe files
-        run: |
-          echo ${GITHUB_WORKSPACE}
-          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/examples.toml
-          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/sample-kernels.toml
-
       - name: Build examples
         run: |
-          ./hekit build recipes/examples.toml
+          ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit list
           echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
           echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
@@ -127,7 +120,7 @@ jobs:
 
       - name: Build sample kernels
         run: |
-          ./hekit build recipes/sample-kernels.toml
+          ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit list
           echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
           echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
@@ -214,16 +207,9 @@ jobs:
           ./hekit install recipes/default.toml
           ./hekit list
 
-      # TODO: Remove this once there is !! substitution
-      - name: Modify paths in recipe files
-        run: |
-          echo ${GITHUB_WORKSPACE}
-          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/examples.toml
-          sed -i -e "s,\(src_dir = \"\)~/git/public-toolkit/v2-prep,\1${GITHUB_WORKSPACE},g" recipes/sample-kernels.toml
-
       - name: Build examples
         run: |
-          ./hekit build recipes/examples.toml
+          ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit list
           echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
           echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
@@ -250,7 +236,7 @@ jobs:
 
       - name: Build sample kernels
         run: |
-          ./hekit build recipes/sample-kernels.toml
+          ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit list
           echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
           echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
