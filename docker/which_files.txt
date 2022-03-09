@@ -16,7 +16,6 @@ docker/IDE-Config/settings.json
 docker/README.md
 docker/basic-docker-test.sh
 docker/runners.sh
-docker/vscode.sh
 docker/which_files.txt
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
