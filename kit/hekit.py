@@ -30,7 +30,7 @@ def get_recipe_arg_dict(recipe_arg: str):
 
     for pair in recipe_arg.replace(" ", "").split(","):
         key_value = pair.split("=")
-        print(key_value)
+
         if len(key_value) != 2:
             raise ValueError(f"Wrong format for {key_value}. Expected key=value")
 

@@ -16,7 +16,7 @@ def read_spec(component, instance, attrib, repo_location):
     return inst_obj[attrib]
 
 
-def fill_user_string_dict(d, recipe_arg_dict: dict):
+def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
     """Returns a dict with str values written by the user.
     NB. Only works for flat str value dict."""
 
