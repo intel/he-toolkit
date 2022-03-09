@@ -19,19 +19,9 @@ def test_transform_spec_to_toml_dict():
 def test_parse_basic_spec(create_basic_spec_file):
     """The most basic test to check that a spec object is created"""
     filepath, expected_dict = create_basic_spec_file
-    spec_generator = Spec.from_toml_file(filepath, rloc="", recipe_arg=None)
+    spec_generator = Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={})
     spec = next(spec_generator)
     assert spec.to_toml_dict() == expected_dict
-
-
-def test_parse_basic_spec_recipe_arg_wong(create_basic_spec_file):
-    """The recipe_arg attribute must have a valid format."""
-    key_value = "version"
-    filepath, expected_dict = create_basic_spec_file
-    with pytest.raises(InvalidSpec) as execinfo:
-        spec_generator = Spec.from_toml_file(filepath, rloc="", recipe_arg=key_value)
-        spec = next(spec_generator)
-    assert "Wrong format for ['version']. Expected key=value" == str(execinfo.value)
 
 
 def test_when_name_not_given():

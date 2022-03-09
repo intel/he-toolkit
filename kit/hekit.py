@@ -19,6 +19,27 @@ from tab_completion import (
 )
 
 
+def get_recipe_arg_dict(recipe_arg: str):
+    """Returns a dictionary filled with recipe_arg values"""
+    # Case when recipe_arg was not defined
+    if not isinstance(recipe_arg, str):
+        return {}
+
+    # Fill the dict if the user defined recipe_arg
+    recipe_arg_dict = {}
+
+    for pair in recipe_arg.replace(" ", "").split(","):
+        key_value = pair.split("=")
+        print(key_value)
+        if len(key_value) != 2:
+            raise ValueError(f"Wrong format for {key_value}. Expected key=value")
+
+        key, value = key_value
+        recipe_arg_dict[key] = value
+
+    return recipe_arg_dict
+
+
 def parse_cmdline():
     """Parse commandline commands"""
     # create the top-level parser
@@ -56,7 +77,7 @@ def parse_cmdline():
     )
     parser_install.add_argument(
         "--recipe_arg",
-        type=str,
+        type=get_recipe_arg_dict,
         help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
     parser_install.set_defaults(fn=install_components, upto_stage="install")
@@ -68,7 +89,7 @@ def parse_cmdline():
     )
     parser_build.add_argument(
         "--recipe_arg",
-        type=str,
+        type=get_recipe_arg_dict,
         help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
     parser_build.set_defaults(fn=install_components, upto_stage="build")
@@ -80,7 +101,7 @@ def parse_cmdline():
     )
     parser_fetch.add_argument(
         "--recipe_arg",
-        type=str,
+        type=get_recipe_arg_dict,
         help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
     parser_fetch.set_defaults(fn=install_components, upto_stage="fetch")

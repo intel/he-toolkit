@@ -5,7 +5,7 @@ import pytest
 from os import getcwd, chdir
 
 from .context import hekit, config, command_list, command_remove, command_install, spec
-from hekit import main
+from hekit import main, get_recipe_arg_dict
 from command_list import list_components
 from command_remove import remove_components
 from command_install import install_components
@@ -152,6 +152,69 @@ def test_command_remove_after_install(mocker, args_remove, restore_pwd):
     mock_print.assert_called_with(arg1)
 
 
+def test_get_recipe_arg_dict_correct_format():
+    """Arrange"""
+    act_arg = "key1=value1, key2=value2, key3=value3"
+    exc_dict = {"key1": "value1", "key2": "value2", "key3": "value3"}
+
+    """Act"""
+    act_dict = get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert exc_dict == act_dict
+
+
+def test_get_recipe_arg_dict_duplicated_key():
+    """Arrange"""
+    act_arg = "key1=value1, key1=value2, key3=value3"
+    exc_dict = {"key1": "value2", "key3": "value3"}
+
+    """Act"""
+    act_dict = get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert exc_dict == act_dict
+
+
+def test_get_recipe_arg_dict_with_None():
+    """Arrange"""
+    act_arg = None
+    exc_dict = {}
+
+    """Act"""
+    act_dict = get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert exc_dict == act_dict
+
+
+def test_get_recipe_arg_dict_wrong_format():
+    """Arrange"""
+    act_arg = "key1=value1, key1=value2, key3"
+
+    """Act"""
+    with pytest.raises(ValueError) as execinfo:
+        get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert "Wrong format for ['key3']. Expected key=value" == str(execinfo.value)
+
+
+def test_get_recipe_arg_dict_missing_comma():
+    """Arrange"""
+    act_arg = "key1=value1 key2=value2, key3"
+
+    """Act"""
+    with pytest.raises(ValueError) as execinfo:
+        get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert (
+        "Wrong format for ['key1', 'value1key2', 'value2']. Expected key=value"
+        == str(execinfo.value)
+    )
+
+
 """Utilities used by the tests"""
 
 
@@ -164,7 +227,7 @@ class MockArgs:
         self.recipe_file = "tests/config/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
-        self.recipe_arg = f"name={self.instance}"
+        self.recipe_arg = {"name": self.instance}
 
 
 @pytest.fixture

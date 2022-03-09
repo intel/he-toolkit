@@ -137,7 +137,7 @@ def Popen_failure():
 def specs_data():
     filename = "hexl"
     repo = "/home/test/components"
-    recipe_arg = "version=2.3.1"
+    recipe_arg = {"version": "2.3.1"}
 
     class Spec:
         def __init__(self):

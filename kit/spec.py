@@ -4,6 +4,7 @@
 from toml import load, dump
 from re import findall
 from dataclasses import dataclass
+from typing import Dict
 
 
 def read_spec(component, instance, attrib, repo_location):
@@ -13,22 +14,6 @@ def read_spec(component, instance, attrib, repo_location):
     # There should only be one instance
     inst_obj = spec[component][0]
     return inst_obj[attrib]
-
-
-def get_recipe_arg_dict(recipe_arg: str):
-    """Returns a dictionary filled with recipe_arg values"""
-    recipe_arg_dict = {}
-
-    # Fill the dict if the user defined recipe_arg
-    if isinstance(recipe_arg, str):
-        for value in recipe_arg.strip().split(","):
-            key_value = value.split("=")
-            if len(key_value) == 2:
-                recipe_arg_dict[key_value[0]] = key_value[1]
-            else:
-                raise InvalidSpec(f"Wrong format for {key_value}. Expected key=value")
-
-    return recipe_arg_dict
 
 
 def fill_user_string_dict(d, recipe_arg_dict: dict):
@@ -149,12 +134,12 @@ class Spec:
 
     # Factory from TOML file
     @classmethod
-    def from_toml_file(cls, filename: str, rloc: str, recipe_arg: str):
+    def from_toml_file(cls, filename: str, rloc: str, recipe_arg_dict: Dict[str, str]):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
 
         # Dictionary filled with recipe_arg values
-        cls.recipe_arg_dict = get_recipe_arg_dict(recipe_arg)
+        cls.recipe_arg_dict = recipe_arg_dict
 
         toml_specs = load(filename)
         for component, instance_specs in toml_specs.items():
