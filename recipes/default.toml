@@ -92,7 +92,6 @@ install = "cmake --install %init_install_dir%"
 # Dependencies
 ntl = "ntl/11.5.1"
 hexl = "hexl/1.2.3"
-ntl = "ntl/11.5.1"
 
 
 [[seal]]
