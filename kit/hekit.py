@@ -19,6 +19,23 @@ from tab_completion import (
 )
 
 
+def get_recipe_arg_dict(recipe_arg: str):
+    """Returns a dictionary filled with recipe_arg values"""
+    # Fill the dict if the user defined recipe_arg
+    recipe_arg_dict = {}
+
+    for pair in recipe_arg.replace(" ", "").split(","):
+        key_value = pair.split("=")
+
+        if len(key_value) != 2:
+            raise ValueError(f"Wrong format for {key_value}. Expected key=value")
+
+        key, value = key_value
+        recipe_arg_dict[key] = value
+
+    return recipe_arg_dict
+
+
 def parse_cmdline():
     """Parse commandline commands"""
     # create the top-level parser
@@ -54,6 +71,12 @@ def parse_cmdline():
     parser_install.add_argument(
         "recipe_file", metavar="recipe-file", type=str, help="TOML file for install"
     )
+    parser_install.add_argument(
+        "--recipe_arg",
+        default={},
+        type=get_recipe_arg_dict,
+        help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
+    )
     parser_install.set_defaults(fn=install_components, upto_stage="install")
 
     # create the parser for the "build" command
@@ -61,12 +84,24 @@ def parse_cmdline():
     parser_build.add_argument(
         "recipe_file", metavar="recipe-file", type=str, help="TOML file for build"
     )
+    parser_build.add_argument(
+        "--recipe_arg",
+        default={},
+        type=get_recipe_arg_dict,
+        help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
+    )
     parser_build.set_defaults(fn=install_components, upto_stage="build")
 
     # create the parser for the "fetch" command
     parser_fetch = subparsers.add_parser("fetch", description="fetches components")
     parser_fetch.add_argument(
         "recipe_file", metavar="recipe-file", type=str, help="TOML file for fetch"
+    )
+    parser_fetch.add_argument(
+        "--recipe_arg",
+        default={},
+        type=get_recipe_arg_dict,
+        help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
     parser_fetch.set_defaults(fn=install_components, upto_stage="fetch")
 

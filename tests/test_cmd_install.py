@@ -18,7 +18,9 @@ def test_install_components_all_unskipped(mocker, args, unskipped_components):
 
     """Assert"""
     mock_component.assert_called_once()
-    mock_component.assert_called_with(args.recipe_file, args.config.repo_location)
+    mock_component.assert_called_with(
+        args.recipe_file, args.config.repo_location, args.recipe_arg
+    )
     assert 3 == mock_chain_run.call_count
 
 
@@ -34,7 +36,9 @@ def test_install_components_all_skipped(mocker, args, skipped_components):
 
     """Assert"""
     mock_component.assert_called_once()
-    mock_component.assert_called_with(args.recipe_file, args.config.repo_location)
+    mock_component.assert_called_with(
+        args.recipe_file, args.config.repo_location, args.recipe_arg
+    )
     mock_chain_run.assert_not_called()
 
 
@@ -50,7 +54,9 @@ def test_install_components_one_unskipped(mocker, args, one_unskipped_component)
 
     """Assert"""
     mock_component.assert_called_once()
-    mock_component.assert_called_with(args.recipe_file, args.config.repo_location)
+    mock_component.assert_called_with(
+        args.recipe_file, args.config.repo_location, args.recipe_arg
+    )
     mock_chain_run.assert_called_once()
 
 
@@ -111,6 +117,7 @@ class MockArgs:
         self.config = MockArgs.Config()
         self.recipe_file = "file_test"
         self.upto_stage = "install"
+        self.recipe_arg = {"version": "1.2.3"}
 
 
 class MockComponent:

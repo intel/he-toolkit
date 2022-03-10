@@ -81,6 +81,7 @@ class MockArgs:
         self.recipe_file = "tests/config/test_two_instances.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        self.recipe_arg = {}
 
 
 @pytest.fixture
@@ -90,19 +91,23 @@ def comp_data():
 
 @pytest.fixture
 def args_tab(comp_data):
-    return MockArgs(None, comp_data["comp"], "", "")
+    return MockArgs(None, comp_data["comp"], instance="", upto_stage="")
 
 
 @pytest.fixture
 def args_fetch(comp_data):
-    return MockArgs(install_components, "", "", "fetch")
+    return MockArgs(install_components, component="", instance="", upto_stage="fetch")
 
 
 @pytest.fixture
 def args_remove_v1(comp_data):
-    return MockArgs(remove_components, comp_data["comp"], comp_data["inst_v1"], "")
+    return MockArgs(
+        remove_components, comp_data["comp"], comp_data["inst_v1"], upto_stage=""
+    )
 
 
 @pytest.fixture
 def args_remove_v2(comp_data):
-    return MockArgs(remove_components, comp_data["comp"], comp_data["inst_v2"], "")
+    return MockArgs(
+        remove_components, comp_data["comp"], comp_data["inst_v2"], upto_stage=""
+    )

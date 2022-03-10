@@ -4,8 +4,8 @@
 import pytest
 from os import getcwd, chdir
 
-from .context import hekit, config, command_list, command_remove, command_install
-from hekit import main
+from .context import hekit, config, command_list, command_remove, command_install, spec
+from hekit import main, get_recipe_arg_dict
 from command_list import list_components
 from command_remove import remove_components
 from command_install import install_components
@@ -20,6 +20,8 @@ def test_command_install_fetch(mocker, args_fetch):
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("command_install.print")
+    mock_input = mocker.patch("spec.input")
+    mock_input.return_value = args_fetch.instance
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
@@ -27,7 +29,8 @@ def test_command_install_fetch(mocker, args_fetch):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1)
+    mock_print.assert_called_with(arg1)
+    mock_input.assert_called_once()
 
 
 def test_command_list_after_fetch(mocker, args_list, restore_pwd):
@@ -45,7 +48,7 @@ def test_command_list_after_fetch(mocker, args_list, restore_pwd):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1, arg2, arg34, arg34)
+    mock_print.assert_called_with(arg1, arg2, arg34, arg34)
 
 
 def test_command_install_build(mocker, args_build):
@@ -53,6 +56,8 @@ def test_command_install_build(mocker, args_build):
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_build, ""
     mock_print = mocker.patch("command_install.print")
+    mock_input = mocker.patch("spec.input")
+    mock_input.return_value = args_build.instance
 
     arg1 = f"{args_build.component}/{args_build.instance}"
 
@@ -60,7 +65,8 @@ def test_command_install_build(mocker, args_build):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1)
+    mock_print.assert_called_with(arg1)
+    mock_input.assert_called_once()
 
 
 def test_command_list_after_build(mocker, args_list, restore_pwd):
@@ -78,7 +84,7 @@ def test_command_list_after_build(mocker, args_list, restore_pwd):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1, arg23, arg23, arg4)
+    mock_print.assert_called_with(arg1, arg23, arg23, arg4)
 
 
 def test_command_remove_after_build(mocker, args_remove, restore_pwd):
@@ -93,7 +99,7 @@ def test_command_remove_after_build(mocker, args_remove, restore_pwd):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1)
+    mock_print.assert_called_with(arg1)
 
 
 def test_command_install_execution(mocker, args_install):
@@ -101,6 +107,8 @@ def test_command_install_execution(mocker, args_install):
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_install, ""
     mock_print = mocker.patch("command_install.print")
+    mock_input = mocker.patch("spec.input")
+    mock_input.return_value = args_install.instance
 
     arg1 = f"{args_install.component}/{args_install.instance}"
 
@@ -108,7 +116,8 @@ def test_command_install_execution(mocker, args_install):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1)
+    mock_print.assert_called_with(arg1)
+    mock_input.assert_called_once()
 
 
 def test_command_list_after_install(mocker, args_list, restore_pwd):
@@ -125,7 +134,7 @@ def test_command_list_after_install(mocker, args_list, restore_pwd):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1, arg234, arg234, arg234)
+    mock_print.assert_called_with(arg1, arg234, arg234, arg234)
 
 
 def test_command_remove_after_install(mocker, args_remove, restore_pwd):
@@ -140,7 +149,58 @@ def test_command_remove_after_install(mocker, args_remove, restore_pwd):
     main()
 
     """Assert"""
-    mock_print.assert_any_call(arg1)
+    mock_print.assert_called_with(arg1)
+
+
+def test_get_recipe_arg_dict_correct_format():
+    """Arrange"""
+    act_arg = "key1=value1, key2=value2, key3=value3"
+    exc_dict = {"key1": "value1", "key2": "value2", "key3": "value3"}
+
+    """Act"""
+    act_dict = get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert exc_dict == act_dict
+
+
+def test_get_recipe_arg_dict_duplicated_key():
+    """Arrange"""
+    act_arg = "key1=value1, key1=value2, key3=value3"
+    exc_dict = {"key1": "value2", "key3": "value3"}
+
+    """Act"""
+    act_dict = get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert exc_dict == act_dict
+
+
+def test_get_recipe_arg_dict_wrong_format():
+    """Arrange"""
+    act_arg = "key1=value1, key1=value2, key3"
+
+    """Act"""
+    with pytest.raises(ValueError) as execinfo:
+        get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert "Wrong format for ['key3']. Expected key=value" == str(execinfo.value)
+
+
+def test_get_recipe_arg_dict_missing_comma():
+    """Arrange"""
+    act_arg = "key1=value1 key2=value2, key3"
+
+    """Act"""
+    with pytest.raises(ValueError) as execinfo:
+        get_recipe_arg_dict(act_arg)
+
+    """assert"""
+    assert (
+        "Wrong format for ['key1', 'value1key2', 'value2']. Expected key=value"
+        == str(execinfo.value)
+    )
 
 
 """Utilities used by the tests"""
@@ -155,6 +215,7 @@ class MockArgs:
         self.recipe_file = "tests/config/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        self.recipe_arg = {"name": self.instance}
 
 
 @pytest.fixture

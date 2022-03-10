@@ -9,6 +9,7 @@ from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
+from typing import Dict
 
 
 class BuildError(Exception):
@@ -60,9 +61,11 @@ def try_run(spec: dict, attrib: str):
         return True, 0
 
 
-def components_to_build_from(filename: str, repo_location: str):
+def components_to_build_from(
+    filename: str, repo_location: str, recipe_arg_dict: Dict[str, str]
+):
     """Returns a generator that yields a component to be built and/or installed"""
-    specs = Spec.from_toml_file(filename, repo_location)
+    specs = Spec.from_toml_file(filename, repo_location, recipe_arg_dict)
     return (ComponentBuilder(spec) for spec in specs)
 
 

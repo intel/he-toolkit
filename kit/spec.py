@@ -4,6 +4,7 @@
 from toml import load, dump
 from re import findall
 from dataclasses import dataclass
+from typing import Dict
 
 
 def read_spec(component, instance, attrib, repo_location):
@@ -13,6 +14,37 @@ def read_spec(component, instance, attrib, repo_location):
     # There should only be one instance
     inst_obj = spec[component][0]
     return inst_obj[attrib]
+
+
+def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
+    """Returns a dict with str values written by the user.
+    NB. Only works for flat str value dict."""
+
+    def fill_user_str(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = findall(r"(!(.*?)!)", s)
+            if not symbols:
+                return s
+
+            new_s = s
+            for symbol, k in symbols:
+                value = ""
+                if k in recipe_arg_dict:
+                    value = recipe_arg_dict[k]
+                else:
+                    message = f"Please enter {k}: "
+                    value = input(message)
+                new_s = new_s.replace(symbol, value)
+
+            return new_s
+        elif isinstance(s, list):
+            return [fill_user_str(e) for e in s]
+        else:
+            # Not str or list
+            return s
+
+    return {k: fill_user_str(v) for k, v in d.items()}
 
 
 def fill_self_ref_string_dict(d, repo_path):
@@ -98,11 +130,17 @@ class Spec:
         "post_install",
     }
 
+    recipe_arg_dict = {}
+
     # Factory from TOML file
     @classmethod
-    def from_toml_file(cls, filename: str, rloc: str):
+    def from_toml_file(cls, filename: str, rloc: str, recipe_arg_dict: Dict[str, str]):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
+
+        # Dictionary filled with recipe_arg values
+        cls.recipe_arg_dict = recipe_arg_dict
+
         toml_specs = load(filename)
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
@@ -111,6 +149,9 @@ class Spec:
     @staticmethod
     def _expand_instance(component: str, instance: dict, rloc: str):
         """Expansion operations"""
+        # substitution from user must come before rloc expansion
+        # to avoid asking for the same data several times
+        instance = fill_user_string_dict(instance, Spec.recipe_arg_dict)
         if rloc != "":
             instance_name = instance["name"]
             instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
