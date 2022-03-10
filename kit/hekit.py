@@ -21,10 +21,6 @@ from tab_completion import (
 
 def get_recipe_arg_dict(recipe_arg: str):
     """Returns a dictionary filled with recipe_arg values"""
-    # Case when recipe_arg was not defined
-    if not isinstance(recipe_arg, str):
-        return {}
-
     # Fill the dict if the user defined recipe_arg
     recipe_arg_dict = {}
 

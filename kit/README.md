@@ -7,7 +7,7 @@ The hekit can be executed using the following options:
 cd kit
 ./hekit.py [--config CONFIG_FILE] {init, list, install, build, fetch, remove}
 ```
-where the options and the inputs files are explained in the following sections.
+where the options and the input files are explained in the following sections.
 
 ### Flags
 
@@ -64,13 +64,13 @@ hexl = "hexl/1.2.3"
 The [recipes](../recipes/) directory contains the usual files to set up a working enviroment.
 
 #### Back Sustitution in a recipe file
-The specfic value of a pair (key = "value") in the recipe file can be reuse in others sections of the file. That can be achieved using the following options:
+The specfic value of a pair (key = "value") in a recipe file can be reused in other sections of the file. That can be achieved using the following expressions:
 
-%key% : it will be replaced with the string value of a key defined in the same section.
+%key% : it will be replaced with the string value of a key that was defined in the same section.
 
 $key$ : similar as %key%, but it must be used when replacing dependecies.
 
-!key! : it will be replaced with a string defined from a external source. If --recipe_arg is not set, there will be a prompt message asking about it.
+!key! : it will be replaced with a string defined from an external source. If --recipe_arg is not set, there will be a prompt message asking about it.
 
 ## Examples
 
