@@ -77,6 +77,7 @@ def parse_cmdline():
     )
     parser_install.add_argument(
         "--recipe_arg",
+        default={},
         type=get_recipe_arg_dict,
         help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
@@ -89,6 +90,7 @@ def parse_cmdline():
     )
     parser_build.add_argument(
         "--recipe_arg",
+        default={},
         type=get_recipe_arg_dict,
         help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
@@ -101,6 +103,7 @@ def parse_cmdline():
     )
     parser_fetch.add_argument(
         "--recipe_arg",
+        default={},
         type=get_recipe_arg_dict,
         help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data",
     )
