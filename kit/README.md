@@ -7,7 +7,7 @@ The hekit can be executed using the following options:
 cd kit
 ./hekit.py [--config CONFIG_FILE] {init, list, install, build, fetch, remove}
 ```
-where the options and the input files are explained in the following sections.
+where the options and input files are explained in the following sections.
 
 ### Flags
 
@@ -21,15 +21,15 @@ where the options and the input files are explained in the following sections.
 
 `list`: Lists installed components.
 
-`install RECIPE_FILE`: Installs components defined in [recipen file](#recipe-file).
+`install RECIPE_FILE`: Installs components defined in [recipe file](#recipe-file).
 
-`build RECIPE_FILE`: Builds components defined in [recipen file](#recipe-file).
+`build RECIPE_FILE`: Builds components defined in [recipe file](#recipe-file).
 
-`fetch RECIPE_FILE`: Fetches components defined in [recipen file](#recipe-file).
+`fetch RECIPE_FILE`: Fetches components defined in [recipe file](#recipe-file).
 
 `remove component instance`: Uninstalls a specific component.
 
-`--recipe_arg "key=value"`: Optional argument to replace data marked as !key! in a [recipen file](#recipe-file).
+`--recipe_arg "key=value"`: Optional argument to replace data marked as !key! in a [recipe file](#recipe-file).
 
 ### Configuration file
 
@@ -63,14 +63,14 @@ hexl = "hexl/1.2.3"
 ```
 The [recipes](../recipes/) directory contains the usual files to set up a working enviroment.
 
-#### Back Sustitution in a recipe file
-The specfic value of a pair (key = "value") in a recipe file can be reused in other sections of the file. That can be achieved using the following expressions:
+#### Back Substitution in a recipe file
+The value of the pair (key = "value") in the recipe file can be reused in other sections of the file. This can be achieved using the following options:
 
-%key% : it will be replaced with the string value of a key that was defined in the same section.
+%key% : back substitute a value from within the same instance.
 
-$key$ : similar as %key%, but it must be used when replacing dependecies.
+$component/instance/key$ : back substitutes the `key` from a specific instance.
 
-!key! : it will be replaced with a string defined from an external source. If --recipe_arg is not set, there will be a prompt message asking about it.
+!key! : back substitute a value defined from an external source. If `--recipe_arg` is not set, the user will be prompted to provide a value.
 
 ## Examples
 
