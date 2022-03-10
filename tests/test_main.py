@@ -176,18 +176,6 @@ def test_get_recipe_arg_dict_duplicated_key():
     assert exc_dict == act_dict
 
 
-def test_get_recipe_arg_dict_with_None():
-    """Arrange"""
-    act_arg = None
-    exc_dict = {}
-
-    """Act"""
-    act_dict = get_recipe_arg_dict(act_arg)
-
-    """assert"""
-    assert exc_dict == act_dict
-
-
 def test_get_recipe_arg_dict_wrong_format():
     """Arrange"""
     act_arg = "key1=value1, key1=value2, key3"

@@ -41,7 +41,7 @@ The toolkit provides [default.config](../default.config) file that can be used a
 
 ### Recipe File
 
-The recipe File is a TOML file that defines the libraries and the required actions to install them, as shown in the following example:
+The recipe file is a TOML file that defines the libraries and the required actions to install them, as shown in the following example:
 ```
 [[library]]
 skip = false
@@ -61,7 +61,7 @@ install = "cmake --install %init_install_dir%"
 # Dependencies
 hexl = "hexl/1.2.3"
 ```
-The [recipes](../recipes/) directory contains the usual files to set up a working enviroment.
+The [recipes](../recipes/) directory contains default recipes for setting up a working environment.
 
 #### Back Substitution in a recipe file
 The value of the pair (key = "value") in the recipe file can be reused in other sections of the file. This can be achieved using the following options:
