@@ -21,7 +21,7 @@ where the options and the input files are explained in the following sections.
 
 `list`: Lists installed components.
 
-`install RECIPE_FILE`: Installs components defined in [recipen file](#recipe-file).
+`install RECIPE_FILE`: Installs components defined in [recipe file](#recipe-file).
 
 `build RECIPE_FILE`: Builds components defined in [recipen file](#recipe-file).
 
