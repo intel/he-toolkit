@@ -7,7 +7,7 @@ The hekit can be executed using the following options:
 cd kit
 ./hekit.py [--config CONFIG_FILE] {init, list, install, build, fetch, remove}
 ```
-where the options are explained in the following section:
+where the options and the inputs files are explained in the following sections.
 
 ### Flags
 
@@ -15,29 +15,62 @@ where the options are explained in the following section:
 
 `--version`: Displays Intel HE toolkit version.
 
-`--config CONFIG_FILE`: Defines a configuration file. Default is `~/.hekit/default.config`.
+`--config CONFIG_FILE`: Defines a [configuration file](#configuration-file). Default is `~/.hekit/default.config`.
 
 `init`: Initializes hekit.
 
 `list`: Lists installed components.
 
-`install RECIPE_FILE`: Installs components defined in RECIPE_FILE.
+`install RECIPE_FILE`: Installs components defined in [recipen file](#recipe-file).
 
-`build RECIPE_FILE`: Builds components defined in RECIPE_FILE.
+`build RECIPE_FILE`: Builds components defined in [recipen file](#recipe-file).
 
-`fetch RECIPE_FILE`: Fetches components defined in RECIPE_FILE.
+`fetch RECIPE_FILE`: Fetches components defined in [recipen file](#recipe-file).
 
 `remove component instance`: Uninstalls a specific component.
 
-### Input Files
+`--recipe_arg "key=value"`: Optional argument to replace data marked as !key! in a [recipen file](#recipe-file).
 
-CONFIG_FILE file defines the working directory where the libraries will be available, for instance:
+### Configuration file
+
+The configuration file defines the working directory where the libraries will be available, for instance:
 ```
 repo_location = "~/.hekit/components"
 ```
-The toolkit provides a example of a CONFIG_FILE and it can be found at [default.config](../default.config).
+The toolkit provides [default.config](../default.config) file that can be used as a valid option for --config argument.
 
-RECIPE_FILE is a TOML file that defines the libraries and the required actions to install them. The default template can be found at [default.toml](../recipes/default.toml).
+### Recipe File
+
+The recipe File is a TOML file that defines the libraries and the required actions to install them, as shown in the following example:
+```
+[[library]]
+skip = false
+version = "!version!"
+name = "v1.11.6"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
+fetch = "git clone https://gitlab.com/library/library-release.git --branch %name%"
+pre-build = """cmake -S %init_fetch_dir%/library-release -B %init_build_dir%
+               -DWITH_INTEL_HEXL=ON
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+# Dependencies
+hexl = "hexl/1.2.3"
+```
+The [recipes](../recipes/) directory contains the usual files to set up a working enviroment.
+
+#### Back Sustitution in a recipe file
+The specfic value of a pair (key = "value") in the recipe file can be reuse in others sections of the file. That can be achieved using the following options:
+
+%key% : it will be replaced with the string value of a key defined in the same section.
+
+$key$ : similar as %key%, but it must be used when replacing dependecies.
+
+!key! : it will be replaced with a string defined from a external source. If --recipe_arg is not set, there will be a prompt message asking about it.
 
 ## Examples
 
@@ -58,7 +91,7 @@ The install command can be used to fetch, build and install the required librari
 
 Using fetch and build commands, the user has access to perform specific actions. For example, for fetching libraries:
 ```bash
-./hekit.py --config ../default.config fetch ../recipes/default.toml
+./hekit.py --config ../default.config fetch ../recipes/default.toml --recipe_arg "version=v1.2.3"
 ```
 
 In order to uninstall a specific component, execute the remove command
