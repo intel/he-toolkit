@@ -6,7 +6,7 @@ from os import getcwd, chdir
 
 from .context import hekit, config, command_list, command_remove, command_install, spec
 from hekit import main, get_recipe_arg_dict
-from command_list import list_components
+from command_list import list_components, get_number_spaces
 from command_remove import remove_components
 from command_install import install_components
 
@@ -39,8 +39,7 @@ def test_command_list_after_fetch(mocker, args_list, restore_pwd):
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
-    width = 10
-    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg2 = f"{'success':{width}}"
     arg34 = f"{'':{width}}"
 
@@ -75,8 +74,7 @@ def test_command_list_after_build(mocker, args_list, restore_pwd):
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
-    width = 10
-    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg23 = f"{'success':{width}}"
     arg4 = f"{'':{width}}"
 
@@ -126,8 +124,7 @@ def test_command_list_after_install(mocker, args_list, restore_pwd):
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
-    width = 10
-    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg234 = f"{'success':{width}}"
 
     """Act"""
@@ -247,3 +244,11 @@ def args_remove():
 def restore_pwd():
     global cwd_test
     chdir(cwd_test)
+
+
+def get_width_and_arg1(comp: str, inst: str):
+    width = 10
+    width_comp = len(comp) + get_number_spaces()
+    width_inst = len(inst) + get_number_spaces()
+
+    return width, f"{comp:{width_comp}} {inst:{width_inst}}"
