@@ -3,9 +3,51 @@
 
 from toml import load
 from os import walk
+from pathlib import Path
+from itertools import chain
+from typing import Dict, List
+
+# Number of separation spaces for columns
+_SEP_SPACES = 2
 
 
-def list_dirs(path: str):
+class RepoProperties:
+    """ Contains a dictionary with the structure of the repo
+        and widths of the widest component and instance"""
+
+    def __init__(self, repo_location: str, separation_spaces: int = _SEP_SPACES):
+        # Get the components and instances
+        self._repo_structure = RepoProperties._repo_struct(repo_location)
+
+        max_len = lambda iterable: max(map(len, iterable), default=0)
+        # Get the width of the widest component
+        self.width_comp = max_len(self._repo_structure.keys())
+
+        # Get the width of the widest instance
+        all_instances = self._repo_structure.values()
+        self.width_inst = max_len(chain.from_iterable(all_instances))
+
+        # Include column separation
+        self.width_comp += separation_spaces
+        self.width_inst += separation_spaces
+        self.width_status = 10
+        self.separation_spaces = separation_spaces
+
+    @property
+    def structure(self) -> Dict[str, List[str]]:
+        return self._repo_structure
+
+    @staticmethod
+    def _repo_struct(path: str) -> Dict[str, List[str]]:
+        """Return a dictionary with sorted keys as components and values as
+           sorted list of instances"""
+        path = Path(path)
+        return {component: list_dirs(path / component) for component in list_dirs(path)}
+
+
+# TODO move out into some util module
+# This is a util func also used for tab completion
+def list_dirs(path: str) -> List[str]:
     """Return list of directories in path."""
     try:
         dirs = next(walk(path))[1]  # dirs in a list
@@ -14,58 +56,25 @@ def list_dirs(path: str):
         return []
 
 
-def get_number_spaces():
-    """ Define the number of spaces after the widest
-    component and instance to separate the columns"""
-    return 2
-
-
-def get_repo_properties(repo_location: str):
-    """ Return a dictionary with the structure of the repo
-        and widths of the widest component and instance"""
-    # Get the components
-    comp_list = list_dirs(repo_location)
-
-    repo_structure = {}
-    max_width_inst = 0
-    # Get the width of the widest component
-    max_width_comp = len(max(comp_list, key=len, default=""))
-
-    for comp_name in comp_list:
-        # Get the instances
-        comp_name_path = f"{repo_location}/{comp_name}"
-        inst_list = list_dirs(comp_name_path)
-
-        # Get the width of the widest instance
-        width_inst = len(max(inst_list, key=len, default=""))
-        if width_inst > max_width_inst:
-            max_width_inst = width_inst
-
-        # Fill the dict where key=comp_name, value=instances
-        repo_structure[comp_name] = inst_list
-
-    return (
-        repo_structure,
-        max_width_comp + get_number_spaces(),
-        max_width_inst + get_number_spaces(),
-    )
-
-
 def list_components(args):
     """List to stdout info on components."""
-    repo_location = args.config.repo_location
-    width_status = 10
-    repo_structure, width_comp, width_inst = get_repo_properties(repo_location)
+    repo_location = Path(args.config.repo_location)
+    repo_properties = RepoProperties(repo_location)
+
+    # Aliases
+    width_status = repo_properties.width_status
+    width_comp = repo_properties.width_comp
+    width_inst = repo_properties.width_inst
 
     # Header
     print(
         f"{'component':{width_comp}} {'instance':{width_inst}} {'fetch':{width_status}} {'build':{width_status}} {'install':{width_status}}"
     )
 
-    for comp_name, inst_list in repo_structure.items():
+    for comp_name, inst_list in repo_properties.structure.items():
         for comp_inst in inst_list:
             try:
-                info_filepath = f"{repo_location}/{comp_name}/{comp_inst}/hekit.info"
+                info_filepath = repo_location / comp_name / comp_inst / "hekit.info"
                 info_file = load(info_filepath)
                 print(
                     f"{comp_name:{width_comp}} {comp_inst:{width_inst}}",
@@ -79,7 +88,7 @@ def list_components(args):
                     f"{'unknown':{width_status}}",
                     f"{'unknown':{width_status}}",
                     f"{'unknown':{width_status}}",
-                    f"'{info_filepath}' not found",
+                    f"file '{info_filepath}' not found",
                 )
             except KeyError as emsg:
                 print(

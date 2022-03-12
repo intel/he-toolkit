@@ -6,7 +6,7 @@ from os import getcwd, chdir
 
 from .context import hekit, config, command_list, command_remove, command_install, spec
 from hekit import main, get_recipe_arg_dict
-from command_list import list_components, get_number_spaces
+from command_list import list_components, _SEP_SPACES
 from command_remove import remove_components
 from command_install import install_components
 
@@ -246,9 +246,9 @@ def restore_pwd():
     chdir(cwd_test)
 
 
-def get_width_and_arg1(comp: str, inst: str):
+def get_width_and_arg1(comp: str, inst: str, separation_spaces: int = _SEP_SPACES):
     width = 10
-    width_comp = len(comp) + get_number_spaces()
-    width_inst = len(inst) + get_number_spaces()
+    width_comp = len(comp) + separation_spaces
+    width_inst = len(inst) + separation_spaces
 
     return width, f"{comp:{width_comp}} {inst:{width_inst}}"
