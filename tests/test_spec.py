@@ -19,7 +19,7 @@ def test_transform_spec_to_toml_dict():
 def test_parse_basic_spec(create_basic_spec_file):
     """The most basic test to check that a spec object is created"""
     filepath, expected_dict = create_basic_spec_file
-    spec_generator = Spec.from_toml_file(filepath, rloc="")
+    spec_generator = Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={})
     spec = next(spec_generator)
     assert spec.to_toml_dict() == expected_dict
 
@@ -107,6 +107,59 @@ def test_add_component_repo_location_to_inits_and_exports():
     # rloc/component/instance
     assert spec["init_something"] == f"{rloc}/hexl/bob/bla/bob/bla"
     assert spec["export_something"] == f"{rloc}/hexl/bob/blu/bob/blu"
+
+
+def test_basic_user_substitutions_are_expanded(mocker):
+    """The attribs need to have substitution keys expanded"""
+    # Purposely put 'another' before 'something'.
+    exp_version = "2.3.6"
+    exp_name = "Charles"
+    mock_input = mocker.patch("spec.input")
+    mock_input.side_effect = [exp_version, exp_name]
+
+    expected = {
+        "hexl": [
+            {
+                "version": "!version!",
+                "name": "bob!name!",
+                "another": "start-%version%-%init_something%-end",
+                "init_something": "bla/%name%/bla",
+            }
+        ]
+    }
+    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+    assert spec["name"] == f"bob{exp_name}"
+    assert spec["init_something"] == f"bla/bob{exp_name}/bla"
+    assert spec["another"] == f"start-{exp_version}-bla/bob{exp_name}/bla-end"
+
+
+def test_user_substitutions_are_expanded_to_init(mocker):
+    """Components are built in a component repo, a dedicated space
+    that can be changed"""
+    exp_name = "bob"
+    exp_version = "1.2.5"
+    mock_input = mocker.patch("spec.input")
+    mock_input.return_value = exp_name
+
+    expected = {
+        "hexl": [
+            {
+                "name": "!name!",
+                "version": "!version!",
+                "something": "bla/%name%/bla",
+                "init_something": "bla/%name%/bla",
+                "export_something": "blu/%version%/blu",
+            }
+        ]
+    }
+    rloc = "/home/some_user"
+    Spec.recipe_arg_dict = {"version": exp_version}
+    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc)
+    mock_input.assert_called_once()
+    assert spec["something"] == f"bla/{exp_name}/bla"
+    # rloc/component/instance
+    assert spec["init_something"] == f"{rloc}/hexl/{exp_name}/bla/{exp_name}/bla"
+    assert spec["export_something"] == f"{rloc}/hexl/{exp_name}/blu/{exp_version}/blu"
 
 
 @pytest.fixture

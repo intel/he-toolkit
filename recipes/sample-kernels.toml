@@ -6,8 +6,7 @@ skip = false
 name = "seal"
 fetch = ""
 init_fetch_dir = ""
-# FIXME: Change path to location of HE-Toolkit
-src_dir = "~/git/public-toolkit/v2-prep/he-samples/sample-kernels"
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
 init_build_dir = "build"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DENABLE_SEAL=ON
@@ -23,8 +22,7 @@ skip = false
 name = "palisade"
 fetch = ""
 init_fetch_dir = ""
-# FIXME: Change path to location of HE-Toolkit
-src_dir = "~/git/public-toolkit/v2-prep/he-samples/sample-kernels"
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
 init_build_dir = "build"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DENABLE_PALISADE=ON
@@ -39,8 +37,7 @@ skip = true
 name = "all"
 fetch = ""
 init_fetch_dir = ""
-# FIXME: Change path to location of HE-Toolkit
-src_dir = "~/git/public-toolkit/v2-prep/he-samples/sample-kernels"
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
 init_build_dir = "build"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DENABLE_SEAL=ON

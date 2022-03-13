@@ -20,12 +20,13 @@ env:
   SEAL_VER: 3.7.2
   PALISADE_VER: 1.11.6
   HELIB_VER: 2.2.1
-  HEXL_DIR: ~/.hekit/components/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
-  SEAL_DIR: ~/.hekit/components/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
-  PALISADE_DIR: ~/.hekit/components/palisade/v${PALISADE_VER}/install/lib/Palisade
-  HELIB_DIR: ~/.hekit/components/helib/v${HELIB_VER}/share/cmake/helib
-  GSL_DIR: ~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
-  ZSTD_DIR: ~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
+  HEKIT_DIR: ~/.hekit/components
+  HEXL_DIR: ${HEKIT_DIR}/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
+  SEAL_DIR: ${HEKIT_DIR}/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
+  PALISADE_DIR: ${HEKIT_DIR}/palisade/v${PALISADE_VER}/install/lib/Palisade
+  HELIB_DIR: ${HEKIT_DIR}/helib/v${HELIB_VER}/share/cmake/helib
+  GSL_DIR: ${HEKIT_DIR}/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
+  ZSTD_DIR: ${HEKIT_DIR}/zstd/v1.4.5/install/lib/cmake/zstd
 
 ################
 # Ubuntu 20.04 #
@@ -66,7 +67,7 @@ jobs:
 
   build-and-test-toolkit:
     if: ${{ false }} # FIXME: Disable this job for now
-    name: Build, test and run components
+    name: Build, test and run HE Toolkit
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
@@ -90,64 +91,63 @@ jobs:
           ./hekit install recipes/default.toml
           ./hekit list
 
-      - name: Build and run PSI example
-        # TODO: Refactor to use hekit build recipes/examples.toml
+      - name: Build examples
         run: |
-          cd he-samples/examples/psi
-          cmake -S . -B build -Dhelib_DIR=${{ env.HELIB_DIR }}
-          cmake --build build -j
-          cd build
-          echo "apple\nBanana\ncat" > client.set
-          ./psi client.set | grep -B 1 "apple"
+          ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit list
+          echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
+          echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
 
-      - name: Build and run Secure Query example
-        # TODO: Refactor to use hekit build recipes/examples.toml
+      - name: Run PSI example
         run: |
-          cd he-samples/examples/secure-query
-          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
-          cmake --build build -j
-          cd build
+          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
+
+      - name: Run Secure Query example
+        run: |
+          cd ${QUERY_BUILD_DIR}
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
-      - name: Build and run LR example
-        # TODO: Refactor to use hekit build recipes/examples.toml
+      - name: Run LR example
         run: |
-          cd he-samples/examples/logistic-regression
-          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
-          cmake --build build -j
-          cd build
+          cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
       - name: Build sample kernels
-        # TODO: Refactor to use hekit build recipes/sample-kernels.toml
         run: |
-          cd he-samples/sample-kernels
-          cmake -S . -B build -DENABLE_SEAL=ON -DENABLE_PALISADE=ON -DSEAL_DIR=${{ env.SEAL_DIR }} -DPalisade_DIR=${{ env.PALISADE_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
-          cmake --build build -j
+          ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit list
+          echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run unit tests
-        run: ./he-samples/sample-kernels/build/test/unit-test
+        run: |
+          ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
+          ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
 
@@ -184,8 +184,7 @@ jobs:
         run: pytest tests/
 
   build-and-test-toolkit-icelake:
-    if: ${{ false }} # FIXME: Disable this job for now
-    name: Build, test and run components (IceLake)
+    name: Build, test and run HE Toolkit (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
     environment: intel_workflow
@@ -208,72 +207,61 @@ jobs:
           ./hekit install recipes/default.toml
           ./hekit list
 
-      - name: Build and run PSI example
-        # TODO: Refactor to use hekit build recipes/examples.toml
+      - name: Build examples
         run: |
-          cd he-samples/examples/psi
-          cmake -S . -B build -Dhelib_DIR=${{ env.HELIB_DIR }}
-          cmake --build build -j
-          cd build
-          echo "apple\nBanana\ncat" > client.set
-          ./psi client.set | grep -B 1 "apple"
+          ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit list
+          echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
+          echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
 
-      - name: Build and run Secure Query example
-        # TODO: Refactor to use hekit build recipes/examples.toml
+      - name: Run PSI example
         run: |
-          cd he-samples/examples/secure-query
-          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
-          cmake --build build -j
-          cd build
+          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
+
+      - name: Run Secure Query example
+        run: |
+          cd ${QUERY_BUILD_DIR}
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
-      - name: Build and run LR example
-        # TODO: Refactor to use hekit build recipes/examples.toml
+      - name: Run LR example
         run: |
-          cd he-samples/examples/logistic-regression
-          cmake -S . -B build -DSEAL_DIR=${{ env.SEAL_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
-          cmake --build build -j
-          cd build
+          cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
       - name: Build sample kernels
-        # TODO: Refactor to use hekit build recipes/sample-kernels.toml
         run: |
-          cd he-samples/sample-kernels
-          cmake -S . -B build -DENABLE_SEAL=ON -DENABLE_PALISADE=ON -DSEAL_DIR=${{ env.SEAL_DIR }} -DPalisade_DIR=${{ env.PALISADE_DIR }} -DMicrosft.GSL_DIR=${{ env.GSL_DIR }} -Dzstd_DIR=${{ env.ZSTD_DIR }} -DHEXL_DIR=${{ env.HEXL_DIR }}
-          cmake --build build -j
+          ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit list
+          echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run unit tests
-        run: ./he-samples/sample-kernels/build/test/unit-test
+        run: |
+          ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
+          ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./he-samples/sample-kernels/build/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
-
-      - name: Remove components
-        run: |
-          ./hekit remove seal v${{ env.SEAL_VER }}
-          ./hekit remove gsl v3.1.0
-          ./hekit remove zstd v1.4.5
-          ./hekit remove helib v${{ env.HELIB_VER }}
-          ./hekit remove ntl 11.5.1
-          ./hekit remove palisade v${{ env.PALISADE_VER }}
-          ./hekit remove hexl ${{ env.HEXL_VER }}
