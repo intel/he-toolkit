@@ -3,7 +3,73 @@
 
 import pytest
 from .context import command_list
-from command_list import list_components
+from command_list import list_components, RepoProperties, _SEP_SPACES
+
+
+def test_get_repo_properties_max_width(mocker):
+    """Arrange"""
+    exp_comps = ["1234567", "123", "12345678"]
+    exp_inst1 = ["123"]
+    exp_inst2 = ["1", "1234567890123456"]
+    exp_inst3 = ["123456"]
+    mock_list_dirs = mocker.patch("command_list.list_dirs")
+    mock_list_dirs.side_effect = [exp_comps, exp_inst1, exp_inst2, exp_inst3]
+
+    exp_repo_structure = {
+        exp_comps[0]: exp_inst1,
+        exp_comps[1]: exp_inst2,
+        exp_comps[2]: exp_inst3,
+    }
+    exp_width_comp = 8 + _SEP_SPACES
+    exp_width_inst = 16 + _SEP_SPACES
+
+    """Act"""
+    act_props = RepoProperties("")
+
+    """assert"""
+    assert act_props.structure == exp_repo_structure
+    assert act_props.width_comp == exp_width_comp
+    assert act_props.width_inst == exp_width_inst
+
+
+def test_get_repo_properties_without_instances(mocker):
+    """Arrange"""
+    exp_comps = ["12345678901234567890"]
+    exp_inst1 = []
+    mock_list_dirs = mocker.patch("command_list.list_dirs")
+    mock_list_dirs.side_effect = [exp_comps, exp_inst1]
+
+    exp_repo_structure = {exp_comps[0]: exp_inst1}
+    exp_width_comp = 20 + _SEP_SPACES
+    exp_width_inst = 0 + _SEP_SPACES
+
+    """Act"""
+    act_props = RepoProperties("")
+
+    """assert"""
+    assert act_props.structure == exp_repo_structure
+    assert act_props.width_comp == exp_width_comp
+    assert act_props.width_inst == exp_width_inst
+
+
+def test_get_repo_properties_without_components(mocker):
+    """Arrange"""
+    exp_comps = []
+    exp_inst1 = []
+    mock_list_dirs = mocker.patch("command_list.list_dirs")
+    mock_list_dirs.side_effect = [exp_comps, exp_inst1]
+
+    exp_repo_structure = {}
+    exp_width_comp = 0 + _SEP_SPACES
+    exp_width_inst = 0 + _SEP_SPACES
+
+    """Act"""
+    act_props = RepoProperties("")
+
+    """assert"""
+    assert act_props.structure == exp_repo_structure
+    assert act_props.width_comp == exp_width_comp
+    assert act_props.width_inst == exp_width_inst
 
 
 def test_list_components_several_correct_items(
@@ -276,9 +342,15 @@ def install_failure():
     return {"status": {"fetch": "success", "build": "success", "install": "failure"}}
 
 
-def get_print_args(comp_name, comp_inst, info_file):
+def get_width_and_header(comp_name, comp_inst, separation_spaces=_SEP_SPACES):
     width = 10
-    column1 = f"{comp_name:{width}} {comp_inst:{width}}"
+    width_comp = len(comp_name) + separation_spaces
+    width_inst = len(comp_inst) + separation_spaces
+    return width, f"{comp_name:{width_comp}} {comp_inst:{width_inst}}"
+
+
+def get_print_args(comp_name, comp_inst, info_file):
+    width, column1 = get_width_and_header(comp_name, comp_inst)
     column2 = f"{info_file['status']['fetch']:{width}}"
     column3 = f"{info_file['status']['build']:{width}}"
     column4 = f"{info_file['status']['install']:{width}}"
@@ -287,17 +359,15 @@ def get_print_args(comp_name, comp_inst, info_file):
 
 
 def util_print_file_error_args(comp_name, comp_inst, info_filepath):
-    width = 10
-    column1 = f"{comp_name:{width}} {comp_inst:{width}}"
+    width, column1 = get_width_and_header(comp_name, comp_inst)
     columns234 = f"{'unknown':{width}}"
-    column5 = f"'{info_filepath}' not found"
+    column5 = f"file '{info_filepath}' not found"
 
     return column1, columns234, columns234, columns234, column5
 
 
 def util_print_key_error_args(comp_name, comp_inst, emsg):
-    width = 10
-    column1 = f"{comp_name:{width}} {comp_inst:{width}}"
+    width, column1 = get_width_and_header(comp_name, comp_inst)
     columns234 = f"{'unknown':{width}}"
     column5 = f"key {emsg} not found"
 
