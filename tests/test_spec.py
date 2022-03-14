@@ -122,7 +122,7 @@ def test_basic_user_substitutions_are_expanded(mocker):
             {
                 "version": "!version!",
                 "name": "bob!name!",
-                "another": "start-%version%-%init_something%-end",
+                "another": "start-!version!-%init_something%-end",
                 "init_something": "bla/%name%/bla",
             }
         ]
@@ -131,6 +131,7 @@ def test_basic_user_substitutions_are_expanded(mocker):
     assert spec["name"] == f"bob{exp_name}"
     assert spec["init_something"] == f"bla/bob{exp_name}/bla"
     assert spec["another"] == f"start-{exp_version}-bla/bob{exp_name}/bla-end"
+    assert 2 == mock_input.call_count
 
 
 def test_user_substitutions_are_expanded_to_init(mocker):

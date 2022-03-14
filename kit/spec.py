@@ -35,6 +35,11 @@ def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
                 else:
                     message = f"Please enter {k}: "
                     value = input(message)
+
+                    # Save current value in case the same key
+                    # is needed in other place
+                    recipe_arg_dict[k] = value
+
                 new_s = new_s.replace(symbol, value)
 
             return new_s
