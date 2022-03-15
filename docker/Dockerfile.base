@@ -20,8 +20,7 @@ ENV http_proxy=$http_proxy   \
     https_proxy=$https_proxy \
     socks_proxy=$socks_proxy \
     ftp_proxy=$ftp_proxy     \
-    no_proxy=$no_proxy       \
-    UNAME=$UNAME
+    no_proxy=$no_proxy
 
 # Installation run as "root" in the container
 # before switching to non-privileged user for the toolkit.
