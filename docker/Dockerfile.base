@@ -11,6 +11,7 @@ ARG https_proxy
 ARG socks_proxy
 ARG ftp_proxy
 ARG no_proxy
+ARG UNAME
 
 ARG TZ=UTC
 ARG DEBIAN_FRONTEND=noninteractive
