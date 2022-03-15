@@ -90,6 +90,7 @@ build = "cmake --build %init_build_dir% -j"
 post-build = ""
 install = "cmake --install %init_install_dir%"
 # Dependencies
+ntl = "ntl/11.5.1"
 hexl = "hexl/1.2.3"
 
 
@@ -108,6 +109,7 @@ pre-build = """cmake -S %init_fetch_dir%/SEAL -B %init_build_dir%
                -DSEAL_BUILD_DEPS=OFF
                -DSEAL_USE_INTEL_HEXL=ON
                -DHEXL_DIR=$%hexl%/export_cmake$
+               -DSEAL_USE_ZLIB=OFF
                -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
                -Dzstd_DIR=$%zstd%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"

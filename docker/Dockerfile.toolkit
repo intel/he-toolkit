@@ -12,6 +12,7 @@ LABEL maintainer="HE Toolkit github.com/intel/he-toolkit"
 ARG UNAME
 ARG UID
 ARG GID
+ARG HOME="/home/$UNAME"
 
 RUN groupadd -g $GID $UNAME && \
     useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
@@ -24,9 +25,9 @@ USER $UNAME
 ADD toolkit.tar.gz $HOME
 
 # fetch, build and install all the libraries
-RUN  /kit/hekit.py --config /default.config install /recipes/default.toml
+RUN  $HOME/kit/hekit.py --config $HOME/default.config install $HOME/recipes/default.toml
 
-RUN  /kit/hekit.py --config /default.config build /recipes/examples.toml
-RUN  /kit/hekit.py --config /default.config build /recipes/sample-kernels.toml
+RUN  $HOME/kit/hekit.py --config $HOME/default.config build $HOME/recipes/examples.toml --recipe_arg "toolkit-path=${HOME}"
+RUN  $HOME/kit/hekit.py --config $HOME/default.config build $HOME/recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}"
 
-ENTRYPOINT . /runners.sh && welcome_message && cd $HOME && /bin/bash
+ENTRYPOINT . $HOME/docker/runners.sh && welcome_message && cd $HOME && /bin/bash
