@@ -28,6 +28,8 @@ def check_build(func):
         for response in map(json.loads, responses):
             if "stream" in response.keys():
                 yield response["stream"]
+            elif "aux" in response.keys() and "ID" in response["aux"]:
+                yield response["aux"]["ID"]
             elif "error" in response.keys():
                 raise DockerBuildError("Docker build failed", response)
             else:

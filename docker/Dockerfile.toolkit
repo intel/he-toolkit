@@ -6,8 +6,6 @@ ARG UNAME
 
 FROM $UNAME/ubuntu_he_base:2.0.0
 
-ARG UNAME
-
 LABEL maintainer="HE Toolkit github.com/intel/he-toolkit"
 
 # User-setup
@@ -23,12 +21,12 @@ RUN groupadd -g $GID $UNAME && \
 USER $UNAME
 
 # ADD copies and untars for us
-ADD parts.tar.gz $HOME
+ADD toolkit.tar.gz $HOME
 
 # fetch, build and install all the libraries
 RUN  /kit/hekit.py --config /default.config install /recipes/default.toml
 
-RUN  /kit/hekit.py --config /default.config install /recipes/examples.toml
-RUN  /kit/hekit.py --config /default.config install /recipes/sample-kernels.toml
+RUN  /kit/hekit.py --config /default.config build /recipes/examples.toml
+RUN  /kit/hekit.py --config /default.config build /recipes/sample-kernels.toml
 
 ENTRYPOINT . /runners.sh && welcome_message && cd $HOME && /bin/bash
