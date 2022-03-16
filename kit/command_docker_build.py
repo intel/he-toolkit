@@ -145,11 +145,10 @@ def setup_docker(args):
                 print(f"Error: The file '{root / filepath}' already exists")
                 # then continue
 
-    copyfiles(
-        ("Dockerfile.base", "Dockerfile.toolkit"),
-        src_dir=docker_filepaths,
-        dst_dir=stagging_path,
-    )
+    files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
+    if args.enable == "vscode":
+        files_to_copy.append("Dockerfile.vscode")
+    copyfiles(files_to_copy, src_dir=docker_filepaths, dst_dir=stagging_path)
 
     change_directory_to(stagging_path)
 
