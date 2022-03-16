@@ -20,8 +20,7 @@ USER root
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Create space for IDE settings
-RUN mkdir -p /opt/Intel-HE-Toolkit/HE-Workspace/User && \
-    mkdir -p /opt/Intel-HE-Toolkit/HE-Workspace/.vscode && \
+RUN mkdir -p /opt/Intel-HE-Toolkit/HE-Workspace/{User,.vscode} && \
     # Change ownership of files to user \
     chown -R $UNAME:$UNAME /opt/Intel-HE-Toolkit
 
@@ -32,7 +31,7 @@ USER $UNAME
 COPY --chown=$UNAME:$UNAME ./IDE-Config /opt/Intel-HE-Toolkit/HE-Workspace/.vscode/
 
 # Move he-samples into HE-Workspace
-RUN cp -rp /home/$UNAME/he-samples /opt/Intel-HE-Toolkit/HE-Workspace && \
+RUN cp -rp "$HOME/he-samples" /opt/Intel-HE-Toolkit/HE-Workspace && \
     rm -rf /opt/Intel-HE-Toolkit/HE-Workspace/he-samples/build
 
 # Install code-server extensions
@@ -43,6 +42,9 @@ RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do
 # Update code-server user settings
 RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /opt/Intel-HE-Toolkit/HE-Workspace/User/settings.json && \
     # Create a randomly generated self-signed certificate for code-server \
-    sed -i.bak 's/cert: false/cert: true/' /home/$UNAME/.config/code-server/config.yaml
+    sed -i.bak 's/cert: false/cert: true/' "$HOME"/.config/code-server/config.yaml
 
-ENTRYPOINT ["code-server", "/opt/Intel-HE-Toolkit/HE-Workspace", "--bind-addr", "0.0.0.0:8888", "--user-data-dir", "/opt/Intel-HE-Toolkit/HE-Workspace", "--auth", "none", "--disable-telemetry"]
+ENTRYPOINT ["code-server", "/opt/Intel-HE-Toolkit/HE-Workspace",
+            "--bind-addr", "0.0.0.0:8888",
+            "--user-data-dir", "/opt/Intel-HE-Toolkit/HE-Workspace",
+            "--auth", "none", "--disable-telemetry"]
