@@ -105,9 +105,9 @@ def init_hekit(args):
     path_line = f"PATH={args.hekit_root_dir}:$PATH"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
-        "if [ -n $(type -p register-python-argcomplete) ]; then\n",
-        '  eval "$(register-python-argcomplete hekit.py hekit)"\n',
-        "fi\n",
+        "if [ -n $(type -p register-python-argcomplete) ]; then\n"
+        '  eval "$(register-python-argcomplete hekit.py hekit)"\n'
+        "fi\n"
     )
     content = "\n".join([path_line, eval_lines])
 
