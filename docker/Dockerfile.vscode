@@ -7,37 +7,33 @@ ARG UNAME
 FROM $UNAME/ubuntu_he_test:latest
 
 ARG UNAME
+ARG HOME="/home/$UNAME"
 
 LABEL maintainer="https://github.com/intel/he-toolkit"
 
 # code-server runs on HTTPS port 8888
 EXPOSE 8888/tcp
 
-# Do the following as root
-USER root
-
 # Download and install the latest version of code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Change back to user for remaining installation
-USER $UNAME
-
 # Create space for IDE settings
-RUN mkdir -p /home/$UNAME/User /home/$UNAME/.vscode && \
+RUN mkdir -p $HOME/User $HOME/.vscode && \
     # Move code-server IDE settings into correct location
-    cp /home/$UNAME/docker/IDE-Config/settings.json /home/$UNAME/.vscode/
+    cp $HOME/docker/IDE-Config/settings.json $HOME/.vscode/
 
 # Install code-server extensions
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
-      code-server --user-data-dir=/home/$UNAME/ --install-extension $e; \
+      code-server --user-data-dir=$HOME/ --install-extension $e; \
     done
 
 # Update code-server user settings
-RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /home/$UNAME/User/settings.json && \
+RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > $HOME/User/settings.json && \
     # Create a randomly generated self-signed certificate for code-server \
-    sed -i.bak 's/cert: false/cert: true/' "$HOME"/.config/code-server/config.yaml
+    sed -i.bak 's/cert: false/cert: true/' $HOME/.config/code-server/config.yaml
 
-ENTRYPOINT ["code-server", "/home/$UNAME/he-samples", \
-            "--bind-addr", "0.0.0.0:8888",            \
-            "--user-data-dir", "/home/$UNAME",        \
-            "--auth", "none", "--disable-telemetry"]
+ENTRYPOINT code-server $HOME/he-samples \
+           --bind-addr 0.0.0.0:8888     \
+           --user-data-dir $HOME        \
+           --auth none                  \
+           --disable-telemetry
