@@ -23,11 +23,9 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh
 USER $UNAME
 
 # Create space for IDE settings
-RUN mkdir -p /home/$UNAME/User && \
-    mkdir -p /home/$UNAME/.vscode
-
-# Workspace settings for code-server IDE
-COPY --chown=$UNAME:$UNAME ./IDE-Config /home/$UNAME/.vscode/
+RUN mkdir -p /home/$UNAME/User /home/$UNAME/.vscode && \
+    # Move code-server IDE settings into correct location
+    cp /home/$UNAME/docker/IDE-Config/settings.json /home/$UNAME/.vscode/
 
 # Install code-server extensions
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
