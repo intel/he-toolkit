@@ -19,32 +19,27 @@ USER root
 # Download and install the latest version of code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create space for IDE settings
-RUN mkdir -p /opt/Intel-HE-Toolkit/HE-Workspace/{User,.vscode} && \
-    # Change ownership of files to user \
-    chown -R $UNAME:$UNAME /opt/Intel-HE-Toolkit
-
 # Change back to user for remaining installation
 USER $UNAME
 
-# Workspace settings for code-server IDE
-COPY --chown=$UNAME:$UNAME ./IDE-Config /opt/Intel-HE-Toolkit/HE-Workspace/.vscode/
+# Create space for IDE settings
+RUN mkdir -p /home/$UNAME/User && \
+    mkdir -p /home/$UNAME/.vscode
 
-# Move he-samples into HE-Workspace
-RUN cp -rp "$HOME/he-samples" /opt/Intel-HE-Toolkit/HE-Workspace && \
-    rm -rf /opt/Intel-HE-Toolkit/HE-Workspace/he-samples/build
+# Workspace settings for code-server IDE
+COPY --chown=$UNAME:$UNAME ./IDE-Config /home/$UNAME/.vscode/
 
 # Install code-server extensions
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
-      code-server --user-data-dir=/opt/Intel-HE-Toolkit/HE-Workspace/ --install-extension $e; \
+      code-server --user-data-dir=/home/$UNAME/ --install-extension $e; \
     done
 
 # Update code-server user settings
-RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /opt/Intel-HE-Toolkit/HE-Workspace/User/settings.json && \
+RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /home/$UNAME/User/settings.json && \
     # Create a randomly generated self-signed certificate for code-server \
     sed -i.bak 's/cert: false/cert: true/' "$HOME"/.config/code-server/config.yaml
 
-ENTRYPOINT ["code-server", "/opt/Intel-HE-Toolkit/HE-Workspace",
-            "--bind-addr", "0.0.0.0:8888",
-            "--user-data-dir", "/opt/Intel-HE-Toolkit/HE-Workspace",
+ENTRYPOINT ["code-server", "/home/$UNAME/he-samples", \
+            "--bind-addr", "0.0.0.0:8888",            \
+            "--user-data-dir", "/home/$UNAME",        \
             "--auth", "none", "--disable-telemetry"]
