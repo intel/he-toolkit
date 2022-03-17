@@ -6,7 +6,7 @@ from os import getcwd, chdir
 
 from .context import hekit, config, command_list, command_remove, command_install, spec
 from hekit import main, get_recipe_arg_dict
-from command_list import list_components
+from command_list import list_components, _SEP_SPACES
 from command_remove import remove_components
 from command_install import install_components
 
@@ -21,7 +21,7 @@ def test_command_install_fetch(mocker, args_fetch):
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("command_install.print")
     mock_input = mocker.patch("spec.input")
-    mock_input.return_value = args_fetch.instance
+    mock_input.side_effect = [args_fetch.toml_arg_version, args_fetch.toml_arg_build]
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
@@ -30,7 +30,7 @@ def test_command_install_fetch(mocker, args_fetch):
 
     """Assert"""
     mock_print.assert_called_with(arg1)
-    mock_input.assert_called_once()
+    assert 2 == mock_input.call_count
 
 
 def test_command_list_after_fetch(mocker, args_list, restore_pwd):
@@ -39,8 +39,7 @@ def test_command_list_after_fetch(mocker, args_list, restore_pwd):
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
-    width = 10
-    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg2 = f"{'success':{width}}"
     arg34 = f"{'':{width}}"
 
@@ -57,7 +56,7 @@ def test_command_install_build(mocker, args_build):
     mock_parse_cmdline.return_value = args_build, ""
     mock_print = mocker.patch("command_install.print")
     mock_input = mocker.patch("spec.input")
-    mock_input.return_value = args_build.instance
+    mock_input.side_effect = [args_build.toml_arg_version, args_build.toml_arg_build]
 
     arg1 = f"{args_build.component}/{args_build.instance}"
 
@@ -66,7 +65,7 @@ def test_command_install_build(mocker, args_build):
 
     """Assert"""
     mock_print.assert_called_with(arg1)
-    mock_input.assert_called_once()
+    assert 2 == mock_input.call_count
 
 
 def test_command_list_after_build(mocker, args_list, restore_pwd):
@@ -75,8 +74,7 @@ def test_command_list_after_build(mocker, args_list, restore_pwd):
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
-    width = 10
-    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg23 = f"{'success':{width}}"
     arg4 = f"{'':{width}}"
 
@@ -108,7 +106,10 @@ def test_command_install_execution(mocker, args_install):
     mock_parse_cmdline.return_value = args_install, ""
     mock_print = mocker.patch("command_install.print")
     mock_input = mocker.patch("spec.input")
-    mock_input.return_value = args_install.instance
+    mock_input.side_effect = [
+        args_install.toml_arg_version,
+        args_install.toml_arg_build,
+    ]
 
     arg1 = f"{args_install.component}/{args_install.instance}"
 
@@ -117,7 +118,7 @@ def test_command_install_execution(mocker, args_install):
 
     """Assert"""
     mock_print.assert_called_with(arg1)
-    mock_input.assert_called_once()
+    assert 2 == mock_input.call_count
 
 
 def test_command_list_after_install(mocker, args_list, restore_pwd):
@@ -126,8 +127,7 @@ def test_command_list_after_install(mocker, args_list, restore_pwd):
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("command_list.print")
 
-    width = 10
-    arg1 = f"{args_list.component:{width}} {args_list.instance:{width}}"
+    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg234 = f"{'success':{width}}"
 
     """Act"""
@@ -215,7 +215,10 @@ class MockArgs:
         self.recipe_file = "tests/config/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        # back substitution
         self.recipe_arg = {"name": self.instance}
+        self.toml_arg_version = self.instance
+        self.toml_arg_build = "build"
 
 
 @pytest.fixture
@@ -247,3 +250,11 @@ def args_remove():
 def restore_pwd():
     global cwd_test
     chdir(cwd_test)
+
+
+def get_width_and_arg1(comp: str, inst: str, separation_spaces: int = _SEP_SPACES):
+    width = 10
+    width_comp = len(comp) + separation_spaces
+    width_inst = len(inst) + separation_spaces
+
+    return width, f"{comp:{width_comp}} {inst:{width_inst}}"

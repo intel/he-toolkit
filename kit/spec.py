@@ -34,6 +34,10 @@ def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
                     value = recipe_arg_dict[k]
                 except KeyError:
                     value = input(f"Please enter {k}: ")
+                    # Save current value in case the same key
+                    # is needed in other place
+                    recipe_arg_dict[k] = value
+
                 new_s = new_s.replace(symbol, value)
 
             return new_s
