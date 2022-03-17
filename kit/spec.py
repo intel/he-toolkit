@@ -30,12 +30,14 @@ def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
 
             new_s = s
             for symbol, k in symbols:
-                value = ""
-                if k in recipe_arg_dict:
+                try:
                     value = recipe_arg_dict[k]
-                else:
-                    message = f"Please enter {k}: "
-                    value = input(message)
+                except KeyError:
+                    value = input(f"Please enter {k}: ")
+                    # Save current value in case the same key
+                    # is needed in other place
+                    recipe_arg_dict[k] = value
+
                 new_s = new_s.replace(symbol, value)
 
             return new_s

@@ -3,7 +3,7 @@
 
 FROM ubuntu:20.04
 
-LABEL maintainer="HE Toolkit github.com/intel/he-toolkit"
+LABEL maintainer="HE Toolkit https://github.com/intel/he-toolkit"
 
 # Proxies, user configured
 ARG http_proxy
@@ -21,46 +21,43 @@ ENV http_proxy=$http_proxy   \
     ftp_proxy=$ftp_proxy     \
     no_proxy=$no_proxy
 
-# Installation run as "root" in the container
-# before switching to non-privileged user for the toolkit.
-
 RUN apt update && \
     apt -y dist-upgrade && \
     apt install -y apt-utils                      \
-                   software-properties-common     \
-                   --no-install-recommends tzdata \
-                   libterm-readline-gnu-perl      \
+                   autoconf                       \
                    build-essential                \
                    byobu                          \
+                   clang-10                       \
+                   cmake                          \
                    curl                           \
+                   file                           \
+                   g++-10                         \
+                   gcc-10                         \
                    git                            \
                    htop                           \
+                   libgmp-dev                     \
+                   libterm-readline-gnu-perl      \
+                   m4                             \
                    man                            \
-                   xz-utils                       \
+                   --no-install-recommends tzdata \
+                   patchelf                       \
+                   python3-pip                    \
+                   software-properties-common     \
+                   sudo                           \
                    unzip                          \
                    vim                            \
-                   wget                           \
-                   sudo                           \
-                   cmake                          \
-                   m4                             \
-                   file                           \
-                   patchelf                       \
-                   autoconf                       \
                    virtualenv                     \
-                   gcc-10                         \
-                   g++-10                         \
-                   clang-10                       \
-                   libgmp-dev                     \
-                   python3-pip                 && \
+                   wget                           \
+                   xz-utils                    && \
     apt autoremove -y && \
-    apt autoclean -y && \
+    apt autoclean -y  && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install toml argcomplete
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 10 && \
+RUN ["pip", "install", "toml", "argcomplete"]
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  10 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 20 && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 20 && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 10
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  10 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 20
     # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
