@@ -84,11 +84,11 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
 def setup_docker(args):
     """Build the docker for the toolkit"""
 
-    ROOT = args.hekit_root_dir
+    ROOT = Path(args.hekit_root_dir)
     docker_filepaths = ROOT / "docker"
 
     # set_stagging_area
-    stagging_path = Path(ROOT) / "__stagging__"
+    stagging_path = ROOT / "__stagging__"
     stagging_path.mkdir(exist_ok=True)
 
     if args.clean:

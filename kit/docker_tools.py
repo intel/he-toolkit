@@ -1,13 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import docker
+from docker import from_env as docker_from_env
 from docker.errors import DockerException
 
 import json
 from sys import stderr
 from pathlib import Path
-from typing import Dict
 
 
 class DockerBuildError(Exception):
@@ -53,7 +52,7 @@ def simple_container_logs(func):
 
 class DockerTools:
     def __init__(self):
-        self.client = docker.from_env()
+        self.client = docker_from_env()
 
     def image_exists(self, image_name: str) -> bool:
         """Returns True if image already exists otherwise False"""
