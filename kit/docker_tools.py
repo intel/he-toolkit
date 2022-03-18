@@ -45,7 +45,7 @@ def simple_container_logs(func):
         container = func(*args, **kwargs)
         for log in container.logs(stream=True):
             yield log, None
-        yield None, container.wait()["StatusCode"]
+        yield b"\n", container.wait()["StatusCode"]
 
     return inner
 
@@ -83,3 +83,23 @@ class DockerTools:
             image=image,
             command="/bin/bash /script",
         )
+
+    def try_build_new_image(self, dockerfile: str, tag: str, buildargs):
+        if not self.image_exists(tag):
+            response = self.build_image(dockerfile, tag, buildargs)
+            for out in response:
+                print(out)
+
+    def test_connection(self, environment, scriptpath):
+        # proxy checks
+        check_conn = self.run_script_in_container(environment, scriptpath)
+        # refactor for better output
+        for log, status_code in check_conn:
+            print("[CONTAINER]", log.decode("utf-8"), end="")
+        if status_code != 0:
+            print(
+                "In-docker connectivity failing.",
+                f"Return code was '{status_code}'",
+                file=stderr,
+            )
+            exit(1)

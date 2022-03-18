@@ -137,7 +137,7 @@ def test_image_exists_some_elements_list(mocker):
 
 def test_run_script_in_container_normal_execution(mocker):
     """Arrange"""
-    exp_log = "A generic log"
+    exp_log = b"A generic log"
     exp_code = "4545"
     client = Client()
     client.set_container(exp_log, exp_code)
@@ -154,6 +154,88 @@ def test_run_script_in_container_normal_execution(mocker):
     _, act_code = next(response)
     assert act_log == exp_log
     assert act_code == exp_code
+
+
+def test_try_build_new_image_build_skipped(mocker):
+    """Arrange"""
+    list = ["something"]
+    client = Client()
+    client.set_images(list)
+
+    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print = mocker.patch("docker_tools.print")
+
+    """Act"""
+    act_docker = DockerTools()
+    act_docker.try_build_new_image([], "", "")
+
+    """assert"""
+    mock_print.assert_not_called()
+
+
+def test_try_build_new_image_build_executed(mocker):
+    """Arrange"""
+    list = []
+    key = f'"stream"'
+    value = f'"Step 1/1 : ARG UNAME"'
+    client = Client()
+    client.set_images(list)
+    client.set_API(key, value)
+
+    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print = mocker.patch("docker_tools.print")
+
+    """Act"""
+    act_docker = DockerTools()
+    act_docker.try_build_new_image([], "", "")
+
+    """assert"""
+    mock_print.assert_called_once_with(value.replace('"', ""))
+
+
+def test_test_connection_no_error(mocker):
+    """Arrange"""
+    exp_log = b"A generic log"
+    exp_code = 0
+    client = Client()
+    client.set_container(exp_log, exp_code)
+
+    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print = mocker.patch("docker_tools.print")
+    mock_exit = mocker.patch("docker_tools.exit")
+
+    """Act"""
+    act_docker = DockerTools()
+    act_docker.test_connection("", "")
+
+    """assert"""
+    exp_arg = exp_log.decode("utf-8").replace('"', "")
+    mock_print.assert_any_call("[CONTAINER]", exp_arg, end="")
+    mock_exit.assert_not_called()
+
+
+def test_test_connection_error(mocker):
+    """Arrange"""
+    exp_log = b"A generic log"
+    exp_code = 23
+    client = Client()
+    client.set_container(exp_log, exp_code)
+
+    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print = mocker.patch("docker_tools.print")
+    mock_exit = mocker.patch("docker_tools.exit")
+
+    """Act"""
+    act_docker = DockerTools()
+    act_docker.test_connection("", "")
+
+    """assert"""
+    mock_print.assert_any_call("[CONTAINER]", "\n", end="")
+    mock_exit.assert_called_once_with(1)
 
 
 """Utilities used by the tests"""
@@ -189,7 +271,7 @@ class Images:
 
 
 class Container:
-    class Container_result:
+    class Container_return:
         def __init__(self, log, stauts_code):
             self.log = log
             self.stauts_code = stauts_code
@@ -201,7 +283,7 @@ class Container:
             return {"Error": None, "StatusCode": self.stauts_code}
 
     def __init__(self, logs, stauts_code):
-        self.result = self.Container_result(logs, stauts_code)
+        self.result = self.Container_return(logs, stauts_code)
 
     def run(self, volumes, detach, stream, environment, image, command):
         return self.result

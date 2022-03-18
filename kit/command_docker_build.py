@@ -4,7 +4,7 @@
 from re import search
 from sys import stderr
 from getpass import getuser
-from os import geteuid, getcwd, getuid, getgid, environ, chdir as change_directory_to
+from os import getuid, getgid, environ, chdir as change_directory_to
 from dataclasses import dataclass
 from pathlib import Path
 from shutil import copyfile, rmtree
@@ -31,6 +31,7 @@ def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
 
 
 def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
+    """"""
     if ID:
         USERID, GROUPID = ID, ID
     elif os_name() == "Darwin":
@@ -47,6 +48,19 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
         "GID": str(GROUPID),
         "UNAME": environment["USER"],
     }
+
+
+def create_environment():
+    """"""
+    environment: Dict[str, str] = {
+        "http_proxy": environ.get("http_proxy", ""),
+        "https_proxy": environ.get("https_proxy", ""),
+        "socks_proxy": environ.get("socks_proxy", ""),
+        "ftp_proxy": environ.get("ftp_proxy", ""),
+        "no_proxy": environ.get("no_proxy", ""),
+        "USER": getuser(),
+    }
+    return environment
 
 
 def print_preamble() -> None:
@@ -81,15 +95,25 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
             yield filename.rstrip()
 
 
+def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
+    """"""
+    if not toolkit_tar_gz.exists():
+        print("MAKING TOOLKIT.TAR.GZ ...")
+        with open(archived_files) as f:
+            root = ROOT
+            try:
+                archive_and_compress(toolkit_tar_gz, filter_file_list(f), root)
+            except FileExistsError as file_exists_error:
+                print(f"Error: The file '{root / filepath}' already exists")
+                # then continue
+
+
 def setup_docker(args):
     """Build the docker for the toolkit"""
 
     ROOT = Path(args.hekit_root_dir)
     docker_filepaths = ROOT / "docker"
-
-    # set_stagging_area
     stagging_path = ROOT / "__stagging__"
-    stagging_path.mkdir(exist_ok=True)
 
     if args.clean:
         rmtree(stagging_path)
@@ -99,51 +123,30 @@ def setup_docker(args):
     if args.y:
         print_preamble()
 
-    environment: Dict[str, str] = {
-        "http_proxy": environ.get("http_proxy", ""),
-        "https_proxy": environ.get("https_proxy", ""),
-        "socks_proxy": environ.get("socks_proxy", ""),
-        "ftp_proxy": environ.get("ftp_proxy", ""),
-        "no_proxy": environ.get("no_proxy", ""),
-        "USER": getuser(),
-    }
+    try:
+        print("CHECKING DOCKER FUNCTIONALITY ...")
+        docker_tools = DockerTools()
+    except DockerException as docker_exception:
+        print("Docker Error\n", docker_exception, file=stderr)
+        exit(1)
+
+    environment = create_environment()
 
     if args.check_only:
-        try:
-            print("CHECKING DOCKER FUNCTIONALITY ...")
-            docker_tools = DockerTools()
-        except DockerException as docker_exception:
-            print("Docker Error\n", docker_exception, file=stderr)
-            exit(1)
-
         print("CHECKING IN-DOCKER CONNECTIVITY ...")
-        # proxy checks
-        check_conn = docker_tools.run_script_in_container(
-            # Assume we are in he-toolkit directory
-            environment,
-            docker_filepaths / "basic-docker-test.sh",
+        # Assume we are in he-toolkit directory
+        docker_tools.test_connection(
+            environment=environment,
+            scriptpath=docker_filepaths / "basic-docker-test.sh",
         )
-        # refactor for better output
-        for log, status_code in check_conn:
-            print("[CONTAINER]", log)
-        if status_code != 0:
-            print(
-                "In-docker connectivity failing.",
-                f"Return code was '{status_code}'",
-                file=stderr,
-            )
-            exit(1)
         exit(0)
 
+    # set_stagging_area
+    stagging_path.mkdir(exist_ok=True)
+
     toolkit_tar_gz = stagging_path / "toolkit.tar.gz"
-    if not toolkit_tar_gz.exists():
-        print("MAKING TOOLKIT.TAR.GZ ...")
-        with open(docker_filepaths / "which_files.txt") as f:
-            try:
-                archive_and_compress(toolkit_tar_gz, filter_file_list(f), root=ROOT)
-            except FileExistsError as file_exists_error:
-                print(f"Error: The file '{root / filepath}' already exists")
-                # then continue
+    archived_files = docker_filepaths / "which_files.txt"
+    create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
     files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
     if args.enable == "vscode":
@@ -152,49 +155,33 @@ def setup_docker(args):
 
     change_directory_to(stagging_path)
 
-    try:
-        print("CHECKING DOCKER FUNCTIONALITY ...")
-        docker_tools = DockerTools()
-    except DockerException as docker_exception:
-        print("Docker Error\n", docker_exception, file=stderr)
-        exit(1)
-
     constants = Constants()
 
     buildargs = create_buildargs(environment, args.id)
+
     print(
         f"WARNING: Setting UID/GID of docker user to '{buildargs['UID']}/{buildargs['GID']}'"
     )
 
-    if not docker_tools.image_exists(constants.base_label):
-        print("BUILDING BASE DOCKERFILE ...")
-        response = docker_tools.build_image(
-            dockerfile="Dockerfile.base", tag=constants.base_label, buildargs=buildargs
-        )
-        for out in response:
-            print(out)
+    print("BUILDING BASE DOCKERFILE ...")
+    docker_tools.try_build_new_image(
+        dockerfile="Dockerfile.base", tag=constants.base_label, buildargs=buildargs
+    )
 
-    if not docker_tools.image_exists(constants.derived_label):
-        print("BUILDING TOOLKIT DOCKERFILE ...")
-        response = docker_tools.build_image(
-            dockerfile="Dockerfile.toolkit",
-            tag=constants.derived_label,
-            buildargs=buildargs,
-        )
-        for out in response:
-            print(out)
+    print("BUILDING TOOLKIT DOCKERFILE ...")
+    docker_tools.try_build_new_image(
+        dockerfile="Dockerfile.toolkit",
+        tag=constants.derived_label,
+        buildargs=buildargs,
+    )
 
-    if args.enable == "vscode" and not docker_tools.image_exists(
-        constants.vscode_label
-    ):
+    if args.enable == "vscode":
         print("BUILDING VSCODE DOCKERFILE ...")
-        response = docker_tools.build_image(
+        docker_tools.try_build_new_image(
             dockerfile="Dockerfile.vscode",
             tag=constants.vscode_label,
             buildargs=buildargs,
         )
-        for out in response:
-            print(out)
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
