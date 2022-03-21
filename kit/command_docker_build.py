@@ -91,7 +91,7 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
     """"""
     for filename in file_list:
         # filter out comment lines and empty lines
-        if not search("^\s*#|^\s*$", filename):
+        if not search(r"^\s*#|^\s*$", filename):
             yield filename.rstrip()
 
 
