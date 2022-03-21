@@ -23,11 +23,11 @@ RUN groupadd -g $GID $UNAME && \
 USER $UNAME
 
 # ADD copies and untars for us
-ADD toolkit.tar.gz $HOME/Intel-HE-Toolkit
-RUN chown -R $UNAME:$UNAME $HOME/Intel-HE-Toolkit
+ADD toolkit.tar.gz $HOME/he-toolkit
+RUN chown -R $UNAME:$UNAME $HOME/he-toolkit
 
 # Change directories to $HOME/Intel-HE-Toolkit
-WORKDIR $HOME/Intel-HE-Toolkit
+WORKDIR $HOME/he-toolkit
 
 # Initialize hekit
 RUN ./kit/hekit.py --config default.config init
@@ -36,7 +36,7 @@ RUN ./kit/hekit.py --config default.config init
 RUN  ./kit/hekit.py --config default.config install recipes/default.toml && \
      cp default.config $HOME/.hekit/
 
-RUN  ./kit/hekit.py --config default.config build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/Intel-HE-Toolkit"
-RUN  ./kit/hekit.py --config default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/Intel-HE-Toolkit"
+RUN  ./kit/hekit.py --config default.config build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+RUN  ./kit/hekit.py --config default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 
 ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash

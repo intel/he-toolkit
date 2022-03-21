@@ -145,7 +145,7 @@ def setup_docker(args):
     stagging_path.mkdir(exist_ok=True)
 
     toolkit_tar_gz = stagging_path / "toolkit.tar.gz"
-    archived_files = docker_filepaths / "which_files.txt"
+    archived_files = docker_filepaths / "which-files.txt"
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
     files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
