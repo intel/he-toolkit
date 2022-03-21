@@ -17,10 +17,10 @@ EXPOSE 8888/tcp
 # Download and install the latest version of code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create space for IDE settings
-RUN mkdir -p $HOME/User $HOME/.vscode && \
+# Create space for IDE settings and workspace
+RUN mkdir -p $HOME/User $HOME/.vscode $HOME/HE-Workspace && \
     # Move code-server IDE settings into correct location
-    cp $HOME/docker/IDE-Config/settings.json $HOME/.vscode/
+    cp $HOME/Intel-HE-Toolkit/docker/IDE-Config/settings.json $HOME/.vscode/
 
 # Install code-server extensions
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
@@ -32,8 +32,8 @@ RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Defaul
     # Create a randomly generated self-signed certificate for code-server \
     sed -i.bak 's/cert: false/cert: true/' $HOME/.config/code-server/config.yaml
 
-ENTRYPOINT code-server $HOME/he-samples \
-           --bind-addr 0.0.0.0:8888     \
-           --user-data-dir $HOME        \
-           --auth none                  \
+ENTRYPOINT code-server $HOME/HE-Workspace \
+           --bind-addr 0.0.0.0:8888       \
+           --user-data-dir $HOME          \
+           --auth none                    \
            --disable-telemetry
