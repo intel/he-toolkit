@@ -147,7 +147,7 @@ def parse_cmdline():
     )
     parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
     parser_docker_build.add_argument(
-        "--clean", action="store_true", help="delete stagging"
+        "--clean", action="store_true", help="delete staging"
     )
     # FIXME should this be its own subcommand?
     parser_docker_build.add_argument(

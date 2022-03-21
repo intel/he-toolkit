@@ -91,7 +91,7 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
     """"""
     for filename in file_list:
         # filter out comment lines and empty lines
-        if not search("^\s*#|^\s*$", filename):
+        if not search(r"^\s*#|^\s*$", filename):
             yield filename.rstrip()
 
 
@@ -113,10 +113,10 @@ def setup_docker(args):
 
     ROOT = Path(args.hekit_root_dir)
     docker_filepaths = ROOT / "docker"
-    stagging_path = ROOT / "__stagging__"
+    staging_path = ROOT / "__staging__"
 
     if args.clean:
-        rmtree(stagging_path)
+        rmtree(staging_path)
         print("Stagging area deleted")
         exit(0)
 
@@ -141,19 +141,19 @@ def setup_docker(args):
         )
         exit(0)
 
-    # set_stagging_area
-    stagging_path.mkdir(exist_ok=True)
+    # set_staging_area
+    staging_path.mkdir(exist_ok=True)
 
-    toolkit_tar_gz = stagging_path / "toolkit.tar.gz"
-    archived_files = docker_filepaths / "which_files.txt"
+    toolkit_tar_gz = staging_path / "toolkit.tar.gz"
+    archived_files = docker_filepaths / "which-files.txt"
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
     files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
     if args.enable == "vscode":
         files_to_copy.append("Dockerfile.vscode")
-    copyfiles(files_to_copy, src_dir=docker_filepaths, dst_dir=stagging_path)
+    copyfiles(files_to_copy, src_dir=docker_filepaths, dst_dir=staging_path)
 
-    change_directory_to(stagging_path)
+    change_directory_to(staging_path)
 
     constants = Constants()
 

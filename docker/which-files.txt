@@ -12,11 +12,11 @@ default.config
 docker/Dockerfile.base
 docker/Dockerfile.toolkit
 docker/Dockerfile.vscode
-docker/IDE-Config/settings.json
+docker/ide-config/settings.json
 docker/README.md
 docker/basic-docker-test.sh
 docker/runners.sh
-docker/which_files.txt
+docker/which-files.txt
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
 he-samples/cmake/gtest.cmake
