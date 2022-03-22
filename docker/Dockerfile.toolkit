@@ -29,14 +29,10 @@ USER $UNAME
 # Change directories to $HOME/Intel-HE-Toolkit
 WORKDIR $HOME/he-toolkit
 
-# Initialize hekit
-RUN mkdir $HOME/.hekit && cp default.config $HOME/.hekit
-RUN ./hekit init
-
-# fetch, build and install all the libraries
-RUN ./hekit install recipes/default.toml
-
-RUN ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
-RUN ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+# Initialize hekit and install librares, examples, and kernels
+RUN mkdir $HOME/.hekit && cp default.config $HOME/.hekit && ./hekit init && \
+    ./hekit install recipes/default.toml && \
+    ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
+    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 
 ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash
