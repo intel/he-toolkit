@@ -30,11 +30,11 @@ USER $UNAME
 WORKDIR $HOME/he-toolkit
 
 # Initialize hekit
-RUN ./kit/hekit.py --config default.config init
+RUN mkdir $HOME/.hekit && cp default.config $HOME/.hekit
+RUN ./kit/hekit.py init
 
 # fetch, build and install all the libraries
-RUN  ./kit/hekit.py --config default.config install recipes/default.toml && \
-     cp default.config $HOME/.hekit/
+RUN  ./kit/hekit.py --config default.config install recipes/default.toml
 
 RUN  ./kit/hekit.py --config default.config build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 RUN  ./kit/hekit.py --config default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
