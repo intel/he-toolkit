@@ -31,12 +31,12 @@ WORKDIR $HOME/he-toolkit
 
 # Initialize hekit
 RUN mkdir $HOME/.hekit && cp default.config $HOME/.hekit
-RUN ./kit/hekit.py init
+RUN ./hekit init
 
 # fetch, build and install all the libraries
-RUN  ./kit/hekit.py --config default.config install recipes/default.toml
+RUN ./hekit install recipes/default.toml
 
-RUN  ./kit/hekit.py --config default.config build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
-RUN  ./kit/hekit.py --config default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+RUN ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+RUN ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 
 ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash
