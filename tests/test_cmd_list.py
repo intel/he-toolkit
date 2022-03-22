@@ -26,7 +26,7 @@ def test_get_repo_properties_max_width(mocker):
     """Act"""
     act_props = RepoProperties("")
 
-    """assert"""
+    """Assert"""
     assert act_props.structure == exp_repo_structure
     assert act_props.width_comp == exp_width_comp
     assert act_props.width_inst == exp_width_inst
@@ -46,7 +46,7 @@ def test_get_repo_properties_without_instances(mocker):
     """Act"""
     act_props = RepoProperties("")
 
-    """assert"""
+    """Assert"""
     assert act_props.structure == exp_repo_structure
     assert act_props.width_comp == exp_width_comp
     assert act_props.width_inst == exp_width_inst
@@ -66,7 +66,7 @@ def test_get_repo_properties_without_components(mocker):
     """Act"""
     act_props = RepoProperties("")
 
-    """assert"""
+    """Assert"""
     assert act_props.structure == exp_repo_structure
     assert act_props.width_comp == exp_width_comp
     assert act_props.width_inst == exp_width_inst
