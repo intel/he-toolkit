@@ -291,7 +291,7 @@ def test_setup_docker_vscode(mocker):
     mock_change_dir.assert_called()
     mock_print.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
     mock_print.assert_any_call(
-        "Then to open vscode navigate to localhost:8888 in your chosen browser"
+        "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
     )
 
 

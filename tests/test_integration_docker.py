@@ -68,7 +68,7 @@ def test_docker_build_check_enable(mocker, restore_pwd):
     mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
     mock_print_build.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
     mock_print_build.assert_any_call(
-        "Then to open vscode navigate to localhost:8888 in your chosen browser"
+        "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
     )
     mock_print_tools.assert_any_call(client.value.replace('"', ""))
 
