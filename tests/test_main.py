@@ -15,7 +15,7 @@ def test_get_recipe_arg_dict_correct_format():
     """Act"""
     act_dict = get_recipe_arg_dict(act_arg)
 
-    """assert"""
+    """Assert"""
     assert exc_dict == act_dict
 
 
@@ -27,7 +27,7 @@ def test_get_recipe_arg_dict_duplicated_key():
     """Act"""
     act_dict = get_recipe_arg_dict(act_arg)
 
-    """assert"""
+    """Assert"""
     assert exc_dict == act_dict
 
 
@@ -39,7 +39,7 @@ def test_get_recipe_arg_dict_wrong_format():
     with pytest.raises(ValueError) as execinfo:
         get_recipe_arg_dict(act_arg)
 
-    """assert"""
+    """Assert"""
     assert "Wrong format for ['key3']. Expected key=value" == str(execinfo.value)
 
 
@@ -51,7 +51,7 @@ def test_get_recipe_arg_dict_missing_comma():
     with pytest.raises(ValueError) as execinfo:
         get_recipe_arg_dict(act_arg)
 
-    """assert"""
+    """Assert"""
     assert (
         "Wrong format for ['key1', 'value1key2', 'value2']. Expected key=value"
         == str(execinfo.value)

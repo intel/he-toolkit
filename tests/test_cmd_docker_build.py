@@ -3,7 +3,7 @@
 
 import pytest
 from pathlib import Path
-from .context import command_docker_build
+from .context import command_docker_build, docker_tools
 from docker_tools import DockerException
 from command_docker_build import (
     copyfiles,
@@ -28,7 +28,7 @@ def test_copyfiles_execution(mocker):
     """Act"""
     copyfiles(files, src_dir, dst_dir)
 
-    """assert"""
+    """Assert"""
     assert 3 == mock_copyfile.call_count
     mock_copyfile.assert_called_with(exp_arg1, exp_arg2)
 
@@ -41,7 +41,7 @@ def test_create_buildargs_with_ID(mocker):
     """Act"""
     exp_value = create_buildargs(act_env, act_ID)
 
-    """assert"""
+    """Assert"""
     assert exp_value["UID"] == str(act_ID)
     assert exp_value["GID"] == str(act_ID)
     assert exp_value["UNAME"] == "Bob"
@@ -59,7 +59,7 @@ def test_create_buildargs_Darwin(mocker):
     """Act"""
     exp_value = create_buildargs(act_env, act_ID)
 
-    """assert"""
+    """Assert"""
     assert exp_value["UID"] == str(exp_ID)
     assert exp_value["GID"] == str(exp_ID)
     assert exp_value["UNAME"] == "Bob"
@@ -81,7 +81,7 @@ def test_create_buildargs_other(mocker):
     """Act"""
     exp_value = create_buildargs(act_env, act_ID)
 
-    """assert"""
+    """Assert"""
     assert exp_value["UID"] == str(exp_uid)
     assert exp_value["GID"] == str(exp_id)
     assert exp_value["UNAME"] == "Bob"
@@ -98,7 +98,7 @@ def test_print_preamble_normal_execution(mocker):
     """Act"""
     print_preamble()
 
-    """assert"""
+    """Assert"""
     mock_print.assert_called_once()
     mock_exit.assert_not_called()
 
@@ -113,7 +113,7 @@ def test_print_preamble_KeyboardInterrupt(mocker):
     """Act"""
     print_preamble()
 
-    """assert"""
+    """Assert"""
     assert 2 == mock_print.call_count
     mock_exit.assert_called_once_with(1)
 
@@ -126,7 +126,7 @@ def test_filter_file_list_execution(mocker):
     """Act"""
     exp_value = filter_file_list(file_list)
 
-    """assert"""
+    """Assert"""
     assert next(exp_value) == exp_file
 
 
@@ -148,7 +148,7 @@ def test_create_tar_gz_file_execution(mocker):
     """Act"""
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
-    """assert"""
+    """Assert"""
     mock_print.assert_called_once_with("MAKING TOOLKIT.TAR.GZ ...")
     mock_open.assert_called_once_with(archived_files)
     mock_compress.assert_called_with(toolkit_tar_gz, exp_files, root=ROOT)
@@ -173,7 +173,7 @@ def test_create_tar_gz_file_FileExistsError(mocker):
     """Act"""
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
-    """assert"""
+    """Assert"""
     assert 2 == mock_print.call_count
     mock_open.assert_called_once_with(archived_files)
     mock_compress.assert_called_with(toolkit_tar_gz, exp_files, root=ROOT)
@@ -195,7 +195,7 @@ def test_create_tar_gz_file_File_Exists(mocker):
     """Act"""
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
-    """assert"""
+    """Assert"""
     mock_print.assert_not_called()
     mock_open.assert_not_called()
     mock_filter.assert_not_called()
@@ -214,7 +214,7 @@ def test_setup_docker_clean(mocker):
     with pytest.raises(SystemExit) as exc_info:
         setup_docker(args)
 
-    """assert"""
+    """Assert"""
     mock_rmtree.assert_called_with(Path(args.hekit_root_dir) / "__staging__")
     mock_print.assert_called_with("Stagging area deleted")
     mock_print_preamble.assert_not_called()
@@ -235,7 +235,7 @@ def test_setup_docker_docker_error(mocker):
     with pytest.raises(SystemExit) as exc_info:
         setup_docker(args)
 
-    """assert"""
+    """Assert"""
     mock_rmtree.assert_not_called()
     mock_print_preamble.assert_called()
     mock_DockerTools.assert_called()
@@ -256,7 +256,7 @@ def test_setup_docker_check_only(mocker):
     with pytest.raises(SystemExit) as exc_info:
         setup_docker(args)
 
-    """assert"""
+    """Assert"""
     mock_rmtree.assert_not_called()
     mock_print_preamble.assert_not_called()
     mock_DockerTools.assert_called()
@@ -281,7 +281,7 @@ def test_setup_docker_vscode(mocker):
     """Act"""
     setup_docker(args)
 
-    """assert"""
+    """Assert"""
     mock_rmtree.assert_not_called()
     mock_print_preamble.assert_not_called()
     mock_DockerTools.assert_called()
@@ -291,7 +291,7 @@ def test_setup_docker_vscode(mocker):
     mock_change_dir.assert_called()
     mock_print.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
     mock_print.assert_any_call(
-        "Then to open vscode navigate to localhost:8888 in your chosen browser"
+        "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
     )
 
 
@@ -320,7 +320,7 @@ def test_setup_docker_build(mocker):
     """Act"""
     setup_docker(args)
 
-    """assert"""
+    """Assert"""
     mock_rmtree.assert_not_called()
     mock_print_preamble.assert_not_called()
     mock_DockerTools.assert_called()

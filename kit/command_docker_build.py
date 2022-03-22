@@ -109,7 +109,6 @@ def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
 
 def setup_docker(args):
     """Build the docker for the toolkit"""
-
     ROOT = Path(args.hekit_root_dir)
     docker_filepaths = ROOT / "docker"
     staging_path = ROOT / "__staging__"

@@ -20,7 +20,7 @@ def test_build_image_response_stream(mocker):
     act_docker = DockerTools()
     response = act_docker.build_image("", "", [])
 
-    """assert"""
+    """Assert"""
     assert next(response) == value.replace('"', "")
 
 
@@ -39,7 +39,7 @@ def test_build_image_response_aux(mocker):
     act_docker = DockerTools()
     response = act_docker.build_image("", "", [])
 
-    """assert"""
+    """Assert"""
     assert next(response) == value_ID.replace('"', "")
 
 
@@ -59,7 +59,7 @@ def test_build_image_response_error(mocker):
         response = act_docker.build_image("", "", [])
         next(response)
 
-    """assert"""
+    """Assert"""
     assert "Docker build failed" == str(exc_info.value)
 
 
@@ -79,7 +79,7 @@ def test_build_image_response_other(mocker):
         response = act_docker.build_image("", "", [])
         next(response)
 
-    """assert"""
+    """Assert"""
     assert "Unrecognised stream property" == str(exc_info.value)
 
 
@@ -96,7 +96,7 @@ def test_image_exists_empty_list(mocker):
     act_docker = DockerTools()
     response = act_docker.image_exists("")
 
-    """assert"""
+    """Assert"""
     assert response == False
 
 
@@ -113,7 +113,7 @@ def test_image_exists_not_empty_list(mocker):
     act_docker = DockerTools()
     response = act_docker.image_exists("")
 
-    """assert"""
+    """Assert"""
     assert response == True
 
 
@@ -130,7 +130,7 @@ def test_image_exists_some_elements_list(mocker):
     act_docker = DockerTools()
     response = act_docker.image_exists("")
 
-    """assert"""
+    """Assert"""
     assert response == True
 
 
@@ -148,7 +148,7 @@ def test_run_script_in_container_normal_execution(mocker):
     act_docker = DockerTools()
     response = act_docker.run_script_in_container([], "")
 
-    """assert"""
+    """Assert"""
     act_log, _ = next(response)
     _, act_code = next(response)
     assert act_log == exp_log
@@ -169,7 +169,7 @@ def test_try_build_new_image_build_skipped(mocker):
     act_docker = DockerTools()
     act_docker.try_build_new_image([], "", "")
 
-    """assert"""
+    """Assert"""
     mock_print.assert_not_called()
 
 
@@ -190,7 +190,7 @@ def test_try_build_new_image_build_executed(mocker):
     act_docker = DockerTools()
     act_docker.try_build_new_image([], "", "")
 
-    """assert"""
+    """Assert"""
     mock_print.assert_called_once_with(value.replace('"', ""))
 
 
@@ -210,7 +210,7 @@ def test_test_connection_no_error(mocker):
     act_docker = DockerTools()
     act_docker.test_connection("", "")
 
-    """assert"""
+    """Assert"""
     exp_arg = exp_log.decode("utf-8").replace('"', "")
     mock_print.assert_any_call("[CONTAINER]", exp_arg, end="")
     mock_exit.assert_not_called()
@@ -232,7 +232,7 @@ def test_test_connection_error(mocker):
     act_docker = DockerTools()
     act_docker.test_connection("", "")
 
-    """assert"""
+    """Assert"""
     mock_print.assert_any_call("[CONTAINER]", "\n", end="")
     mock_exit.assert_called_once_with(1)
 
