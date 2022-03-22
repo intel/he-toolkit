@@ -19,12 +19,12 @@ RUN groupadd -g $GID $UNAME && \
     useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
     echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Switch user to $UNAME
-USER $UNAME
-
 # ADD copies and untars for us
 ADD toolkit.tar.gz $HOME/he-toolkit
 RUN chown -R $UNAME:$UNAME $HOME/he-toolkit
+
+# Switch user to $UNAME
+USER $UNAME
 
 # Change directories to $HOME/Intel-HE-Toolkit
 WORKDIR $HOME/he-toolkit
