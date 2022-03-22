@@ -154,20 +154,50 @@ are common to both sets. See the [README](he-samples/examples/psi/README.md)
 for usage information.
 
 # Contributing
-At this time, Intel HE Toolkit does not accept external contributions. We
-encourage feedback and suggestions via
-[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
-[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
+Intel HE Toolkit welcomes external contributions through pull requests to the
+`main` branch.
 
-For Intel developers, ensure the [pre-commit](https://pre-commit.com) config is
-active prior to contributing, i.e. run
+Please sign your commits before making a pull request. See instructions
+[here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)
+for how to sign commits.
+
+Before contributing, please ensure the [pre-commit](https://pre-commit.com)
+checks pass, i.e. run
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
 and make sure all pre-commit checks pass.
 
-**NOTE:** Please ensure you are using clang-format version >= 10
+Also please run
+```bash
+pytest tests
+```
+to make sure the tests pass.
+
+We encourage feedback and suggestions via
+[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
+[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
+
+
+## Troubleshooting ##
+
+* ```Executable `cpplint` not found```
+
+  Make sure you install cpplint: ```pip install cpplint```.
+  If you install `cpplint` locally, make sure to add it to your `PATH`.
+
+* ```/bin/sh: 1: pre-commit: not found```
+
+  Install `pre-commit`. More info at https://pre-commit.com/.
+
+* ```
+     error: gpg failed to sign the data
+     fatal: failed to write commit object
+  ```
+  Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
+  as `~/.bashrc`.
+
 
 # Contributors
 The Intel contributors to this project, sorted by last name, are

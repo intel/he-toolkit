@@ -19,24 +19,24 @@ RUN groupadd -g $GID $UNAME && \
     useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
     echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Switch user to $UNAME
-USER $UNAME
-
 # ADD copies and untars for us
 ADD toolkit.tar.gz $HOME/he-toolkit
 RUN chown -R $UNAME:$UNAME $HOME/he-toolkit
+
+# Switch user to $UNAME
+USER $UNAME
 
 # Change directories to $HOME/Intel-HE-Toolkit
 WORKDIR $HOME/he-toolkit
 
 # Initialize hekit
-RUN ./kit/hekit.py --config default.config init
+RUN mkdir $HOME/.hekit && cp default.config $HOME/.hekit
+RUN ./hekit init
 
 # fetch, build and install all the libraries
-RUN  ./kit/hekit.py --config default.config install recipes/default.toml && \
-     cp default.config $HOME/.hekit/
+RUN ./hekit install recipes/default.toml
 
-RUN  ./kit/hekit.py --config default.config build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
-RUN  ./kit/hekit.py --config default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+RUN ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+RUN ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 
 ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash

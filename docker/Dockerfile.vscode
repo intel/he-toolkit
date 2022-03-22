@@ -18,9 +18,10 @@ EXPOSE 8888/tcp
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Create space for IDE settings and workspace
-RUN mkdir -p $HOME/User $HOME/.vscode $HOME/he-workspace && \
+RUN mkdir -p $HOME/User $HOME/he-workspace/.vscode && \
     # Move code-server IDE settings into correct location
-    cp $HOME/he-toolkit/docker/ide-config/settings.json $HOME/.vscode/
+    cp $HOME/he-toolkit/docker/ide-config/settings.json $HOME/he-workspace/.vscode/ && \
+    cp -r $HOME/he-toolkit/he-samples $HOME/he-workspace/
 
 # Install code-server extensions
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \

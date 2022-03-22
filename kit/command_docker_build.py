@@ -184,7 +184,7 @@ def setup_docker(args):
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
     if args.enable == "vscode":
-        print(f"docker run -d -p 8888:8888 {constants.vscode_label}")
-        print("Then to open vscode navigate to localhost:8888 in your chosen browser")
+        print(f"docker run -d -p <ip addr>:<port>:8888 {constants.vscode_label}")
+        print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
         print(f"docker run -it {constants.derived_label}")

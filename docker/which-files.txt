@@ -12,9 +12,9 @@ default.config
 docker/Dockerfile.base
 docker/Dockerfile.toolkit
 docker/Dockerfile.vscode
-docker/ide-config/settings.json
 docker/README.md
 docker/basic-docker-test.sh
+docker/ide-config/settings.json
 docker/runners.sh
 docker/which-files.txt
 he-samples/cmake/gbenchmark.cmake
@@ -130,11 +130,14 @@ tests/config/default.config
 tests/config/test.toml
 tests/config/test_two_instances.toml
 tests/context.py
+tests/test_cmd_docker_build.py
 tests/test_cmd_init.py
 tests/test_cmd_install.py
 tests/test_cmd_list.py
 tests/test_cmd_remove.py
 tests/test_comp_builder.py
+tests/test_docker_tool.py
+tests/test_integration_install.py
 tests/test_main.py
 tests/test_spec.py
 tests/test_tab_comp.py
