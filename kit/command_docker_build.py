@@ -20,8 +20,8 @@ class Constants:
     user: str = getuser()
     # TODO remove hardcoding of version
     base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
-    derived_label: str = f"{getuser()}/ubuntu_he_test"
-    vscode_label: str = f"{getuser()}/ubuntu_he_vscode"
+    derived_label: str = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
+    vscode_label: str = f"{getuser()}/ubuntu_he_vscode:2.0.0"
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
