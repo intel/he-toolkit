@@ -21,7 +21,7 @@ he-benchmarks-venv/
 .DS_Store
 
 # toolkit docker build artifacts
-__stagging__/
+__staging__/
 
 # HElib
 **/helib.log

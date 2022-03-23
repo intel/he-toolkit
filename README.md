@@ -30,6 +30,7 @@ applications.
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
 - [Contributing](#contributing)
+  - [Troubleshooting ##](#troubleshooting-##)
 - [Contributors](#contributors)
 
 
@@ -86,8 +87,8 @@ detailed description on the usage and components of this build.
 Alternatively, one can build the toolkit's HE components using the following commands
 
 ```bash
-cd </path/to/toolkit>/he-samples
-hekit install
+cd <path/to/toolkit>/he-samples
+hekit install recipes/default.toml
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
