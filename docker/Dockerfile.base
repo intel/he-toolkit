@@ -35,6 +35,7 @@ RUN apt update && \
                    gcc-10                         \
                    git                            \
                    htop                           \
+                   jq                             \
                    libgmp-dev                     \
                    libterm-readline-gnu-perl      \
                    m4                             \

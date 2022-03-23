@@ -29,7 +29,8 @@ RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do
     done
 
 # Update code-server user settings
-RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > $HOME/User/settings.json && \
+RUN echo '{"extensions.autoUpdate": false, "workbench.colorTheme": "Default Dark+"}' |\
+    jq . > $HOME/User/settings.json && \
     # Create a randomly generated self-signed certificate for code-server \
     sed -i.bak 's/cert: false/cert: true/' $HOME/.config/code-server/config.yaml
 

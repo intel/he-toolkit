@@ -160,6 +160,7 @@ def parse_cmdline():
     parser_docker_build.add_argument(
         "--enable",
         type=str,
+        choices=["vscode"],
         help="add/enable extra features in docker build of toolkit",
     )
     parser_docker_build.add_argument(
