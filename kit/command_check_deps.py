@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import subprocess
+from subprocess import run as subprocess_run
 from re import search
 from shutil import which
 from enum import Enum, auto
@@ -84,7 +84,7 @@ def check_dependency(dep: Dep) -> None:
         print(f"'{dep.name}' found")
         return
     version_flag = "--version"
-    output = subprocess.run([dep.name, version_flag], capture_output=True)
+    output = subprocess_run([dep.name, version_flag], capture_output=True)
     if output.returncode == 0:
         stdout = output.stdout.decode("utf-8")
         version_found = search("\d+(\.\d+)*", stdout)
