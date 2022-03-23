@@ -76,7 +76,7 @@ def append_to_rc(path: str, content: str) -> None:
             rc_file.write(line)
 
 
-def get_rc_file():
+def get_rc_file() -> str:
     """ Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
@@ -85,8 +85,9 @@ def get_rc_file():
         rc_file = "~/.bash_profile"
         if not Path(rc_file).expanduser().resolve().exists():
             rc_file = "~/.bashrc"
-    elif active_shell_path == "zsh":
-        rc_file = ""
+    # TODO add support for other popular shells
+    #    elif active_shell_path == "zsh":
+    #        rc_file = ""
     else:
         raise ValueError(f"Unknown shell '{active_shell_path}'")
 
@@ -95,6 +96,10 @@ def get_rc_file():
 
 def init_hekit(args):
     """Initialize hekit"""
+    # Create ~/.hekit, this should always exist
+    Path("~/.hekit").expanduser().mkdir(exist_ok=True)
+
+    # Modify shell init file
     rc_file = get_rc_file()
     rc_backup_file = create_backup(rc_file)
     print("Backup file created at", rc_backup_file)
@@ -112,5 +117,17 @@ def init_hekit(args):
     content = "\n".join([path_line, eval_lines])
 
     append_to_rc(rc_file, content)
+
+    # TODO This flow should be improved
+    # Setup config file
+    if args.default_config:
+        default_config_path = Path("~/.hekit/default.config").expanduser()
+        if default_config_path.exists():
+            print("~/.hekit/default.config file already exists")
+        else:
+            copyfile(args.hekit_root_dir / "default.config", default_config_path)
+            print("~/.hekit/default.config created")
+
+    # Instructions for user
     print("Please, source your shell init file as follows")
     print(f"source {rc_file}")

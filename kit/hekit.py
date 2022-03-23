@@ -70,6 +70,9 @@ def parse_cmdline():
 
     # create the parser for the "init" command
     parser_init = subparsers.add_parser("init", description="initialize hekit")
+    parser_init.add_argument(
+        "--default-config", action="store_true", help="setup default config file"
+    )
     parser_init.set_defaults(fn=init_hekit, hekit_root_dir=hekit_root_dir)
 
     # create the parser for the "list" command
@@ -180,8 +183,10 @@ def main():
 
     # Load config file
     try:
-        # replace the filename with the actual config
-        args.config = load_config(args.config)
+        # FIXME logic convoluted here
+        if args.fn != init_hekit:
+            # replace the filename with the actual config
+            args.config = load_config(args.config)
     except Exception as e:
         # Exit on any exception from config file
         print("Error while parsing config file\n", f"{e!r}", file=stderr)
