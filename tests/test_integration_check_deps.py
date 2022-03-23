@@ -124,6 +124,6 @@ class MockSubprocess:
         self.vers = version
         self.returncode = 0
         self.message = (
-            f"{program} (Ubuntu) {version}\nCopyright (C) 2022 \nThis is free software"
+            f"{program} (OS) {version}\nCopyright (C) 2022 \nThis is free software"
         )
         self.stdout = self.message.encode("ascii")

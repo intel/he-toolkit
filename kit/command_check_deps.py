@@ -87,7 +87,7 @@ def check_dependency(dep: Dep) -> None:
     output = subprocess_run([dep.name, version_flag], capture_output=True)
     if output.returncode == 0:
         stdout = output.stdout.decode("utf-8")
-        version_found = search("\d+(\.\d+)*", stdout)
+        version_found = search(r"\d+(\.\d+)*", stdout)
         if version_found:
             ver_str = version_found.group(0)
             version = version_string_to_tuple(ver_str)
@@ -124,7 +124,7 @@ def check_dependencies(args) -> None:
         exit(1)
 
     # filter out comment lines and empty lines
-    filtered_lines = (line for line in lines if not search("^\s*#|^\s*$", line))
+    filtered_lines = (line for line in lines if not search(r"^\s*#|^\s*$", line))
 
     # At the mo, dependencies file is very constrained
     check_dependencies_list(filtered_lines)
