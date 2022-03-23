@@ -19,7 +19,7 @@ def test_docker_build_check_build(mocker):
     """Arrange"""
     args = MockArgs(check_only=False, clean=False, enable=None)
     client = MockClient()
-    derived_label = f"{getuser()}/ubuntu_he_test"
+    derived_label = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
 
     # Mocking command line args
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
