@@ -55,7 +55,7 @@ def parse_dependencies(dep_and_ver_str: str) -> Dep:
     """Separate dependencies, versions, and operations.
     Matches either a string i.e 'python' or triple string i.e. 'python >= 3.8'
     """
-    match = search("(.*)(>=|==)(.*)", dep_and_ver_str)
+    match = search(r"(.*)(>=|==)(.*)", dep_and_ver_str)
     if match:
         dep_str, op_str, ver_str = match.groups()
         return Dep.make_from_triple(dep_str.strip(), op_str, ver_str.strip())
@@ -119,7 +119,7 @@ def check_dependencies(args) -> None:
     try:
         with path.open() as f:
             lines = f.readlines()
-    except FileNotFoundError as file_not_found:
+    except FileNotFoundError:
         print(f"File '{path}' does not exist")
         exit(1)
 

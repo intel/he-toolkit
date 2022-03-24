@@ -1,12 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from docker import from_env as docker_from_env
-from docker.errors import DockerException
-
 import json
 from sys import stderr
 from pathlib import Path
+
+from docker import from_env as docker_from_env
+from docker.errors import DockerException
 
 
 class DockerBuildError(Exception):

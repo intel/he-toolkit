@@ -26,7 +26,7 @@ try:
     from command_docker_build import setup_docker
 except ImportError as ie:
 
-    def setup_docker(arg):
+    def setup_docker(arg):  # pylint: disable=unused-argument
         print("This command is disabled. To enable it install the docker-py dependency")
         print("  pip install docker")
 

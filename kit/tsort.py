@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""Module providing a topological sort"""
+
 
 class CycleError(Exception):
     """Error for indicating a cycle found in an DAG"""

@@ -1,11 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from toml import load
 from os import walk
 from pathlib import Path
 from itertools import chain
 from typing import Dict, List
+
+from toml import load
 
 # Number of separation spaces for columns
 _SEP_SPACES = 2
