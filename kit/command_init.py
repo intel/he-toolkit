@@ -4,8 +4,7 @@
 from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
-from filecmp import cmp as compare_files
-from importlib import util
+from filecmp import cmp as same_files
 
 
 class Tags:
@@ -29,7 +28,7 @@ def create_backup(path: str, ext: str = ".hekit.bak") -> str:
     backup = path.with_suffix(ext)
     copyfile(path, backup)
     # Sanity check - we really need to guarantee we copied the file
-    if compare_files(path, backup, shallow=False) == False:
+    if not same_files(path, backup, shallow=False):
         raise ValueError("Backup file does not match original")
     return backup
 
