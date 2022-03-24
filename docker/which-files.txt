@@ -1,4 +1,7 @@
 .clang-format
+.github/hekit-recipes/helib.toml
+.github/hekit-recipes/palisade.toml
+.github/hekit-recipes/seal.toml
 .github/workflows/github-ci.yml
 .gitignore
 .pre-commit-config.yaml
@@ -127,9 +130,11 @@ recipes/sample-kernels.toml
 recipes/test.toml
 tests/__init__.py
 tests/config/default.config
+tests/config/dependencies.txt
 tests/config/test.toml
 tests/config/test_two_instances.toml
 tests/context.py
+tests/test_cmd_check_deps.py
 tests/test_cmd_docker_build.py
 tests/test_cmd_init.py
 tests/test_cmd_install.py
@@ -137,6 +142,8 @@ tests/test_cmd_list.py
 tests/test_cmd_remove.py
 tests/test_comp_builder.py
 tests/test_docker_tool.py
+tests/test_integration_check_deps.py
+tests/test_integration_docker.py
 tests/test_integration_install.py
 tests/test_main.py
 tests/test_spec.py
