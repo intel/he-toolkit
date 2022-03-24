@@ -59,8 +59,9 @@ def parse_dependencies(dep_and_ver_str: str) -> Dep:
     if match:
         dep_str, op_str, ver_str = match.groups()
         return Dep.make_from_triple(dep_str.strip(), op_str, ver_str.strip())
-    else:  # assume str
-        return Dep.make_from_str(dep_and_ver_str.strip())
+
+    # else assume str
+    return Dep.make_from_str(dep_and_ver_str.strip())
 
 
 def check_dependency(dep: Dep) -> None:

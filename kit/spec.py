@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module handles the specification file a.k.a. recipe"""
+
 from re import findall
 from dataclasses import dataclass
 from typing import Dict
@@ -41,11 +43,12 @@ def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
                 new_s = new_s.replace(symbol, value)
 
             return new_s
-        elif isinstance(s, list):
+
+        if isinstance(s, list):
             return [fill_user_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
+
+        # Not str or list
+        return s
 
     return {k: fill_user_str(v) for k, v in d.items()}
 
@@ -66,11 +69,12 @@ def fill_self_ref_string_dict(d, repo_path):
                 new_s = new_s.replace(symbol, fill_str(d[k]))
 
             return new_s
-        elif isinstance(s, list):
+
+        if isinstance(s, list):
             return [fill_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
+
+        # Not str or list
+        return s
 
     def fill_dep_str(s):
         """s can be a string or a list of strings"""
@@ -87,11 +91,12 @@ def fill_self_ref_string_dict(d, repo_path):
                 new_s = new_s.replace(symbol, sub)
 
             return new_s
-        elif isinstance(s, list):
+
+        if isinstance(s, list):
             return [fill_dep_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
+
+        # Not str or list
+        return s
 
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 

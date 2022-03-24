@@ -45,7 +45,8 @@ def remove_from_rc(path: str) -> None:
 
     if start_tag_count == 0 and end_tag_count == 0:
         return  # nothing to do
-    elif start_tag_count == 1 and end_tag_count == 1:
+
+    if start_tag_count == 1 and end_tag_count == 1:
         start_index, end_index = lines.index(Tags.start_tag), lines.index(Tags.end_tag)
         lines_to_write = (
             line for i, line in enumerate(lines) if not start_index <= i <= end_index
