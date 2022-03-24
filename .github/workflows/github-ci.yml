@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup
         run: |
-          pip3 install pytest pytest-mock toml
+          pip3 install pytest pytest-mock toml docker
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
         run: pytest tests/
