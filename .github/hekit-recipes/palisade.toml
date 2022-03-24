@@ -58,6 +58,7 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DHEXL_DIR=$%hexl%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 post-build = ""
+init_install_dir = ""
 install = ""
 # Dependencies
 palisade = "palisade/v1.11.6"

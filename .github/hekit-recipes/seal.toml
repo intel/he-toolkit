@@ -98,6 +98,7 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DHEXL_DIR=$%hexl%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 post-build = ""
+init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
@@ -120,6 +121,7 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DHEXL_DIR=$%hexl%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 post-build = ""
+init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
@@ -143,6 +145,7 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DHEXL_DIR=$%hexl%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 post-build = ""
+init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"

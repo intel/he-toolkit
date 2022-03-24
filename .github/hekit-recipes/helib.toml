@@ -70,6 +70,7 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -Dhelib_DIR=$%helib%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 post-build = ""
+init_install_dir = ""
 install = ""
 # Dependencies
 helib = "helib/v2.2.1"
