@@ -1,13 +1,13 @@
 # Intel Homomorphic Encryption Toolkit
-
-The Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
+Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
 delivering innovation around HE with the aim of providing both the community
-and industry with an intuitive entry point into exploring HE technologies.
-The HE Toolkit currently offers sample kernels and example programs that
-demonstrate varying operations and applications that can be built leveraging
-three major HE libraries [Microsoft SEAL](https://github.com/microsoft/SEAL),
+and industry with an intuitive entry point for Experimentation, Development and
+Deployment of HE applications. Intel HE oolkit currently offers sample kernels
+and example programs that demonstrate varying operations and applications that
+can be built leveraging three major HE libraries [Microsoft
+SEAL](https://github.com/microsoft/SEAL),
 [PALISADE](https://gitlab.com/palisade/palisade-release), and
-[HElib](https://github.com/homenc/HElib). Additionally, Intel's HE Toolkit
+[HElib](https://github.com/homenc/HElib). Moreover, Intel HE Toolkit
 demonstrates the advantages of using Intel® Processors through libraries such
 as the [Intel HE Acceleration Library](https://github.com/intel/hexl) to
 utilize the latest Intel hardware features.
@@ -89,8 +89,7 @@ Alternatively, one can build the toolkit's HE components using the following
 commands
 
 ```bash
-cd <path/to/toolkit>/he-samples
-hekit install recipes/default.toml
+hekit install <path/to/toolkit>/recipes/default.toml
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
