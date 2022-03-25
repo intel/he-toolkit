@@ -1,16 +1,16 @@
 # Intel Homomorphic Encryption Toolkit
-The Intel Homomorphic Encryption (HE) toolkit is designed to make it fast and
-easy to evaluate homomorphic encryption technology on Intel® Processors using
-libraries, such as [Intel HE Acceleration Library](https://github.com/intel/hexl), optimized to
-take advantage of the newest Intel hardware features.  Additionally, the Intel
-HE-Toolkit is a great starting point for people new to homomorphic encryption,
-offering sample kernels showing multiple examples of how the libraries can be
-used to implement common mathematical operations using
-[Microsoft SEAL](https://github.com/microsoft/SEAL),
-[PALISADE](https://gitlab.com/palisade/palisade-release), or
-[HElib](https://github.com/homenc/HElib). In addition, there are example
-applications which demonstrate how HE technology can be used to create secure
-applications.
+
+The Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
+delivering innovation around HE with the aim of providing both the community
+and industry with an intuitive entry point into exploring HE technologies.
+The HE Toolkit currently offers sample kernels and example programs that
+demonstrate varying operations and applications that can be built leveraging
+three major HE libraries [Microsoft SEAL](https://github.com/microsoft/SEAL),
+[PALISADE](https://gitlab.com/palisade/palisade-release), and
+[HElib](https://github.com/homenc/HElib). Additionally, Intel's HE Toolkit
+demonstrates the advantages of using Intel® Processors through libraries such
+as the [Intel HE Acceleration Library](https://github.com/intel/hexl) to
+utilize the latest Intel hardware features.
 
 
 ## Contents
@@ -46,12 +46,14 @@ python >= 3.8
 Further Python dependencies include,
 ```
 toml
-argparse (optional for tab completion)
+argcomplete (optional for tab completion)
 pytest (optional for running tests)
+pytest-mock (optional for running tests)
+docker (optional for building docker containers)
 ```
 
 However, to build anything useful with the toolkit, we recommend that in
-addition the following, system dependencies,
+addition to install the following system dependencies,
 
 ```
 m4
@@ -63,16 +65,14 @@ virtualenv
 autoconf
 ```
 
-Specific system dependencies for toolkit components can be found in the respective
-directory of each HE component.
-
-
 ## Instructions
-Intel HE toolkit is primarily accessible through the `hekit` command.
-There are currently two ways of interacting with the toolkit: through a Docker
-build; or, directly on your system.
+Intel HE toolkit is primarily accessible through the `hekit` command.  There
+are currently two ways of interacting with the toolkit: through a Docker build;
+or, directly on your system.
 
 ### The hekit command
+**Move some of the kit/README to here**
+
 The `hekit` subcommands can be used by the user to easily setup the required
 environment to evaluate HE technology. See the [README](kit/README.md) for
 instructions.
@@ -80,11 +80,13 @@ instructions.
 ### Docker build (Recommended)
 The **recommended** method is to use the Docker build and installation which
 builds the toolkit in its entirety including all HE libraries in a
-self-contained docker container running Ubuntu 20.04. See [here](docker) for a
-detailed description on the usage and components of this build.
+self-contained docker container running Ubuntu 20.04. This can be built through
+the `hekit` command `hekit docker-build`. See [here](docker) for a detailed
+description on the usage and components of this build.
 
 ### System build of toolkit's HE components
-Alternatively, one can build the toolkit's HE components using the following commands
+Alternatively, one can build the toolkit's HE components using the following
+commands
 
 ```bash
 cd <path/to/toolkit>/he-samples
@@ -92,7 +94,8 @@ hekit install recipes/default.toml
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
-download and build all three HE libraries automatically with Intel HE Acceleration Library enabled.
+download and build all three HE libraries automatically with Intel HE
+Acceleration Library enabled.
 
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
@@ -192,7 +195,8 @@ We encourage feedback and suggestions via
 
   Install `pre-commit`. More info at https://pre-commit.com/.
 
-* ```
+* When attempting to sign a commit
+  ```
      error: gpg failed to sign the data
      fatal: failed to write commit object
   ```
@@ -201,7 +205,7 @@ We encourage feedback and suggestions via
 
 
 # Contributors
-The Intel contributors to this project, sorted by last name, are
+The Intel past and present contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
