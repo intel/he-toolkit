@@ -18,10 +18,10 @@ utilize the latest Intel hardware features.
 - [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
   - [Contents](#contents)
   - [Dependencies](#dependencies)
-  - [Instructions](#instructions)
-    - [The hekit command](#the-hekit-command)
-    - [Docker build (Recommended)](#docker-build-recommended)
-    - [System build of toolkit's HE components](#system-build-of-toolkits-he-components)
+  - [Setup](#setup)
+  - [The hekit command](#the-hekit-command)
+  - [Docker build (Recommended)](#docker-build-recommended)
+  - [System build](#system-build)
   - [Kernels](#kernels)
     - [Sample kernels](#sample-kernels)
     - [Test sample kernels](#test-sample-kernels)
@@ -47,9 +47,9 @@ Further Python dependencies include,
 ```
 toml
 argcomplete (optional for tab completion)
-pytest (optional for running tests)
+pytest      (optional for running tests)
 pytest-mock (optional for running tests)
-docker (optional for building docker containers)
+docker      (optional for building docker containers)
 ```
 
 However, to build anything useful with the toolkit, we recommend that in
@@ -61,35 +61,51 @@ patchelf
 cmake >= 3.13
 g++ >= 10.0 or clang >= 10.0
 pthread
-virtualenv
-autoconf
+virtualenv (optional if building the Logistic Regression Example)
+autoconf   (optional if using PALISADE)
+gmp        (optional if using HElib)
 ```
 
-## Instructions
+## Setup
+To set up the toolkit users must first initialize the `hekit` command using
+```bash
+git clone https://github.com/intel/he-toolkit.git
+cd he-toolkit
+./hekit --config default.config init
+```
+
+This will create a directory `~/.hekit` in the user's home directory and copy
+the `default.config`, or other user specified config file to this location.
+This directory will be where all components built and installed by `hekit` be
+kept.
+
+In addition to this, the `hekit` command will be added to the user's `PATH` so
+as to enable the user to call the command from anyway on their system.
+
 Intel HE toolkit is primarily accessible through the `hekit` command.  There
 are currently two ways of interacting with the toolkit: through a Docker build;
 or, directly on your system.
 
-### The hekit command
+## The hekit command
 **Move some of the kit/README to here**
 
 The `hekit` subcommands can be used by the user to easily setup the required
 environment to evaluate HE technology. See the [README](kit/README.md) for
 instructions.
 
-### Docker build (Recommended)
+## Docker build (Recommended)
 The **recommended** method is to use the Docker build and installation which
 builds the toolkit in its entirety including all HE libraries in a
 self-contained docker container running Ubuntu 20.04. This can be built through
 the `hekit` command `hekit docker-build`. See [here](docker) for a detailed
 description on the usage and components of this build.
 
-### System build of toolkit's HE components
+## System build
 Alternatively, one can build the toolkit's HE components using the following
-commands
+command
 
 ```bash
-hekit install <path/to/toolkit>/recipes/default.toml
+hekit install recipes/default.toml
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
@@ -99,6 +115,24 @@ Acceleration Library enabled.
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
 
+The [sample kernels](kernels) and [examples](examples) can also be built in a
+similar manner using 
+```bash
+hekit build recipes/sample-kernels.toml
+```
+and
+```bash
+hekit build recipes/examples.toml
+```
+respectively.
+
+To view a list of the components and their instances have been built/installed
+through `hekit` one can execute
+```bash
+hekit list
+```
+to list each component, their instance(s) and the status of the fetch, build,
+and install steps.
 
 ## Kernels
 Located in [he-samples](he-samples) is a collection of software components
