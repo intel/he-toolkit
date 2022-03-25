@@ -11,17 +11,22 @@
     - [Steps](#steps)
   - [Running the Examples](#running-the-examples)
     - [Docker Controls](#docker-controls)
-      - [Inside of the Docker Container](#inside-of-the-docker-container)
-      - [Outside of the Docker Container](#outside-of-the-docker-container)
+      - [Commands used inside the Docker Container:](#commands-used-inside-the-docker-container)
+      - [Commands used outside of the Docker Container:](#commands-used-outside-of-the-docker-container)
   - [Modifying the Examples](#modifying-the-examples)
   - [Common Issues](#common-issues)
+    - [System config](#system-config)
+    - [Proxy](#proxy)
+    - [Dockerhub](#dockerhub)
+    - [Docker](#docker)
+    - [Performance](#performance)
 
 
 ## Introduction
 Provided is a description of the components, usage, and installation of the
-Dockerized Intel Homomorphic Encryption Toolkit. The toolkit provides a docker
+Dockerized Intel HE Toolkit. The toolkit provides a docker
 environment in which one can run and modify example programs that have been
-built using various Homomorphic Encryption libraries, including
+built using various HE libraries, including
 [Microsoft SEAL](https://github.com/microsoft/SEAL),
 [PALISADE](https://gitlab.com/palisade/palisade-release), and
 [HElib](https://github.com/homenc/HElib).
@@ -82,9 +87,9 @@ on `Apply & Restart`.
   memory. This can be done via the `Resources` tab under `Preferences`.
 
 ### Steps
-To build and run the Intel HE Toolkit container, from `he-toolkit/docker` run
+To build and run the Intel HE Toolkit container run
 ```bash
-./setup_and_run_docker.sh
+hekit docker-build
 ```
 The installation should take a few minutes and once successful will run the
 container as the current user. This will be signified with the printing of the
@@ -101,57 +106,52 @@ the user created in the docker container will both be set to 1000 by default.
 To override this value the user can simply pass in the desired UID/GID as
 follows
 ```bash
-./setup_and_run_docker.sh 1234
+hekit docker-build --id 1234
 ```
 
 ## Running the Examples
 After a successful install and build of the docker container, the user should
-be greeted with  welcome message and be inside the container as their user in
-the `~/runners` directory.
+be greeted with  welcome message and be inside their user home directory.
 
-This directory will contain the following scripts:
-- ***run_lr_example.sh***: This will run a Logistic Regression (LR) example
+This directory will contain the following commands that have been sourced.
+- ***run_lr_example***: This will run a Logistic Regression (LR) example
   allowing users to see a faster, more scalable method for LR in HE. Unlike the
   LR code available in the sample-kernels, this version takes extra steps to
   utilize as many slots as possible in the ciphertexts.
-- ***run_psi_example.sh***: This will run a PSI example allowing users to
+- ***run_psi_example***: This will run a PSI example allowing users to
   perform a set intersection between a user-defined "client set" and a "server
   set" (example server sets provided). The program encrypts the client set,
   computes the intersection, and returns encrypted elements that are common to
   both sets.
-- ***run_query_example.sh***: This will run a Secure Query example allowing
+- ***run_query_example***: This will run a Secure Query example allowing
   users to query on a database of the 50 U.S. States while controlling
   (optionally) the crypto-parameters used. When prompted, enter a State and, if
   present, the corresponding City will be decoded and printed.
-- ***run_sample_kernels_palisade.sh***: This will run several HE sample kernels
+- ***run_sample_kernels_palisade***: This will run several HE sample kernels
   in PALISADE including Matrix Multiplication and Logistic Regression.
-- ***run_sample_kernels_seal.sh***: This will run several HE sample kernels in
+- ***run_sample_kernels_seal***: This will run several HE sample kernels in
   SEAL including Matrix Multiplication and Logistic Regression.
-- ***run_tests.sh***: This will run several unit tests to confirm the validity
+- ***run_tests***: This will run several unit tests to confirm the validity
   of the above sample kernels by comparing against the same operation in the
   non-HE space.
 
-Each of these scripts can be run from the runners directory in the form of
-`./<script>.sh` e.g. `./run_lr_example.sh` will run the Logistic Regression
-example program.
+Each command can be run from the command line simply by name e.g.
+`run_lr_example` will run the Logistic Regression example program.
 
 ### Docker Controls
-The docker controls utilized for this toolkit are the same as the standard
-docker controls:
+The docker controls utilized for Intel HE toolkit are the same as the standard
+docker controls. Some tips are provided below.
 
-#### Inside of the Docker Container:
-- **exit**: This will exit and close the docker container. As such, the
-  container would need to be rebuilt using `./setup_and_run_docker.sh`. If the
-  Dockerfiles are not modified then subsequent builds should be faster as the
-  existing images will cache steps.
-  Alternatively, one can simply run the command `docker run -it
-  <user-name>/ubuntu_he_test` to rerun the container from a previously built
-  image.
-- **Ctrl+P -> Ctrl+Q**: This will exit the docker container while leaving it
-  running. As such the container will not need to be rerun. This is the same
+#### Commands used inside the Docker Container:
+- **exit**: This will exit and and stop the docker container. The containder can
+  be restarted with `docker start <container_id|container_name>`. The user can
+  discover their container via `docker ps -a`.
+- **Ctrl+P Ctrl+Q**: This will exit the docker container while leaving it
+  running. The container will not need to be rerun. This is the same
   behavior if there is a connection interruption while connected to the docker.
+  The user can reattach using `docker attach <container_id|container_name>`.
 
-#### Outside of the Docker Container:
+#### Commands used outside of the Docker Container:
 - **docker ps**: This will list information about the current running docker
   containers, including the `container_id`. Use this to check if there is a
   pre-existing docker running.
@@ -164,11 +164,11 @@ docker controls:
 
 ## Modifying the Examples
 The included source code allows for modification or existing workloads and
-creations of new ones. All HE-Toolkit code can be found in
+creations of new ones. All Intel HE Toolkit code can be found in
 `/home/$USER/he-samples` with a directory structure directly reflected in this
 repository.
 
-HE-Samples consists of three different sub-components:
+`he-samples` consists of three different sub-components:
 1. **Sample Kernels**: Sample kernels created through a combination of various
   micro kernels. They are meant as samples of how the  micro kernels can be
   used together. A few sample kernels (but is not limited to): Matrix
@@ -184,14 +184,51 @@ HE-Samples consists of three different sub-components:
   [Logistic Regression](../he-samples/examples/logistic-regression).
 
 ## Common Issues
-The following table documents common issues, causes, and potential solutions.
+The following documents common issues, causes, and potential solutions.
 
-|         Issue           |          Cause          |                  Workload                 |
-|-------------------------|-------------------------|-------------------------------------------|
-|**System config**: apt-get commands fail with message: `Release file for link is not valid yet (invalid for another Xd Xh Xmin Xs)`|Ubuntu system time must correct for the physical location of the system in question. If not, apt-get will fail to verify the system's certificates.|Ideally set the date and time to update automatically with: `sudo timedatectl set-ntp 1`. Or set manually with `sudo timedatectl set-time '<date> <time>'`|
-|**Proxy**: Connection to Ubuntu archive, docker-hub, or general websites fail with a timeout.|Required proxy environment variables are not set up/configured properly. There are multiple proxy files that must be set, so please make sure to set all of them as required.|Set environment variables `(http_proxy & https_proxy): export http(s)_proxy=url:port`<br>Set same in the following files: `/etc/apt/apt.conf.d/proxy/conf`, `/etc/environment`|
-|**Proxy**: `apt-get`, `wget`, or other connectivity necessary commands fail with `xx cannot resolve address xx`|If the host DNS is not configured to resolve addresses, then any docker fill revert to using the default Google DNS (8.8.8.8).|Enter the correct DNS address for the corporate net by editing `/etc/system/resolved.conf` accordingly.|
-|**Docker**: Unsuccessful attempt at pulling docker-hub image (either hello-world image of Ubuntu 20.04 image) due to pull limit being reached.|Beginning on November 2, 2020, Docker began phasing in pull limits to reduce the amount of image pulls by anonymous Docker users.|Users may either: 1. Attempt to rerun the setup script or 2. Following the error's instructions, create a login with a Docker-hub account.|
-|**Docker**: Docker connection is lost while operation inside of the Docker container.|This can be caused by many things. If the network is disconnected while the user is logged into the docker, or the terminal is closed, then they will also be removed from the running docker instance.|After logging back into the system, first check if the docker is running (see `docker ps` above). If it is, then log in with the `docker exec` command (mentioned above). If not, then rerun `setup_and_run_docker.sh`|
-|**Performance**: Performance for certain samples seem to vary/run slower from inside the docker container.|Docker may cause some variance with programs that utilize a large amount of threads due to the extra level of indirection caused by the container.|While docker is meant to ease the process of setup/running, workloads may also be run outside of the docker to view full performance if necessary.|
-|**Reliability**: One of the samples exits early with an error message.|We have observed in some rare cases that the code may enter an undefined state and exit early especially when running some of the more involved sample kernels.|We expect these issues to be resolved with future releases and in the meantime can be mitigated by executing the test again.|
+### System config
+apt-get command fail with message: `Release file for link is not valid yet
+(invalid for another Xd Xh Xmin Xs)`. Ubuntu system time must correct for the
+physical location of the system in question. If not, apt-get will fail to
+verify the system's certificates. Ideally set the date and time to update
+automatically with: `sudo timedatectl set-ntp 1` or set manually with `sudo
+timedatectl set-time '<date> <time>'`.
+
+### Proxy
+Connection to Ubuntu archive, docker-hub, or general websites fail with a
+timeout. Required proxy environment variables are not set up/configured
+properly. There are multiple proxy files that must be set, so please make sure
+to set all of them as required. Set environment variables `(http_proxy &
+https_proxy): export http(s)_proxy=url:port`<br>Set same in the following
+files: `/etc/apt/apt.conf.d/proxy/conf`, `/etc/environment`.
+
+`apt-get`, `wget`, or other connectivity necessary commands fail with `xx
+cannot resolve address xx`If the host DNS is not configured to resolve
+addresses, then any docker fill revert to using the default Google DNS
+(8.8.8.8). Enter the correct DNS address for the corporate net by editing
+`/etc/system/resolved.conf` accordingly.
+
+### Dockerhub
+Unsuccessful attempt at pulling a dockerhub base image due to pull limit being
+reached.  Beginning on November 2, 2020, Dockerhub began phasing in pull limits
+to reduce the amount of image pulls by anonymous Docker users. Users may
+either: 1. Attempt to rerun the setup script or 2. Following the error's
+instructions, create a login with a Dockerhub account.
+
+### Docker
+Docker connection is lost while operation inside of the Docker container. This
+can be due several reasons. If the network is disconnected while the user is
+logged into the docker or the terminal is closed, then the user will also be
+removed from the running docker instance. After logging back into the system,
+check if the docker container is running with `docker ps`. If the container is
+running, attach with the `docker attach` command. If the docker container is
+not running restart the container with `docker start` or if the container has
+been deleted create a new one with `docker run`.
+
+### Performance
+Performance for certain samples may vary from inside the docker
+container. Docker may cause some variance with programs that utilize a large
+amount of threads due to the extra level of indirection caused by the
+container. While docker is meant to ease the process of deployment, workloads
+may also be run outside of the docker to view full performance if necessary
+(see [System build](###)).
