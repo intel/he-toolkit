@@ -109,6 +109,23 @@ follows
 hekit docker-build --id 1234
 ```
 
+### Using VS Code Server
+The docker build also allows users to interact with HE Toolkit via the VS Code
+IDE via [code-server](https://coder.com/docs/code-server/latest). To enable
+this run
+```bash
+hekit docker-build --enable vscode
+```
+This will build an extra layer on top of the previous images containing VS Code
+configuration.
+
+**TODO: Extra steps on setup**
+- docker run expose the port you want to use
+- navigate to url via browser
+- default config is HE Workspace contains a copy of he-samples directory
+- VS Code will ask for a CMake file, select from the list a particular program
+  that you are interested in i.e. examples/psi
+
 ## Running the Examples
 After a successful install and build of the docker container, the user should
 be greeted with  welcome message and be inside their user home directory.
@@ -143,7 +160,7 @@ The docker controls utilized for Intel HE toolkit are the same as the standard
 docker controls. Some tips are provided below.
 
 #### Commands used inside the Docker Container:
-- **exit**: This will exit and and stop the docker container. The containder can
+- **exit**: This will exit and stop the docker container. The container can
   be restarted with `docker start <container_id|container_name>`. The user can
   discover their container via `docker ps -a`.
 - **Ctrl+P Ctrl+Q**: This will exit the docker container while leaving it
@@ -209,7 +226,7 @@ addresses, then any docker fill revert to using the default Google DNS
 `/etc/system/resolved.conf` accordingly.
 
 ### Dockerhub
-Unsuccessful attempt at pulling a dockerhub base image due to pull limit being
+Unsuccessful attempt at pulling a Dockerhub base image due to pull limit being
 reached.  Beginning on November 2, 2020, Dockerhub began phasing in pull limits
 to reduce the amount of image pulls by anonymous Docker users. Users may
 either: 1. Attempt to rerun the setup script or 2. Following the error's

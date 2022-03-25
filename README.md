@@ -87,9 +87,33 @@ are currently two ways of interacting with the toolkit: through a Docker build
 or directly on your system.
 
 ## The hekit command
-The `hekit` subcommands can be used by the user to easily setup the required
-environment to evaluate HE technology. See the [README](kit/README.md) for
-instructions.
+The `hekit` command is a command-line tool that can be used by the user to
+easily set up an HE environment in a configurable and intuitive manner.
+
+The `hekit` command has a help option which lists all sub-commands and flags
+```bash
+hekit -h
+usage: hekit [-h] [--version] [--config CONFIG] {init,list,install,build,fetch,remove,check-dependencies,docker-build} ...
+
+positional arguments:
+  {init,list,install,build,fetch,remove,check-dependencies,docker-build}
+                        sub-command help
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             display Intel HE toolkit version
+  --config CONFIG       use a non-default configuration file instead
+```
+
+Moreover, each sub-command has a help option that can be invoked with `hekit
+<sub-command> -h`.
+
+The `hekit` subcommands consist of utility commands such as
+`check-dependencies` and `docker-build` as well as commands for managing the
+fetching, building, and installation of user-defined projects using recipe
+files (more information found [here](kit/README.md#recipe-file)).
+See the [README](kit/README.md) for more detailed information on the usage of
+`hekit`.
 
 ## Docker build (Recommended)
 The **recommended** method is to use the Docker build and installation which
