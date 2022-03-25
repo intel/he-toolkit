@@ -30,25 +30,22 @@ Library](https://github.com/intel/hexl) library to take advantage of the newest
 Intel hardware features.
 
 ## Components
-The `he-toolkit/docker` directory currently contains:
-- ***setup_and_run_docker.sh***: Script for building and running a docker
-  container containing all HE libraries with Intel HE Acceleration Library
-  enabled. This will be the main entry point for most users.
+The `docker` directory of Intel HE toolkit contains:
+- ***README.md***: This file detailing how to build and use the Docker build
+  Intel HE toolkit.
 - ***basic-docker-test.sh***: Script for testing in-docker connectivity.
-- ***check_dependencies.sh***: Script for checking if all required dependencies
-  are installed.
-- ***welcome_msg.sh***: Script which displays a welcome message upon startup of
-  the docker container.
-- ***Dockerfile.base***: Dockerfile recipe for building the base HE-Toolkit
-  image.
+- ***runners.sh***: Script containing runners for example programs and
+  tests.
+- ***Dockerfile.base***: Dockerfile recipe for building the base for Intel HE
+  Toolkit image.
 - ***Dockerfile.toolkit***: Dockerfile recipe which builds a docker image
-  derived from the base.
-- ***env.list***: List for configuring proxy environment variables to be used
-  by the docker container.
-- ***utils/***: Directory containing various utility shell scripts used during
-  setup.
-- ***runners/***: Directory containing runner scripts for example programs and
-  tests. This directory will be copied into the docker container.
+  derived from the base providing user setup and installation of toolkit
+  components.
+- ***Dockerfile.vscode***: Dockerfile recipe which builds a docker image
+  derived from toolkit image that enables vscode server.
+- ***which-files.txt***: This is an inclusive listing of the toolkit to be
+  copied into the docker image.
+- ***ide-config***: Directory contains configurations for vscode IDE.
 
 ## Installation
 This section provides a list of pre-requisites for building and running the HE
@@ -65,23 +62,15 @@ container.
   does not require any AVX512-enabled hardware, it is recommended to use a
   processor with at least Intel AVX512DQ support.  For best performance, it is
   recommended to use processors supporting AVX512-IFMA52.
-- The docker build has been tested on Ubuntu 20.04 and MacOS Catalina
-  (10.15.7).
+- The docker build has been tested on,
+-- Ubuntu 20.04;
+-- MacOS Catalina (10.15.7).
 
 #### Running the Docker Build on MacOS
 In order to successfully run the docker build on MacOS you may be required to
 run the following steps if not done so already.
 
-1. Ensure you have `realpath` which can be installed via `brew` using
-```bash
-brew install coreutils
-```
-or `macports` via
-```bash
-sudo port install realpath
-```
-
-2. If using Docker Desktop and you see an error such as
+1. If using Docker Desktop and you see an error such as
 ```bash
 => ERROR [internal] load metadata for docker.io/$USER/ubuntu_he_base:1.4
 ```
@@ -89,7 +78,7 @@ then open Docker Desktop, got to `Preferences`, navigate to the `Docker Engine`
 tab, set the `buildkit` variable to `false`, and save this change by clicking
 on `Apply & Restart`.
 
-3. Also ensure that you allocate the docker container with at least 16GB of
+2. Also ensure that you allocate the docker container with at least 16GB of
   memory. This can be done via the `Resources` tab under `Preferences`.
 
 ### Steps

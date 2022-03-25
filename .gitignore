@@ -20,9 +20,8 @@ he-benchmarks-venv/
 # MacOS
 .DS_Store
 
-# Other artifacts
-**.tar.gz
-docker/libs/
+# toolkit docker build artifacts
+__staging__/
 
 # HElib
 **/helib.log

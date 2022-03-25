@@ -1,10 +1,13 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from toml import load, dump
+"""This module handles the specification file a.k.a. recipe"""
+
 from re import findall
 from dataclasses import dataclass
 from typing import Dict
+
+from toml import dump, load
 
 
 def read_spec(component, instance, attrib, repo_location):
@@ -29,13 +32,10 @@ def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
 
             new_s = s
             for symbol, k in symbols:
-                value = ""
-                if k in recipe_arg_dict:
+                try:
                     value = recipe_arg_dict[k]
-                else:
-                    message = f"Please enter {k}: "
-                    value = input(message)
-
+                except KeyError:
+                    value = input(f"Please enter {k}: ")
                     # Save current value in case the same key
                     # is needed in other place
                     recipe_arg_dict[k] = value
@@ -43,11 +43,12 @@ def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
                 new_s = new_s.replace(symbol, value)
 
             return new_s
-        elif isinstance(s, list):
+
+        if isinstance(s, list):
             return [fill_user_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
+
+        # Not str or list
+        return s
 
     return {k: fill_user_str(v) for k, v in d.items()}
 
@@ -68,11 +69,12 @@ def fill_self_ref_string_dict(d, repo_path):
                 new_s = new_s.replace(symbol, fill_str(d[k]))
 
             return new_s
-        elif isinstance(s, list):
+
+        if isinstance(s, list):
             return [fill_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
+
+        # Not str or list
+        return s
 
     def fill_dep_str(s):
         """s can be a string or a list of strings"""
@@ -89,11 +91,12 @@ def fill_self_ref_string_dict(d, repo_path):
                 new_s = new_s.replace(symbol, sub)
 
             return new_s
-        elif isinstance(s, list):
+
+        if isinstance(s, list):
             return [fill_dep_str(e) for e in s]
-        else:
-            # Not str or list
-            return s
+
+        # Not str or list
+        return s
 
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 

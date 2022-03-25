@@ -3,20 +3,32 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from os import geteuid
 from sys import stderr
 from argparse import ArgumentParser
 from pathlib import Path
 
 from config import load_config
-from command_init import init_hekit
-from command_remove import remove_components
-from command_list import list_components
-from command_install import install_components
 from tab_completion import (
     enable_tab_completion,
     components_completer,
     instances_completer,
 )
+
+from command_init import init_hekit
+from command_remove import remove_components
+from command_list import list_components
+from command_install import install_components
+from command_check_deps import check_dependencies
+
+try:
+    # docker-py is optional and definitely won't be used form within a docker container
+    from command_docker_build import setup_docker
+except ImportError as ie:
+
+    def setup_docker(arg):  # pylint: disable=unused-argument
+        print("This command is disabled. To enable it install the docker-py dependency")
+        print("  pip install docker")
 
 
 def get_recipe_arg_dict(recipe_arg: str):
@@ -38,6 +50,10 @@ def get_recipe_arg_dict(recipe_arg: str):
 
 def parse_cmdline():
     """Parse commandline commands"""
+
+    # resolve first to follow the symlink, if any
+    hekit_root_dir = Path(__file__).resolve().parent.parent
+
     # create the top-level parser
     parser = ArgumentParser(prog="hekit")
     parser.set_defaults(fn=None)
@@ -54,11 +70,10 @@ def parse_cmdline():
 
     # create the parser for the "init" command
     parser_init = subparsers.add_parser("init", description="initialize hekit")
-    parser_init.set_defaults(
-        # resolve first to follow the symlink, if any
-        fn=init_hekit,
-        hekit_root_dir=Path(__file__).resolve().parent.parent,
+    parser_init.add_argument(
+        "--default-config", action="store_true", help="setup default config file"
     )
+    parser_init.set_defaults(fn=init_hekit, hekit_root_dir=hekit_root_dir)
 
     # create the parser for the "list" command
     parser_list = subparsers.add_parser(
@@ -117,27 +132,65 @@ def parse_cmdline():
     ).completer = instances_completer
     parser_remove.set_defaults(fn=remove_components)
 
+    # create the parser for the "check-dependencies" command
+    parser_check_dependencies = subparsers.add_parser(
+        "check-dependencies", description="check system dependencies"
+    )
+    parser_check_dependencies.add_argument(
+        "dependencies_file",
+        metavar="dependencies-file",
+        type=str,
+        help="dependencies file",
+    )
+    parser_check_dependencies.set_defaults(fn=check_dependencies)
+
+    # create the parser for the "docker-build" command
+    parser_docker_build = subparsers.add_parser(
+        "docker-build", description="docker build of the toolkit"
+    )
+    parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
+    parser_docker_build.add_argument(
+        "--clean", action="store_true", help="delete staging"
+    )
+    # FIXME should this be its own subcommand?
+    parser_docker_build.add_argument(
+        "--check-only", action="store_true", help="only run container for proxy checks"
+    )
+    # In future change to accept several strings
+    parser_docker_build.add_argument(
+        "--enable",
+        type=str,
+        choices=["vscode"],
+        help="add/enable extra features in docker build of toolkit",
+    )
+    parser_docker_build.add_argument(
+        "-y", action="store_false", help="say yes to prompts"
+    )
+    parser_docker_build.set_defaults(fn=setup_docker, hekit_root_dir=hekit_root_dir)
+
     enable_tab_completion(parser)
 
     return parser.parse_args(), parser.print_help
 
 
 def main():
-
-    toolkit_version = "2.0.0"
+    """"""
     args, print_help = parse_cmdline()
 
     if args.version:
+        toolkit_version = "2.0.0"
         print(f"Intel HE Toolkit version {toolkit_version}")
         exit(0)
 
     # Load config file
     try:
-        # replace the filename with the actual config
-        args.config = load_config(args.config)
+        # FIXME logic convoluted here
+        if args.fn != init_hekit:
+            # replace the filename with the actual config
+            args.config = load_config(args.config)
     except Exception as e:
         # Exit on any exception from config file
-        print(f"Error while parsing config file\n  {e!r}", file=stderr)
+        print("Error while parsing config file\n", f"{e!r}", file=stderr)
         exit(1)
 
     # Run the command
@@ -149,4 +202,8 @@ def main():
 
 
 if __name__ == "__main__":
+    if geteuid() == 0:
+        print("You cannot run hekit as root (a.k.a. superuser)")
+        exit(1)
+
     main()

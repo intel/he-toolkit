@@ -1,15 +1,15 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import toml
-from spec import Spec
-
 import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
 from typing import Dict
+
+import toml
+from spec import Spec
 
 
 class BuildError(Exception):

@@ -1,11 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from toml import load
 from os import walk
 from pathlib import Path
 from itertools import chain
 from typing import Dict, List
+
+from toml import load
 
 # Number of separation spaces for columns
 _SEP_SPACES = 2
@@ -68,7 +69,7 @@ def list_components(args):
 
     # Header
     print(
-        f"{'component':{width_comp}} {'instance':{width_inst}} {'fetch':{width_status}} {'build':{width_status}} {'install':{width_status}}"
+        f"{'COMPONENT':{width_comp}} {'INSTANCE':{width_inst}} {'FETCH':{width_status}} {'BUILD':{width_status}} {'INSTALL':{width_status}}"
     )
 
     for comp_name, inst_list in repo_properties.structure.items():

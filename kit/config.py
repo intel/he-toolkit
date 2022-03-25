@@ -1,9 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from toml import load
+"""Module for dealing with the hekit configuration file"""
+
 from os import path
 from typing import NamedTuple
+
+from toml import load
 
 
 class Config(NamedTuple):

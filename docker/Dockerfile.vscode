@@ -4,45 +4,38 @@
 # Username
 ARG UNAME
 
-FROM $UNAME/ubuntu_he_test:latest
+FROM $UNAME/ubuntu_he_toolkit:2.0.0
 
 ARG UNAME
+ARG HOME="/home/$UNAME"
 
 LABEL maintainer="https://github.com/intel/he-toolkit"
 
 # code-server runs on HTTPS port 8888
 EXPOSE 8888/tcp
 
-# Do the following as root
-USER root
-
 # Download and install the latest version of code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create space for IDE settings
-RUN mkdir -p /opt/Intel-HE-Toolkit/HE-Workspace/User && \
-    mkdir -p /opt/Intel-HE-Toolkit/HE-Workspace/.vscode && \
-    # Change ownership of files to user \
-    chown -R $UNAME:$UNAME /opt/Intel-HE-Toolkit
-
-# Change back to user for remaining installation
-USER $UNAME
-
-# Workspace settings for code-server IDE
-COPY --chown=$UNAME:$UNAME ./IDE-Config /opt/Intel-HE-Toolkit/HE-Workspace/.vscode/
-
-# Move he-samples into HE-Workspace
-RUN cp -rp /home/$UNAME/he-samples /opt/Intel-HE-Toolkit/HE-Workspace && \
-    rm -rf /opt/Intel-HE-Toolkit/HE-Workspace/he-samples/build
+# Create space for IDE settings and workspace
+RUN mkdir -p $HOME/User $HOME/he-workspace/.vscode && \
+    # Move code-server IDE settings into correct location
+    cp $HOME/he-toolkit/docker/ide-config/settings.json $HOME/he-workspace/.vscode/ && \
+    cp -r $HOME/he-toolkit/he-samples $HOME/he-workspace/
 
 # Install code-server extensions
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
-      code-server --user-data-dir=/opt/Intel-HE-Toolkit/HE-Workspace/ --install-extension $e; \
+      code-server --user-data-dir=$HOME/ --install-extension $e; \
     done
 
 # Update code-server user settings
-RUN echo "{\"extensions.autoUpdate\": false,\n\"workbench.colorTheme\": \"Default Dark+\"}" > /opt/Intel-HE-Toolkit/HE-Workspace/User/settings.json && \
+RUN echo '{"extensions.autoUpdate": false, "workbench.colorTheme": "Default Dark+"}' |\
+    jq . > $HOME/User/settings.json && \
     # Create a randomly generated self-signed certificate for code-server \
-    sed -i.bak 's/cert: false/cert: true/' /home/$UNAME/.config/code-server/config.yaml
+    sed -i.bak 's/cert: false/cert: true/' $HOME/.config/code-server/config.yaml
 
-ENTRYPOINT ["code-server", "/opt/Intel-HE-Toolkit/HE-Workspace", "--bind-addr", "0.0.0.0:8888", "--user-data-dir", "/opt/Intel-HE-Toolkit/HE-Workspace", "--auth", "none", "--disable-telemetry"]
+ENTRYPOINT code-server $HOME/he-workspace \
+           --bind-addr 0.0.0.0:8888       \
+           --user-data-dir $HOME          \
+           --auth none                    \
+           --disable-telemetry

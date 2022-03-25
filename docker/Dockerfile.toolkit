@@ -4,36 +4,35 @@
 # Username
 ARG UNAME
 
-FROM $UNAME/ubuntu_he_base:2.0
+FROM $UNAME/ubuntu_he_base:2.0.0
 
+LABEL maintainer="HE Toolkit github.com/intel/he-toolkit"
+
+# User-setup
 ARG UNAME
+ARG UID
+ARG GID
+ARG HOME="/home/$UNAME"
+ENV SHELL="/bin/bash"
 
-LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
+RUN groupadd -g $GID $UNAME && \
+    useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
+    echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-RUN mv /runners /home/$UNAME/ && \
-    mv /he-samples /home/$UNAME
+# ADD copies and untars for us
+ADD toolkit.tar.gz $HOME/he-toolkit
+RUN chown -R $UNAME:$UNAME $HOME/he-toolkit
 
 # Switch user to $UNAME
 USER $UNAME
 
-# fetch, build and install all the libraries
-RUN  /kit/hekit.py --config /default.config install /recipes/default.toml
+# Change directories to $HOME/Intel-HE-Toolkit
+WORKDIR $HOME/he-toolkit
 
-# Build he-samples and link them to the libraries
-# TODO: this needs to be refactored
-RUN cd /home/$UNAME/he-samples && \
-    cmake -S . -B build \
-    -DSEAL_PREBUILT=ON \
-    -DPALISADE_PREBUILT=ON \
-    -DHELIB_PREBUILT=ON \
-    -DSEAL_HINT_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7/ \
-    -DPALISADE_HINT_DIR=~/.hekit/components/palisade/v1.11.6/install/lib/Palisade/ \
-    -DHELIB_HINT_DIR=~/.hekit/components/helib/v2.2.1/install/share/cmake/helib/ \
-    -DINTEL_HEXL_HINT_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3/ \
-    -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL \
-    -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd && \
-    cmake --build build -j
+# Initialize hekit and install librares, examples, and kernels
+RUN ./hekit init --default-config && \
+    ./hekit install recipes/default.toml && \
+    ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
+    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 
-ENTRYPOINT cd /home/$UNAME/runners && \
-           /home/$UNAME/welcome_msg.sh && \
-           /bin/bash
+ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash

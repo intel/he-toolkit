@@ -12,14 +12,16 @@ used to implement common mathematical operations using
 applications which demonstrate how HE technology can be used to create secure
 applications.
 
+
 ## Contents
+
 - [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
   - [Contents](#contents)
   - [Dependencies](#dependencies)
   - [Instructions](#instructions)
-    - [Docker Build (Recommended)](#docker-build-recommended)
-    - [Hekit Build](#hekit-build)
-    - [Native Build](#native-build)
+    - [The hekit command](#the-hekit-command)
+    - [Docker build (Recommended)](#docker-build-recommended)
+    - [System build of toolkit's HE components](#system-build-of-toolkit's-he-components)
   - [Kernels](#kernels)
     - [Sample kernels](#sample-kernels)
     - [Test sample kernels](#test-sample-kernels)
@@ -28,58 +30,65 @@ applications.
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
 - [Contributing](#contributing)
+  - [Troubleshooting ##](#troubleshooting-##)
 - [Contributors](#contributors)
 
+
 ## Dependencies
-The toolkit has been tested on Ubuntu 20.04
+Intel HE toolkit has been tested on Ubuntu 20.04
 
-Must have dependencies include:
+Must have system dependencies for the toolkit include,
 ```
-cmake >= 3.13
 git
-pthread
-patchelf
-m4
-g++ >= 10.0 or clang >= 10.0
 python >= 3.8
-virtualenv
 ```
 
-Further Python dependencies include:
+Further Python dependencies include,
 ```
 toml
-pytest (optional, for tests)
+argparse (optional for tab completion)
+pytest (optional for running tests)
 ```
 
-Dependencies required per library include:
+However, to build anything useful with the toolkit, we recommend that in
+addition the following, system dependencies,
+
 ```
-autoconf (PALISADE)
-gmp >= 6.2.1 (HElib)
-NTL >= 11.5.1 (HElib)
+m4
+patchelf
+cmake >= 3.13
+g++ >= 10.0 or clang >= 10.0
+pthread
+virtualenv
+autoconf
 ```
+
+Specific system dependencies for toolkit components can be found in the respective
+directory of each HE component.
+
 
 ## Instructions
-There are currently two methods for building the toolkit project.
+Intel HE toolkit is primarily accessible through the `hekit` command.
+There are currently two ways of interacting with the toolkit: through a Docker
+build; or, directly on your system.
 
-### Docker Build (Recommended)
+### The hekit command
+The `hekit` subcommands can be used by the user to easily setup the required
+environment to evaluate HE technology. See the [README](kit/README.md) for
+instructions.
+
+### Docker build (Recommended)
 The **recommended** method is to use the Docker build and installation which
 builds the toolkit in its entirety including all HE libraries in a
 self-contained docker container running Ubuntu 20.04. See [here](docker) for a
 detailed description on the usage and components of this build.
 
-### Hekit Build
-The [kit](kit) tool is a collection of python scripts that can be used by the
-user to set-up easily the required environment to evaluate homomorphic encryption
-technology. See the [README](kit/README.md) for instructions.
-
-### Native Build
-Alternatively, one can build the toolkit natively using the following commands
+### System build of toolkit's HE components
+Alternatively, one can build the toolkit's HE components using the following commands
 
 ```bash
-export HE_SAMPLES=$(pwd)/he-samples
-cd $HE_SAMPLES
-cmake -S . -B build
-cmake --build build -j
+cd <path/to/toolkit>/he-samples
+hekit install recipes/default.toml
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
@@ -88,37 +97,6 @@ download and build all three HE libraries automatically with Intel HE Accelerati
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
 
-It is possible to pass additional options, for example:
-```bash
- -DENABLE_PALISADE=ON
- -DENABLE_SEAL=ON
- -DENABLE_HELIB=OFF
-```
-to enable/disable building of certain HE libraries. The following table
-contains the current CMake options, default values are in bold.
-
-| CMake options            | Values   | Comments      |
-|--------------------------|----------|---------------|
-|`ENABLE_PALISADE`         |**ON**/OFF|Enable PALISADE|
-|`ENABLE_SEAL`             |**ON**/OFF|Enable SEAL|
-|`ENABLE_HELIB`            |**ON**/OFF|Enable HElib|
-|`ENABLE_INTEL_HEXL`       |**ON**/OFF|Enable Intel HE Acceleration Library|
-|`ENABLE_ADDRESS_SANITIZER`|ON/**OFF**|Compiles and link with Address Sanitizer|
-|`ENABLE_THREAD_SANITIZER` |ON/**OFF**|Compiles and link with Thread Sanitizer|
-|`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|
-|`SEAL_PREBUILT`           |ON/**OFF**|Use a pre-built installation of SEAL|
-|`PALISADE_PREBUILT`       |ON/**OFF**|Use a pre-built installation of PALISADE|
-|`HELIB_PREBUILT`          |ON/**OFF**|Use a pre-built installation of HElib|
-
-**Note:** If using a pre-built library then you may need to use the option
-`-D<SEAL|PALISADE|HELIB>_HINT_DIR=<path-to-installation>` if you have installed
-them in a non-default location.
-
-**Note:** If opting to use HElib with HEXL enabled, the user must have a
-pre-installed version of HEXL due to HElib currently only supports linking to a
-pre-installed HEXL. See
-[here](https://github.com/homenc/HElib/blob/master/INSTALL.md) for more
-details.
 
 ## Kernels
 Located in [he-samples](he-samples) is a collection of software components
@@ -177,20 +155,50 @@ are common to both sets. See the [README](he-samples/examples/psi/README.md)
 for usage information.
 
 # Contributing
-At this time, Intel HE Toolkit does not accept external contributions. We
-encourage feedback and suggestions via
-[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
-[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
+Intel HE Toolkit welcomes external contributions through pull requests to the
+`main` branch.
 
-For Intel developers, ensure the [pre-commit](https://pre-commit.com) config is
-active prior to contributing, i.e. run
+Please sign your commits before making a pull request. See instructions
+[here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)
+for how to sign commits.
+
+Before contributing, please ensure the [pre-commit](https://pre-commit.com)
+checks pass, i.e. run
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
 and make sure all pre-commit checks pass.
 
-**NOTE:** Please ensure you are using clang-format version >= 10
+Also please run
+```bash
+pytest tests
+```
+to make sure the tests pass.
+
+We encourage feedback and suggestions via
+[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
+[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
+
+
+## Troubleshooting ##
+
+* ```Executable `cpplint` not found```
+
+  Make sure you install cpplint: ```pip install cpplint```.
+  If you install `cpplint` locally, make sure to add it to your `PATH`.
+
+* ```/bin/sh: 1: pre-commit: not found```
+
+  Install `pre-commit`. More info at https://pre-commit.com/.
+
+* ```
+     error: gpg failed to sign the data
+     fatal: failed to write commit object
+  ```
+  Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
+  as `~/.bashrc`.
+
 
 # Contributors
 The Intel contributors to this project, sorted by last name, are
