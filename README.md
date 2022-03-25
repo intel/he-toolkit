@@ -21,7 +21,7 @@ applications.
   - [Instructions](#instructions)
     - [The hekit command](#the-hekit-command)
     - [Docker build (Recommended)](#docker-build-recommended)
-    - [System build of toolkit's HE components](#system-build-of-toolkit's-he-components)
+    - [System build of toolkit's HE components](#system-build-of-toolkits-he-components)
   - [Kernels](#kernels)
     - [Sample kernels](#sample-kernels)
     - [Test sample kernels](#test-sample-kernels)
@@ -30,7 +30,7 @@ applications.
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
 - [Contributing](#contributing)
-  - [Troubleshooting ##](#troubleshooting-##)
+  - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
 
 
@@ -181,7 +181,7 @@ We encourage feedback and suggestions via
 [GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
 
 
-## Troubleshooting ##
+## Troubleshooting
 
 * ```Executable `cpplint` not found```
 
