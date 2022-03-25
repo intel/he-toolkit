@@ -44,10 +44,7 @@ def get_initweight(X, y, add1=True):
 
 # get evaluation metrics (accuracy, f1 score, etc.)
 def get_eval_metrics(actual, predicted):
-    tp = 0
-    tn = 0
-    fp = 0
-    fn = 0
+    tp, tn, fp, fn = 0, 0, 0, 0
     for a, p in zip(actual, predicted):
         if a == 1 and p == 1:
             tp += 1
@@ -59,20 +56,19 @@ def get_eval_metrics(actual, predicted):
             tn += 1
 
     acc = (tp + tn) / (tp + fp + tn + fn)
+    precision = 0.0
+    recall = 0.0
+
     if tp + fp > 0:
         precision = tp / (tp + fp)  # correct 1s over predicted 1s
-    else:
-        precision = 0.0
 
     if tp + fn > 0:
         recall = tp / (tp + fn)  # correct 1s over actual 1s
-    else:
-        recall = 0.0
 
-    if precision + recall == 0:
-        f1 = 0.0
-    else:
+    try:
         f1 = 2 * (precision * recall) / (precision + recall)
+    except ZeroDivisionError:
+        f1 = 0.0
 
     return acc, precision, recall, f1
 
@@ -112,45 +108,26 @@ def get_lgd_poly3(X, y, w):
 
 
 # test standard sigmoid
-def test(X, y, w, add1=True):
+def test(X, y, w, add1=True, sigmoid=sigmoid):
     if add1:
         X_ = np.concatenate([np.ones((X.shape[0], 1)), X], axis=1)
     else:
         X_ = np.array(X)
 
-    y_ = np.array([])
-    for xi in X_:
-        xiw = np.inner(xi, w)
-        yi = sigmoid(xiw)  # 1./(1+np.exp(-xiw))
-        if yi > 0.5:
-            yi = 1
-        else:
-            yi = 0
+    xws = (np.inner(x, w) for x in X_)
 
-        y_ = np.append(y_, yi)
+    y_ = np.array([])
+    for xiw in xws:
+        # 1./(1+np.exp(-xiw))
+        if sigmoid(xiw) > 0.5:
+            y_ = np.append(y_, 1)
+        else:
+            y_ = np.append(y_, 0)
 
     acc, _, recall, f1 = get_eval_metrics(y, y_)
-    return np.array(y_), acc, recall, f1
+    return y_, acc, recall, f1
 
 
 # test poly3 sigmoid
 def test_poly3(X, y, w, add1=True):
-    if add1:
-        X_ = np.concatenate([np.ones((X.shape[0], 1)), X], axis=1)
-    else:
-        X_ = np.array(X)
-
-    y_ = np.array([])
-
-    for xi in X_:
-        xiw = np.inner(xi, w)
-        yi = sigmoid_poly3(-xiw)  # 1./(1+np.exp(-xiw))
-        if yi > 0.5:
-            yi = 1
-        else:
-            yi = 0
-
-        y_ = np.append(y_, yi)
-
-    acc, _, recall, f1 = get_eval_metrics(y, y_)
-    return np.array(y_), acc, recall, f1
+    return test(X, y, w, add1, sigmoid=lambda x: sigmoid_poly3(-x))
