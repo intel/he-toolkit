@@ -71,24 +71,22 @@ To set up the toolkit users must first initialize the `hekit` command using
 ```bash
 git clone https://github.com/intel/he-toolkit.git
 cd he-toolkit
-./hekit --config default.config init
+./hekit init --default-config
 ```
 
-This will create a directory `~/.hekit` in the user's home directory and copy
+This will create a directory `~/.hekit` in the user's home directory and create
 the `default.config`, or other user specified config file to this location.
-This directory will be where all components built and installed by `hekit` be
-kept.
+This directory will be where all components built and installed by `hekit` will
+be kept.
 
-In addition to this, the `hekit` command will be added to the user's `PATH` so
-as to enable the user to call the command from anyway on their system.
+Moreover, the `hekit` command will be added to the user's `PATH` so
+as to enable the user to call the command from anywhere on their system.
 
 Intel HE toolkit is primarily accessible through the `hekit` command.  There
-are currently two ways of interacting with the toolkit: through a Docker build;
-or, directly on your system.
+are currently two ways of interacting with the toolkit: through a Docker build
+or directly on your system.
 
 ## The hekit command
-**Move some of the kit/README to here**
-
 The `hekit` subcommands can be used by the user to easily setup the required
 environment to evaluate HE technology. See the [README](kit/README.md) for
 instructions.
@@ -116,7 +114,7 @@ Acceleration Library enabled.
 [dependencies](#dependencies).
 
 The [sample kernels](kernels) and [examples](examples) can also be built in a
-similar manner using 
+similar manner using
 ```bash
 hekit build recipes/sample-kernels.toml
 ```
