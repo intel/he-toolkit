@@ -68,8 +68,8 @@ container.
   processor with at least Intel AVX512DQ support.  For best performance, it is
   recommended to use processors supporting AVX512-IFMA52.
 - The docker build has been tested on,
--- Ubuntu 20.04;
--- MacOS Catalina (10.15.7).
+  - Ubuntu 20.04;
+  - MacOS Catalina (10.15.7).
 
 #### Running the Docker Build on MacOS
 In order to successfully run the docker build on MacOS you may be required to
@@ -116,15 +116,49 @@ this run
 ```bash
 hekit docker-build --enable vscode
 ```
-This will build an extra layer on top of the previous images containing VS Code
-configuration.
+This will build an extra layer on top of the previous images containing a VS
+Code configuration.
 
-**TODO: Extra steps on setup**
-- docker run expose the port you want to use
-- navigate to url via browser
-- default config is HE Workspace contains a copy of he-samples directory
-- VS Code will ask for a CMake file, select from the list a particular program
-  that you are interested in i.e. examples/psi
+Once this step is successfully completed the program shall output
+```bash
+Successfully tagged <username>/ubuntu_he_vscode:2.0.0
+
+RUN DOCKER CONTAINER ...
+Run container with
+docker run -d -p <ip addr>:<port>:8888 jcrawford/ubuntu_he_vscode:2.0.0
+Then to open vscode navigate to <ip addr>:<port> in your chosen browser
+```
+
+This directs the user to run the VS Code enabled docker container using a
+specified IP address and port using the `-p` option. The `-d` flag runs the
+container in the background, allowing the user to continue using the terminal.
+
+**Note:** To stop a container that is running in the background run
+```bash
+docker stop <container id>
+```
+
+After the container has been run navigate to the chosen `<ip addr>:<port>` in
+your chosen browser to gain access to the Docker container via code server. You
+shall initially be prompted to accept the certificate to gain access to the
+webpage. Once accepted, you will directed to the IDE.
+
+The default workspace, `HE Workspace`, contains a copy of the he-samples
+directory which the user is free to modify. Upon initial opening of the IDE,
+the user may be prompted to locate a CMake file. Clicking on `Locate` shall
+open a drop-down menu with a list of CMake files that have been detected.
+Select the CMake of a project that you are interested in and this can be built
+and run through the IDE.
+
+Alternatively, the container comes with pre-built examples and sample-kernels.
+These have all been built via the `hekit` command and are located in
+`$HOME/.hekit/components/<component-name>/<instance-name>`. To list the
+components available, open a terminal and execute
+```bash
+hekit list
+```
+For more information on the `hekit` command see [here](../kit/README.md).
+
 
 ## Running the Examples
 After a successful install and build of the docker container, the user should
@@ -196,9 +230,9 @@ repository.
 3. **Examples**: A collection of high-level examples that utilize the sample
   kernels to provide a peek into what a real-world example may look like.
   Currently three examples are implemented:
-  [Secure Query](../he-samples/examples/secure-query)
-  [Private Set Intersection](../he-samples/examples/psi).
-  [Logistic Regression](../he-samples/examples/logistic-regression).
+    - [Secure Query](../he-samples/examples/secure-query)
+    - [Private Set Intersection](../he-samples/examples/psi)
+    - [Logistic Regression](../he-samples/examples/logistic-regression)
 
 ## Common Issues
 The following documents common issues, causes, and potential solutions.
@@ -248,4 +282,4 @@ container. Docker may cause some variance with programs that utilize a large
 amount of threads due to the extra level of indirection caused by the
 container. While docker is meant to ease the process of deployment, workloads
 may also be run outside of the docker to view full performance if necessary
-(see [System build](###)).
+(see [System build](../README.md#system-build)).
