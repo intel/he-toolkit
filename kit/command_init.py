@@ -99,26 +99,25 @@ def get_rc_file() -> str:
     return rc_file
 
 
-def copy_default_config(args) -> None:
-    """Move the default config file to ~/.hekit,
+def create_default_config() -> None:
+    """Create default config file in ~/.hekit,
     when the user sets the default_config flag"""
     # Create ~/.hekit, this should always exist
     Path("~/.hekit").expanduser().mkdir(exist_ok=True)
 
-    # TODO This flow should be improved
     # Setup config file
-    if args.default_config:
-        default_config_path = Path("~/.hekit/default.config").expanduser()
-        if file_exits(default_config_path):
-            print("~/.hekit/default.config file already exists")
-        else:
-            copyfile(args.hekit_root_dir / "default.config", default_config_path)
-            print("~/.hekit/default.config created")
+    default_config_path = Path("~/.hekit/default.config").expanduser()
+    if file_exits(default_config_path):
+        print("~/.hekit/default.config file already exists")
+    else:
+        copyfile(args.hekit_root_dir / "default.config", default_config_path)
+        print("~/.hekit/default.config created")
 
 
 def init_hekit(args):
     """Initialize hekit"""
-    copy_default_config(args)
+    if args.default_config:
+        create_default_config()
 
     # Modify shell init file
     rc_file = get_rc_file()
