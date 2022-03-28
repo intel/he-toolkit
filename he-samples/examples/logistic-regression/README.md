@@ -1,9 +1,18 @@
 # Logistic/Linear Regression with Homomorphic Encryption
 The logistic regression example provides a fast and scalable implementation of
-SEAL CKKS HE scheme based logistic regression.  It will be built whenever SEAL
-is enabled as part of HE Toolkit build.
+SEAL CKKS HE scheme based logistic regression.  It will be built whenever
+[SEAL](https://github.com/microsoft/SEAL) is enabled as part of the HE Toolkit
+build.
 
-This example is also capable of running linear regression instead of logistic regression. Logistic regression can be achieved by ["wrapping"](https://philippmuens.com/logistic-regression-from-scratch) a [mulitiple linear regression](https://en.wikipedia.org/wiki/Linear_regression#Simple_and_multiple_linear_regression) model with a [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function). The sigmoid function can be skipped by using the `--linear_regression` option, effectively running a linear regression.
+This example is also capable of running linear regression instead of logistic
+regression. Logistic regression can be achieved by
+["wrapping"](https://philippmuens.com/logistic-regression-from-scratch) a
+[mulitiple linear
+regression](https://en.wikipedia.org/wiki/Linear_regression#Simple_and_multiple_linear_regression)
+model with a [sigmoid
+function](https://en.wikipedia.org/wiki/Sigmoid_function). The sigmoid function
+can be skipped by using the `--linear_regression` option, effectively running a
+linear regression.
 
 ## Requirements
 ```
@@ -12,12 +21,13 @@ virtualenv
 ```
 Packages needed for generating the synthetic datasets are automatically
 installed in a virtual environment within
-`$HE_SAMPLES/build/examples/logistic-regression/datasets/`.
+`$HOME/.hekit/components/examples/logistic-regression/build/datasets/`.
 
 ## Usage
-To run the example program execute
+Assuming the user used `hekit` to build the example program using the provided
+recipe file `recipes/examples.toml`, it can be run by executing
 ```bash
-cd $HE_SAMPLES/build/examples/logistic-regression
+cd $HOME/.hekit/components/examples/logistic-regression/build
 ./lr_test
 ```
 
