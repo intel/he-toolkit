@@ -8,7 +8,7 @@ from hekit import main
 from command_init import init_hekit
 
 
-def test_init_hekit_config_file_exist(mocker):
+def test_init_hekit_config_file_exists(mocker):
     """Arrange"""
     args = MockArgs()
     rc_file = "~/.mybashfile"
@@ -31,7 +31,7 @@ def test_init_hekit_config_file_exist(mocker):
     mockers.mock_append_to_rc.assert_called_once()
 
 
-def test_init_hekit_config_file_copy(mocker):
+def test_init_hekit_config_file_is_copied(mocker):
     """Arrange"""
     args = MockArgs()
     rc_file = "~/.mybashfile"
@@ -54,7 +54,7 @@ def test_init_hekit_config_file_copy(mocker):
     mockers.mock_append_to_rc.assert_called_once()
 
 
-def test_init_hekit_config_FileNotFoundError_from_create_backup(mocker):
+def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
     """Arrange"""
     args = MockArgs()
     rc_file = "~/.mybashfile"
@@ -107,7 +107,6 @@ class Mockers:
     def __init__(self, mocker):
         # mocking functions for Path Objects
         self.mock_mkdir = mocker.patch.object(Path, "mkdir")
-        self.mock_open = mocker.patch.object(Path, "open")
         # mocking included functions
         self.mock_print = mocker.patch("command_init.print")
         self.mock_copyfile = mocker.patch("command_init.copyfile")
@@ -115,7 +114,7 @@ class Mockers:
         # mocking internal functions
         self.mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
         self.mock_get_rc_file = mocker.patch("command_init.get_rc_file")
-        self.mock_exists = mocker.patch("command_init.file_exits")
+        self.mock_exists = mocker.patch("command_init.file_exists")
         self.mock_remove_from_rc = mocker.patch("command_init.remove_from_rc")
         self.mock_append_to_rc = mocker.patch("command_init.append_to_rc")
 
