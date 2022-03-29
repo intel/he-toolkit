@@ -12,19 +12,24 @@ class Tags:
     end_tag: str = "# <<<  hekit end  <<<\n"
 
 
-def check_file_exist(path: str):
+def file_exists(file: Path) -> bool:
+    """ Wrapper to check if file exists because Path.exists() cannot be mocked
+    directly due to being used internally by pytest creating some clash"""
+    return file.exists()
+
+
+def get_expanded_path(path: str) -> Path:
     """Return the expanded path of a file if it exists,
-    otherwise it rises an exception"""
+    otherwise raise an exception"""
     path_file = Path(path).expanduser().resolve()
-    if not path_file.exists():
+    if not file_exists(path_file):
         raise FileNotFoundError(path_file)
 
     return path_file
 
 
-def create_backup(path: str, ext: str = ".hekit.bak") -> str:
+def create_backup(path: Path, ext: str = ".hekit.bak") -> str:
     """Create a backup of the input file"""
-    path = check_file_exist(path)
     backup = path.with_suffix(ext)
     copyfile(path, backup)
     # Sanity check - we really need to guarantee we copied the file
@@ -33,9 +38,8 @@ def create_backup(path: str, ext: str = ".hekit.bak") -> str:
     return backup
 
 
-def remove_from_rc(path: str) -> None:
+def remove_from_rc(path: Path) -> None:
     """Remove hekit section"""
-    path = check_file_exist(path)
     with path.open() as f:
         lines = f.readlines()  # slurp
 
@@ -61,17 +65,15 @@ def remove_from_rc(path: str) -> None:
         )
 
 
-def append_to_rc(path: str, content: str) -> None:
+def append_to_rc(path: Path, content: str) -> None:
     """Config bash init file to know about hekit"""
-    shell_rc_path = check_file_exist(path)
-
     if content[:-1] != "\n":  # add newline if not there
         content += "\n"
 
     # newline to not accidentally mix with existing content
     # newline to end as courtesy to space our code
     lines = ["\n", Tags.start_tag, content, Tags.end_tag, "\n"]
-    with shell_rc_path.open("a") as rc_file:
+    with path.open("a") as rc_file:
         for line in lines:
             rc_file.write(line)
 
@@ -82,8 +84,8 @@ def get_rc_file() -> str:
 
     if active_shell_path == "bash":
         # if bash_profile file does not exist, try bashrc file
-        rc_file = "~/.bash_profile"
-        if not Path(rc_file).expanduser().resolve().exists():
+        rc_file = Path("~/.bash_profile").expanduser().resolve()
+        if not file_exists(rc_file):
             rc_file = "~/.bashrc"
     # TODO add support for other popular shells
     #    elif active_shell_path == "zsh":
@@ -94,18 +96,36 @@ def get_rc_file() -> str:
     return rc_file
 
 
-def init_hekit(args):
-    """Initialize hekit"""
+def create_default_config(hekit_root_dir: str) -> None:
+    """Create default config file in ~/.hekit,
+    when the user sets the default_config flag"""
     # Create ~/.hekit, this should always exist
     Path("~/.hekit").expanduser().mkdir(exist_ok=True)
 
-    # Modify shell init file
-    rc_file = get_rc_file()
-    rc_backup_file = create_backup(rc_file)
-    print("Backup file created at", rc_backup_file)
-    remove_from_rc(rc_file)
+    # Setup config file
+    default_config_path = Path("~/.hekit/default.config").expanduser()
+    if file_exists(default_config_path):
+        print("~/.hekit/default.config file already exists")
+    else:
+        copyfile(hekit_root_dir / "default.config", default_config_path)
+        print("~/.hekit/default.config created")
 
-    # New lines that will be added in the rc_file:
+
+def init_hekit(args):
+    """Initialize hekit"""
+    if args.default_config:
+        create_default_config(args.hekit_root_dir)
+
+    # Backup the shell init file
+    rc_file = get_rc_file()
+    rc_path = get_expanded_path(rc_file)
+    rc_backup_file = create_backup(rc_path)
+    print("Backup file created at", rc_backup_file)
+
+    # Remove current hekit section, if it exists
+    remove_from_rc(rc_path)
+
+    # Add new lines in the rc_file:
     # 1-Add hekit directory as part of environmental variable PATH
     path_line = f"PATH={args.hekit_root_dir}:$PATH"
     # 2-Register hekit link and hekit.py script to enable tab completion
@@ -115,18 +135,7 @@ def init_hekit(args):
         "fi\n"
     )
     content = "\n".join([path_line, eval_lines])
-
-    append_to_rc(rc_file, content)
-
-    # TODO This flow should be improved
-    # Setup config file
-    if args.default_config:
-        default_config_path = Path("~/.hekit/default.config").expanduser()
-        if default_config_path.exists():
-            print("~/.hekit/default.config file already exists")
-        else:
-            copyfile(args.hekit_root_dir / "default.config", default_config_path)
-            print("~/.hekit/default.config created")
+    append_to_rc(rc_path, content)
 
     # Instructions for user
     print("Please, source your shell init file as follows")

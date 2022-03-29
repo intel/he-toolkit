@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from pathlib import Path
-from os import getcwd, chdir
-from getpass import getuser
 
 from .context import hekit, command_check_deps
 from hekit import main
