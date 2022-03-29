@@ -12,14 +12,13 @@ class Tags:
     end_tag: str = "# <<<  hekit end  <<<\n"
 
 
-def file_exists(file: Path):
-    """ Wrapper to checks if a file exist, this
-    is needed due to Path.exists() can not be mocked
-    directly because it is used by Pytest"""
+def file_exists(file: Path) -> bool:
+    """ Wrapper to check if file exists because Path.exists() cannot be mocked
+    directly due to being used internally by pytest creating some clash"""
     return file.exists()
 
 
-def get_expanded_path(path: str):
+def get_expanded_path(path: str) -> Path:
     """Return the expanded path of a file if it exists,
     otherwise raise an exception"""
     path_file = Path(path).expanduser().resolve()
