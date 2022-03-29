@@ -20,8 +20,7 @@ run_lr_example() {
 }
 
 run_psi_example() {
-  # FIXME data relative to executable not where called from
-  __run_cmd "$HEKIT_EXAMPLES"/psi/build/psi "$@"
+  __run_cmd "$HEKIT_EXAMPLES"/psi/build/psi --server "$HEKIT_EXAMPLES"/psi/build/datasets/fruits.set "$@"
 }
 
 run_query_example() {
