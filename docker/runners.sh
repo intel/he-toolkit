@@ -10,33 +10,36 @@ HEKIT_SAMPLE_KERNELS="$HEKIT_DIR/sample-kernels"
 __run_cmd() {
   (
     set -e
-    "$@"
+    eval "$@"
   )
 }
 
 run_lr_example() {
+  # FIXME data relative to executable not where called from
   __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_EXAMPLES"/logistic-regression/build/lr_test "$@"
 }
 
 run_psi_example() {
+  # FIXME data relative to executable not where called from
   __run_cmd "$HEKIT_EXAMPLES"/psi/build/psi "$@"
 }
 
 run_query_example() {
+  # FIXME data relative to executable not where called from
   __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_EXAMPLES"/secure-query/build/secure-query
 }
 
 run_sample_kernels_palisade() {
-  __run_cmd KMP_WARNINGS=0 OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLES_KERNELS"/palisade/build/sample-kernels-palisade --benchmark_min_time=2
+  __run_cmd KMP_WARNINGS=0 OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLE_KERNELS"/palisade/build/sample-kernels-palisade --benchmark_min_time=2
 }
 
 run_sample_kernels_seal() {
-  __run_cmd KMP_WARNINGS=0 OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLES_KERNELS"/seal/build/sample-kernels-seal --benchmark_min_time=2
+  __run_cmd KMP_WARNINGS=0 OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLE_KERNELS"/seal/build/sample-kernels-seal --benchmark_min_time=2
 }
 
 run_tests() {
-  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLES_TESTS"/palisade/build/test/unit-test
-  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLES_TESTS"/seal/build/test/unit-test
+  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLE_KERNELS"/palisade/build/test/unit-test
+  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_SAMPLE_KERNELS"/seal/build/test/unit-test
 }
 
 welcome_message() {
