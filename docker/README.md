@@ -109,10 +109,18 @@ follows
 hekit docker-build --id 1234
 ```
 
+After the image has been successfully built, the below message will be
+displayed
+```bash
+Run container with
+docker run -it <username>/ubuntu_he_toolkit:2.0.0
+```
+Executing this command shall start the container using `bash`.
+
 ### Using VS Code Server
-The docker build also allows users to interact with HE Toolkit via the VS Code
-IDE via [code-server](https://coder.com/docs/code-server/latest). To enable
-this run
+The docker build optionally allows users to interact with HE Toolkit via the VS
+Code IDE via [code-server](https://coder.com/docs/code-server/latest) instead
+of directly via the command line. To enable this run
 ```bash
 hekit docker-build --enable vscode
 ```
@@ -148,7 +156,9 @@ directory which the user is free to modify. Upon initial opening of the IDE,
 the user may be prompted to locate a CMake file. Clicking on `Locate` shall
 open a drop-down menu with a list of CMake files that have been detected.
 Select the CMake of a project that you are interested in and this can be built
-and run through the IDE.
+and run through the IDE. To change the target, open the `.vscode/settings.json`
+file and change the `cmake.sourceDirectory` path to the location of another
+CMake project you are interested in.
 
 Alternatively, the container comes with pre-built examples and sample-kernels.
 These have all been built via the `hekit` command and are located in
@@ -159,12 +169,21 @@ hekit list
 ```
 For more information on the `hekit` command see [here](../kit/README.md).
 
+To run these pre-built projects use the provided runner commands described in
+the following section [Running the Examples](#running-the-examples).
+
 
 ## Running the Examples
 After a successful install and build of the docker container, the user should
-be greeted with  welcome message and be inside their user home directory.
+be greeted with a welcome message and be inside their user home directory.
+Within the home directory will be the `he-toolkit` repo which has already been
+pre-built for the user. To run the runner commands listed below, first source
+the runner script be executing
+```bash
+source he-toolkit/docker/runners.sh
+```
 
-This directory will contain the following commands that have been sourced.
+The user will now have access to the following commands that have been sourced.
 - ***run_lr_example***: This will run a Logistic Regression (LR) example
   allowing users to see a faster, more scalable method for LR in HE. Unlike the
   LR code available in the sample-kernels, this version takes extra steps to
