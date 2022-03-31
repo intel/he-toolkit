@@ -15,8 +15,11 @@ __run_cmd() {
 }
 
 run_lr_example() {
-  # FIXME data relative to executable not where called from
-  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_EXAMPLES"/logistic-regression/build/lr_test "$@"
+  (
+    set -e
+    cd "$HEKIT_EXAMPLES/logistic-regression/build"
+    OMP_NUM_THREADS="$(nproc)" ./lr_test "$@"
+  )
 }
 
 run_psi_example() {
@@ -24,8 +27,20 @@ run_psi_example() {
 }
 
 run_query_example() {
-  # FIXME data relative to executable not where called from
-  __run_cmd OMP_NUM_THREADS="$(nproc)" "$HEKIT_EXAMPLES"/secure-query/build/secure-query
+  (
+    echo -n "Initialize SEAL BFV scheme with default parameters[Y(default)|N]: "
+    read -r params
+    echo -n "Input file to use for database or press enter to use default[us_state_capitals.csv]: "
+    read -r database
+    echo -n "Input key value to use for database query: "
+    read -r query
+    set -e
+    OMP_NUM_THREADS="$(nproc)" "$HEKIT_EXAMPLES"/secure-query/build/secure-query <<- EOF
+			${params}
+			${database}
+			${query}
+EOF
+  )
 }
 
 run_sample_kernels_palisade() {
