@@ -41,15 +41,24 @@ Must have system dependencies for the toolkit include,
 ```
 git
 python >= 3.8
+pip
 ```
 
 Further Python dependencies include,
 ```
 toml
 argcomplete (optional for tab completion)
+docker      (optional for building docker containers)
 pytest      (optional for running tests)
 pytest-mock (optional for running tests)
-docker      (optional for building docker containers)
+```
+
+For faster setup, a `requirements.txt` file is provided for recommended user
+python dependencies and a `dev_reqs.txt` is provided for all python dependencies
+listed above. Either file can install dependencies with
+
+```bash
+pip install -r <requirements-file>
 ```
 
 However, to build anything useful with the toolkit, we recommend that in
