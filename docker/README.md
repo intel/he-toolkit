@@ -11,8 +11,8 @@
     - [Steps](#steps)
   - [Running the Examples](#running-the-examples)
     - [Docker Controls](#docker-controls)
-      - [Commands used inside the Docker Container:](#commands-used-inside-the-docker-container)
-      - [Commands used outside of the Docker Container:](#commands-used-outside-of-the-docker-container)
+      - [Commands used inside the Docker Container](#commands-used-inside-the-docker-container)
+      - [Commands used outside of the Docker Container](#commands-used-outside-of-the-docker-container)
   - [Modifying the Examples](#modifying-the-examples)
   - [Common Issues](#common-issues)
     - [System config](#system-config)
@@ -212,7 +212,7 @@ Each command can be run from the command line simply by name e.g.
 The docker controls utilized for Intel HE toolkit are the same as the standard
 docker controls. Some tips are provided below.
 
-#### Commands used inside the Docker Container:
+#### Commands used inside the Docker Container
 - **exit**: This will exit and stop the docker container. The container can
   be restarted with `docker start <container_id|container_name>`. The user can
   discover their container via `docker ps -a`.
@@ -221,7 +221,7 @@ docker controls. Some tips are provided below.
   behavior if there is a connection interruption while connected to the docker.
   The user can reattach using `docker attach <container_id|container_name>`.
 
-#### Commands used outside of the Docker Container:
+#### Commands used outside of the Docker Container
 - **docker ps**: This will list information about the current running docker
   containers, including the `container_id`. Use this to check if there is a
   pre-existing docker running.
