@@ -16,8 +16,8 @@ run by calling
 
 ```bash
 # Note, these will take several minutes
-$HOME/.hekit/components/sample-kerenels/seal/build/sample-kernels-seal
-$HOME/.hekit/components/sample-kerenels/palisade/build/sample-kernels-palisade
+$HOME/.hekit/components/sample-kernels/seal/build/sample-kernels-seal
+$HOME/.hekit/components/sample-kernels/palisade/build/sample-kernels-palisade
 ```
 This will output timing results using google benchmark.
 
