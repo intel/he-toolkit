@@ -1,25 +1,36 @@
 # Sample Kernels
-This directory contains sample kernels implemented using google test and google benchmark for Microsoft SEAL and PALISADE. These sample kernels are for operations that are not full standalone use cases. An example of such an operation is matrix multiplication for which we provide several different sample kernels showing alternative methods of implementing the same algorithm using different approaches, libraries, and schemes. The full set of available sample kernels for each library and a brief description are described in the details section below.
+This directory contains sample kernels implemented using google test and google
+benchmark for Microsoft SEAL and PALISADE. These sample kernels are for
+operations that are not full standalone use cases. An example of such an
+operation is matrix multiplication for which we provide several different
+sample kernels showing alternative methods of implementing the same algorithm
+using different approaches, libraries, and schemes. The full set of available
+sample kernels for each library and a brief description are described in the
+details section below.
 
 # Usage
-This directory contains sample kernels which benchmark a set of more complex HE
-operations in both SEAL and PALISADE.
+This directory contains sample kernels which benchmark a set of more complex
+HE operations in both SEAL and PALISADE.  Assuming the sample kernels were
+built via `hekit` using the provided recipe `sample-kernels.toml` they can
+run by calling
 
-To run the sample kernels such as dot product, call
 ```bash
 # Note, these will take several minutes
-$HE_SAMPLES/build/sample-kernels/sample-kernels-seal
-$HE_SAMPLES/build/sample-kernels/sample-kernels-palisade
+$HOME/.hekit/components/sample-kernels/seal/build/sample-kernels-seal
+$HOME/.hekit/components/sample-kernels/palisade/build/sample-kernels-palisade
 ```
-this will output timing results using google benchmark.
+This will output timing results using google benchmark.
 
-For unit test, run
+For the sample kernel unit tests, run
 ```bash
-$HE_SAMPLES/build/sample-kernels/test/unit-test
+$HOME/.hekit/components/sample-kernels/seal//build/test/unit-test
+$HOME/.hekit/components/sample-kernels/palisade//build/test/unit-test
 ```
 
 # Details
-The following tables list and give a brief description of the different sample kernels available. All sample kernels use N = 8192 with 3 Coefficient modulus primes.
+The following tables list and give a brief description of the different sample
+kernels available. All sample kernels use N = 8192 with 3 Coefficient modulus
+primes.
 
 ## Microsoft SEAL Sample Kernels
 

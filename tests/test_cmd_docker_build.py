@@ -216,7 +216,7 @@ def test_setup_docker_clean(mocker):
 
     """Assert"""
     mock_rmtree.assert_called_with(Path(args.hekit_root_dir) / "__staging__")
-    mock_print.assert_called_with("Stagging area deleted")
+    mock_print.assert_called_with("Staging area deleted")
     mock_print_preamble.assert_not_called()
     mock_DockerTools.assert_not_called()
     assert exc_info.value.code == 0

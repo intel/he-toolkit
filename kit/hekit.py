@@ -22,7 +22,7 @@ from command_install import install_components
 from command_check_deps import check_dependencies
 
 try:
-    # docker-py is optional and definitely won't be used form within a docker container
+    # docker-py is optional and will not be used from within a docker container
     from command_docker_build import setup_docker
 except ImportError as ie:
 

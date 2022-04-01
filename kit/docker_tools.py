@@ -32,7 +32,7 @@ def check_build(func):
             elif "error" in response.keys():
                 raise DockerBuildError("Docker build failed", response)
             else:
-                raise DockerBuildError("Unrecognised stream property", response)
+                raise DockerBuildError("Unrecognized stream property", response)
 
     return inner
 

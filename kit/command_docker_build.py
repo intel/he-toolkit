@@ -115,7 +115,7 @@ def setup_docker(args):
 
     if args.clean:
         rmtree(staging_path)
-        print("Stagging area deleted")
+        print("Staging area deleted")
         exit(0)
 
     if args.y:
