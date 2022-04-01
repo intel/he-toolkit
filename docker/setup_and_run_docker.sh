@@ -59,7 +59,7 @@ echo -e "\nCHECKING IN-DOCKER CONNECTIVITY..."
 if ! docker run -v \
   "$PWD"/basic-docker-test.sh:/basic-docker-test.sh \
   --env-file ./env.list \
-  ubuntu:bionic \
+  "ubuntu:20.04" \
   /bin/bash \
   /basic-docker-test.sh; then
   echo 1>&2 "In-docker connectivity failing."
@@ -82,7 +82,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     GROUPID=1000
   else
     echo -e "\nWARNING: Changing UID/GID of docker user to $1"
-    GROUPID="$1"
+    USERID="$1"
     GROUPID="$1"
   fi
 fi

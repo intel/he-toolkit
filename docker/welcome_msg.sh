@@ -9,20 +9,17 @@ In the current directory, you will find 3 scripts:
   1. run_sample_kernels_[palisade|seal].sh: This will run several HE sample kernels including
      Matrix Multiplication and Logistic Regression. The script will display Wall time,
      CPU time, and the number of iterations that were run.
-  2. run_micro_kernels_[palisade|seal].sh: This will run many HE micro kernels that span a
-     wide range of schemes, and display different parts of the HE pipeline from encoding
-     to encryption and beyond.
-  3. run_tests.sh: This will run several unit tests to confirm the validity of the above
+  2. run_tests.sh: This will run several unit tests to confirm the validity of the above
      sample kernels by comparing against the same operation in the non-HE space.
-  4. run_query_example.sh: This will run a "Secure Query" example allowing users
+  3. run_query_example.sh: This will run a "Secure Query" example allowing users
      to query on a database of the 50 U.S. States while controlling (optionally) the
      crypto-parameters used. When prompted, enter a State and, if present, the
      corresponding City will be decoded and printed.
-  5. run_lr_example.sh: This will run a "Logistic Regression" (LR) example allowing users
+  4. run_lr_example.sh: This will run a "Logistic Regression" (LR) example allowing users
      to see a faster and more scalable method for LR in HE. Unlike the LR code available
      before in the sample-kernels, this version takes extra steps to utilize as many slots
      as possible in the ciphertexts.
-  6. run_psi_example.sh: this will execute an example that uses the HElib library and the
+  5. run_psi_example.sh: this will execute an example that uses the HElib library and the
      BGV scheme to compute the intersection of two given sets. The program requires as input,
      a file with the client set, this is mandatory parameter, so the user must create this
      file before executing the example. Use the flag "-h" for usage information.
