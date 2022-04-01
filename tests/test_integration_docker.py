@@ -122,7 +122,7 @@ def test_docker_build_clean(mocker, restore_pwd):
         main()
 
     """Assert"""
-    mock_print_build.assert_any_call("Stagging area deleted")
+    mock_print_build.assert_any_call("Staging area deleted")
     assert exc_info.value.code == 0
 
 

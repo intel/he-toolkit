@@ -80,7 +80,7 @@ def test_build_image_response_other(mocker):
         next(response)
 
     """Assert"""
-    assert "Unrecognised stream property" == str(exc_info.value)
+    assert "Unrecognized stream property" == str(exc_info.value)
 
 
 def test_image_exists_empty_list(mocker):
