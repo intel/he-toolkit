@@ -89,7 +89,8 @@ This directory will be where all components built and installed by `hekit` will
 be kept.
 
 Moreover, the `hekit` command will be added to the user's `PATH` so
-as to enable the user to call the command from anywhere on their system.
+as to enable the user to call the command from anywhere on their system. This
+modifies your shell's inittialisation script (currently only in bash).
 
 Intel HE toolkit is primarily accessible through the `hekit` command.  There
 are currently two ways of interacting with the toolkit: through a Docker build
