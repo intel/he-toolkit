@@ -162,6 +162,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Performing the set intersection" << std::endl;
     Ptxt result(context);
+
     if (cmdline_opts.ptxt) {
       // Set intersect
       result = helib::calculateSetIntersection(client_set_in_ptxt, server_set);

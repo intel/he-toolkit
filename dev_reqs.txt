@@ -1,0 +1,6 @@
+# Recommended requirements
+-r requirements.txt
+
+# For testing
+pytest
+pytest-mock

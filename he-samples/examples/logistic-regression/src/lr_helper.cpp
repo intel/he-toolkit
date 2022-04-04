@@ -1,15 +1,15 @@
 // Copyright (C) 2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "include/lr_helper.hpp"
+#include "lr_helper.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <numeric>
 
-#include "include/data_loader.hpp"
-#include "kernels/omp_utils.h"
+#include "data_loader.hpp"
+#include "omp_utils.h"
 
 namespace lrhelper {
 template <>

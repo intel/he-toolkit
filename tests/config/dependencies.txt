@@ -1,0 +1,9 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Dependencies test file
+programA >= 3.8
+#comment
+programB
+#comment
+programC == 0.1

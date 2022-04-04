@@ -1,24 +1,27 @@
 # Intel Homomorphic Encryption Toolkit
-The Intel Homomorphic Encryption (HE) toolkit is designed to make it fast and
-easy to evaluate homomorphic encryption technology on Intel® Processors using
-libraries, such as [Intel HE Acceleration Library](https://github.com/intel/hexl), optimized to
-take advantage of the newest Intel hardware features.  Additionally, the Intel
-HE-Toolkit is a great starting point for people new to homomorphic encryption,
-offering sample kernels showing multiple examples of how the libraries can be
-used to implement common mathematical operations using
-[Microsoft SEAL](https://github.com/microsoft/SEAL),
-[PALISADE](https://gitlab.com/palisade/palisade-release), or
-[HElib](https://github.com/homenc/HElib). In addition, there are example
-applications which demonstrate how HE technology can be used to create secure
-applications.
+Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
+delivering innovation around HE with the aim of providing both the community
+and industry with an intuitive entry point for Experimentation, Development and
+Deployment of HE applications. Intel HE oolkit currently offers sample kernels
+and example programs that demonstrate varying operations and applications that
+can be built leveraging three major HE libraries [Microsoft
+SEAL](https://github.com/microsoft/SEAL),
+[PALISADE](https://gitlab.com/palisade/palisade-release), and
+[HElib](https://github.com/homenc/HElib). Moreover, Intel HE Toolkit
+demonstrates the advantages of using Intel® Processors through libraries such
+as the [Intel HE Acceleration Library](https://github.com/intel/hexl) to
+utilize the latest Intel hardware features.
+
 
 ## Contents
+
 - [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
   - [Contents](#contents)
   - [Dependencies](#dependencies)
-  - [Instructions](#instructions)
-    - [Docker Build (Recommended)](#docker-build-recommended)
-    - [Native Build](#native-build)
+  - [Setup](#setup)
+  - [The hekit command](#the-hekit-command)
+  - [Docker build (Recommended)](#docker-build-recommended)
+  - [System build](#system-build)
   - [Kernels](#kernels)
     - [Sample kernels](#sample-kernels)
     - [Test sample kernels](#test-sample-kernels)
@@ -27,88 +30,141 @@ applications.
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
 - [Contributing](#contributing)
+  - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
 
+
 ## Dependencies
-The toolkit has been tested on Ubuntu 20.04
+Intel HE toolkit has been tested on Ubuntu 20.04
 
-Must have dependencies include:
+Must have system dependencies for the toolkit include,
 ```
-cmake >= 3.13
 git
-pthread
-patchelf
-m4
-g++ >= 10.0 or clang >= 10.0
-python >= 3.5
-virtualenv
+python >= 3.8
+pip
 ```
 
-
-Dependencies required per library include:
+Further Python dependencies include,
 ```
-autoconf (PALISADE)
-gmp >= 6.2.1 (HElib)
-NTL >= 11.5.1 (HElib)
+toml
+argcomplete (optional for tab completion)
+docker      (optional for building docker containers)
+pytest      (optional for running tests)
+pytest-mock (optional for running tests)
 ```
 
-## Instructions
-There are currently two methods for building the toolkit project.
-
-### Docker Build (Recommended)
-The **recommended** method is to use the Docker build and installation which
-builds the toolkit in its entirety including all HE libraries in a
-self-contained docker container running Ubuntu 20.04. See [here](docker) for a
-detailed description on the usage and components of this build.
-
-### Native Build
-Alternatively, one can build the toolkit natively using the following commands
+For faster setup, a `requirements.txt` file is provided for recommended user
+python dependencies and a `dev_reqs.txt` is provided for all python dependencies
+listed above. Either file can install dependencies with
 
 ```bash
-export HE_SAMPLES=$(pwd)/he-samples
-cd $HE_SAMPLES
-cmake -S . -B build
-cmake --build build -j
+pip install -r <requirements-file>
+```
+
+However, to build anything useful with the toolkit, we recommend that in
+addition to install the following system dependencies,
+
+```
+m4
+patchelf
+cmake >= 3.13
+g++ >= 10.0 or clang >= 10.0
+pthread
+virtualenv (optional if building the Logistic Regression Example)
+autoconf   (optional if using PALISADE)
+gmp        (optional if using HElib)
+```
+
+## Setup
+To set up the toolkit users must first initialize the `hekit` command using
+```bash
+git clone https://github.com/intel/he-toolkit.git
+cd he-toolkit
+./hekit init --default-config
+```
+
+This will create a directory `~/.hekit` in the user's home directory and create
+the `default.config`, or other user specified config file to this location.
+This directory will be where all components built and installed by `hekit` will
+be kept.
+
+Moreover, the `hekit` command will be added to the user's `PATH` so
+as to enable the user to call the command from anywhere on their system. This
+modifies your shell's inittialisation script (currently only in bash).
+
+Intel HE toolkit is primarily accessible through the `hekit` command.  There
+are currently two ways of interacting with the toolkit: through a Docker build
+or directly on your system.
+
+## The hekit command
+The `hekit` command is a command-line tool that can be used by the user to
+easily set up an HE environment in a configurable and intuitive manner.
+
+The `hekit` command has a help option which lists all sub-commands and flags
+```bash
+hekit -h
+usage: hekit [-h] [--version] [--config CONFIG] {init,list,install,build,fetch,remove,check-dependencies,docker-build} ...
+
+positional arguments:
+  {init,list,install,build,fetch,remove,check-dependencies,docker-build}
+                        sub-command help
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             display Intel HE toolkit version
+  --config CONFIG       use a non-default configuration file instead
+```
+
+Moreover, each sub-command has a help option that can be invoked with `hekit
+<sub-command> -h`.
+
+The `hekit` subcommands consist of utility commands such as
+`check-dependencies` and `docker-build` as well as commands for managing the
+fetching, building, and installation of user-defined projects using recipe
+files (more information found [here](kit/README.md#recipe-file)).
+See the [README](kit/README.md) for more detailed information on the usage of
+`hekit`.
+
+## Docker build (Recommended)
+The **recommended** method is to use the Docker build and installation which
+builds the toolkit in its entirety including all HE libraries in a
+self-contained docker container running Ubuntu 20.04. This can be built through
+the `hekit` command `hekit docker-build`. See [here](docker) for a detailed
+description on the usage and components of this build.
+
+## System build
+Alternatively, one can build the toolkit's HE components using the following
+command
+
+```bash
+hekit install recipes/default.toml
 ```
 
 This will build the toolkit project with the default settings. The toolkit will
-download and build all three HE libraries automatically with Intel HE Acceleration Library enabled.
+download and build all three HE libraries automatically with Intel HE
+Acceleration Library enabled.
 
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
 
-It is possible to pass additional options, for example:
+The [sample kernels](kernels) and [examples](examples) can also be built in a
+similar manner using
 ```bash
- -DENABLE_PALISADE=ON
- -DENABLE_SEAL=ON
- -DENABLE_HELIB=OFF
+hekit build recipes/sample-kernels.toml
 ```
-to enable/disable building of certain HE libraries. The following table
-contains the current CMake options, default values are in bold.
+and
+```bash
+hekit build recipes/examples.toml
+```
+respectively.
 
-| CMake options            | Values   | Comments      |
-|--------------------------|----------|---------------|
-|`ENABLE_PALISADE`         |**ON**/OFF|Enable PALISADE|
-|`ENABLE_SEAL`             |**ON**/OFF|Enable SEAL|
-|`ENABLE_HELIB`            |**ON**/OFF|Enable HElib|
-|`ENABLE_INTEL_HEXL`       |**ON**/OFF|Enable Intel HE Acceleration Library|
-|`ENABLE_ADDRESS_SANITIZER`|ON/**OFF**|Compiles and link with Address Sanitizer|
-|`ENABLE_THREAD_SANITIZER` |ON/**OFF**|Compiles and link with Thread Sanitizer|
-|`ENABLE_UB_SANITIZER`     |ON/**OFF**|Compiles and link with Undefined Behaviour Sanitizer|
-|`SEAL_PREBUILT`           |ON/**OFF**|Use a pre-built installation of SEAL|
-|`PALISADE_PREBUILT`       |ON/**OFF**|Use a pre-built installation of PALISADE|
-|`HELIB_PREBUILT`          |ON/**OFF**|Use a pre-built installation of HElib|
-
-**Note:** If using a pre-built library then you may need to use the option
-`-D<SEAL|PALISADE|HELIB>_HINT_DIR=<path-to-installation>` if you have installed
-them in a non-default location.
-
-**Note:** If opting to use HElib with HEXL enabled, the user must have a
-pre-installed version of HEXL due to HElib currently only supports linking to a
-pre-installed HEXL. See
-[here](https://github.com/homenc/HElib/blob/master/INSTALL.md) for more
-details.
-
+To view a list of the components and their instances have been built/installed
+through `hekit` one can execute
+```bash
+hekit list
+```
+to list each component, their instance(s) and the status of the fetch, build,
+and install steps.
 
 ## Kernels
 Located in [he-samples](he-samples) is a collection of software components
@@ -122,7 +178,7 @@ technology for different use cases.
 ### Sample kernels
 The [sample kernels](he-samples/sample-kernels) are for complex HE operations,
 requiring multiple API calls such as Matrix Multiplication and Vector Dot
-Product. See the [README](he-samples/sample-kernels/README.md) for
+Product.  See the [README](he-samples/sample-kernels/README.md) for
 instructions.
 
 ### Test sample kernels
@@ -167,28 +223,59 @@ are common to both sets. See the [README](he-samples/examples/psi/README.md)
 for usage information.
 
 # Contributing
-At this time, Intel HE Toolkit does not accept external contributions. We
-encourage feedback and suggestions via
-[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
-[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
+Intel HE Toolkit welcomes external contributions through pull requests to the
+`main` branch.
 
-For Intel developers, ensure the [pre-commit](https://pre-commit.com) config is
-active prior to contributing, i.e. run
+Please sign your commits before making a pull request. See instructions
+[here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)
+for how to sign commits.
+
+Before contributing, please ensure the [pre-commit](https://pre-commit.com)
+checks pass, i.e. run
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
 and make sure all pre-commit checks pass.
 
-**NOTE:** Please ensure you are using clang-format version >= 10
+Also please run
+```bash
+pytest tests
+```
+to make sure the tests pass.
+
+We encourage feedback and suggestions via
+[GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
+[GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
+
+
+## Troubleshooting
+
+* ```Executable `cpplint` not found```
+
+  Make sure you install cpplint: ```pip install cpplint```.
+  If you install `cpplint` locally, make sure to add it to your `PATH`.
+
+* ```/bin/sh: 1: pre-commit: not found```
+
+  Install `pre-commit`. More info at https://pre-commit.com/.
+
+* When attempting to sign a commit
+  ```
+     error: gpg failed to sign the data
+     fatal: failed to write commit object
+  ```
+  Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
+  as `~/.bashrc`.
+
 
 # Contributors
-The Intel contributors to this project, sorted by last name, are
+The Intel past and present contributors to this project, sorted by last name, are
   - [Paky Abu-Alam](https://www.linkedin.com/in/paky-abu-alam-89797710/)
   - [Flavio Bergamaschi](https://www.linkedin.com/in/flavio-bergamaschi)
   - [Fabian Boemer](https://www.linkedin.com/in/fabian-boemer-5a40a9102/)
   - [Jeremy Bottleson](https://www.linkedin.com/in/jeremy-bottleson-38852a7/)
-  - Dennis Calderon Vega
+  - [Dennis Calderon Vega](https://www.linkedin.com/in/dennis-calderon-996840a9/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)

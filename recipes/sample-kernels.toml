@@ -1,0 +1,50 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[sample-kernels]]
+skip = false
+name = "seal"
+fetch = ""
+init_fetch_dir = ""
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -DENABLE_SEAL=ON
+               -DSEAL_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7
+               -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
+               -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
+               -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+build = "cmake --build %init_build_dir% -j"
+
+
+[[sample-kernels]]
+skip = false
+name = "palisade"
+fetch = ""
+init_fetch_dir = ""
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -DENABLE_PALISADE=ON
+               -DPalisade_DIR=~/.hekit/components/palisade/v1.11.6/install/lib/Palisade
+               -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+build = "cmake --build %init_build_dir% -j"
+
+
+# Above two recipes combined into one instance (skipped)
+[[sample-kernels]]
+skip = true
+name = "all"
+fetch = ""
+init_fetch_dir = ""
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -DENABLE_SEAL=ON
+               -DENABLE_PALISADE=ON
+               -DSEAL_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7
+               -DPalisade_DIR=~/.hekit/components/palisade/v1.11.6/install/lib/Palisade
+               -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
+               -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
+               -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+build = "cmake --build %init_build_dir% -j"

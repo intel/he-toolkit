@@ -1,0 +1,32 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[hexl]]
+skip = false
+version = "1.2.3"
+name = "1.2.3"
+fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"
+
+[[hexl]]
+skip = false
+version = "1.2.2"
+name = "1.2.2"
+fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"

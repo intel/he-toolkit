@@ -4,82 +4,35 @@
 # Username
 ARG UNAME
 
-FROM $UNAME/ubuntu_he_base:1.4
+FROM $UNAME/ubuntu_he_base:2.0.0
 
+LABEL maintainer="HE Toolkit github.com/intel/he-toolkit"
+
+# User-setup
 ARG UNAME
+ARG UID
+ARG GID
+ARG HOME="/home/$UNAME"
+ENV SHELL="/bin/bash"
 
-LABEL maintainer="HE Toolkit Support <he_toolkit_support@intel.com>"
+RUN groupadd -g $GID $UNAME && \
+    useradd --no-log-init -m -u $UID -g $GID -s /bin/bash $UNAME && \
+    echo "$UNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-COPY libs.tar.gz /
-
-RUN tar -zxvf libs.tar.gz && \
-    # Build and install Intel HE Acceleration Library \
-    cd /libs/hexl && \
-    cmake -S . -B build && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install GSL \
-    cd /libs/GSL && \
-    cmake -S . -B build -DGSL_TEST=OFF && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install zlib \
-    cd /libs/zlib && \
-    cmake -S . -B build && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install zstd \
-    cd /libs/zstd/build/cmake && \
-    cmake -S . -B build -DZSTD_BUILD_PROGRAMS=OFF \
-                        -DZSTD_BUILD_SHARED=OFF \
-                        -DZSTD_BUILD_STATIC=ON \
-                        -DZSTD_BUILD_TESTS=OFF \
-                        -DZSTD_MULTITHREAD_SUPPORT=OFF && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install SEAL \
-    cd /libs/SEAL && \
-    cmake -S . -B build -DSEAL_BUILD_DEPS=OFF \
-                        -DSEAL_USE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install PALISADE \
-    cd /libs/palisade-release && \
-    cmake -S . -B build -DWITH_INTEL_HEXL=ON \
-                        -DINTEL_HEXL_PREBUILT=ON \
-                        -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
-    cmake --build build -j && \
-    cmake --install build && \
-    # Build and install HElib \
-    cd /libs/HElib && \
-    cmake -S . -B build -DUSE_INTEL_HEXL=ON \
-                        -DHEXL_DIR=/usr/local/lib/cmake/hexl-1.2.3/ && \
-    cmake --build build -j && \
-    cmake --install build
-
-# Build he-samples and link to SEAL and PALISADE
-RUN mv /runners /home/$UNAME/ && \
-    mv /he-samples /home/$UNAME/ && \
-    cd /home/$UNAME/he-samples && \
-    cmake -S . -B build \
-             -DENABLE_PALISADE=ON \
-             -DENABLE_SEAL=ON \
-             -DENABLE_HELIB=ON \
-    # FIXME: Intel HE Acceleration Library cmake logic requires re-think \
-             -DENABLE_INTEL_HEXL=ON \
-             -DINTEL_HEXL_HINT_DIR=/usr/local/lib/cmake/hexl-1.2.3/ \
-             -DCMAKE_CXX_COMPILER=clang++-10 \
-             -DCMAKE_C_COMPILER=clang-10 \
-             -DCMAKE_BUILD_TYPE=Release \
-             -DPALISADE_PREBUILT=ON \
-             -DSEAL_PREBUILT=ON \
-             -DHELIB_PREBUILT=ON && \
-    cmake --build build -j
+# ADD copies and untars for us
+ADD toolkit.tar.gz $HOME/he-toolkit
+RUN chown -R $UNAME:$UNAME $HOME/he-toolkit
 
 # Switch user to $UNAME
 USER $UNAME
 
-ENTRYPOINT cd /home/$UNAME/runners && \
-           /home/$UNAME/welcome_msg.sh && \
-           /bin/bash
+# Change directories to $HOME/Intel-HE-Toolkit
+WORKDIR $HOME/he-toolkit
+
+# Initialize hekit and install librares, examples, and kernels
+RUN ./hekit init --default-config && \
+    ./hekit install recipes/default.toml && \
+    ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
+    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+
+ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash
