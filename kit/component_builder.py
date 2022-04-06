@@ -139,9 +139,9 @@ class ComponentBuilder:
             chain_run(fns)
             self.update_info_file(stage, success=True)
             return True, 0
-        except BuildError as be:
+        except BuildError as e:
             self.update_info_file(stage, success=False)
-            return False, be.error
+            return False, e.error
 
     def pre_fetch(self):
         """Any steps after a fetch"""
