@@ -9,9 +9,8 @@ from shutil import copyfile
 from filecmp import cmp as same_files
 
 
-class Tags:
+class Tags: # pylint: disable=too-few-public-methods
     """Defines opening and closing tags to be added in the shell init file"""
-
     start_tag: str = "# >>> hekit start >>>\n"
     end_tag: str = "# <<<  hekit end  <<<\n"
 

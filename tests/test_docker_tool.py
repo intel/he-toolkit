@@ -204,7 +204,7 @@ def test_test_connection_no_error(mocker):
     mock_from_env = mocker.patch("docker_tools.docker_from_env")
     mock_from_env.return_value = client
     mock_print = mocker.patch("docker_tools.print")
-    mock_exit = mocker.patch("docker_tools.exit")
+    mock_exit = mocker.patch("docker_tools.sys_exit")
 
     """Act"""
     act_docker = DockerTools()
@@ -226,7 +226,7 @@ def test_test_connection_error(mocker):
     mock_from_env = mocker.patch("docker_tools.docker_from_env")
     mock_from_env.return_value = client
     mock_print = mocker.patch("docker_tools.print")
-    mock_exit = mocker.patch("docker_tools.exit")
+    mock_exit = mocker.patch("docker_tools.sys_exit")
 
     """Act"""
     act_docker = DockerTools()

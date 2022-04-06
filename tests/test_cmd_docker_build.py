@@ -91,7 +91,7 @@ def test_create_buildargs_other(mocker):
 def test_print_preamble_normal_execution(mocker):
     """Arrange"""
     mock_print = mocker.patch("command_docker_build.print")
-    mock_exit = mocker.patch("command_docker_build.exit")
+    mock_exit = mocker.patch("command_docker_build.sys_exit")
     mock_input = mocker.patch("command_docker_build.input")
     mock_input.return_value = "a"
 
@@ -106,7 +106,7 @@ def test_print_preamble_normal_execution(mocker):
 def test_print_preamble_KeyboardInterrupt(mocker):
     """Arrange"""
     mock_print = mocker.patch("command_docker_build.print")
-    mock_exit = mocker.patch("command_docker_build.exit")
+    mock_exit = mocker.patch("command_docker_build.sys_exit")
     mock_input = mocker.patch("command_docker_build.input")
     mock_input.side_effect = KeyboardInterrupt()
 

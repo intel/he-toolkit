@@ -4,7 +4,7 @@
 """This module sets up a docker container with the required libraries for executing FHE applications"""
 
 from re import search
-from sys import stderr, exit
+from sys import stderr, exit as sys_exit
 from getpass import getuser
 from os import getuid, getgid, environ, chdir as change_directory_to
 from dataclasses import dataclass
@@ -90,7 +90,7 @@ http_proxy and https_proxy are set.
         )
     except KeyboardInterrupt:
         print()  # newline
-        exit(1)
+        sys_exit(1)
 
 
 def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
@@ -121,7 +121,7 @@ def setup_docker(args):
     if args.clean:
         rmtree(staging_path)
         print("Staging area deleted")
-        exit(0)
+        sys_exit(0)
 
     if args.y:
         print_preamble()
@@ -131,7 +131,7 @@ def setup_docker(args):
         docker_tools = DockerTools()
     except DockerException as docker_exception:
         print("Docker Error\n", docker_exception, file=stderr)
-        exit(1)
+        sys_exit(1)
 
     environment = create_environment()
 
@@ -142,7 +142,7 @@ def setup_docker(args):
             environment=environment,
             scriptpath=docker_filepaths / "basic-docker-test.sh",
         )
-        exit(0)
+        sys_exit(0)
 
     # set_staging_area
     staging_path.mkdir(exist_ok=True)

@@ -6,7 +6,7 @@
 """This module provides helper functions to set up a docker contaniner"""
 
 from os import geteuid
-from sys import stderr, exit
+from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -183,7 +183,7 @@ def main():
     if args.version:
         toolkit_version = "2.0.0"
         print(f"Intel HE Toolkit version {toolkit_version}")
-        exit(0)
+        sys_exit(0)
 
     # Load config file
     try:
@@ -194,19 +194,19 @@ def main():
     except Exception as e:
         # Exit on any exception from config file
         print("Error while parsing config file\n", f"{e!r}", file=stderr)
-        exit(1)
+        sys_exit(1)
 
     # Run the command
     if args.fn is None:
         print("hekit requires a command", file=stderr)
         print_help(stderr)
-        exit(1)
+        sys_exit(1)
     args.fn(args)
 
 
 if __name__ == "__main__":
     if geteuid() == 0:
         print("You cannot run hekit as root (a.k.a. superuser)")
-        exit(1)
+        sys_exit(1)
 
     main()

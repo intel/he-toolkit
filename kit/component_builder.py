@@ -9,9 +9,8 @@ from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
 from typing import Dict
-
-import toml
 from spec import Spec
+import toml
 
 
 class BuildError(Exception):

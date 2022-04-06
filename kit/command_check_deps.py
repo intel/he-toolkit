@@ -12,7 +12,7 @@ from enum import Enum, auto
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
-from sys import exit
+from sys import exit as sys_exit
 
 
 class Op(Enum):
@@ -72,7 +72,7 @@ def parse_dependencies(dep_and_ver_str: str) -> Dep:
     return Dep.make_from_str(dep_and_ver_str.strip())
 
 
-def check_dependency(dep: Dep) -> None:
+def check_dependency(dep: Dep) -> None: # pylint: disable=too-many-branches
     """Check the dependency and print what was found."""
     if not which(dep.name):
         if dep.operation == Op.ANY:
@@ -130,7 +130,7 @@ def check_dependencies(args) -> None:
             lines = f.readlines()
     except FileNotFoundError:
         print(f"File '{path}' does not exist")
-        exit(1)
+        sys_exit(1)
 
     # filter out comment lines and empty lines
     filtered_lines = (line for line in lines if not search(r"^\s*#|^\s*$", line))

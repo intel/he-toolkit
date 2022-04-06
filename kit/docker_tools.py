@@ -4,12 +4,11 @@
 """This module provides helper functions to set up a docker container"""
 
 import json
-from sys import stderr, exit
+from sys import stderr, exit as sys_exit
 from pathlib import Path
 
 from docker import from_env as docker_from_env
-from docker.errors import DockerException
-
+from docker.errors import DockerException # pylint: disable=unused-import
 
 class DockerBuildError(Exception):
     """Exception for something wrong with the docker build."""
@@ -101,6 +100,7 @@ class DockerTools:
         # proxy checks
         check_conn = self.run_script_in_container(environment, scriptpath)
         # refactor for better output
+        status_code = 0
         for log, status_code in check_conn:
             print("[CONTAINER]", log.decode("utf-8"), end="")
         if status_code != 0:
@@ -109,4 +109,4 @@ class DockerTools:
                 f"Return code was '{status_code}'",
                 file=stderr,
             )
-            exit(1)
+            sys_exit(1)
