@@ -6,7 +6,7 @@
 """This module provides helper functions to set up a docker contaniner"""
 
 from os import geteuid
-from sys import stderr
+from sys import stderr, exit
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -177,7 +177,7 @@ def parse_cmdline():
 
 
 def main():
-    """"""
+    """Starting point for program execution"""
     args, print_help = parse_cmdline()
 
     if args.version:

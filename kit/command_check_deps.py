@@ -12,6 +12,7 @@ from enum import Enum, auto
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
+from sys import exit
 
 
 class Op(Enum):
@@ -122,7 +123,7 @@ def check_dependencies_list(deps: List[str]) -> None:
 
 
 def check_dependencies(args) -> None:
-    """"""
+    """Check dependiencies described in an input file"""
     path = Path(args.dependencies_file)
     try:
         with path.open() as f:

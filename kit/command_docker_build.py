@@ -4,7 +4,7 @@
 """This module sets up a docker container with the required libraries for executing FHE applications"""
 
 from re import search
-from sys import stderr
+from sys import stderr, exit
 from getpass import getuser
 from os import getuid, getgid, environ, chdir as change_directory_to
 from dataclasses import dataclass
@@ -94,15 +94,14 @@ http_proxy and https_proxy are set.
 
 
 def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
-    """"""
+    """Filter out comment lines and empty lines"""
     for filename in file_list:
-        # filter out comment lines and empty lines
         if not search(r"^\s*#|^\s*$", filename):
             yield filename.rstrip()
 
 
 def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
-    """"""
+    """Archive several files in a tar.gz file"""
     if not toolkit_tar_gz.exists():
         print("MAKING TOOLKIT.TAR.GZ ...")
         with open(archived_files) as f:

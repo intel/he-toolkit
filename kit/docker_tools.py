@@ -4,7 +4,7 @@
 """This module provides helper functions to set up a docker container"""
 
 import json
-from sys import stderr
+from sys import stderr, exit
 from pathlib import Path
 
 from docker import from_env as docker_from_env
