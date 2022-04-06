@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module provides helper functions to set up a docker container"""
+
 import json
 from sys import stderr
 from pathlib import Path
@@ -51,6 +53,8 @@ def simple_container_logs(func):
 
 
 class DockerTools:
+    """Defines helper functions to set up a docker container"""
+
     def __init__(self):
         self.client = docker_from_env()
 
@@ -74,6 +78,7 @@ class DockerTools:
     def run_script_in_container(
         self, environment, scriptpath, image="ubuntu:20.04"
     ) -> int:
+        """Executes a script in the container"""
         scriptsrc = Path(scriptpath).expanduser().resolve()
         return self.client.containers.run(
             volumes=[f"{scriptsrc}:/script"],
@@ -85,12 +90,14 @@ class DockerTools:
         )
 
     def try_build_new_image(self, dockerfile: str, tag: str, buildargs):
+        """Builds an image if it does not exist"""
         if not self.image_exists(tag):
             response = self.build_image(dockerfile, tag, buildargs)
             for out in response:
                 print(out)
 
     def test_connection(self, environment, scriptpath):
+        """Tests docker connectivity"""
         # proxy checks
         check_conn = self.run_script_in_container(environment, scriptpath)
         # refactor for better output

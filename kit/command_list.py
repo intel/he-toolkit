@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module lists the libraries that were installed with hekit"""
+
 from os import walk
 from pathlib import Path
 from itertools import chain
@@ -36,6 +38,7 @@ class RepoProperties:
 
     @property
     def structure(self) -> Dict[str, List[str]]:
+        """Return a dictionary with the structure of the repo"""
         return self._repo_structure
 
     @staticmethod

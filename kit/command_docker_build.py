@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module sets up a docker container with the required libraries for executing FHE applications"""
+
 from re import search
 from sys import stderr
 from getpass import getuser
@@ -17,6 +19,8 @@ from docker_tools import DockerTools, DockerException
 
 @dataclass(frozen=True, init=False)
 class Constants:
+    """Defines constants for the docker's tags"""
+
     user: str = getuser()
     # TODO remove hardcoding of version
     base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
@@ -25,13 +29,14 @@ class Constants:
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
+    """Copies several files from a source to a destiny"""
     src_dir, dst_dir = Path(src_dir), Path(dst_dir)
     for filename in files:
         copyfile(src_dir / filename, dst_dir / filename)
 
 
 def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
-    """"""
+    """Returns a dictionary of build arguments"""
     if ID:
         USERID, GROUPID = ID, ID
     elif os_name() == "Darwin":
@@ -51,7 +56,7 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
 
 
 def create_environment():
-    """"""
+    """Returns a dictionary of environmental variables"""
     environment: Dict[str, str] = {
         "http_proxy": environ.get("http_proxy", ""),
         "https_proxy": environ.get("https_proxy", ""),
@@ -64,6 +69,7 @@ def create_environment():
 
 
 def print_preamble() -> None:
+    """Prints instruction about docker functionality"""
     INSTRUCTIONS: str = """
 
 PLEASE READ ALL OF THE FOLLOWING:

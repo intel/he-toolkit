@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module provides tab completion if the dependencies are installed"""
+
 from config import load_config
 from command_list import list_dirs
 
@@ -18,13 +20,17 @@ def enable_tab_completion(parser):
         pass
 
 
-def components_completer(prefix, parsed_args, **kwargs):
+def components_completer(
+    prefix, parsed_args, **kwargs
+):  # pylint: disable=unused-argument
     """Returns the components that were installed with the hekit"""
     config = load_config(parsed_args.config)
     return list_dirs(config.repo_location)
 
 
-def instances_completer(prefix, parsed_args, **kwargs):
+def instances_completer(
+    prefix, parsed_args, **kwargs
+):  # pylint: disable=unused-argument
     """Returns the instances of a component that
     was installed with the hekit"""
     config = load_config(parsed_args.config)

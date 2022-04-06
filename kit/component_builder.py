@@ -1,6 +1,8 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module execute the actions specified by the user in the hekit arguments"""
+
 import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
@@ -90,12 +92,15 @@ class ComponentBuilder:
             self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
 
     def skip(self):
+        """Returns skip value"""
         return self._spec.skip
 
     def component_name(self):
+        """Returns component name"""
         return self._spec.component
 
     def instance_name(self):
+        """Returns instance name"""
         return self._spec.name
 
     def setup(self):
@@ -116,6 +121,7 @@ class ComponentBuilder:
         return self._info_file["status"][stage] == "success"
 
     def update_info_file(self, stage, success):
+        """Updates the hekit.info file"""
         with open(f"{self._location}/hekit.info", "w") as info_file:
             self._info_file["status"][stage] = "success" if success else "failure"
             toml.dump(self._info_file, info_file)

@@ -3,6 +3,8 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module provides helper functions to set up a docker contaniner"""
+
 from os import geteuid
 from sys import stderr
 from argparse import ArgumentParser
@@ -27,6 +29,7 @@ try:
 except ImportError as e:
 
     def setup_docker(arg):  # pylint: disable=unused-argument
+        """Informs that this command can't be used due to missing dependencies"""
         print("This command is disabled. To enable it install the docker-py dependency")
         print("  pip install docker")
 

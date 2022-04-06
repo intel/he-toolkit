@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module checks the dependencies that are specified in an input file"""
+
 from __future__ import annotations
 
 from subprocess import run as subprocess_run
@@ -13,6 +15,8 @@ from typing import List, Tuple
 
 
 class Op(Enum):
+    """Define the operations to compare the dependence’s versions"""
+
     EXACT = auto()
     MIN = auto()
     ANY = auto()
@@ -20,6 +24,8 @@ class Op(Enum):
 
 @dataclass(frozen=True)
 class Dep:
+    """Define the properties of a dependency"""
+
     name: str
     operation: Op
     version: Tuple[int]
@@ -40,6 +46,7 @@ class Dep:
 
     @classmethod
     def make_from_str(cls, dep_str: str) -> Dep:
+        """Factory that transforms from string"""
         return cls(dep_str, Op.ANY, tuple(), "")
 
 
