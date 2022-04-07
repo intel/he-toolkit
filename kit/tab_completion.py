@@ -3,7 +3,7 @@
 
 """This module provides tab completion if the dependencies are installed"""
 
-from config import load_config # pylint: disable=no-name-in-module
+from config import load_config  # pylint: disable=no-name-in-module
 from command_list import list_dirs
 
 try:
@@ -13,6 +13,7 @@ try:
     # hekit script, tab completion will be available
     from argcomplete import autocomplete
 except ImportError as e:
+
     def autocomplete(arg):  # pylint: disable=unused-argument
         """Continue with the execution"""
 
@@ -20,6 +21,7 @@ except ImportError as e:
 def enable_tab_completion(parser):
     """Enables tab completion feature if dependencies are fulfilled"""
     autocomplete(parser)
+
 
 def components_completer(
     prefix, parsed_args, **kwargs

@@ -72,7 +72,7 @@ def parse_dependencies(dep_and_ver_str: str) -> Dep:
     return Dep.make_from_str(dep_and_ver_str.strip())
 
 
-def check_dependency(dep: Dep) -> None: # pylint: disable=too-many-branches
+def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
     """Check the dependency and print what was found."""
     if not which(dep.name):
         if dep.operation == Op.ANY:
@@ -95,7 +95,9 @@ def check_dependency(dep: Dep) -> None: # pylint: disable=too-many-branches
     version_flag = "--version"
 
     try:
-        output = subprocess_run([dep.name, version_flag], capture_output=True, check=True)
+        output = subprocess_run(
+            [dep.name, version_flag], capture_output=True, check=True
+        )
         stdout = output.stdout.decode("utf-8")
         version_found = search(r"\d+(\.\d+)*", stdout)
         if version_found:
