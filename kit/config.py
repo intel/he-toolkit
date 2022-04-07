@@ -5,7 +5,6 @@
 
 from os import path
 from typing import NamedTuple
-
 from toml import load
 
 

@@ -1,15 +1,16 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module execute the actions specified by the user in the hekit arguments"""
+
 import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
 from typing import Dict
-
+from spec import Spec  # pylint: disable=no-name-in-module
 import toml
-from spec import Spec
 
 
 class BuildError(Exception):
@@ -47,7 +48,7 @@ def run(cmd_and_args: Union[str, List[str]]):
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
             print(f"[{basename}]", line.decode("utf-8"), end="")
-    success = True if proc.returncode == 0 else False
+    success = proc.returncode == 0
     return success, proc.returncode
 
 
@@ -90,12 +91,15 @@ class ComponentBuilder:
             self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
 
     def skip(self):
+        """Returns skip value"""
         return self._spec.skip
 
     def component_name(self):
+        """Returns component name"""
         return self._spec.component
 
     def instance_name(self):
+        """Returns instance name"""
         return self._spec.name
 
     def setup(self):
@@ -116,6 +120,7 @@ class ComponentBuilder:
         return self._info_file["status"][stage] == "success"
 
     def update_info_file(self, stage, success):
+        """Updates the hekit.info file"""
         with open(f"{self._location}/hekit.info", "w") as info_file:
             self._info_file["status"][stage] = "success" if success else "failure"
             toml.dump(self._info_file, info_file)
@@ -139,9 +144,9 @@ class ComponentBuilder:
             chain_run(fns)
             self.update_info_file(stage, success=True)
             return True, 0
-        except BuildError as be:
+        except BuildError as e:
             self.update_info_file(stage, success=False)
-            return False, be.error
+            return False, e.error
 
     def pre_fetch(self):
         """Any steps after a fetch"""

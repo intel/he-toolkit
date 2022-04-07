@@ -1,18 +1,23 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module checks the dependencies that are specified in an input file"""
+
 from __future__ import annotations
 
-from subprocess import run as subprocess_run
+from subprocess import CalledProcessError, run as subprocess_run
 from re import search
 from shutil import which
 from enum import Enum, auto
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
+from sys import exit as sys_exit
 
 
 class Op(Enum):
+    """Define the operations to compare the dependence’s versions"""
+
     EXACT = auto()
     MIN = auto()
     ANY = auto()
@@ -20,6 +25,8 @@ class Op(Enum):
 
 @dataclass(frozen=True)
 class Dep:
+    """Define the properties of a dependency"""
+
     name: str
     operation: Op
     version: Tuple[int]
@@ -40,6 +47,7 @@ class Dep:
 
     @classmethod
     def make_from_str(cls, dep_str: str) -> Dep:
+        """Factory that transforms from string"""
         return cls(dep_str, Op.ANY, tuple(), "")
 
 
@@ -64,7 +72,7 @@ def parse_dependencies(dep_and_ver_str: str) -> Dep:
     return Dep.make_from_str(dep_and_ver_str.strip())
 
 
-def check_dependency(dep: Dep) -> None:
+def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
     """Check the dependency and print what was found."""
     if not which(dep.name):
         if dep.operation == Op.ANY:
@@ -85,8 +93,11 @@ def check_dependency(dep: Dep) -> None:
         print(f"'{dep.name}' found")
         return
     version_flag = "--version"
-    output = subprocess_run([dep.name, version_flag], capture_output=True)
-    if output.returncode == 0:
+
+    try:
+        output = subprocess_run(
+            [dep.name, version_flag], capture_output=True, check=True
+        )
         stdout = output.stdout.decode("utf-8")
         version_found = search(r"\d+(\.\d+)*", stdout)
         if version_found:
@@ -106,6 +117,8 @@ def check_dependency(dep: Dep) -> None:
                     print(
                         f"'{dep.name} {ver_str}' found, but minimum version '{dep.ver_str}' is required"
                     )
+    except CalledProcessError:
+        pass
 
 
 def check_dependencies_list(deps: List[str]) -> None:
@@ -115,14 +128,14 @@ def check_dependencies_list(deps: List[str]) -> None:
 
 
 def check_dependencies(args) -> None:
-    """"""
+    """Check dependiencies described in an input file"""
     path = Path(args.dependencies_file)
     try:
         with path.open() as f:
             lines = f.readlines()
     except FileNotFoundError:
         print(f"File '{path}' does not exist")
-        exit(1)
+        sys_exit(1)
 
     # filter out comment lines and empty lines
     filtered_lines = (line for line in lines if not search(r"^\s*#|^\s*$", line))

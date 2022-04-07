@@ -1,8 +1,10 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module sets up a docker container with the required libraries for executing FHE applications"""
+
 from re import search
-from sys import stderr
+from sys import stderr, exit as sys_exit
 from getpass import getuser
 from os import getuid, getgid, environ, chdir as change_directory_to
 from dataclasses import dataclass
@@ -17,6 +19,8 @@ from docker_tools import DockerTools, DockerException
 
 @dataclass(frozen=True, init=False)
 class Constants:
+    """Defines constants for the docker's tags"""
+
     user: str = getuser()
     # TODO remove hardcoding of version
     base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
@@ -25,13 +29,14 @@ class Constants:
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
+    """Copies several files from a source to a destiny"""
     src_dir, dst_dir = Path(src_dir), Path(dst_dir)
     for filename in files:
         copyfile(src_dir / filename, dst_dir / filename)
 
 
 def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
-    """"""
+    """Returns a dictionary of build arguments"""
     if ID:
         USERID, GROUPID = ID, ID
     elif os_name() == "Darwin":
@@ -51,7 +56,7 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
 
 
 def create_environment():
-    """"""
+    """Returns a dictionary of environmental variables"""
     environment: Dict[str, str] = {
         "http_proxy": environ.get("http_proxy", ""),
         "https_proxy": environ.get("https_proxy", ""),
@@ -64,6 +69,7 @@ def create_environment():
 
 
 def print_preamble() -> None:
+    """Prints instruction about docker functionality"""
     INSTRUCTIONS: str = """
 
 PLEASE READ ALL OF THE FOLLOWING:
@@ -84,19 +90,18 @@ http_proxy and https_proxy are set.
         )
     except KeyboardInterrupt:
         print()  # newline
-        exit(1)
+        sys_exit(1)
 
 
 def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
-    """"""
+    """Filter out comment lines and empty lines"""
     for filename in file_list:
-        # filter out comment lines and empty lines
         if not search(r"^\s*#|^\s*$", filename):
             yield filename.rstrip()
 
 
 def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
-    """"""
+    """Archive several files in a tar.gz file"""
     if not toolkit_tar_gz.exists():
         print("MAKING TOOLKIT.TAR.GZ ...")
         with open(archived_files) as f:
@@ -116,7 +121,7 @@ def setup_docker(args):
     if args.clean:
         rmtree(staging_path)
         print("Staging area deleted")
-        exit(0)
+        sys_exit(0)
 
     if args.y:
         print_preamble()
@@ -126,7 +131,7 @@ def setup_docker(args):
         docker_tools = DockerTools()
     except DockerException as docker_exception:
         print("Docker Error\n", docker_exception, file=stderr)
-        exit(1)
+        sys_exit(1)
 
     environment = create_environment()
 
@@ -137,7 +142,7 @@ def setup_docker(args):
             environment=environment,
             scriptpath=docker_filepaths / "basic-docker-test.sh",
         )
-        exit(0)
+        sys_exit(0)
 
     # set_staging_area
     staging_path.mkdir(exist_ok=True)

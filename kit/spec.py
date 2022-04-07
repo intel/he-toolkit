@@ -6,7 +6,6 @@
 from re import findall
 from dataclasses import dataclass
 from typing import Dict
-
 from toml import dump, load
 
 
@@ -214,9 +213,9 @@ class Spec:
 
 # Require func to create a non-local
 def _fn(k):
-    return lambda self: self._instance_spec[k]
+    return lambda self: self._instance_spec[k]  # pylint: disable=protected-access
 
 
 # Attach fixed attrib properties
-for method in Spec._fixed_attribs:
+for method in Spec._fixed_attribs:  # pylint: disable=protected-access
     setattr(Spec, method, property(_fn(method)))
