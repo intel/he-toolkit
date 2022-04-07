@@ -39,6 +39,7 @@ jobs:
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
+      - run: pip install pylint
       # Required for pre-commit
       - run: pip3 install cpplint
       - run: sudo snap install shfmt
