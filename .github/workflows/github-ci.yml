@@ -206,7 +206,9 @@ jobs:
       - uses: actions/checkout@v2
         # Add local bin for cpplint
       - name: Setup
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: |
+          pip install pylint
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: pre-commit
         run: pre-commit run --all-files
       - name: Pylist
