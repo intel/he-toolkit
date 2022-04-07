@@ -47,6 +47,8 @@ jobs:
       - uses: pre-commit/action@v2.0.3
         with:
           extra_args: --all-files
+      - name: Pylist
+        run: pylint kit/
 
   test-hekit:
     name: Test hekit commands
@@ -206,6 +208,8 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: pre-commit
         run: pre-commit run --all-files
+      - name: Pylist
+        run: pylint kit/
 
   test-hekit-icelake:
     name: Test hekit commands (IceLake)
