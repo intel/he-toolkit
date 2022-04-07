@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from subprocess import run as subprocess_run
+from subprocess import CalledProcessError, run as subprocess_run
 from re import search
 from shutil import which
 from enum import Enum, auto
@@ -93,8 +93,9 @@ def check_dependency(dep: Dep) -> None: # pylint: disable=too-many-branches
         print(f"'{dep.name}' found")
         return
     version_flag = "--version"
-    output = subprocess_run([dep.name, version_flag], capture_output=True)
-    if output.returncode == 0:
+
+    try:
+        output = subprocess_run([dep.name, version_flag], capture_output=True, check=True)
         stdout = output.stdout.decode("utf-8")
         version_found = search(r"\d+(\.\d+)*", stdout)
         if version_found:
@@ -114,6 +115,8 @@ def check_dependency(dep: Dep) -> None: # pylint: disable=too-many-branches
                     print(
                         f"'{dep.name} {ver_str}' found, but minimum version '{dep.ver_str}' is required"
                     )
+    except CalledProcessError:
+        pass
 
 
 def check_dependencies_list(deps: List[str]) -> None:

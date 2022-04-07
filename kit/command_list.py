@@ -14,7 +14,7 @@ from toml import load
 _SEP_SPACES = 2
 
 
-class RepoProperties: # pylint: disable=too-few-public-methods
+class RepoProperties:
     """ Contains a dictionary with the structure of the repo
         and widths of the widest component and instance"""
 

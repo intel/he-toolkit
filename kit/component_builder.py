@@ -9,7 +9,7 @@ from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
 from typing import Dict
-from spec import Spec
+from spec import Spec # pylint: disable=no-name-in-module
 import toml
 
 
@@ -48,7 +48,7 @@ def run(cmd_and_args: Union[str, List[str]]):
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
         for line in proc.stdout:
             print(f"[{basename}]", line.decode("utf-8"), end="")
-    success = True if proc.returncode == 0 else False
+    success = (proc.returncode == 0)
     return success, proc.returncode
 
 

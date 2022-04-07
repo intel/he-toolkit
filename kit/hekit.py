@@ -10,7 +10,7 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
-from config import load_config
+from config import load_config # pylint: disable=no-name-in-module
 from tab_completion import (
     enable_tab_completion,
     components_completer,
@@ -188,10 +188,10 @@ def main():
     # Load config file
     try:
         # FIXME logic convoluted here
-        if args.fn != init_hekit:
+        if args.fn != init_hekit: # pylint: disable=comparison-with-callable
             # replace the filename with the actual config
             args.config = load_config(args.config)
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         # Exit on any exception from config file
         print("Error while parsing config file\n", f"{e!r}", file=stderr)
         sys_exit(1)
