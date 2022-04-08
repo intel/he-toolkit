@@ -202,7 +202,7 @@ class Spec:
     def to_toml_file(self, filename: str):
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             dump(obj_as_dict, f)
 
     def __getitem__(self, key: str):

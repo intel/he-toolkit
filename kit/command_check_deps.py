@@ -55,8 +55,8 @@ def version_string_to_tuple(ver_str: str) -> Tuple[int]:
     """version '10.11.12' -> (10, 11, 12) """
     try:
         return tuple(int(i) for i in ver_str.split("."))
-    except ValueError:
-        raise ValueError(f"Invalid version number '{ver_str}'")
+    except ValueError as e:
+        raise ValueError(f"Invalid version number '{ver_str}'") from e
 
 
 def parse_dependencies(dep_and_ver_str: str) -> Dep:
@@ -131,7 +131,7 @@ def check_dependencies(args) -> None:
     """Check dependiencies described in an input file"""
     path = Path(args.dependencies_file)
     try:
-        with path.open() as f:
+        with path.open(encoding="utf-8") as f:
             lines = f.readlines()
     except FileNotFoundError:
         print(f"File '{path}' does not exist")

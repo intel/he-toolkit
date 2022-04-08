@@ -142,7 +142,8 @@ disable=print-statement,
         fixme,
         line-too-long,
         bad-continuation,
-        too-few-public-methods
+        too-few-public-methods,
+        import-error
 
 
 # Enable the message, report, category or checker with the given id(s). You can

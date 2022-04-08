@@ -39,8 +39,8 @@ jobs:
     environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
-      # Required for pre-commit
-      - run: pip3 install cpplint
+      # Required for pre-commit and pylint
+      - run: pip3 install cpplint pylint
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck black
       # NOTE: This is deprecated in favor of pre-commit.ci

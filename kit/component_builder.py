@@ -9,8 +9,8 @@ from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
 from typing import Dict
-from spec import Spec  # pylint: disable=no-name-in-module
 import toml
+from spec import Spec  # pylint: disable=no-name-in-module
 
 
 class BuildError(Exception):
@@ -85,7 +85,7 @@ class ComponentBuilder:
 
         # load previous from info file
         try:
-            with open(f"{self._location}/hekit.info") as info_file:
+            with open(f"{self._location}/hekit.info", encoding="utf-8") as info_file:
                 self._info_file = toml.load(info_file)
         except FileNotFoundError:
             self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
@@ -121,7 +121,7 @@ class ComponentBuilder:
 
     def update_info_file(self, stage, success):
         """Updates the hekit.info file"""
-        with open(f"{self._location}/hekit.info", "w") as info_file:
+        with open(f"{self._location}/hekit.info", "w", encoding="utf-8") as info_file:
             self._info_file["status"][stage] = "success" if success else "failure"
             toml.dump(self._info_file, info_file)
 

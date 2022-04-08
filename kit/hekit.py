@@ -26,7 +26,7 @@ from command_check_deps import check_dependencies
 try:
     # docker-py is optional and will not be used from within a docker container
     from command_docker_build import setup_docker
-except ImportError as e:
+except ImportError:
 
     def setup_docker(arg):  # pylint: disable=unused-argument
         """Informs that this command can't be used due to missing dependencies"""

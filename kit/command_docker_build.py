@@ -104,7 +104,7 @@ def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
     """Archive several files in a tar.gz file"""
     if not toolkit_tar_gz.exists():
         print("MAKING TOOLKIT.TAR.GZ ...")
-        with open(archived_files) as f:
+        with open(archived_files, encoding="utf-8") as f:
             try:
                 archive_and_compress(toolkit_tar_gz, filter_file_list(f), root=ROOT)
             except FileExistsError as file_exists_error:
