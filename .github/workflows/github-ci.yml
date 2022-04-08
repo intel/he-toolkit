@@ -40,14 +40,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit and pylint
-      - run: pip3 install cpplint pylint
+      - run: pip3 install cpplint pylint docker
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck black
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.3
         with:
           extra_args: --all-files
-      - name: Pylist
+      - name: Pylint
         run: pylint kit/
 
   test-hekit:
@@ -208,7 +208,7 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: pre-commit
         run: pre-commit run --all-files
-      - name: Pylist
+      - name: Pylint
         run: pylint kit/
 
   test-hekit-icelake:
