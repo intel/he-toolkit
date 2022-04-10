@@ -210,12 +210,10 @@ class Spec:
         Raises KeyError if key does not exist"""
         return self._instance_spec[key]
 
-
-# Require func to create a non-local
-def _fn(k):
-    return lambda self: self._instance_spec[k]  # pylint: disable=protected-access
-
-
-# Attach fixed attrib properties
-for method in Spec._fixed_attribs:  # pylint: disable=protected-access
-    setattr(Spec, method, property(_fn(method)))
+    def __getattr__(self, attrib: str):
+        """Return the spec's specified attribute.
+        Raises AttributeError if it does not exist"""
+        try:
+            return self._instance_spec[attrib]
+        except KeyError:
+            raise AttributeError(f"{attrib} is not an attribute of Spec")
