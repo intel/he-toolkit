@@ -215,5 +215,5 @@ class Spec:
         Raises AttributeError if it does not exist"""
         try:
             return self._instance_spec[attrib]
-        except KeyError:
-            raise AttributeError(f"{attrib} is not an attribute of Spec")
+        except KeyError as e:
+            raise AttributeError(f"{attrib} is not an attribute of Spec") from e
