@@ -22,16 +22,19 @@ def test_init_hekit_config_file_exists(mocker):
     main()
 
     """Assert"""
-    mockers.mock_print.assert_any_call(f"source {rc_file}")
-    mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
+    # create_default_config function
     mockers.mock_mkdir.assert_called_once()
-    assert 1 == mockers.mock_copyfile.call_count
+    mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
+    # create_backup function
+    mockers.mock_copyfile.assert_called_once()
     mockers.mock_same_files.assert_called_once()
+    # init_hekit function
     mockers.mock_remove_from_rc.assert_called_once()
     mockers.mock_append_to_rc.assert_called_once()
+    mockers.mock_print.assert_any_call(f"source {rc_file}")
 
 
-def test_init_hekit_config_file_is_copied(mocker):
+def test_init_hekit_config_file_is_created(mocker):
     """Arrange"""
     args = MockArgs()
     rc_file = "~/.mybashfile"
@@ -45,13 +48,17 @@ def test_init_hekit_config_file_is_copied(mocker):
     main()
 
     """Assert"""
-    mockers.mock_print.assert_any_call(f"source {rc_file}")
-    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
+    # create_default_config function
     mockers.mock_mkdir.assert_called_once()
-    assert 2 == mockers.mock_copyfile.call_count
+    mockers.mock_open.assert_called_once()
+    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
+    # create_backup function
+    mockers.mock_copyfile.assert_called_once()
     mockers.mock_same_files.assert_called_once()
+    # init_hekit function
     mockers.mock_remove_from_rc.assert_called_once()
     mockers.mock_append_to_rc.assert_called_once()
+    mockers.mock_print.assert_any_call(f"source {rc_file}")
 
 
 def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
@@ -69,10 +76,14 @@ def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
         main()
 
     """Assert"""
-    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
+    # create_default_config function
     mockers.mock_mkdir.assert_called_once()
-    assert 1 == mockers.mock_copyfile.call_count
+    mockers.mock_open.assert_called_once()
+    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
+    # create_backup function
+    mockers.mock_copyfile.assert_not_called()
     mockers.mock_same_files.assert_not_called()
+    # init_hekit function
     mockers.mock_remove_from_rc.assert_not_called()
     mockers.mock_append_to_rc.assert_not_called()
 
@@ -85,17 +96,20 @@ def test_init_hekit_ValueError_from_create_backup(mocker):
     mockers.mock_parse_cmdline.return_value = args, ""
     mockers.mock_get_rc_file.return_value = rc_file
     mockers.mock_same_files.return_value = False
-    mockers.mock_exists.side_effect = [False, True]
+    mockers.mock_exists.side_effect = [True, True]
 
     """Act"""
     with pytest.raises(ValueError) as exc_info:
         main()
 
     """Assert"""
-    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
+    # create_default_config function
     mockers.mock_mkdir.assert_called_once()
-    assert 2 == mockers.mock_copyfile.call_count
+    mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
+    # create_backup function
+    mockers.mock_copyfile.assert_called_once()
     mockers.mock_same_files.assert_called_once()
+    # init_hekit function
     mockers.mock_remove_from_rc.assert_not_called()
     mockers.mock_append_to_rc.assert_not_called()
 
@@ -107,6 +121,7 @@ class Mockers:
     def __init__(self, mocker):
         # mocking functions for Path Objects
         self.mock_mkdir = mocker.patch.object(Path, "mkdir")
+        self.mock_open = mocker.patch.object(Path, "open")
         # mocking included functions
         self.mock_print = mocker.patch("command_init.print")
         self.mock_copyfile = mocker.patch("command_init.copyfile")
