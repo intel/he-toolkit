@@ -10,7 +10,6 @@ from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
-
 from archive import archive_and_compress
 from docker_tools import DockerTools, DockerException
 
@@ -188,3 +187,29 @@ def setup_docker(args):
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
         print(f"docker run -it {constants.derived_label}")
+
+
+def set_docker_subparser(subparsers, hekit_root_dir):
+    """create the parser for the 'docker-build' command"""
+    parser_docker_build = subparsers.add_parser(
+        "docker-build", description="docker build of the toolkit"
+    )
+    parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
+    parser_docker_build.add_argument(
+        "--clean", action="store_true", help="delete staging"
+    )
+    # FIXME should this be its own subcommand?
+    parser_docker_build.add_argument(
+        "--check-only", action="store_true", help="only run container for proxy checks"
+    )
+    # In future change to accept several strings
+    parser_docker_build.add_argument(
+        "--enable",
+        type=str,
+        choices=["vscode"],
+        help="add/enable extra features in docker build of toolkit",
+    )
+    parser_docker_build.add_argument(
+        "-y", action="store_false", help="say yes to prompts"
+    )
+    parser_docker_build.set_defaults(fn=setup_docker, hekit_root_dir=hekit_root_dir)

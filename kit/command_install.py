@@ -39,3 +39,40 @@ def install_components(args):
             continue
 
         chain_run(the_stages(component))
+
+
+def get_recipe_arg_dict(recipe_arg: str):
+    """Returns a dictionary filled with recipe_arg values"""
+    recipe_arg_dict = {}
+
+    for pair in recipe_arg.replace(" ", "").split(","):
+        key_value = pair.split("=")
+
+        if len(key_value) != 2:
+            raise ValueError(f"Wrong format for {key_value}. Expected key=value")
+
+        key, value = key_value
+        recipe_arg_dict[key] = value
+
+    return recipe_arg_dict
+
+
+def set_install_subparser(subparsers):
+    """create the parser for the 'install' command"""
+    list = ["install", "build", "fetch"]
+
+    for action in list:
+        parser = subparsers.add_parser(action, description=f"{action} components")
+        parser.add_argument(
+            "recipe_file",
+            metavar="recipe-file",
+            type=str,
+            help=f"TOML file for {action}",
+        )
+        parser.add_argument(
+            "--recipe_arg",
+            default={},
+            type=get_recipe_arg_dict,
+            help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data.",
+        )
+        parser.set_defaults(fn=install_components, upto_stage=action)
