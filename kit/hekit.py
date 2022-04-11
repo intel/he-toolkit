@@ -15,7 +15,15 @@ from command_remove import set_remove_subparser
 from command_list import set_list_subparser
 from command_install import set_install_subparser
 from command_check_deps import set_check_dep_subparser
-from command_docker_build import set_docker_subparser
+
+try:
+    # docker-py is optional and will not be used from within a docker container
+    from command_docker_build import set_docker_subparser
+except ImportError:
+
+    def set_docker_subparser(arg1, arg2):  # pylint: disable=unused-argument
+        print("This command is disabled. To enable it install the docker-py dependency")
+        print("  pip install docker")
 
 
 def parse_cmdline():

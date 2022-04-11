@@ -4,15 +4,8 @@
 import json
 from sys import stderr
 from pathlib import Path
-
-
-try:
-    # docker-py is optional and will not be used from within a docker container
-    from docker import from_env as docker_from_env
-    from docker.errors import DockerException
-except ImportError:
-    print("This command is disabled. To enable it install the docker-py dependency")
-    print("  pip install docker")
+from docker import from_env as docker_from_env
+from docker.errors import DockerException
 
 
 class DockerBuildError(Exception):
