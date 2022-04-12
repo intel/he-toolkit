@@ -16,7 +16,7 @@ from sys import exit as sys_exit
 
 
 class Op(Enum):
-    """Define the operations to compare the dependence’s versions"""
+    """Define the operations to compare the dependency’s versions"""
 
     EXACT = auto()
     MIN = auto()
