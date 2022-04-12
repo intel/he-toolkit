@@ -1,7 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module fetches, builds or installs the requested libraries"""
+"""This module fetches, builds, or installs the requested libraries"""
 
 from component_builder import components_to_build_from, chain_run
 
