@@ -153,5 +153,3 @@ def set_init_subparser(subparsers, hekit_root_dir):
         "--default-config", action="store_true", help="setup default config file"
     )
     parser_init.set_defaults(fn=init_hekit, hekit_root_dir=hekit_root_dir)
-
-    return parser_init
