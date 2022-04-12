@@ -1,6 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import Dict
 from component_builder import components_to_build_from, chain_run
 
 
@@ -41,27 +42,23 @@ def install_components(args):
         chain_run(the_stages(component))
 
 
-def get_recipe_arg_dict(recipe_arg: str):
+def get_recipe_arg_dict(recipe_arg: str) -> Dict[str, str]:
     """Returns a dictionary filled with recipe_arg values"""
-    recipe_arg_dict = {}
 
-    for pair in recipe_arg.replace(" ", "").split(","):
-        key_value = pair.split("=")
-
-        if len(key_value) != 2:
-            raise ValueError(f"Wrong format for {key_value}. Expected key=value")
-
-        key, value = key_value
-        recipe_arg_dict[key] = value
-
-    return recipe_arg_dict
+    pairs = [pair.split("=") for pair in recipe_arg.replace(" ", "").split(",")]
+    try:
+        return dict(pairs)
+    except ValueError as e:
+        for pair in pairs:
+            if len(pair) != 2:
+                raise ValueError(f"Wrong format for {pair}. Expected key=value") from e
 
 
 def set_install_subparser(subparsers):
     """create the parser for the 'install' command"""
-    list = ["install", "build", "fetch"]
+    actions = ["install", "build", "fetch"]
 
-    for action in list:
+    for action in actions:
         parser = subparsers.add_parser(action, description=f"{action} components")
         parser.add_argument(
             "recipe_file",
