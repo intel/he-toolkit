@@ -54,6 +54,7 @@ def get_recipe_arg_dict(recipe_arg: str) -> Dict[str, str]:
         for pair in pairs:
             if len(pair) != 2:
                 raise ValueError(f"Wrong format for {pair}. Expected key=value") from e
+        return None
 
 
 def set_install_subparser(subparsers):
