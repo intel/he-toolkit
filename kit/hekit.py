@@ -3,12 +3,14 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module provides helper functions to set up a docker contaniner"""
+
 from os import geteuid
-from sys import stderr
+from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
-from config import load_config
+from config import load_config  # pylint: disable=no-name-in-module
 from tab_completion import enable_tab_completion
 from command_init import init_hekit, set_init_subparser
 from command_remove import set_remove_subparser
@@ -22,6 +24,7 @@ try:
 except ImportError:
 
     def set_docker_subparser(arg1, arg2):  # pylint: disable=unused-argument
+        """Informs that this command can't be used due to missing dependencies"""
         print("This command is disabled. To enable it install the docker-py dependency")
         print("  pip install docker")
 
@@ -61,36 +64,36 @@ def parse_cmdline():
 
 
 def main():
-    """"""
+    """Starting point for program execution"""
     args, print_help = parse_cmdline()
 
     if args.version:
         toolkit_version = "2.0.0"
         print(f"Intel HE Toolkit version {toolkit_version}")
-        exit(0)
+        sys_exit(0)
 
     # Load config file
     try:
         # FIXME logic convoluted here
-        if args.fn != init_hekit:
+        if args.fn != init_hekit:  # pylint: disable=comparison-with-callable
             # replace the filename with the actual config
             args.config = load_config(args.config)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         # Exit on any exception from config file
         print("Error while parsing config file\n", f"{e!r}", file=stderr)
-        exit(1)
+        sys_exit(1)
 
     # Run the command
     if args.fn is None:
         print("hekit requires a command", file=stderr)
         print_help(stderr)
-        exit(1)
+        sys_exit(1)
     args.fn(args)
 
 
 if __name__ == "__main__":
     if geteuid() == 0:
         print("You cannot run hekit as root (a.k.a. superuser)")
-        exit(1)
+        sys_exit(1)
 
     main()

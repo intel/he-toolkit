@@ -91,7 +91,7 @@ def test_create_buildargs_other(mocker):
 def test_print_preamble_normal_execution(mocker):
     """Arrange"""
     mock_print = mocker.patch("command_docker_build.print")
-    mock_exit = mocker.patch("command_docker_build.exit")
+    mock_exit = mocker.patch("command_docker_build.sys_exit")
     mock_input = mocker.patch("command_docker_build.input")
     mock_input.return_value = "a"
 
@@ -106,7 +106,7 @@ def test_print_preamble_normal_execution(mocker):
 def test_print_preamble_KeyboardInterrupt(mocker):
     """Arrange"""
     mock_print = mocker.patch("command_docker_build.print")
-    mock_exit = mocker.patch("command_docker_build.exit")
+    mock_exit = mocker.patch("command_docker_build.sys_exit")
     mock_input = mocker.patch("command_docker_build.input")
     mock_input.side_effect = KeyboardInterrupt()
 
@@ -150,7 +150,7 @@ def test_create_tar_gz_file_execution(mocker):
 
     """Assert"""
     mock_print.assert_called_once_with("MAKING TOOLKIT.TAR.GZ ...")
-    mock_open.assert_called_once_with(archived_files)
+    mock_open.assert_called_once_with(archived_files, encoding="utf-8")
     mock_compress.assert_called_with(toolkit_tar_gz, exp_files, root=ROOT)
 
 
@@ -175,7 +175,7 @@ def test_create_tar_gz_file_FileExistsError(mocker):
 
     """Assert"""
     assert 2 == mock_print.call_count
-    mock_open.assert_called_once_with(archived_files)
+    mock_open.assert_called_once_with(archived_files, encoding="utf-8")
     mock_compress.assert_called_with(toolkit_tar_gz, exp_files, root=ROOT)
 
 

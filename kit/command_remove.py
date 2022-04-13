@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module removes specific libraries"""
+
 from shutil import rmtree
 from os import listdir
 from tab_completion import components_completer, instances_completer
