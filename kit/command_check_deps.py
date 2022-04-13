@@ -142,3 +142,17 @@ def check_dependencies(args) -> None:
 
     # At the mo, dependencies file is very constrained
     check_dependencies_list(filtered_lines)
+
+
+def set_check_dep_subparser(subparsers):
+    """create the parser for the 'check-dependencies' command"""
+    parser_check_dependencies = subparsers.add_parser(
+        "check-dependencies", description="check system dependencies"
+    )
+    parser_check_dependencies.add_argument(
+        "dependencies_file",
+        metavar="dependencies-file",
+        type=str,
+        help="dependencies file",
+    )
+    parser_check_dependencies.set_defaults(fn=check_dependencies)

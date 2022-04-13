@@ -102,3 +102,11 @@ def list_components(args):
                     f"{'unknown':{width_status}}",
                     f"key {emsg} not found",
                 )
+
+
+def set_list_subparser(subparsers):
+    """create the parser for the 'list' command"""
+    parser_list = subparsers.add_parser(
+        "list", description="lists installed components"
+    )
+    parser_list.set_defaults(fn=list_components)

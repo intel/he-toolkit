@@ -145,7 +145,6 @@ tests/test_docker_tool.py
 tests/test_integration_check_deps.py
 tests/test_integration_docker.py
 tests/test_integration_install.py
-tests/test_main.py
 tests/test_spec.py
 tests/test_tab_comp.py
 tests/test_tsort.py
