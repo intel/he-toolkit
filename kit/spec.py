@@ -137,6 +137,7 @@ class Spec:
         "post_install",
     }
 
+    _default_values = {"skip": False}
     recipe_arg_dict = {}
 
     # Factory from TOML file
@@ -184,12 +185,23 @@ class Spec:
             if not isinstance(for_test, str):
                 raise InvalidSpec(f"'{attrib}' is not a string")
 
+    @classmethod
+    def _try_set_defaults_values(cls, instance: dict):
+        """Set a default value if a valid attribute
+        was not defined in the receipe file"""
+        for key, value in Spec._default_values.items():
+            try:
+                return instance[key]
+            except KeyError:
+                instance[key] = value
+
     # Factory given parsed TOML python dict
     @classmethod
     def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str):
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
+        cls._try_set_defaults_values(instance_spec)
         expanded_instance_spec = cls._expand_instance(component, instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)
 
