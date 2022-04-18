@@ -186,7 +186,7 @@ class Spec:
                 raise InvalidSpec(f"'{attrib}' is not a string")
 
     @classmethod
-    def _try_set_defaults_values(cls, instance: dict):
+    def _try_set_default_values(cls, instance: dict):
         """Set a default value if a valid attribute
         was not defined in the receipe file"""
         for key, value in Spec._default_values.items():
@@ -201,7 +201,7 @@ class Spec:
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        cls._try_set_defaults_values(instance_spec)
+        cls._try_set_default_values(instance_spec)
         expanded_instance_spec = cls._expand_instance(component, instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)
 
