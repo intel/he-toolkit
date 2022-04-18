@@ -190,9 +190,7 @@ class Spec:
         """Set a default value if a valid attribute
         was not defined in the receipe file"""
         for key, value in Spec._default_values.items():
-            try:
-                return instance[key]
-            except KeyError:
+            if key not in instance.keys():
                 instance[key] = value
 
     # Factory given parsed TOML python dict
