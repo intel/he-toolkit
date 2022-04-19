@@ -11,9 +11,30 @@ from spec import Spec, InvalidSpec
 def test_transform_spec_to_toml_dict():
     """This method happens to be useful in other tests.
     Avoids having to write to files."""
-    expected = {"hexl": [{"name": "bob"}]}
-    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
-    assert spec.to_toml_dict() == expected
+    input_dict = {"hexl": [{"name": "bob"}]}
+    expected_dict = {
+        "hexl": [
+            {
+                "name": "bob",
+                "skip": False,
+                "pre_fetch": "",
+                "fetch": "",
+                "post_fetch": "",
+                "pre_build": "",
+                "build": "",
+                "post_build": "",
+                "pre_install": "",
+                "install": "",
+                "post_install": "",
+                "init_fetch_dir": "fetch",
+                "init_build_dir": "build",
+                "init_install_dir": "build",
+                "export_install_dir": "install",
+            }
+        ]
+    }
+    spec = Spec.from_instance_spec("hexl", input_dict["hexl"][0], rloc="")
+    assert spec.to_toml_dict() == expected_dict
 
 
 def test_parse_basic_spec(create_basic_spec_file):
@@ -171,13 +192,40 @@ def create_basic_spec_file(tmp_path):
         f.write("[[hexl]]\n")
         f.write('name = "x.y.z"\n')
         f.write("skip = true\n")
+        f.write('pre_fetch = ""\n')
         f.write('fetch = "some-url"\n')
+        f.write('post_fetch = ""\n')
+        f.write('pre_build = ""\n')
         f.write('build = "some-cmd"\n')
+        f.write('post_build = ""\n')
+        f.write('pre_install = ""\n')
+        f.write('install = ""\n')
+        f.write('post_install = ""\n')
+        f.write('init_fetch_dir = "fetch"\n')
+        f.write('init_build_dir = "build"\n')
+        f.write('init_install_dir = "build"\n')
+        f.write('export_install_dir = "install"\n')
         f.write("\n")  # Parser inserts this new line
 
     expected_dict = {
         "hexl": [
-            {"name": "x.y.z", "skip": True, "fetch": "some-url", "build": "some-cmd"}
+            {
+                "name": "x.y.z",
+                "skip": True,
+                "fetch": "some-url",
+                "build": "some-cmd",
+                "pre_fetch": "",
+                "post_fetch": "",
+                "pre_build": "",
+                "post_build": "",
+                "pre_install": "",
+                "install": "",
+                "post_install": "",
+                "init_fetch_dir": "fetch",
+                "init_build_dir": "build",
+                "init_install_dir": "build",
+                "export_install_dir": "install",
+            }
         ]
     }
 

@@ -21,7 +21,7 @@ def test_command_install_fetch(mocker, args_fetch):
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("command_install.print")
     mock_input = mocker.patch("spec.input")
-    mock_input.side_effect = [args_fetch.toml_arg_version, args_fetch.toml_arg_build]
+    mock_input.side_effect = [args_fetch.toml_arg_build, args_fetch.toml_arg_version]
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
@@ -56,7 +56,7 @@ def test_command_install_build(mocker, args_build):
     mock_parse_cmdline.return_value = args_build, ""
     mock_print = mocker.patch("command_install.print")
     mock_input = mocker.patch("spec.input")
-    mock_input.side_effect = [args_build.toml_arg_version, args_build.toml_arg_build]
+    mock_input.side_effect = [args_build.toml_arg_build, args_build.toml_arg_version]
 
     arg1 = f"{args_build.component}/{args_build.instance}"
 
@@ -107,8 +107,8 @@ def test_command_install_execution(mocker, args_install):
     mock_print = mocker.patch("command_install.print")
     mock_input = mocker.patch("spec.input")
     mock_input.side_effect = [
-        args_install.toml_arg_version,
         args_install.toml_arg_build,
+        args_install.toml_arg_version,
     ]
 
     arg1 = f"{args_install.component}/{args_install.instance}"

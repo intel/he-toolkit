@@ -137,7 +137,6 @@ class Spec:
         "post_install",
     }
 
-    _default_values = {"skip": False}
     recipe_arg_dict = {}
 
     # Factory from TOML file
@@ -186,12 +185,29 @@ class Spec:
                 raise InvalidSpec(f"'{attrib}' is not a string")
 
     @classmethod
-    def _try_set_default_values(cls, instance: dict):
-        """Set a default value if a valid attribute
-        was not defined in the recipe file"""
-        for key, value in Spec._default_values.items():
-            if key not in instance.keys():
-                instance[key] = value
+    def _get_instance_default_values(cls, instance: dict):
+        """Returns an instance with default values if a valid
+         attribute was not defined in the recipe file"""
+        default_instance = {
+            "skip": False,
+            "pre_fetch": "",
+            "fetch": "",
+            "post_fetch": "",
+            "pre_build": "",
+            "build": "",
+            "post_build": "",
+            "pre_install": "",
+            "install": "",
+            "post_install": "",
+            "init_fetch_dir": "fetch",
+            "init_build_dir": "build",
+            "init_install_dir": "build",
+            "export_install_dir": "install",
+        }
+
+        for key, value in instance.items():
+            default_instance[key] = value
+        return default_instance
 
     # Factory given parsed TOML python dict
     @classmethod
@@ -199,8 +215,10 @@ class Spec:
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        cls._try_set_default_values(instance_spec)
-        expanded_instance_spec = cls._expand_instance(component, instance_spec, rloc)
+        instance_with_default_values = cls._get_instance_default_values(instance_spec)
+        expanded_instance_spec = cls._expand_instance(
+            component, instance_with_default_values, rloc
+        )
         return cls(component, expanded_instance_spec, rloc)
 
     def to_toml_dict(self):
