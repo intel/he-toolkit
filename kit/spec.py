@@ -188,7 +188,7 @@ class Spec:
     @classmethod
     def _try_set_default_values(cls, instance: dict):
         """Set a default value if a valid attribute
-        was not defined in the receipe file"""
+        was not defined in the recipe file"""
         for key, value in Spec._default_values.items():
             if key not in instance.keys():
                 instance[key] = value
