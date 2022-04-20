@@ -189,7 +189,7 @@ class Spec:
             raise InvalidSpec("'skip' not of type bool")
 
         do_not_include = {"skip"}
-        for attrib in set(cls._fixed_attribs.keys()) - do_not_include:
+        for attrib in cls._fixed_attribs.keys() - do_not_include:
             for_test = instance.get(attrib, str())
             if not isinstance(for_test, str):
                 raise InvalidSpec(f"'{attrib}' is not a string")
