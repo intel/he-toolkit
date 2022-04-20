@@ -61,8 +61,8 @@ listed above. Either file can install dependencies with
 pip install -r <requirements-file>
 ```
 
-However, to build anything useful with the toolkit, we recommend that in
-addition to install the following system dependencies,
+However, to build anything useful with the toolkit, we recommend to
+additionally install the following system dependencies,
 
 ```
 m4
@@ -129,8 +129,12 @@ See the [README](kit/README.md) for more detailed information on the usage of
 The **recommended** method is to use the Docker build and installation which
 builds the toolkit in its entirety including all HE libraries in a
 self-contained docker container running Ubuntu 20.04. This can be built through
-the `hekit` command `hekit docker-build`. See [here](docker) for a detailed
-description on the usage and components of this build.
+the `hekit` command
+```bash
+hekit docker-build
+```
+See [here](docker) for a detailed description on the usage and components of
+this build.
 
 ## System build
 Alternatively, one can build the toolkit's HE components using the following
@@ -230,13 +234,13 @@ Please sign your commits before making a pull request. See instructions
 [here](https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/signing-commits)
 for how to sign commits.
 
-Before contributing, please ensure the [pre-commit](https://pre-commit.com)
-checks pass, i.e. run
+Before contributing, please ensure that you run
+[pre-commit](https://pre-commit.com) with
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
-and make sure all pre-commit checks pass.
+and make sure all checks pass.
 
 Also please run
 ```bash
