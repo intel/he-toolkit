@@ -29,7 +29,6 @@ def test_transform_spec_to_toml_dict():
                 "init_fetch_dir": "fetch",
                 "init_build_dir": "build",
                 "init_install_dir": "build",
-                "export_install_dir": "install",
             }
         ]
     }
@@ -204,7 +203,6 @@ def create_basic_spec_file(tmp_path):
         f.write('init_fetch_dir = "fetch"\n')
         f.write('init_build_dir = "build"\n')
         f.write('init_install_dir = "build"\n')
-        f.write('export_install_dir = "install"\n')
         f.write("\n")  # Parser inserts this new line
 
     expected_dict = {
@@ -224,7 +222,6 @@ def create_basic_spec_file(tmp_path):
                 "init_fetch_dir": "fetch",
                 "init_build_dir": "build",
                 "init_install_dir": "build",
-                "export_install_dir": "install",
             }
         ]
     }
