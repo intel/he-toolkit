@@ -3,10 +3,14 @@
 
 """This module handles the specification file a.k.a. recipe"""
 
+from __future__ import annotations
+
 from re import findall
 from dataclasses import dataclass
 from typing import Dict
 from toml import dump, load
+
+RecipeArgDict = Dict[str, str]
 
 
 def read_spec(component, instance, attrib, repo_location):
@@ -18,7 +22,7 @@ def read_spec(component, instance, attrib, repo_location):
     return inst_obj[attrib]
 
 
-def fill_user_string_dict(d, recipe_arg_dict: Dict[str, str]):
+def fill_user_string_dict(d, recipe_arg_dict: RecipeArgDict):
     """Returns a dict with str values written by the user.
     NB. Only works for flat str value dict."""
 
@@ -121,27 +125,33 @@ class Spec:
     _instance_spec: dict
     repo_location: str
 
-    # These will be turned into property methods
+    # Keys will act as property methods
+    # Values will be used as defaults in Spec obj creation
     _fixed_attribs = {
-        "name",
-        "skip",
+        "name": "",
+        "skip": False,
         # Stages
-        "pre_fetch",
-        "fetch",
-        "post_fetch",
-        "pre_build",
-        "build",
-        "post_build",
-        "pre_install",
-        "install",
-        "post_install",
+        "pre_fetch": "",
+        "fetch": "",
+        "post_fetch": "",
+        "pre_build": "",
+        "build": "",
+        "post_build": "",
+        "pre_install": "",
+        "install": "",
+        "post_install": "",
+        # Inittializer directories
+        "init_fetch_dir": "fetch",
+        "init_build_dir": "build",
+        # This one is counter-intuitive
+        "init_install_dir": "build",
     }
 
     recipe_arg_dict = {}
 
     # Factory from TOML file
     @classmethod
-    def from_toml_file(cls, filename: str, rloc: str, recipe_arg_dict: Dict[str, str]):
+    def from_toml_file(cls, filename: str, rloc: str, recipe_arg_dict: RecipeArgDict):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
 
@@ -167,7 +177,7 @@ class Spec:
         return instance
 
     @classmethod
-    def _validate_instance(cls, instance: dict):
+    def _validate_instance(cls, instance: dict) -> None:
         """Validates the instance.
         This method is gnostic about the spec"""
 
@@ -179,55 +189,31 @@ class Spec:
             raise InvalidSpec("'skip' not of type bool")
 
         do_not_include = {"skip"}
-        for attrib in cls._fixed_attribs - do_not_include:
+        for attrib in set(cls._fixed_attribs.keys()) - do_not_include:
             for_test = instance.get(attrib, str())
             if not isinstance(for_test, str):
                 raise InvalidSpec(f"'{attrib}' is not a string")
 
-    @classmethod
-    def _get_instance_default_values(cls, instance: dict):
-        """Returns an instance with default values if a valid
-         attribute was not defined in the recipe file"""
-        default_instance = {
-            "skip": False,
-            "pre_fetch": "",
-            "fetch": "",
-            "post_fetch": "",
-            "pre_build": "",
-            "build": "",
-            "post_build": "",
-            "pre_install": "",
-            "install": "",
-            "post_install": "",
-            "init_fetch_dir": "fetch",
-            "init_build_dir": "build",
-            "init_install_dir": "build",
-            "export_install_dir": "install",
-        }
-
-        for key, value in instance.items():
-            default_instance[key] = value
-        return default_instance
-
     # Factory given parsed TOML python dict
     @classmethod
-    def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str):
+    def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str) -> Spec:
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
-        instance_with_default_values = cls._get_instance_default_values(instance_spec)
+        # Add some defaults and override with input instance spec
+        instance_spec_with_defaults = {**cls._fixed_attribs, **instance_spec}
         expanded_instance_spec = cls._expand_instance(
-            component, instance_with_default_values, rloc
+            component, instance_spec_with_defaults, rloc
         )
         return cls(component, expanded_instance_spec, rloc)
 
-    def to_toml_dict(self):
+    def to_toml_dict(self) -> dict:
         """Transform to TOML structure as a Python dict"""
         # transformation for TOML
         # {'component': [instance]} -> [[component]]
         return {self.component: [self._instance_spec]}
 
-    def to_toml_file(self, filename: str):
+    def to_toml_file(self, filename: str) -> None:
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
         with open(filename, "w", encoding="utf-8") as f:
