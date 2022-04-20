@@ -128,7 +128,7 @@ def check_dependencies_list(deps: List[str]) -> None:
 
 
 def check_dependencies(args) -> None:
-    """Check dependiencies described in an input file"""
+    """Check dependencies described in an input file"""
     path = Path(args.dependencies_file)
     try:
         with path.open(encoding="utf-8") as f:

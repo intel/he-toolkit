@@ -1,7 +1,7 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module execute the actions specified by the user in the hekit arguments"""
+"""This module executes the actions specified by the user in the hekit arguments"""
 
 import shlex
 from os import chdir as change_directory_to
@@ -74,7 +74,7 @@ class ComponentBuilder:
     """Objects of this class can orchestrate the build of a component"""
 
     def __init__(self, spec: Spec):
-        """Initialise a ComponentBuilder from a Spec object"""
+        """Initialize a ComponentBuilder from a Spec object"""
         if not isinstance(spec, Spec):
             raise TypeError(
                 f"A spec must be type Spec, but got '{type(spec).__name__}'"

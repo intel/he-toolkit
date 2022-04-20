@@ -3,7 +3,9 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module provides helper functions to set up a docker contaniner"""
+"""This module is the main entry point to the hekit command and subcommands for
+configuring the HE Toolkit environment
+"""
 
 from os import geteuid
 from sys import stderr, exit as sys_exit
