@@ -2,7 +2,7 @@
 Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
 delivering innovation around HE with the aim of providing both the community
 and industry with an intuitive entry point for Experimentation, Development and
-Deployment of HE applications. Intel HE oolkit currently offers sample kernels
+Deployment of HE applications. Intel HE Toolkit currently offers sample kernels
 and example programs that demonstrate varying operations and applications that
 can be built leveraging three major HE libraries [Microsoft
 SEAL](https://github.com/microsoft/SEAL),
@@ -90,7 +90,7 @@ be kept.
 
 Moreover, the `hekit` command will be added to the user's `PATH` so
 as to enable the user to call the command from anywhere on their system. This
-modifies your shell's inittialisation script (currently only in bash).
+modifies your shell's initialization script (currently only in bash).
 
 Intel HE toolkit is primarily accessible through the `hekit` command.  There
 are currently two ways of interacting with the toolkit: through a Docker build
