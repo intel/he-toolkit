@@ -135,7 +135,7 @@ def test_basic_user_substitutions_are_expanded(mocker):
     exp_version = "2.3.6"
     exp_name = "Charles"
     mock_input = mocker.patch("spec.input")
-    mock_input.side_effect = [exp_version, exp_name]
+    mock_input.side_effect = [exp_name, exp_version]
 
     expected = {
         "hexl": [
