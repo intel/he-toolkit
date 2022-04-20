@@ -88,7 +88,7 @@ def fill_self_ref_string_dict(d, repo_path):
 
             new_s = s
             for symbol, comp, name, k in symbols:
-                # Assume finalised spec is already expanded
+                # Assume finalized spec is already expanded
                 # The dependency has already been installed
                 sub = read_spec(comp, name, k, repo_path)
                 new_s = new_s.replace(symbol, sub)
@@ -225,7 +225,7 @@ class Spec:
         return self._instance_spec[key]
 
     def __getattr__(self, attrib: str):
-        """Return the spec's specified attribute.
+        """Return the spec object's specified attribute.
         Raises AttributeError if it does not exist"""
         try:
             return self._instance_spec[attrib]

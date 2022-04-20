@@ -28,7 +28,7 @@ class Constants:
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
-    """Copies several files from a source to a destiny"""
+    """Copies several files from a source to a destination"""
     src_dir, dst_dir = Path(src_dir), Path(dst_dir)
     for filename in files:
         copyfile(src_dir / filename, dst_dir / filename)
@@ -55,7 +55,7 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
 
 
 def create_environment():
-    """Returns a dictionary of environmental variables"""
+    """Returns a dictionary of environment variables"""
     environment: Dict[str, str] = {
         "http_proxy": environ.get("http_proxy", ""),
         "https_proxy": environ.get("https_proxy", ""),
