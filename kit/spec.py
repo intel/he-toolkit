@@ -180,15 +180,18 @@ class Spec:
         # load the recipe file
         toml_specs = load(filename)
 
-        # Apply topological sorting
-        dependency_dict = {}
-        for component, instance_specs in toml_specs.items():
-            for instance_spec in instance_specs:
-                dependency_dict[component] = fill_dependencies(instance_spec)
-        sorted_componets = tsort(dependency_dict)
+        # create dependency graph
+        dependency_dict = {
+            component: fill_dependencies(instance_spec)
+            for component, instance_specs in toml_specs.items()
+            for instance_spec in instance_specs
+        }
+
+        # apply topological sorting
+        sorted_components = tsort(dependency_dict)
 
         # create specs
-        for component in sorted_componets:
+        for component in sorted_components:
             for instance_spec in toml_specs[component]:
                 yield cls.from_instance_spec(component, instance_spec, rloc)
 
