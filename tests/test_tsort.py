@@ -6,6 +6,24 @@ from .context import tsort
 from tsort import tsort, CycleError
 
 
+def test_tsort_libraries():
+    G = {
+        "example": ["helib"],
+        "helib": ["ntl", "hexl"],
+        "zstd": [],
+        "seal": ["hexl", "gsl", "zstd"],
+        "ntl": [],
+        "gsl": [],
+        "palisade": ["hexl"],
+        "hexl": [],
+    }
+
+    result = tuple(tsort(G))
+    option1 = ("hexl", "ntl", "helib", "example", "zstd", "gsl", "seal", "palisade")
+    option2 = ("ntl", "hexl", "helib", "example", "zstd", "gsl", "seal", "palisade")
+    assert result == option1 or result == option2
+
+
 def test_tsort_of_DAG():
     """Golden path tests. Can it sort given a DAG."""
     # The dict values are the nodes pointing to the keys.

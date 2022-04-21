@@ -7,6 +7,7 @@ from re import findall
 from dataclasses import dataclass
 from typing import Dict
 from toml import dump, load
+from tsort import tsort
 
 
 def read_spec(component, instance, attrib, repo_location):
@@ -100,6 +101,34 @@ def fill_self_ref_string_dict(d, repo_path):
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
+def fill_dependencies(d):
+    """ Returns a list of dependencies defined
+    and used in the recipe file """
+    dependency_list = []
+
+    def get_dependencies(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = findall(r"(\$%(.*?)%/.*\$)", s)
+            if not symbols:
+                return
+
+            for _, k in symbols:
+                # Assume dependecies are define as:
+                # name/version
+                dependency = d[k].split("/")[0]
+                dependency_list.append(dependency)
+
+        elif isinstance(s, list):
+            for e in s:
+                get_dependencies(e)
+
+    for v in d.values():
+        get_dependencies(v)
+
+    return dependency_list
+
+
 def fill_rloc_paths(d, repo_location):
     """Create absolute path for the top-level attribs that begin
        with 'init_' or '_export_' by prepending repo location"""
@@ -148,9 +177,19 @@ class Spec:
         # Dictionary filled with recipe_arg values
         cls.recipe_arg_dict = recipe_arg_dict
 
+        # load the recipe file
         toml_specs = load(filename)
+
+        # Apply topological sorting
+        dependency_dict = {}
         for component, instance_specs in toml_specs.items():
             for instance_spec in instance_specs:
+                dependency_dict[component] = fill_dependencies(instance_spec)
+        sorted_componets = tsort(dependency_dict)
+
+        # create specs
+        for component in sorted_componets:
+            for instance_spec in toml_specs[component]:
                 yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod

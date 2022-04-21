@@ -163,6 +163,19 @@ def test_user_substitutions_are_expanded_to_init(mocker):
     assert spec["export_something"] == f"{rloc}/hexl/{exp_name}/blu/{exp_version}/blu"
 
 
+def test_from_toml_file_tsot(mocker):
+    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec.return_value = ""
+
+    filepath = "tests/config/test_tsort.toml"
+    spec_generator = Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={})
+    exp_keys = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
+
+    for act_key in exp_keys:
+        spec = next(spec_generator).to_toml_dict()
+        assert act_key in spec.keys()
+
+
 @pytest.fixture
 def create_basic_spec_file(tmp_path):
     """Create TOML file of one instance"""
