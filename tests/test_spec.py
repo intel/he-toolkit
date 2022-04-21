@@ -5,7 +5,7 @@ import pytest
 from filecmp import cmp as compare_files
 
 from .context import spec
-from spec import Spec, InvalidSpec
+from spec import Spec, InvalidSpecError
 
 
 def test_transform_spec_to_toml_dict():
@@ -27,7 +27,7 @@ def test_parse_basic_spec(create_basic_spec_file):
 def test_when_name_not_given():
     """The name attribute for a component must always be provided."""
     expected = {"hexl": [{}]}
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'name' was not provided for instance" == str(execinfo.value)
 

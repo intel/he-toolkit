@@ -116,7 +116,7 @@ def fill_dependencies(d):
             for _, k in symbols:
                 # Assume dependecies are define as:
                 # name/version
-                dependency = d[k].split("/")[0]
+                dependency, _ = d[k].split("/")
                 dependency_list.append(dependency)
 
         elif isinstance(s, list):
@@ -138,8 +138,8 @@ def fill_rloc_paths(d, repo_location):
     return d
 
 
-class InvalidSpec(Exception):
-    """InvalidSpec exception raised for an invalid spec"""
+class InvalidSpecError(Exception):
+    """InvalidSpecError exception raised for an invalid spec"""
 
 
 @dataclass(frozen=True)
@@ -215,16 +215,16 @@ class Spec:
 
         # Name attrib must be provided
         if "name" not in instance.keys():
-            raise InvalidSpec("'name' was not provided for instance")
+            raise InvalidSpecError("'name' was not provided for instance")
 
         if not isinstance(instance.get("skip", False), bool):
-            raise InvalidSpec("'skip' not of type bool")
+            raise InvalidSpecError("'skip' not of type bool")
 
         do_not_include = {"skip"}
         for attrib in cls._fixed_attribs - do_not_include:
             for_test = instance.get(attrib, str())
             if not isinstance(for_test, str):
-                raise InvalidSpec(f"'{attrib}' is not a string")
+                raise InvalidSpecError(f"'{attrib}' is not a string")
 
     # Factory given parsed TOML python dict
     @classmethod
