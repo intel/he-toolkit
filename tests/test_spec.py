@@ -164,6 +164,7 @@ def test_user_substitutions_are_expanded_to_init(mocker):
 
 
 def test_from_toml_file_tsort(mocker):
+    """Verify dependencies are installed first"""
     mock_read_spec = mocker.patch("spec.read_spec")
     mock_read_spec.return_value = ""
     exp_keys_list = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
