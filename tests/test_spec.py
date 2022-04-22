@@ -197,6 +197,49 @@ def test_user_substitutions_are_expanded_to_init(mocker):
     assert spec["export_something"] == f"{rloc}/hexl/{exp_name}/blu/{exp_version}/blu"
 
 
+def test_validate_unique_instance_no_file():
+    """Verify that the function continues without errors
+    if hekit.spec files does not exist"""
+    act_comp = "comp"
+    act_inst = {"name": "test"}
+    act_rloc = "/home"
+
+    Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
+
+
+def test_validate_unique_instance_same_values(mocker):
+    """Verify that the function continues without errors
+    if the instance is the same as the previous one"""
+    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec.return_value = {"name": "test", "option": "debug"}
+    act_comp = "comp"
+    act_inst = {"name": "test", "option": "debug"}
+    act_rloc = "/home"
+
+    Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
+
+    mock_read_spec.assert_called_once()
+
+
+def test_validate_unique_instance_different_values(mocker):
+    """Verify it triggers InvalidSpec exception when
+    the instance is not the same as the previous one"""
+    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec.return_value = {"name": "test", "option": "debug"}
+    act_comp = "comp"
+    act_inst = {"name": "test", "option": "release"}
+    act_rloc = "/home"
+
+    with pytest.raises(InvalidSpec) as execinfo:
+        Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
+
+    mock_read_spec.assert_called_once()
+    assert (
+        "comp/test is already present but it was executed with different options"
+        == str(execinfo.value)
+    )
+
+
 @pytest.fixture
 def create_basic_spec_file(tmp_path):
     """Create TOML file of one instance"""

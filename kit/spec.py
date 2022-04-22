@@ -13,13 +13,12 @@ from toml import dump, load
 RecipeArgDict = Dict[str, str]
 
 
-def read_spec(component, instance, attrib, repo_location):
+def read_spec(component, instance, repo_location):
     """Return hekit.spec file as a dict"""
     path = f"{repo_location}/{component}/{instance}/hekit.spec"
     spec = load(path)
     # There should only be one instance
-    inst_obj = spec[component][0]
-    return inst_obj[attrib]
+    return spec[component][0]
 
 
 def fill_user_string_dict(d, recipe_arg_dict: RecipeArgDict):
@@ -90,8 +89,8 @@ def fill_self_ref_string_dict(d, repo_path):
             for symbol, comp, name, k in symbols:
                 # Assume finalized spec is already expanded
                 # The dependency has already been installed
-                sub = read_spec(comp, name, k, repo_path)
-                new_s = new_s.replace(symbol, sub)
+                sub = read_spec(comp, name, repo_path)
+                new_s = new_s.replace(symbol, sub[k])
 
             return new_s
 
@@ -194,6 +193,21 @@ class Spec:
             if not isinstance(for_test, str):
                 raise InvalidSpec(f"'{attrib}' is not a string")
 
+    @classmethod
+    def _validate_unique_instance(
+        cls, component: str, instance: dict, rloc: str
+    ) -> None:
+        # load previous spec from info file
+        try:
+            instance_name = instance["name"]
+            previous_instance = read_spec(component, instance_name, rloc)
+            if previous_instance != instance:
+                raise InvalidSpec(
+                    f"{component}/{instance_name} is already present but it was executed with different options"
+                )
+        except FileNotFoundError:
+            pass
+
     # Factory given parsed TOML python dict
     @classmethod
     def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str) -> Spec:
@@ -205,6 +219,7 @@ class Spec:
         expanded_instance_spec = cls._expand_instance(
             component, instance_spec_with_defaults, rloc
         )
+        cls._validate_unique_instance(component, expanded_instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)
 
     def to_toml_dict(self) -> dict:
