@@ -166,15 +166,15 @@ def test_user_substitutions_are_expanded_to_init(mocker):
 def test_from_toml_file_tsort(mocker):
     mock_read_spec = mocker.patch("spec.read_spec")
     mock_read_spec.return_value = ""
-
+    exp_keys_list = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
     filepath = "tests/config/test_tsort.toml"
-    specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
-    exp_keys = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
 
-    assert len(specs) == len(exp_keys)
-    for act_key, spec in zip(exp_keys, specs):
+    specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
+
+    assert len(specs) == len(exp_keys_list)
+    for exp_key, spec in zip(exp_keys_list, specs):
         spec_as_dict = spec.to_toml_dict()
-        assert act_key in spec_as_dict.keys()
+        assert exp_key in spec_as_dict.keys()
 
 
 @pytest.fixture
