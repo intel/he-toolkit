@@ -11,9 +11,29 @@ from spec import Spec, InvalidSpec
 def test_transform_spec_to_toml_dict():
     """This method happens to be useful in other tests.
     Avoids having to write to files."""
-    expected = {"hexl": [{"name": "bob"}]}
-    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
-    assert spec.to_toml_dict() == expected
+    input_dict = {"hexl": [{"name": "bob"}]}
+    expected_dict = {
+        "hexl": [
+            {
+                "name": "bob",
+                "skip": False,
+                "pre_fetch": "",
+                "fetch": "",
+                "post_fetch": "",
+                "pre_build": "",
+                "build": "",
+                "post_build": "",
+                "pre_install": "",
+                "install": "",
+                "post_install": "",
+                "init_fetch_dir": "fetch",
+                "init_build_dir": "build",
+                "init_install_dir": "build",
+            }
+        ]
+    }
+    spec = Spec.from_instance_spec("hexl", input_dict["hexl"][0], rloc="")
+    assert spec.to_toml_dict() == expected_dict
 
 
 def test_parse_basic_spec(create_basic_spec_file):
@@ -30,6 +50,20 @@ def test_when_name_not_given():
     with pytest.raises(InvalidSpec) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'name' was not provided for instance" == str(execinfo.value)
+
+
+def test_when_skip_not_boolean():
+    expected = {"hexl": [{"name": "bob", "skip": "False"}]}
+    with pytest.raises(InvalidSpec) as execinfo:
+        Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+    assert "'skip' not of type bool" == str(execinfo.value)
+
+
+def test_when_attribute_not_string():
+    expected = {"hexl": [{"name": "bob", "build": "build", "fetch": False}]}
+    with pytest.raises(InvalidSpec) as execinfo:
+        Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+    assert "'fetch' is not a string" == str(execinfo.value)
 
 
 def test_basic_substitutions_are_expanded():
@@ -115,7 +149,7 @@ def test_basic_user_substitutions_are_expanded(mocker):
     exp_version = "2.3.6"
     exp_name = "Charles"
     mock_input = mocker.patch("spec.input")
-    mock_input.side_effect = [exp_version, exp_name]
+    mock_input.side_effect = [exp_name, exp_version]
 
     expected = {
         "hexl": [
@@ -171,13 +205,38 @@ def create_basic_spec_file(tmp_path):
         f.write("[[hexl]]\n")
         f.write('name = "x.y.z"\n')
         f.write("skip = true\n")
+        f.write('pre_fetch = ""\n')
         f.write('fetch = "some-url"\n')
+        f.write('post_fetch = ""\n')
+        f.write('pre_build = ""\n')
         f.write('build = "some-cmd"\n')
+        f.write('post_build = ""\n')
+        f.write('pre_install = ""\n')
+        f.write('install = ""\n')
+        f.write('post_install = ""\n')
+        f.write('init_fetch_dir = "fetch"\n')
+        f.write('init_build_dir = "build"\n')
+        f.write('init_install_dir = "build"\n')
         f.write("\n")  # Parser inserts this new line
 
     expected_dict = {
         "hexl": [
-            {"name": "x.y.z", "skip": True, "fetch": "some-url", "build": "some-cmd"}
+            {
+                "name": "x.y.z",
+                "skip": True,
+                "fetch": "some-url",
+                "build": "some-cmd",
+                "pre_fetch": "",
+                "post_fetch": "",
+                "pre_build": "",
+                "post_build": "",
+                "pre_install": "",
+                "install": "",
+                "post_install": "",
+                "init_fetch_dir": "fetch",
+                "init_build_dir": "build",
+                "init_install_dir": "build",
+            }
         ]
     }
 

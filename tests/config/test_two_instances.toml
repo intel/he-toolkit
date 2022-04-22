@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [[hexl]]
-skip = false
+#skip = false
 version = "1.2.3"
 name = "1.2.3"
 fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
