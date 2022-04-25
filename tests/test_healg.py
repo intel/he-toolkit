@@ -1,12 +1,14 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
-from sys import maxsize
-import os.path
-from argparse import ArgumentTypeError
 import pytest
-from tools.healg import *
+import subprocess
+import os.path
+from sys import maxsize
+from argparse import ArgumentTypeError
+
+from .context import healg
+from healg import *
 
 
 def test_powerset():
@@ -24,30 +26,32 @@ def test_powerset():
 
 
 def test_prime_factors():
-    assert len(list(prime_factors([x for x in range(10)]))) == 10
-    assert list(prime_factors([1])) == [()]  # Special case
-    assert list(prime_factors([5])) == [(5,)]
-    assert list(prime_factors([12])) == [(2, 2, 3)]
+    assert len(list(compute_prime_factors([x for x in range(10)]))) == 10
+    assert list(compute_prime_factors([1])) == [()]  # Special case
+    assert list(compute_prime_factors([5])) == [(5,)]
+    assert list(compute_prime_factors([12])) == [(2, 2, 3)]
     # Note that largest prime pre-computed in primes.txt is 139999
-    assert set(prime_factors([24, 10009729])) == set([(2, 2, 2, 3), (10009729,)])
+    assert set(compute_prime_factors([24, 10009729])) == set(
+        [(2, 2, 2, 3), (10009729,)]
+    )
 
     # cmdline factor util hangs with no input
-    # prime_factors should not hang if no input passed in
-    assert prime_factors([]) is None
+    # compute_prime_factors should not hang if no input passed in
+    assert compute_prime_factors([]) is None
 
     with pytest.raises(ValueError):
-        list(prime_factors([-1]))
+        list(compute_prime_factors([-1]))
 
     with pytest.raises(CalledProcessError):
-        list(prime_factors([7.5]))
+        list(compute_prime_factors([7.5]))
 
 
-def test_ms():
-    assert list(ms(ps=[], ds=[], factorize=prime_factors)) == []
-    assert set(ms([12], [5], prime_factors)) == set(
+def test_find_ms():
+    assert list(find_ms(ps=[], ds=[], factorize=compute_prime_factors)) == []
+    assert set(find_ms([12], [5], compute_prime_factors)) == set(
         [(12, 5, (11,)), (12, 5, (22621,)), (12, 5, (11, 22621))]
     )
-    assert set(ms([2, 3], [2, 3], prime_factors)) == set(
+    assert set(find_ms([2, 3], [2, 3], compute_prime_factors)) == set(
         [
             (2, 2, (3,)),
             (2, 3, (7,)),
@@ -65,14 +69,14 @@ def test_ms():
     )
 
     with pytest.raises(TypeError):
-        list(ms(12, 1, prime_factors))
+        list(find_ms(12, 1, compute_prime_factors))
 
     with pytest.raises(CalledProcessError):
         # Checking for positive integers
-        list(ms([8.5], [1], prime_factors))
-        list(ms([4], [1.5], prime_factors))
-        list(ms([12], [-1], prime_factors))
-        list(ms([-12], [1], prime_factors))
+        list(find_ms([8.5], [1], compute_prime_factors))
+        list(find_ms([4], [1.5], compute_prime_factors))
+        list(find_ms([12], [-1], compute_prime_factors))
+        list(find_ms([-12], [1], compute_prime_factors))
 
 
 def test_phi():
@@ -228,7 +232,10 @@ def test_parse_cmdline():
         os.remove(f_primes)
 
 
-def test_main():
+def test_main(mocker):
+    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
+    mock_PrimesFromFile.is_prime.return_value = True
+
     cmdline_args = "--no-header".split()
     args = parse_cmdline(cmdline_args)
     assert main(args) is None
