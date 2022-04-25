@@ -3,6 +3,8 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module finds HE parameters based on user constraints"""
+
 import sys
 
 assert sys.version_info >= (3, 8)
@@ -26,7 +28,7 @@ def powerset(iterable):
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
 
-def ms(ps, ds, factorize):
+def find_ms(ps, ds, factorize):
     """Generator returns the p, gen for max m's for p^d"""
     prime_factors = factorize(p ** d - 1 for p in ps for d in ds)
     if prime_factors:
@@ -43,26 +45,27 @@ def str_to_range(s):
     if s.isdigit():
         num = int(s)
         return range(num, num + 1)
-    else:
-        regex = re.compile(r"^((\d+)\s*-\s*(\d+))$")
-        match = None
-        try:
-            match, start, end = regex.fullmatch(s).groups()
-            if match != None:
-                start, end = int(start), int(end)
-                if start > end:
-                    raise argparse.ArgumentTypeError(f"backward range '{match}'")
-                return range(start, end + 1)
-            else:
-                raise argparse.ArgumentTypeError(
-                    f"Unknown error. Range with match '{match}'"
-                )
-        except AttributeError:
-            if match:
-                raise argparse.ArgumentTypeError(
-                    f"Wrong syntax for range given '{match}'."
-                )
-            raise argparse.ArgumentTypeError(f"Wrong syntax for range given '{s}'.")
+
+    regex = re.compile(r"^((\d+)\s*-\s*(\d+))$")
+    match = None
+    try:
+        match, start, end = regex.fullmatch(s).groups()
+        if match is None:
+            raise argparse.ArgumentTypeError(
+                f"Unknown error. Range with match '{match}'"
+            )
+        start, end = int(start), int(end)
+        if start > end:
+            raise argparse.ArgumentTypeError(f"backward range '{match}'")
+        return range(start, end + 1)
+    except AttributeError as error:
+        if match:
+            raise argparse.ArgumentTypeError(
+                f"Wrong syntax for range given '{match}'."
+            ) from error
+        raise argparse.ArgumentTypeError(
+            f"Wrong syntax for range given '{s}'."
+        ) from error
 
 
 def parse_range(string, filter_fn=None):
@@ -82,7 +85,7 @@ class PrimesFromFile:
 
     def __init__(self, filename):
         """Load file with primes."""
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             self.primes = tuple(int(p) for p in f.readlines())
             self.max = self.primes[-1]
 
@@ -99,13 +102,12 @@ def parse_factor_line(line):
     key = split_line[0]
     if key[-1] != ":":
         raise ValueError(f"{line} does not have valid key format")
-    else:
-        key = int(key[:-1])
+    key = int(key[:-1])
     value = tuple(int(num) for num in split_line[1:])
     return key, value
 
 
-def prime_factors(numbers, factor_util="factor"):
+def compute_prime_factors(numbers, factor_util="factor"):
     """Return generator. Keys m, Value prime factors.
        Process out to factor"""
 
@@ -120,9 +122,10 @@ def prime_factors(numbers, factor_util="factor"):
     except CalledProcessError as error:
         # Was it a negative number on the input?
         if any(number < 0 for number in numbers):
-            raise ValueError(f"A negative number was found in the input: {numbers}")
-        else:
-            raise error
+            raise ValueError(
+                f"A negative number was found in the input: {numbers}"
+            ) from error
+        raise error
 
     factor_lines = out.stdout.decode("ascii").strip().split("\n")
 
@@ -195,7 +198,7 @@ def main(args):
         print(
             f"{'p' :^{width}} {'d' :^{width}} {'m' :^{width}} {'phim' :^{width}} {'nslots' :^{width}}"
         )
-    for p, d, m_factors in ms(args.p, args.d, prime_factors):
+    for p, d, m_factors in find_ms(args.p, args.d, compute_prime_factors):
         m = math.prod(m_factors)
         e, corrected = correct_for_d(p, d, m)
         soln = (p, e, m)
@@ -215,5 +218,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_cmdline()
-    main(args)
+    args_main = parse_cmdline()
+    main(args_main)
