@@ -243,6 +243,9 @@ jobs:
 
       - name: Init hekit
         run: |
+          #TODO: rm command must be replaced when
+          #command "hekit remove all" is available
+          rm -rf ~/.hekit
           mkdir -p ~/.hekit
           cp default.config ~/.hekit
 
