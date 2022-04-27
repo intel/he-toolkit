@@ -23,7 +23,7 @@ This `primes.txt` file can be created by running the supplied script
 
 The `healg` tool can be executed with the following options.
 
-Header | Meaning |
+| Option | Meaning |
 | --- | --- |
 | `-h, help` | Show the help message. |
 | `-p` | Define plaintext prime. Default value is 2. |
