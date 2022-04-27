@@ -11,8 +11,8 @@ p-boxes `d` returns the available algebras.
 
 ### Setup
 
-The `healg` tool requires as input a file that containts a sorted list of primes.
-This `primes.txt` file can be created by running the supplied script 
+The `healg` tool requires as input a file that contains a sorted list of primes.
+This `primes.txt` file can be created by running the supplied script
 `gen_primes.sh` without any arguments.
 
 ```bash
@@ -41,15 +41,15 @@ where the prime is 2, those between 11 and 25 inclusive, and 31.
 ./healg.py -p 2,11-25,31
 ```
 
-Searching for algebras that give `d` larger than 1 simply pass the flag and 
-argument in a similar manner to `p`. For example, searching algebras with 
+Searching for algebras that give `d` larger than 1 simply pass the flag and
+argument in a similar manner to `p`. For example, searching algebras with
 the same `p`, but with `d` values of 2 and between 4 to 5, inclusive.
 
 ```bash
 ./healg.py -p 2,11-25,31 -d 2,4-5
 ```
 
-For more information run 
+For more information run
 ```bash
 `./healg.py -h`
 ```
