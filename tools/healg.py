@@ -208,7 +208,7 @@ def main(args):
                 continue
             phim = phi(m_factors)
             print(
-                f"{p :{width}} {e :{width}} {m :{width}} {phim :{width}} {phim // e :{width}}"
+                f"{p :^{width}} {e :^{width}} {m :^{width}} {phim :^{width}} {phim // e :^{width}}"
             )
 
     if args.no_header:
