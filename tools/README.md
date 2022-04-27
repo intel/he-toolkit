@@ -11,29 +11,50 @@ p-boxes `d` returns the available algebras.
 
 ### Setup
 
-Before use of the `healg` tool we must generate a list of primes that the tool
-uses.  This can be achieved by running the supplied script `gen_primes.sh`
-without any arguments. A resultant `primes.txt` file is created.
+The `healg` tool requires as input a file that containts a sorted list of primes.
+This `primes.txt` file can be created by running the supplied script 
+`gen_primes.sh` without any arguments.
+
+```bash
+./gen_primes.sh
+```
+
+### Options
+
+The `healg` tool can be executed with the following options.
+
+Header | Meaning |
+| --- | --- |
+| `-h, help` | Show the help message. |
+| `-p` | Define plaintext prime. Default value is 2. |
+| `-d` | Define number of coefficients in a slot. Default value is 1. |
+| `--no-corrected` | Include corrected d orders. |
+| `--no-header` | Do not print headers. |
 
 ### Running
 
 To run the tool, simply provide a single prime or a range where primes may be,
-or a combination of the two.  For example, if we wish to search for algebras
-where the prime is 2 and those between 11 and 25 inclusive, and 31 then we can
-run the following,
+or a combination of the two.  For example, searching for algebras
+where the prime is 2, those between 11 and 25 inclusive, and 31.
 
 ```bash
 ./healg.py -p 2,11-25,31
 ```
 
-By default, `p` is 2 and `d`is 1 if not provided. Searching for algebras that
-give `d` larger than 1 simply pass the flag and argument in a similar manner to `p`.
+Searching for algebras that give `d` larger than 1 simply pass the flag and 
+argument in a similar manner to `p`. For example, searching algebras with 
+the same `p`, but with `d` values of 2 and between 4 to 5, inclusive.
 
 ```bash
 ./healg.py -p 2,11-25,31 -d 2,4-5
 ```
-Here, we are searching algebras with the same `p`, but with `d` values of 2 and
-between 4 to 5, inclusive.
+
+For more information run 
+```bash
+`./healg.py -h`
+```
+
+### Result
 
 The table retuned by the searches have the following column headers shown below
 with their meanings,
@@ -45,10 +66,6 @@ with their meanings,
 | `m` | order of the cyclotomic polynomial |
 | `phi(m)` | the Euler totient of m which is the degree of the ciphertext and plaintext polynomial |
 | `nslots` | the number of slots in a ciphertext and plaintext polynomial (`phi(m)` / `d`) |
-
-
-For more information run `./healg.py -h`
-
 
 ### Known issues
 
