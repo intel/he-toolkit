@@ -230,12 +230,3 @@ def test_parse_cmdline():
     # Cleanup
     if not pfile_exists:
         os.remove(f_primes)
-
-
-def test_main(mocker):
-    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-
-    cmdline_args = "--no-header".split()
-    args = parse_cmdline(cmdline_args)
-    assert main(args) is None
