@@ -15,9 +15,22 @@ import argparse
 import subprocess  # nosec
 from subprocess import CalledProcessError
 import shutil
+from sys import stdout
 from functools import partial
 from itertools import chain, combinations
 from collections import Counter
+from pathlib import Path
+
+
+def gen_primes(start=2, stop=140_000, factor_util="factor", outfile=stdout):
+    """Writes to outfile a list of primes
+    from start to stop values inclusive"""
+
+    numbers = range(start, stop + 1)
+    primes = [
+        factors[0] for factors in compute_prime_factors(numbers) if len(factors) == 1
+    ]
+    outfile.write("\n".join(map(str, primes)))
 
 
 def powerset(iterable):
