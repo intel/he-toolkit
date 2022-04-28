@@ -20,6 +20,8 @@ import spec
 import tab_completion
 import tsort
 
-sys_path.insert(0, os_path.abspath(os_path.join(os_path.dirname(__file__), "../tools")))
+sys_path.insert(
+    0, os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/tools"))
+)
 
 import healg
