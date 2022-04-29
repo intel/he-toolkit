@@ -12,18 +12,27 @@ def remove_components(args):
     """Remove component instances"""
     try:
         component = args.component
-        comp_path = f"{args.config.repo_location}/{component}"
         instance = args.instance
+        repo_path = args.config.repo_location
+        comp_path = f"{repo_path}/{component}"
+        ints_path = f"{comp_path}/{instance}"
 
-        if instance is None:
+        if args.all:
             value = input(
-                f"All instances of component '{component}' will be deleted. Do you want to continue? (y/n)"
+                f"All components in {repo_path} will be deleted. Do you want to continue? (y/n) "
+            )
+            if value in ("y", "Y"):
+                rmtree(repo_path)
+                print("All components successfully removed")
+        elif not instance:
+
+            value = input(
+                f"All instances of component '{component}' will be deleted. Do you want to continue? (y/n) "
             )
             if value in ("y", "Y"):
                 rmtree(comp_path)
                 print(f"All instances of component '{component}' successfully removed")
         else:
-            ints_path = f"{comp_path}/{instance}"
             rmtree(ints_path)
             print(
                 f"Instance '{instance}' of component '{component}' successfully removed"
@@ -46,9 +55,12 @@ def set_remove_subparser(subparsers):
         "remove", description="removes/uninstalls components"
     )
     parser_remove.add_argument(
-        "component", type=str, help="component to be removed"
+        "--all", action="store_true", help="remove all components"
+    )
+    parser_remove.add_argument(
+        "component", type=str, help="component to be removed", nargs="?", default=""
     ).completer = components_completer
     parser_remove.add_argument(
-        "--instance", type=str, help="instance to be removed"
+        "instance", type=str, help="instance to be removed", nargs="?", default=""
     ).completer = instances_completer
     parser_remove.set_defaults(fn=remove_components)
