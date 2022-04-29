@@ -3,6 +3,7 @@
 
 import pytest
 from os import getcwd, chdir
+from pathlib import Path
 
 from .context import hekit, command_list, command_remove, command_install
 from hekit import main
@@ -157,11 +158,12 @@ def test_command_remove_after_install(mocker, args_remove, restore_pwd):
 
 class MockArgs:
     def __init__(self, fn, upto_stage):
+        self.tests_path = Path(__file__).resolve().parent
         self.version = False
         self.component = "hexl"
         self.instance = "1.2.3"
-        self.config = "tests/config/default.config"
-        self.recipe_file = "tests/config/test.toml"
+        self.config = f"{self.tests_path}/input_files/default.config"
+        self.recipe_file = f"{self.tests_path}/input_files/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
         # back substitution

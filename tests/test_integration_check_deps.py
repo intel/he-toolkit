@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+from pathlib import Path
 
 from .context import hekit, command_check_deps
 from hekit import main
@@ -90,7 +91,7 @@ def test_check_dependencies_found_wrong_version(mocker):
 def test_check_dependencies_FileNotFoundError(mocker):
     """Arrange"""
     args = MockArgs()
-    args.dependencies_file = "tests/config/no_a_file.txt"
+    args.dependencies_file = "/tests/input_files/no_a_file.txt"
 
     # Mocking command line args
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -109,8 +110,9 @@ def test_check_dependencies_FileNotFoundError(mocker):
 
 class MockArgs:
     def __init__(self):
-        self.dependencies_file = "tests/config/dependencies.txt"
-        self.config = "tests/config/default.config"
+        self.tests_path = Path(__file__).resolve().parent
+        self.dependencies_file = f"{self.tests_path}/input_files/dependencies.txt"
+        self.config = f"{self.tests_path}/input_files/default.config"
         self.fn = check_dependencies
         self.version = False
 
