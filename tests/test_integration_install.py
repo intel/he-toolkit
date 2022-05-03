@@ -146,6 +146,8 @@ def test_command_remove_all_after_install(mocker, args_remove, restore_pwd):
     mock_input = mocker.patch("command_remove.input", return_value="y")
 
     args_remove.all = True
+    args_remove.instance = ""
+    args_remove.component = ""
     arg1 = "All components successfully removed"
 
     """Act"""

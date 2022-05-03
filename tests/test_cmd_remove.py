@@ -87,6 +87,8 @@ def test_remove_all_instances_answer_no(mocker, args):
 def test_remove_all_components_answer_yes(mocker, args):
     """Arrange"""
     args.all = True
+    args.instance = ""
+    args.component = ""
     mock_rmtree = mocker.patch("command_remove.rmtree")
     mock_print = mocker.patch("command_remove.print")
     mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
@@ -109,6 +111,8 @@ def test_remove_all_components_answer_yes(mocker, args):
 def test_remove_all_components_answer_no(mocker, args):
     """Arrange"""
     args.all = True
+    args.instance = ""
+    args.component = ""
     mock_rmtree = mocker.patch("command_remove.rmtree")
     mock_print = mocker.patch("command_remove.print")
     mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
@@ -122,6 +126,25 @@ def test_remove_all_components_answer_no(mocker, args):
     mock_rmtree.assert_not_called()
     mock_listdir.assert_not_called()
     mock_input.assert_called_once()
+
+
+def test_remove_all_ValueError_exception(mocker, args):
+    """Arrange"""
+    args.all = True
+    mock_rmtree = mocker.patch("command_remove.rmtree")
+    mock_print = mocker.patch("command_remove.print")
+    mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
+    mock_input = mocker.patch("command_remove.input", return_value="n")
+
+    """Act"""
+    with pytest.raises(ValueError) as execinfo:
+        remove_components(args)
+
+    """Assert"""
+    assert (
+        str(execinfo.value)
+        == "Flag '--all' cannot be used after specifying a component or instance"
+    )
 
 
 def test_remove_components_FileNotFoundError_exception(mocker, args):

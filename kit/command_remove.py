@@ -18,6 +18,11 @@ def remove_components(args):
         ints_path = f"{comp_path}/{instance}"
 
         if args.all:
+            if component or instance:
+                raise ValueError(
+                    "Flag '--all' cannot be used after specifying a component or instance"
+                )
+
             value = input(
                 f"All components in {repo_path} will be deleted. Do you want to continue? (y/n) "
             )
@@ -25,7 +30,6 @@ def remove_components(args):
                 rmtree(repo_path)
                 print("All components successfully removed")
         elif not instance:
-
             value = input(
                 f"All instances of component '{component}' will be deleted. Do you want to continue? (y/n) "
             )
