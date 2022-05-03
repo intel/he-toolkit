@@ -15,7 +15,7 @@ def remove_components(args):
         instance = args.instance
         repo_path = args.config.repo_location
         comp_path = f"{repo_path}/{component}"
-        ints_path = f"{comp_path}/{instance}"
+        inst_path = f"{comp_path}/{instance}"
 
         if args.all:
             if component or instance:
@@ -37,7 +37,7 @@ def remove_components(args):
                 rmtree(comp_path)
                 print(f"All instances of component '{component}' successfully removed")
         else:
-            rmtree(ints_path)
+            rmtree(inst_path)
             print(
                 f"Instance '{instance}' of component '{component}' successfully removed"
             )
