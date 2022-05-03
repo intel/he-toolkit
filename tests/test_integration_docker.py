@@ -131,11 +131,12 @@ def test_docker_build_clean(mocker, restore_pwd):
 
 class MockArgs:
     def __init__(self, check_only, clean, enable):
+        self.tests_path = Path(__file__).resolve().parent
         self.check_only = check_only
         self.clean = clean
         self.enable = enable
-        self.config = "tests/config/default.config"
-        self.hekit_root_dir = Path(__file__).resolve().parent.parent
+        self.config = f"{self.tests_path}/input_files/default.config"
+        self.hekit_root_dir = self.tests_path.parent
         self.fn = setup_docker
         self.id = None
         self.version = False
