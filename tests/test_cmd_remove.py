@@ -6,7 +6,7 @@ from .context import command_remove
 from command_remove import remove_components
 
 
-def test_remove_instance_no_error(mocker, args):
+def test_remove_instance_of_component_with_many_instances(mocker, args):
     """Arrange"""
     mock_rmtree = mocker.patch("command_remove.rmtree")
     mock_print = mocker.patch("command_remove.print")
@@ -25,7 +25,7 @@ def test_remove_instance_no_error(mocker, args):
     mock_listdir.assert_called_once()
 
 
-def test_remove_component_no_error(mocker, args):
+def test_remove_instance_of_component_with_single_instance(mocker, args):
     """Arrange"""
     mock_rmtree = mocker.patch("command_remove.rmtree")
     mock_print = mocker.patch("command_remove.print")
@@ -42,6 +42,86 @@ def test_remove_component_no_error(mocker, args):
     assert 2 == mock_rmtree.call_count
     mock_rmtree.assert_called_with(path)
     mock_listdir.assert_called_once()
+
+
+def test_remove_all_instances_answer_yes(mocker, args):
+    """Arrange"""
+    args.instance = None
+    mock_rmtree = mocker.patch("command_remove.rmtree")
+    mock_print = mocker.patch("command_remove.print")
+    mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
+    mock_input = mocker.patch("command_remove.input", return_value="y")
+    text = f"All instances of component '{args.component}' successfully removed"
+    path = f"{args.config.repo_location}/{args.component}"
+
+    """Act"""
+    remove_components(args)
+
+    """Assert"""
+    mock_print.assert_called_once()
+    mock_print.assert_called_with(text)
+    mock_rmtree.assert_called_once()
+    mock_rmtree.assert_called_with(path)
+    mock_listdir.assert_not_called()
+    mock_input.assert_called_once()
+
+
+def test_remove_all_instances_answer_no(mocker, args):
+    """Arrange"""
+    args.instance = None
+    mock_rmtree = mocker.patch("command_remove.rmtree")
+    mock_print = mocker.patch("command_remove.print")
+    mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
+    mock_input = mocker.patch("command_remove.input", return_value="n")
+
+    """Act"""
+    remove_components(args)
+
+    """Assert"""
+    mock_print.assert_not_called()
+    mock_rmtree.assert_not_called()
+    mock_listdir.assert_not_called()
+    mock_input.assert_called_once()
+
+
+def test_remove_all_components_answer_yes(mocker, args):
+    """Arrange"""
+    args.all = True
+    mock_rmtree = mocker.patch("command_remove.rmtree")
+    mock_print = mocker.patch("command_remove.print")
+    mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
+    mock_input = mocker.patch("command_remove.input", return_value="y")
+    text = f"All components successfully removed"
+    path = f"{args.config.repo_location}"
+
+    """Act"""
+    remove_components(args)
+
+    """Assert"""
+    mock_print.assert_called_once()
+    mock_print.assert_called_with(text)
+    mock_rmtree.assert_called_once()
+    mock_rmtree.assert_called_with(path)
+    mock_listdir.assert_not_called()
+    mock_input.assert_called_once()
+
+
+def test_remove_all_components_answer_no(mocker, args):
+    """Arrange"""
+    args.all = True
+    mock_rmtree = mocker.patch("command_remove.rmtree")
+    mock_print = mocker.patch("command_remove.print")
+    mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
+    mock_input = mocker.patch("command_remove.input", return_value="n")
+
+    """Act"""
+    remove_components(args)
+
+    """Assert"""
+    mock_print.assert_not_called()
+    mock_rmtree.assert_not_called()
+    mock_listdir.assert_not_called()
+    mock_input.assert_called_once()
 
 
 def test_remove_components_FileNotFoundError_exception(mocker, args):
@@ -75,6 +155,7 @@ class MockArgs:
         self.config = MockArgs.Config()
         self.instance = "test_instance"
         self.component = "component"
+        self.all = False
 
 
 @pytest.fixture

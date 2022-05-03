@@ -137,19 +137,22 @@ def test_command_list_after_install(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg234, arg234, arg234)
 
 
-def test_command_remove_after_install(mocker, args_remove, restore_pwd):
+def test_command_remove_all_after_install(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
     mock_print = mocker.patch("command_remove.print")
+    mock_input = mocker.patch("command_remove.input", return_value="y")
 
-    arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
+    args_remove.all = True
+    arg1 = "All components successfully removed"
 
     """Act"""
     main()
 
     """Assert"""
     mock_print.assert_called_with(arg1)
+    mock_input.assert_called_once()
 
 
 """Utilities used by the tests"""
@@ -164,6 +167,7 @@ class MockArgs:
         self.recipe_file = "tests/config/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        self.all = False
         # back substitution
         self.recipe_arg = {"name": self.instance}
         self.toml_arg_version = self.instance

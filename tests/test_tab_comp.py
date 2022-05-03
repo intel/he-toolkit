@@ -81,6 +81,7 @@ class MockArgs:
         self.recipe_file = "tests/config/test_two_instances.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        self.all = False
         self.recipe_arg = {}
 
 
