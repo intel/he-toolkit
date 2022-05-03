@@ -22,15 +22,26 @@ from collections import Counter
 from pathlib import Path
 
 
-def gen_primes(start=2, stop=140_000, factor_util="factor", outfile=stdout):
-    """Writes to outfile a list of primes
-    from start to stop values inclusive"""
+def set_gen_primes(subparsers):
+    """Register subparser to generate primes"""
+
+    parser = subparsers.add_parser(
+        "gen-primes",
+        description="generate primes in range [n, m] where n, m are positive integers",
+    )
+    parser.add_argument("start", type=int, default=2, help="start number")
+    parser.add_argument("stop", type=int, default=100, help="stop number")
+    parser.set_defaults(fn=lambda args: gen_primes(args.start, args.stop))
+
+
+def gen_primes(start: int, stop: int, factor_util: str = "factor", outfile=stdout):
+    """Writes to outfile a list of primes from start to stop values inclusive"""
 
     numbers = range(start, stop + 1)
     primes = [
         factors[0] for factors in compute_prime_factors(numbers) if len(factors) == 1
     ]
-    outfile.write("\n".join(map(str, primes)))
+    print("\n".join(map(str, primes)), file=outfile)
 
 
 def powerset(iterable):
