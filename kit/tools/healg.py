@@ -22,15 +22,34 @@ from collections import Counter
 from pathlib import Path
 
 
-def gen_primes(start=2, stop=140_000, factor_util="factor", outfile=stdout):
-    """Writes to outfile a list of primes
-    from start to stop values inclusive"""
+def set_gen_primes(subparsers):
+    """Register subparser to generate primes"""
+
+    parser = subparsers.add_parser(
+        "gen-primes",
+        description="generate primes in range [n, m] where n, m are positive integers",
+    )
+    parser.add_argument("start", type=int, default=2, help="start number")
+    parser.add_argument("stop", type=int, default=100, help="stop number")
+    parser.set_defaults(fn=lambda args: gen_primes(args.start, args.stop))
+
+
+def set_gen_algebras(subparsers):
+    """Register subparser to generate algebras"""
+    parser = subparsers.add_parser("algebras", description="generate algebras")
+    parser.add_argument("start", type=int, default=2, help="start number")
+    parser.add_argument("stop", type=int, default=100, help="stop number")
+    parser.set_defaults(fn=lambda args: gen_primes(args.start, args.stop))
+
+
+def gen_primes(start: int, stop: int, factor_util: str = "factor", outfile=stdout):
+    """Writes to outfile a list of primes from start to stop values inclusive"""
 
     numbers = range(start, stop + 1)
     primes = [
         factors[0] for factors in compute_prime_factors(numbers) if len(factors) == 1
     ]
-    outfile.write("\n".join(map(str, primes)))
+    print("\n".join(map(str, primes)), file=outfile)
 
 
 def powerset(iterable):
@@ -147,38 +166,41 @@ def compute_prime_factors(numbers, factor_util="factor"):
     return (parse_factor_line(line)[1] for line in factor_lines)
 
 
-def parse_cmdline(argv: list = None):
-    """Return parsed command line args"""
+def set_gen_algebras(subparsers):
+    """Register subparser to generate algebras"""
+    parser = subparsers.add_parser(
+        "algebras", description="generate ZZ_p[x]/phi(X) algebras"
+    )
 
-    primes_list = PrimesFromFile("primes.txt")
+    default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
+    try:
+        primes_list = PrimesFromFile(default_primes_filepath)
+    except FileNotFoundError as error:
+        with default_primes_filepath.open("w") as f:
+            gen_primes(2, 140_000, outfile=f)
+        primes_list = PrimesFromFile(default_primes_filepath)
 
     parse_range_for_primes = partial(parse_range, filter_fn=primes_list.is_prime)
 
-    parser = argparse.ArgumentParser(description="")
     parser.add_argument(
-        "-p", type=parse_range_for_primes, default="2", help="Plaintext prime"
+        "-p", type=parse_range_for_primes, default="2", help="plaintext prime"
     )
     parser.add_argument(
-        "-d", type=parse_range, default="1", help="Number of coefficients in a slot"
+        "-d", type=parse_range, default="1", help="number of coefficients in a slot"
     )
     parser.add_argument(
-        "--no-corrected", action="store_false", help="Include corrected d orders"
+        "--no-corrected", action="store_false", help="include corrected d orders"
     )
     parser.add_argument(
-        "--no-header", action="store_false", help="Do not print headers"
+        "--no-header", action="store_false", help="do not print headers"
     )
-    args = parser.parse_args(argv)
 
-    if not args.p:
-        print("prime p not found in numbers provided", file=sys.stderr)
+    factor_util = shutil.which("factor") or shutil.which("gfactor")
+    if factor_util is None:
+        print("To run, factor utility is required.", file=sys.stderr)
         sys.exit(1)
 
-    args.factor_util = shutil.which("factor") or shutil.which("gfactor")
-    if args.factor_util is None:
-        print("To run factor utility is required.", file=sys.stderr)
-        sys.exit(1)
-
-    return args
+    parser.set_defaults(fn=healg, factor_util=factor_util)
 
 
 def phi(prime_factors):
@@ -201,9 +223,14 @@ def correct_for_d(p, d, m):
     return e, e != d
 
 
-def main(args):
+def healg(args):
     """Given a prime p(s) and a required d(s) what algebras (p, d, m)
     are available?"""
+
+    # Sanity check that we have at least one prime to work with
+    if not args.p:
+        print("prime p not found in numbers provided", file=sys.stderr)
+        sys.exit(1)
 
     solns = set()
     width = 20
@@ -228,8 +255,3 @@ def main(args):
         print(
             f"{'p' :^{width}} {'d' :^{width}} {'m' :^{width}} {'phim' :^{width}} {'nslots' :^{width}}"
         )
-
-
-if __name__ == "__main__":
-    args_main = parse_cmdline()
-    main(args_main)
