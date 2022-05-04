@@ -289,3 +289,4 @@ The Intel past and present contributors to this project, sorted by last name, ar
   - [Kylan Race](https://www.linkedin.com/in/kylanrace/)
   - [Ernesto Z Ramos](https://www.linkedin.com/in/sidezr)
   - [Gelila Seifu](https://www.linkedin.com/in/gelila-seifu/)
+  - [Manasa Kilari](www.linkedin.com/in/manasakilari/)
