@@ -248,6 +248,7 @@ jobs:
 
       - name: Build and install default recipe
         run: |
+          ./hekit remove --all -y
           ./hekit install recipes/default.toml
           ./hekit list
 
@@ -309,6 +310,3 @@ jobs:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
-
-      - name: Clean up data
-        run: ./hekit remove --all -y
