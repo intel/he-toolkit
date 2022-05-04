@@ -36,7 +36,7 @@ jobs:
     name: Format
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
-    environment: intel_workflow
+    #environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit and pylint
@@ -200,7 +200,7 @@ jobs:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     # Use environment protection (require review)
-    environment: intel_workflow
+    #environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
         # Add local bin for cpplint
