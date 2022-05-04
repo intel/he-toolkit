@@ -199,7 +199,7 @@ def test_user_substitutions_are_expanded_to_init(mocker):
 
 def test_validate_unique_instance_no_file():
     """Verify that the function continues without errors
-    if hekit.spec files does not exist"""
+    if hekit.spec file does not exist"""
     act_comp = "comp"
     act_inst = {"name": "test"}
     act_rloc = "/home"

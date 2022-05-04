@@ -84,6 +84,7 @@ class MockArgs:
         self.fn = fn
         self.upto_stage = upto_stage
         self.all = False
+        self.y = True
         self.recipe_arg = {}
 
 
