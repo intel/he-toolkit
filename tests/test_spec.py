@@ -3,6 +3,7 @@
 
 import pytest
 from filecmp import cmp as compare_files
+from pathlib import Path
 
 from .context import spec
 from spec import Spec, InvalidSpecError
@@ -54,14 +55,14 @@ def test_when_name_not_given():
 
 def test_when_skip_not_boolean():
     expected = {"hexl": [{"name": "bob", "skip": "False"}]}
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'skip' not of type bool" == str(execinfo.value)
 
 
 def test_when_attribute_not_string():
     expected = {"hexl": [{"name": "bob", "build": "build", "fetch": False}]}
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'fetch' is not a string" == str(execinfo.value)
 
@@ -199,10 +200,11 @@ def test_user_substitutions_are_expanded_to_init(mocker):
 
 def test_from_toml_file_tsort(mocker):
     """Verify dependencies are installed first"""
+    tests_path = Path(__file__).resolve().parent
     mock_read_spec = mocker.patch("spec.read_spec")
     mock_read_spec.return_value = ""
     exp_keys_list = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
-    filepath = "tests/config/test_tsort.toml"
+    filepath = f"{tests_path}/input_files/test_tsort.toml"
 
     specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
 
