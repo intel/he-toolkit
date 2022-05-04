@@ -20,7 +20,7 @@ def remove_components(args):
         inst_path = f"{comp_path}/{instance}"
 
         if args.all:
-            #Case: delete all components
+            # Case: delete all components
             if component or instance:
                 raise ValueError(
                     "Flag '--all' cannot be used when specifying a component or instance"
@@ -35,9 +35,9 @@ def remove_components(args):
         elif not component:
             raise ValueError(
                 "A component or flag '--all' should be specified as argument"
-                )
+            )
         elif not instance:
-            #Case: delete all instances of a component            
+            # Case: delete all instances of a component
             if request_info:
                 user_answer = input(
                     f"All instances of component '{component}' will be deleted. Do you want to continue? (y/n) "
@@ -46,7 +46,7 @@ def remove_components(args):
                 rmtree(comp_path)
                 print(f"All instances of component '{component}' successfully removed")
         else:
-            #Case: delete a specific instances of a component                
+            # Case: delete a specific instances of a component
             rmtree(inst_path)
             print(
                 f"Instance '{instance}' of component '{component}' successfully removed"
@@ -71,9 +71,7 @@ def set_remove_subparser(subparsers):
     parser_remove.add_argument(
         "--all", action="store_true", help="remove all components"
     )
-    parser_remove.add_argument(
-        "-y", action="store_false", help="say yes to prompts"
-    )    
+    parser_remove.add_argument("-y", action="store_false", help="say yes to prompts")
     parser_remove.add_argument(
         "component", type=str, help="component to be removed", nargs="?", default=""
     ).completer = components_completer
