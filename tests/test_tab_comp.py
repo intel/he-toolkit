@@ -3,6 +3,7 @@
 
 import pytest
 from os import getcwd, chdir
+from pathlib import Path
 
 from .context import hekit, tab_completion, command_remove, command_install
 from hekit import main
@@ -74,13 +75,15 @@ def test_get_instances_after_remove_v2(mocker, args_remove_v2, args_tab):
 
 class MockArgs:
     def __init__(self, fn, component, instance, upto_stage):
+        self.tests_path = Path(__file__).resolve().parent
         self.version = False
         self.component = component
         self.instance = instance
-        self.config = "tests/config/default.config"
-        self.recipe_file = "tests/config/test_two_instances.toml"
+        self.config = f"{self.tests_path}/input_files/default.config"
+        self.recipe_file = f"{self.tests_path}/input_files/test_two_instances.toml"
         self.fn = fn
         self.upto_stage = upto_stage
+        self.all = False
         self.recipe_arg = {}
 
 
