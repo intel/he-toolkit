@@ -129,10 +129,10 @@ recipes/examples.toml
 recipes/sample-kernels.toml
 recipes/test.toml
 tests/__init__.py
-tests/config/default.config
-tests/config/dependencies.txt
-tests/config/test.toml
-tests/config/test_two_instances.toml
+tests/input_files/default.config
+tests/input_files/dependencies.txt
+tests/input_files/test.toml
+tests/input_files/test_two_instances.toml
 tests/context.py
 tests/test_cmd_check_deps.py
 tests/test_cmd_docker_build.py
