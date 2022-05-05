@@ -81,7 +81,6 @@ def main():
     try:
         # FIXME logic convoluted here
         functions = [init_hekit, healg]
-        import pdb; pdb.set_trace()
         if args.fn not in functions:  # pylint: disable=comparison-with-callable
             # replace the filename with the actual config
             args.config = load_config(args.config)
