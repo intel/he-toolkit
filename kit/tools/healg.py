@@ -34,15 +34,7 @@ def set_gen_primes(subparsers):
     parser.set_defaults(fn=lambda args: gen_primes(args.start, args.stop))
 
 
-def set_gen_algebras(subparsers):
-    """Register subparser to generate algebras"""
-    parser = subparsers.add_parser("algebras", description="generate algebras")
-    parser.add_argument("start", type=int, default=2, help="start number")
-    parser.add_argument("stop", type=int, default=100, help="stop number")
-    parser.set_defaults(fn=lambda args: gen_primes(args.start, args.stop))
-
-
-def gen_primes(start: int, stop: int, factor_util: str = "factor", outfile=stdout):
+def gen_primes(start: int, stop: int, outfile=stdout):
     """Writes to outfile a list of primes from start to stop values inclusive"""
 
     numbers = range(start, stop + 1)
@@ -175,8 +167,8 @@ def set_gen_algebras(subparsers):
     default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
     try:
         primes_list = PrimesFromFile(default_primes_filepath)
-    except FileNotFoundError as error:
-        with default_primes_filepath.open("w") as f:
+    except FileNotFoundError:
+        with default_primes_filepath.open("w", encoding="utf-8") as f:
             gen_primes(2, 140_000, outfile=f)
         primes_list = PrimesFromFile(default_primes_filepath)
 
