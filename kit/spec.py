@@ -193,17 +193,15 @@ class Spec:
             if not isinstance(for_test, str):
                 raise InvalidSpec(f"'{attrib}' is not a string")
 
-    @classmethod
-    def _validate_unique_instance(
-        cls, component: str, instance: dict, rloc: str
-    ) -> None:
+    @staticmethod
+    def _validate_unique_instance(component: str, instance: dict, rloc: str) -> None:
         # load previous spec from info file
         try:
             instance_name = instance["name"]
             previous_instance = read_spec(component, instance_name, rloc)
             if previous_instance != instance:
                 raise InvalidSpec(
-                    f"{component}/{instance_name} is already present but it was executed with different options"
+                    f"{component}/{instance_name} is already present but it was executed with different options \n {previous_instance} \n {instance}"
                 )
         except FileNotFoundError:
             pass

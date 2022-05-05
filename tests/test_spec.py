@@ -236,7 +236,7 @@ def test_validate_unique_instance_different_values(mocker):
     mock_read_spec.assert_called_once()
     assert (
         "comp/test is already present but it was executed with different options"
-        == str(execinfo.value)
+        in str(execinfo.value)
     )
 
 
