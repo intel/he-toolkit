@@ -248,7 +248,6 @@ jobs:
 
       - name: Build and install default recipe
         run: |
-          ./hekit remove --all -y
           ./hekit install recipes/default.toml
           ./hekit list
 
