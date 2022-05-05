@@ -7,6 +7,10 @@
 configuring the HE Toolkit environment
 """
 
+import sys
+
+assert sys.version_info >= (3, 8)
+
 from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser

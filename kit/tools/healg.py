@@ -1,13 +1,7 @@
-#! /usr/bin/env python3
-
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 """This module finds HE parameters based on user constraints"""
-
-import sys
-
-assert sys.version_info >= (3, 8)
 
 import math
 import re
