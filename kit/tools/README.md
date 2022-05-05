@@ -6,22 +6,12 @@ The program `healg.py` given the plaintext prime `p` and the required number of
 p-boxes `d` returns the available algebras.
 
 ### Dependencies
+
 - python >= 3.8
-- factor (common unix utility)
-
-### Setup
-
-The `healg` tool requires as input a file that contains a sorted list of primes.
-This `primes.txt` file can be created by running the supplied script
-`gen_primes.sh` without any arguments.
-
-```bash
-./gen_primes.sh
-```
 
 ### Options
 
-The `healg` tool can be executed with the following options.
+The `healg` command can be executed with the following options.
 
 | Option | Meaning |
 | --- | --- |
@@ -38,7 +28,7 @@ or a combination of the two.  For example, searching for algebras
 where the prime is 2, those between 11 and 25 inclusive, and 31.
 
 ```bash
-./healg.py -p 2,11-25,31
+hekit algebras -p 2,11-25,31
 ```
 
 Searching for algebras that give `d` larger than 1 simply pass the flag and
@@ -46,12 +36,12 @@ argument in a similar manner to `p`. For example, searching algebras with
 the same `p`, but with `d` values of 2 and between 4 to 5, inclusive.
 
 ```bash
-./healg.py -p 2,11-25,31 -d 2,4-5
+hekit algebras -p 2,11-25,31 -d 2,4-5
 ```
 
 For more information run
 ```bash
-`./healg.py -h`
+hekit algebras -h
 ```
 
 ### Result
@@ -72,4 +62,4 @@ with their meanings,
 The tool is dependent on the `factor` utility. There is a hard limit at
 representing numbers if `factor` has not been compiled with the GMP library.
 
-The primes that can be used are only those provided in the `primes.txt` file.
+The primes that can be used are only those provided in the `~/.hekit/primes.txt` file.
