@@ -68,9 +68,7 @@ def str_to_range(s):
     try:
         match, start, end = regex.fullmatch(s).groups()
         if match is None:
-            raise ArgumentTypeError(
-                f"Unknown error. Range with match '{match}'"
-            )
+            raise ArgumentTypeError(f"Unknown error. Range with match '{match}'")
         start, end = int(start), int(end)
         if start > end:
             raise ArgumentTypeError(f"backward range '{match}'")
@@ -80,9 +78,7 @@ def str_to_range(s):
             raise ArgumentTypeError(
                 f"Wrong syntax for range given '{match}'."
             ) from error
-        raise ArgumentTypeError(
-            f"Wrong syntax for range given '{s}'."
-        ) from error
+        raise ArgumentTypeError(f"Wrong syntax for range given '{s}'.") from error
 
 
 def parse_range(string, filter_fn=None):
