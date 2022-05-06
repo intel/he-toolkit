@@ -5,11 +5,10 @@
 
 import math
 import re
-import argparse
-import subprocess  # nosec
-from subprocess import CalledProcessError
 import shutil
-from sys import stdout
+from argparse import ArgumentTypeError
+from subprocess import CalledProcessError, run, PIPE
+from sys import stdout, stderr, exit as sys_exit
 from functools import partial
 from itertools import chain, combinations
 from collections import Counter
@@ -69,19 +68,19 @@ def str_to_range(s):
     try:
         match, start, end = regex.fullmatch(s).groups()
         if match is None:
-            raise argparse.ArgumentTypeError(
+            raise ArgumentTypeError(
                 f"Unknown error. Range with match '{match}'"
             )
         start, end = int(start), int(end)
         if start > end:
-            raise argparse.ArgumentTypeError(f"backward range '{match}'")
+            raise ArgumentTypeError(f"backward range '{match}'")
         return range(start, end + 1)
     except AttributeError as error:
         if match:
-            raise argparse.ArgumentTypeError(
+            raise ArgumentTypeError(
                 f"Wrong syntax for range given '{match}'."
             ) from error
-        raise argparse.ArgumentTypeError(
+        raise ArgumentTypeError(
             f"Wrong syntax for range given '{s}'."
         ) from error
 
@@ -136,7 +135,7 @@ def compute_prime_factors(numbers, factor_util="factor"):
     command_and_args = [factor_util, *map(str, numbers)]
 
     try:
-        out = subprocess.run(command_and_args, stdout=subprocess.PIPE, check=True)
+        out = run(command_and_args, stdout=PIPE, check=True)
     except CalledProcessError as error:
         # Was it a negative number on the input?
         if any(number < 0 for number in numbers):
@@ -183,8 +182,8 @@ def set_gen_algebras(subparsers):
 
     factor_util = shutil.which("factor") or shutil.which("gfactor")
     if factor_util is None:
-        print("To run, factor utility is required.", file=sys.stderr)
-        sys.exit(1)
+        print("To run, factor utility is required.", file=stderr)
+        sys_exit(1)
 
     parser.set_defaults(fn=healg, factor_util=factor_util)
 
@@ -215,8 +214,8 @@ def healg(args):
 
     # Sanity check that we have at least one prime to work with
     if not args.p:
-        print("prime p not found in numbers provided", file=sys.stderr)
-        sys.exit(1)
+        print("prime p not found in numbers provided", file=stderr)
+        sys_exit(1)
 
     solns = set()
     width = 20
