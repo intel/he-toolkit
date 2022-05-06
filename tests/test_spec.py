@@ -3,9 +3,10 @@
 
 import pytest
 from filecmp import cmp as compare_files
+from pathlib import Path
 
 from .context import spec
-from spec import Spec, InvalidSpec
+from spec import Spec, InvalidSpecError
 
 
 def test_transform_spec_to_toml_dict():
@@ -47,21 +48,21 @@ def test_parse_basic_spec(create_basic_spec_file):
 def test_when_name_not_given():
     """The name attribute for a component must always be provided."""
     expected = {"hexl": [{}]}
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'name' was not provided for instance" == str(execinfo.value)
 
 
 def test_when_skip_not_boolean():
     expected = {"hexl": [{"name": "bob", "skip": "False"}]}
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'skip' not of type bool" == str(execinfo.value)
 
 
 def test_when_attribute_not_string():
     expected = {"hexl": [{"name": "bob", "build": "build", "fetch": False}]}
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
     assert "'fetch' is not a string" == str(execinfo.value)
 
@@ -230,7 +231,7 @@ def test_validate_unique_instance_different_values(mocker):
     act_inst = {"name": "test", "option": "release"}
     act_rloc = "/home"
 
-    with pytest.raises(InvalidSpec) as execinfo:
+    with pytest.raises(InvalidSpecError) as execinfo:
         Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
 
     mock_read_spec.assert_called_once()
@@ -238,6 +239,22 @@ def test_validate_unique_instance_different_values(mocker):
         "comp/test is already present but it was executed with different options"
         in str(execinfo.value)
     )
+
+
+def test_from_toml_file_tsort(mocker):
+    """Verify dependencies are installed first"""
+    tests_path = Path(__file__).resolve().parent
+    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec.return_value = ""
+    exp_keys_list = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
+    filepath = f"{tests_path}/input_files/test_tsort.toml"
+
+    specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
+
+    assert len(specs) == len(exp_keys_list)
+    for exp_key, spec in zip(exp_keys_list, specs):
+        spec_as_dict = spec.to_toml_dict()
+        assert exp_key in spec_as_dict.keys()
 
 
 @pytest.fixture

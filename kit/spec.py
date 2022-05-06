@@ -9,6 +9,7 @@ from re import findall
 from dataclasses import dataclass
 from typing import Dict
 from toml import dump, load
+from tsort import tsort
 
 RecipeArgDict = Dict[str, str]
 
@@ -103,6 +104,34 @@ def fill_self_ref_string_dict(d, repo_path):
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
+def fill_dependencies(d):
+    """ Returns a list of dependencies defined
+    and used in the recipe file """
+    dependency_list = []
+
+    def get_dependencies(s):
+        """s can be a string or a list of strings"""
+        if isinstance(s, str):
+            symbols = findall(r"(\$%(.*?)%/.*\$)", s)
+            if not symbols:
+                return
+
+            for _, k in symbols:
+                # Assume dependecies are define as:
+                # name/version
+                dependency, _ = d[k].split("/")
+                dependency_list.append(dependency)
+
+        elif isinstance(s, list):
+            for e in s:
+                get_dependencies(e)
+
+    for v in d.values():
+        get_dependencies(v)
+
+    return dependency_list
+
+
 def fill_rloc_paths(d, repo_location):
     """Create absolute path for the top-level attribs that begin
        with 'init_' or '_export_' by prepending repo location"""
@@ -112,8 +141,8 @@ def fill_rloc_paths(d, repo_location):
     return d
 
 
-class InvalidSpec(Exception):
-    """InvalidSpec exception raised for an invalid spec"""
+class InvalidSpecError(Exception):
+    """InvalidSpecError exception raised for an invalid spec"""
 
 
 @dataclass(frozen=True)
@@ -157,9 +186,22 @@ class Spec:
         # Dictionary filled with recipe_arg values
         cls.recipe_arg_dict = recipe_arg_dict
 
+        # load the recipe file
         toml_specs = load(filename)
-        for component, instance_specs in toml_specs.items():
-            for instance_spec in instance_specs:
+
+        # create dependency graph
+        dependency_dict = {
+            component: fill_dependencies(instance_spec)
+            for component, instance_specs in toml_specs.items()
+            for instance_spec in instance_specs
+        }
+
+        # apply topological sorting
+        sorted_components = tsort(dependency_dict)
+
+        # create specs
+        for component in sorted_components:
+            for instance_spec in toml_specs[component]:
                 yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod
@@ -182,16 +224,16 @@ class Spec:
 
         # Name attrib must be provided
         if "name" not in instance.keys():
-            raise InvalidSpec("'name' was not provided for instance")
+            raise InvalidSpecError("'name' was not provided for instance")
 
         if not isinstance(instance.get("skip", False), bool):
-            raise InvalidSpec("'skip' not of type bool")
+            raise InvalidSpecError("'skip' not of type bool")
 
         do_not_include = {"skip"}
         for attrib in cls._fixed_attribs.keys() - do_not_include:
             for_test = instance.get(attrib, str())
             if not isinstance(for_test, str):
-                raise InvalidSpec(f"'{attrib}' is not a string")
+                raise InvalidSpecError(f"'{attrib}' is not a string")
 
     @staticmethod
     def _validate_unique_instance(component: str, instance: dict, rloc: str) -> None:
@@ -200,7 +242,7 @@ class Spec:
             instance_name = instance["name"]
             previous_instance = read_spec(component, instance_name, rloc)
             if previous_instance != instance:
-                raise InvalidSpec(
+                raise InvalidSpecError(
                     f"{component}/{instance_name} is already present but it was executed with different options"
                 )
         except FileNotFoundError:
