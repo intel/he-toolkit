@@ -86,9 +86,10 @@ def saveData(dataName, X, y, datamode: DataMode = DataMode.eval):
   """
     nFeatures = X.shape[1]
     suffix = datamode.name
-    data = [f"feature_{i}" for i in range(nFeatures)]
-    data.append("target")
-    data += np.concatenate((X, np.transpose([y])), axis=1).tolist()
+    features = [f"feature_{i}" for i in range(nFeatures)]
+    features.append("target")
+    data = [features]
+    data.append(np.concatenate((X, np.transpose([y])), axis=1).tolist())
 
     # Save to csv
     with open(f"{dataName}_{suffix}.csv", "w") as csvfile:
