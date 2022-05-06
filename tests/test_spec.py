@@ -245,12 +245,15 @@ def test_from_toml_file_tsort(mocker):
     """Verify dependencies are installed first"""
     tests_path = Path(__file__).resolve().parent
     mock_read_spec = mocker.patch("spec.read_spec")
-    mock_read_spec.return_value = ""
+    mock_read_spec.return_value = {"export_install_dir": "", "export_cmake": ""}
+    mock_validate_unique = mocker.patch("spec.Spec._validate_unique_instance")
     exp_keys_list = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
     filepath = f"{tests_path}/input_files/test_tsort.toml"
 
     specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
 
+    assert 6 == mock_read_spec.call_count
+    assert 8 == mock_validate_unique.call_count
     assert len(specs) == len(exp_keys_list)
     for exp_key, spec in zip(exp_keys_list, specs):
         spec_as_dict = spec.to_toml_dict()
