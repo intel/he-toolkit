@@ -201,7 +201,7 @@ class Spec:
             previous_instance = read_spec(component, instance_name, rloc)
             if previous_instance != instance:
                 raise InvalidSpec(
-                    f"{component}/{instance_name} is already present but it was executed with different options \n {previous_instance} \n {instance}"
+                    f"{component}/{instance_name} is already present but it was executed with different options"
                 )
         except FileNotFoundError:
             pass
