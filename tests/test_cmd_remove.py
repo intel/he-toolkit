@@ -143,7 +143,26 @@ def test_remove_all_ValueError_exception(mocker, args):
     """Assert"""
     assert (
         str(execinfo.value)
-        == "Flag '--all' cannot be used after specifying a component or instance"
+        == "Flag '--all' cannot be used when specifying a component or instance"
+    )
+
+
+def test_remove_component_ValueError_exception(mocker, args):
+    """Arrange"""
+    args.component = ""
+    mock_rmtree = mocker.patch("command_remove.rmtree")
+    mock_print = mocker.patch("command_remove.print")
+    mock_listdir = mocker.patch("command_remove.listdir", return_value=[])
+    mock_input = mocker.patch("command_remove.input", return_value="n")
+
+    """Act"""
+    with pytest.raises(ValueError) as execinfo:
+        remove_components(args)
+
+    """Assert"""
+    assert (
+        str(execinfo.value)
+        == "A component or flag '--all' should be specified as argument"
     )
 
 
@@ -179,6 +198,7 @@ class MockArgs:
         self.instance = "test_instance"
         self.component = "component"
         self.all = False
+        self.y = True
 
 
 @pytest.fixture

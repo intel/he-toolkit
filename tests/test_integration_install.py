@@ -172,6 +172,7 @@ class MockArgs:
         self.fn = fn
         self.upto_stage = upto_stage
         self.all = False
+        self.y = True
         # back substitution
         self.recipe_arg = {"name": self.instance}
         self.toml_arg_version = self.instance
