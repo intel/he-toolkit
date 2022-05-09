@@ -35,21 +35,31 @@ def test_copyfiles_execution(mocker):
 
 def test_create_buildargs_with_ID(mocker):
     """Arrange"""
+    conts = Constants()
     act_env = {"key": "value", "USER": "Bob"}
     act_ID = 23
 
     """Act"""
-    exp_value = create_buildargs(act_env, act_ID)
+    exp_value = create_buildargs(act_env, act_ID, conts)
 
     """Assert"""
     assert exp_value["UID"] == str(act_ID)
     assert exp_value["GID"] == str(act_ID)
     assert exp_value["UNAME"] == "Bob"
     assert exp_value["key"] == "value"
+    assert (
+        exp_value["TOOLKIT_BASE_IMAGE"]
+        == f"{conts.user}/ubuntu_he_base:{conts.version}"
+    )
+    assert (
+        exp_value["VSCODE_BASE_IMAGE"]
+        == f"{conts.user}/ubuntu_he_toolkit:{conts.version}"
+    )
 
 
 def test_create_buildargs_Darwin(mocker):
     """Arrange"""
+    conts = Constants()
     act_env = {"key": "value", "USER": "Bob"}
     act_ID = 0
     exp_ID = "1000"
@@ -57,17 +67,26 @@ def test_create_buildargs_Darwin(mocker):
     mock_os_name.return_value = "Darwin"
 
     """Act"""
-    exp_value = create_buildargs(act_env, act_ID)
+    exp_value = create_buildargs(act_env, act_ID, conts)
 
     """Assert"""
     assert exp_value["UID"] == str(exp_ID)
     assert exp_value["GID"] == str(exp_ID)
     assert exp_value["UNAME"] == "Bob"
     assert exp_value["key"] == "value"
+    assert (
+        exp_value["TOOLKIT_BASE_IMAGE"]
+        == f"{conts.user}/ubuntu_he_base:{conts.version}"
+    )
+    assert (
+        exp_value["VSCODE_BASE_IMAGE"]
+        == f"{conts.user}/ubuntu_he_toolkit:{conts.version}"
+    )
 
 
 def test_create_buildargs_other(mocker):
     """Arrange"""
+    conts = Constants()
     act_env = {"key": "value", "USER": "Bob"}
     act_ID = 0
     exp_uid, exp_id = 1234, 5678
@@ -79,13 +98,22 @@ def test_create_buildargs_other(mocker):
     mock_getgid.return_value = exp_id
 
     """Act"""
-    exp_value = create_buildargs(act_env, act_ID)
+    exp_value = create_buildargs(act_env, act_ID, conts)
 
     """Assert"""
     assert exp_value["UID"] == str(exp_uid)
     assert exp_value["GID"] == str(exp_id)
     assert exp_value["UNAME"] == "Bob"
     assert exp_value["key"] == "value"
+    assert exp_value["UNAME"] == "Bob"
+    assert (
+        exp_value["TOOLKIT_BASE_IMAGE"]
+        == f"{conts.user}/ubuntu_he_base:{conts.version}"
+    )
+    assert (
+        exp_value["VSCODE_BASE_IMAGE"]
+        == f"{conts.user}/ubuntu_he_toolkit:{conts.version}"
+    )
 
 
 def test_print_preamble_normal_execution(mocker):
@@ -344,6 +372,7 @@ class MockArgs:
         self.check_only = check_only
         self.enable = enable
         self.id = 1
+        self.version = "2.0.0"
 
 
 class MockDockerTools:
@@ -352,3 +381,12 @@ class MockDockerTools:
 
     def try_build_new_image(self, dockerfile, tag, buildargs):
         return True
+
+
+class Constants:
+    user: str = "Bob"
+    version: str = "2.0.0"
+
+    base_label: str = f"{user}/ubuntu_he_base:{version}"
+    toolkit_label: str = f"{user}/ubuntu_he_toolkit:{version}"
+    vscode_label: str = f"{user}/ubuntu_he_vscode:{version}"

@@ -7,7 +7,6 @@ from re import search
 from sys import stderr, exit as sys_exit
 from getpass import getuser
 from os import getuid, getgid, environ, chdir as change_directory_to
-from dataclasses import dataclass
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
@@ -16,15 +15,14 @@ from archive import archive_and_compress
 from docker_tools import DockerTools, DockerException
 
 
-@dataclass(frozen=True, init=False)
 class Constants:
     """Defines constants for the docker's tags"""
 
-    user: str = getuser()
-    # TODO remove hardcoding of version
-    base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
-    derived_label: str = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
-    vscode_label: str = f"{getuser()}/ubuntu_he_vscode:2.0.0"
+    def __init__(self, version):
+        self.user: str = getuser()
+        self.base_label: str = f"{self.user}/ubuntu_he_base:{version}"
+        self.toolkit_label: str = f"{self.user}/ubuntu_he_toolkit:{version}"
+        self.vscode_label: str = f"{self.user}/ubuntu_he_vscode:{version}"
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
@@ -34,7 +32,7 @@ def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
         copyfile(src_dir / filename, dst_dir / filename)
 
 
-def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
+def create_buildargs(environment: Dict[str, str], ID: int, constants) -> Dict[str, str]:
     """Returns a dictionary of build arguments"""
     if ID:
         USERID, GROUPID = ID, ID
@@ -50,7 +48,9 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
         **environment,
         "UID": str(USERID),
         "GID": str(GROUPID),
-        "UNAME": environment["USER"],
+        "UNAME": constants.user,
+        "TOOLKIT_BASE_IMAGE": constants.base_label,
+        "VSCODE_BASE_IMAGE": constants.toolkit_label,
     }
 
 
@@ -118,7 +118,10 @@ def setup_docker(args):
     staging_path = ROOT / "__staging__"
 
     if args.clean:
-        rmtree(staging_path)
+        try:
+            rmtree(staging_path)
+        except FileNotFoundError:
+            pass
         print("Staging area deleted")
         sys_exit(0)
 
@@ -157,9 +160,9 @@ def setup_docker(args):
 
     change_directory_to(staging_path)
 
-    constants = Constants()
+    constants = Constants(args.version)
 
-    buildargs = create_buildargs(environment, args.id)
+    buildargs = create_buildargs(environment, args.id, constants)
 
     print(
         f"WARNING: Setting UID/GID of docker user to '{buildargs['UID']}/{buildargs['GID']}'"
@@ -173,7 +176,7 @@ def setup_docker(args):
     print("BUILDING TOOLKIT DOCKERFILE ...")
     docker_tools.try_build_new_image(
         dockerfile="Dockerfile.toolkit",
-        tag=constants.derived_label,
+        tag=constants.toolkit_label,
         buildargs=buildargs,
     )
 
@@ -191,7 +194,7 @@ def setup_docker(args):
         print(f"docker run -d -p <ip addr>:<port>:8888 {constants.vscode_label}")
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
-        print(f"docker run -it {constants.derived_label}")
+        print(f"docker run -it {constants.toolkit_label}")
 
 
 def set_docker_subparser(subparsers, hekit_root_dir):

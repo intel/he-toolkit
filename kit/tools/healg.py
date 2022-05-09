@@ -9,7 +9,6 @@ import shutil
 from argparse import ArgumentTypeError
 from subprocess import CalledProcessError, run, PIPE
 from sys import stdout, stderr, exit as sys_exit
-from functools import partial
 from itertools import chain, combinations
 from collections import Counter
 from pathlib import Path
@@ -93,6 +92,19 @@ def parse_range(string, filter_fn=None):
     return sorted(unique_nums)
 
 
+def parse_range_for_primes(string):
+    """Create a file with sorted primes"""
+    default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
+    try:
+        primes_list = PrimesFromFile(default_primes_filepath)
+    except FileNotFoundError:
+        with default_primes_filepath.open("w", encoding="utf-8") as f:
+            gen_primes(2, 140_000, outfile=f)
+        primes_list = PrimesFromFile(default_primes_filepath)
+
+    return parse_range(string, filter_fn=primes_list.is_prime)
+
+
 class PrimesFromFile:
     """Process primes from a text file."""
 
@@ -152,16 +164,6 @@ def set_gen_algebras(subparsers):
     parser = subparsers.add_parser(
         "algebras", description="generate ZZ_p[x]/phi(X) algebras"
     )
-
-    default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
-    try:
-        primes_list = PrimesFromFile(default_primes_filepath)
-    except FileNotFoundError:
-        with default_primes_filepath.open("w", encoding="utf-8") as f:
-            gen_primes(2, 140_000, outfile=f)
-        primes_list = PrimesFromFile(default_primes_filepath)
-
-    parse_range_for_primes = partial(parse_range, filter_fn=primes_list.is_prime)
 
     parser.add_argument(
         "-p", type=parse_range_for_primes, default="2", help="plaintext prime"

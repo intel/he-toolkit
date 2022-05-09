@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Username
-ARG UNAME
+ARG VSCODE_BASE_IMAGE
 
-FROM $UNAME/ubuntu_he_toolkit:2.0.0
+FROM $VSCODE_BASE_IMAGE
 
 ARG UNAME
 ARG HOME="/home/$UNAME"
@@ -27,6 +27,7 @@ RUN mkdir -p $HOME/User $HOME/he-workspace/.vscode && \
 RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do \
       code-server --user-data-dir=$HOME/ --install-extension $e; \
     done
+
 
 # Update code-server user settings
 RUN echo '{"extensions.autoUpdate": false, "workbench.colorTheme": "Default Dark+"}' |\

@@ -76,10 +76,12 @@ def main():
     """Starting point for program execution"""
     args, print_help = parse_cmdline()
 
+    toolkit_version = "2.0.0"
     if args.version:
-        toolkit_version = "2.0.0"
         print(f"Intel HE Toolkit version {toolkit_version}")
         sys_exit(0)
+    # Required for docker build command
+    args.version = toolkit_version
 
     # Load config file
     try:
