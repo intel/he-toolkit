@@ -262,8 +262,16 @@ good-names=i,
            v,
            f,
            s,
+           m,
+           n,
+           c,
+           p,
            fn,
            op,
+           ps,
+           ds,
+           ms,
+           pd
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
