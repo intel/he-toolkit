@@ -120,6 +120,7 @@ kit/command_list.py
 kit/command_remove.py
 kit/component_builder.py
 kit/config.py
+kit/constants.py
 kit/docker_tools.py
 kit/hekit.py
 kit/spec.py

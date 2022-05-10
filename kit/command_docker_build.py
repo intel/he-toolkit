@@ -5,7 +5,6 @@
 
 from re import search
 from sys import stderr, exit as sys_exit
-from getpass import getuser
 from os import getuid, getgid, environ, chdir as change_directory_to
 from pathlib import Path
 from shutil import copyfile, rmtree
@@ -13,16 +12,7 @@ from platform import system as os_name
 from typing import Dict, Iterable
 from archive import archive_and_compress
 from docker_tools import DockerTools, DockerException
-
-
-class Constants:
-    """Defines constants for the docker's tags"""
-
-    def __init__(self, version):
-        self.user: str = getuser()
-        self.base_label: str = f"{self.user}/ubuntu_he_base:{version}"
-        self.toolkit_label: str = f"{self.user}/ubuntu_he_toolkit:{version}"
-        self.vscode_label: str = f"{self.user}/ubuntu_he_vscode:{version}"
+from constants import Constants
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
@@ -32,7 +22,7 @@ def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
         copyfile(src_dir / filename, dst_dir / filename)
 
 
-def create_buildargs(environment: Dict[str, str], ID: int, constants) -> Dict[str, str]:
+def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
     """Returns a dictionary of build arguments"""
     if ID:
         USERID, GROUPID = ID, ID
@@ -48,9 +38,9 @@ def create_buildargs(environment: Dict[str, str], ID: int, constants) -> Dict[st
         **environment,
         "UID": str(USERID),
         "GID": str(GROUPID),
-        "UNAME": constants.user,
-        "TOOLKIT_BASE_IMAGE": constants.base_label,
-        "VSCODE_BASE_IMAGE": constants.toolkit_label,
+        "UNAME": Constants.user,
+        "TOOLKIT_BASE_IMAGE": Constants.base_label,
+        "VSCODE_BASE_IMAGE": Constants.toolkit_label,
     }
 
 
@@ -62,7 +52,7 @@ def create_environment():
         "socks_proxy": environ.get("socks_proxy", ""),
         "ftp_proxy": environ.get("ftp_proxy", ""),
         "no_proxy": environ.get("no_proxy", ""),
-        "USER": getuser(),
+        "USER": Constants.user,
     }
     return environment
 
@@ -160,9 +150,7 @@ def setup_docker(args):
 
     change_directory_to(staging_path)
 
-    constants = Constants(args.version)
-
-    buildargs = create_buildargs(environment, args.id, constants)
+    buildargs = create_buildargs(environment, args.id)
 
     print(
         f"WARNING: Setting UID/GID of docker user to '{buildargs['UID']}/{buildargs['GID']}'"
@@ -170,13 +158,13 @@ def setup_docker(args):
 
     print("BUILDING BASE DOCKERFILE ...")
     docker_tools.try_build_new_image(
-        dockerfile="Dockerfile.base", tag=constants.base_label, buildargs=buildargs
+        dockerfile="Dockerfile.base", tag=Constants.base_label, buildargs=buildargs
     )
 
     print("BUILDING TOOLKIT DOCKERFILE ...")
     docker_tools.try_build_new_image(
         dockerfile="Dockerfile.toolkit",
-        tag=constants.toolkit_label,
+        tag=Constants.toolkit_label,
         buildargs=buildargs,
     )
 
@@ -184,17 +172,17 @@ def setup_docker(args):
         print("BUILDING VSCODE DOCKERFILE ...")
         docker_tools.try_build_new_image(
             dockerfile="Dockerfile.vscode",
-            tag=constants.vscode_label,
+            tag=Constants.vscode_label,
             buildargs=buildargs,
         )
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
     if args.enable == "vscode":
-        print(f"docker run -d -p <ip addr>:<port>:8888 {constants.vscode_label}")
+        print(f"docker run -d -p <ip addr>:<port>:8888 {Constants.vscode_label}")
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
-        print(f"docker run -it {constants.toolkit_label}")
+        print(f"docker run -it {Constants.toolkit_label}")
 
 
 def set_docker_subparser(subparsers, hekit_root_dir):
