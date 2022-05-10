@@ -32,6 +32,7 @@ utilize the latest Intel hardware features.
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
+  - [Known Issues](#known-issues)
 - [Contributing](#contributing)
   - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
@@ -229,7 +230,7 @@ set and computes the intersection, returning all the encrypted elements that
 are common to both sets. See the [README](he-samples/examples/psi/README.md)
 for usage information.
 
-# Known Issues
+## Known Issues
 * Running ```./hekit init --default-config``` produces the error
   ```ValueError: Unknown shell 'sh'```
   The `hekit` command currently only supports `bash`, please ensure the default
