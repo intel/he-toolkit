@@ -6,6 +6,7 @@
 from dataclasses import dataclass
 from getpass import getuser
 
+
 @dataclass(frozen=True, init=False)
 class Constants:
     """Defines constants as toolkit version and the docker's tags"""
