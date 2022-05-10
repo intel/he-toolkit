@@ -9,7 +9,7 @@ from getpass import getuser
 
 @dataclass(frozen=True, init=False)
 class Constants:
-    """Defines constants as toolkit version and the docker's tags"""
+    """Defines constants for the toolkit version and the docker's tags"""
 
     user: str = getuser()
     version: str = "2.0.0"
