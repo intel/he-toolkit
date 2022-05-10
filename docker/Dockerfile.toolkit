@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Username
-ARG UNAME
+ARG TOOLKIT_BASE_IMAGE
 
-FROM $UNAME/ubuntu_he_base:2.0.0
+FROM $TOOLKIT_BASE_IMAGE
 
 LABEL maintainer="HE Toolkit github.com/intel/he-toolkit"
 

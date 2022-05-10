@@ -5,26 +5,14 @@
 
 from re import search
 from sys import stderr, exit as sys_exit
-from getpass import getuser
 from os import getuid, getgid, environ, chdir as change_directory_to
-from dataclasses import dataclass
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
 from archive import archive_and_compress
 from docker_tools import DockerTools, DockerException
-
-
-@dataclass(frozen=True, init=False)
-class Constants:
-    """Defines constants for the docker's tags"""
-
-    user: str = getuser()
-    # TODO remove hardcoding of version
-    base_label: str = f"{getuser()}/ubuntu_he_base:2.0.0"
-    derived_label: str = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
-    vscode_label: str = f"{getuser()}/ubuntu_he_vscode:2.0.0"
+from constants import Constants
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
@@ -50,7 +38,9 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
         **environment,
         "UID": str(USERID),
         "GID": str(GROUPID),
-        "UNAME": environment["USER"],
+        "UNAME": Constants.user,
+        "TOOLKIT_BASE_IMAGE": Constants.base_label,
+        "VSCODE_BASE_IMAGE": Constants.toolkit_label,
     }
 
 
@@ -62,7 +52,7 @@ def create_environment():
         "socks_proxy": environ.get("socks_proxy", ""),
         "ftp_proxy": environ.get("ftp_proxy", ""),
         "no_proxy": environ.get("no_proxy", ""),
-        "USER": getuser(),
+        "USER": Constants.user,
     }
     return environment
 
@@ -118,7 +108,10 @@ def setup_docker(args):
     staging_path = ROOT / "__staging__"
 
     if args.clean:
-        rmtree(staging_path)
+        try:
+            rmtree(staging_path)
+        except FileNotFoundError:
+            pass
         print("Staging area deleted")
         sys_exit(0)
 
@@ -157,8 +150,6 @@ def setup_docker(args):
 
     change_directory_to(staging_path)
 
-    constants = Constants()
-
     buildargs = create_buildargs(environment, args.id)
 
     print(
@@ -167,13 +158,13 @@ def setup_docker(args):
 
     print("BUILDING BASE DOCKERFILE ...")
     docker_tools.try_build_new_image(
-        dockerfile="Dockerfile.base", tag=constants.base_label, buildargs=buildargs
+        dockerfile="Dockerfile.base", tag=Constants.base_label, buildargs=buildargs
     )
 
     print("BUILDING TOOLKIT DOCKERFILE ...")
     docker_tools.try_build_new_image(
         dockerfile="Dockerfile.toolkit",
-        tag=constants.derived_label,
+        tag=Constants.toolkit_label,
         buildargs=buildargs,
     )
 
@@ -181,17 +172,17 @@ def setup_docker(args):
         print("BUILDING VSCODE DOCKERFILE ...")
         docker_tools.try_build_new_image(
             dockerfile="Dockerfile.vscode",
-            tag=constants.vscode_label,
+            tag=Constants.vscode_label,
             buildargs=buildargs,
         )
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
     if args.enable == "vscode":
-        print(f"docker run -d -p <ip addr>:<port>:8888 {constants.vscode_label}")
+        print(f"docker run -d -p <ip addr>:<port>:8888 {Constants.vscode_label}")
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
-        print(f"docker run -it {constants.derived_label}")
+        print(f"docker run -it {Constants.toolkit_label}")
 
 
 def set_docker_subparser(subparsers, hekit_root_dir):

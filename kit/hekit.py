@@ -24,6 +24,7 @@ from command_list import set_list_subparser
 from command_install import set_install_subparser
 from command_check_deps import set_check_dep_subparser
 from tools.healg import healg, set_gen_primes, set_gen_algebras
+from constants import Constants
 
 try:
     # docker-py is optional and will not be used from within a docker container
@@ -77,8 +78,7 @@ def main():
     args, print_help = parse_cmdline()
 
     if args.version:
-        toolkit_version = "2.0.0"
-        print(f"Intel HE Toolkit version {toolkit_version}")
+        print(f"Intel HE Toolkit version {Constants.version}")
         sys_exit(0)
 
     # Load config file
