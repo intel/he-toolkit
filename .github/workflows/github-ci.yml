@@ -69,6 +69,7 @@ jobs:
 
   build-and-test-toolkit-palisade:
     name: Build, test and run PALISADE dependent HE Toolkit
+    if: ${{ false }} # Disable this job for now as it fails due to HEXL-PALISADE issue
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
