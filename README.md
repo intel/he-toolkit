@@ -1,4 +1,7 @@
 # Intel Homomorphic Encryption Toolkit
+
+[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg)](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml)
+
 Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
 delivering innovation around HE with the aim of providing both the community
 and industry with an intuitive entry point for Experimentation, Development and
@@ -29,6 +32,7 @@ utilize the latest Intel hardware features.
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
+  - [Known Issues](#known-issues)
 - [Contributing](#contributing)
   - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
@@ -225,6 +229,19 @@ and the server sets, then using the HElib BGV scheme, it encrypts the client
 set and computes the intersection, returning all the encrypted elements that
 are common to both sets. See the [README](he-samples/examples/psi/README.md)
 for usage information.
+
+## Known Issues
+* Running ```./hekit init --default-config``` produces the error
+  ```ValueError: Unknown shell 'sh'```
+  The `hekit` command currently only supports `bash`, please ensure the default
+  shell is set to `bash` or alternatively set the environment variable `export
+  SHELL=/bin/bash`.
+
+* There is a specific hardware configuration, `AVX512DQ`, which causes some of
+  the PALISADE sample kernels to fail when building the HEXL library with
+  PALISADE. This error seems independent of the HE Toolkit and is currently
+  being investigated.
+
 
 # Contributing
 Intel HE Toolkit welcomes external contributions through pull requests to the

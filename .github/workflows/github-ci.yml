@@ -1,7 +1,7 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: he-toolkit
+name: Build and Test
 on:
   # By default this will run when the activity type is "opened", "synchronize",
   # or "reopened".
@@ -9,6 +9,10 @@ on:
     branches:
       - main
       - v2.0-rc # Run on release candidate for v2.0.0
+  # Run when protected branches are pushed to, e.g. via merge
+  push:
+    branches:
+      - main
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
@@ -69,6 +73,7 @@ jobs:
 
   build-and-test-toolkit-palisade:
     name: Build, test and run PALISADE dependent HE Toolkit
+    if: ${{ false }} # Disable this job for now as it fails due to HEXL-PALISADE issue
     runs-on: ubuntu-20.04
     # Use environment protection (require review)
     environment: intel_workflow
@@ -248,7 +253,6 @@ jobs:
 
       - name: Build and install default recipe
         run: |
-          ./hekit remove --all -y
           ./hekit install recipes/default.toml
           ./hekit list
 
@@ -310,3 +314,12 @@ jobs:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
+
+  # Cleanup .hekit directory after build and test job finishes
+  cleanup:
+    name: Cleanup
+    runs-on: [self-hosted, Linux, X64, ice-lake]
+    needs: [build-and-test-toolkit-icelake]
+    if: always()
+    steps:
+      - run: ./hekit remove --all -y
