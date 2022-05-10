@@ -3,8 +3,9 @@
 
 import pytest
 from pathlib import Path
-from .context import command_docker_build, docker_tools
+from .context import command_docker_build, docker_tools, constants
 from docker_tools import DockerException
+from constants import Constants
 from command_docker_build import (
     copyfiles,
     create_buildargs,
@@ -35,7 +36,7 @@ def test_copyfiles_execution(mocker):
 
 def test_create_buildargs_with_ID(mocker):
     """Arrange"""
-    act_env = {"key": "value", "USER": "Bob"}
+    act_env = {"key": "value"}
     act_ID = 23
 
     """Act"""
@@ -44,13 +45,15 @@ def test_create_buildargs_with_ID(mocker):
     """Assert"""
     assert exp_value["UID"] == str(act_ID)
     assert exp_value["GID"] == str(act_ID)
-    assert exp_value["UNAME"] == "Bob"
+    assert exp_value["UNAME"] == Constants.user
     assert exp_value["key"] == "value"
+    assert exp_value["TOOLKIT_BASE_IMAGE"] == Constants.base_label
+    assert exp_value["VSCODE_BASE_IMAGE"] == Constants.toolkit_label
 
 
 def test_create_buildargs_Darwin(mocker):
     """Arrange"""
-    act_env = {"key": "value", "USER": "Bob"}
+    act_env = {"key": "value"}
     act_ID = 0
     exp_ID = "1000"
     mock_os_name = mocker.patch("command_docker_build.os_name")
@@ -62,13 +65,15 @@ def test_create_buildargs_Darwin(mocker):
     """Assert"""
     assert exp_value["UID"] == str(exp_ID)
     assert exp_value["GID"] == str(exp_ID)
-    assert exp_value["UNAME"] == "Bob"
+    assert exp_value["UNAME"] == Constants.user
     assert exp_value["key"] == "value"
+    assert exp_value["TOOLKIT_BASE_IMAGE"] == Constants.base_label
+    assert exp_value["VSCODE_BASE_IMAGE"] == Constants.toolkit_label
 
 
 def test_create_buildargs_other(mocker):
     """Arrange"""
-    act_env = {"key": "value", "USER": "Bob"}
+    act_env = {"key": "value"}
     act_ID = 0
     exp_uid, exp_id = 1234, 5678
     mock_os_name = mocker.patch("command_docker_build.os_name")
@@ -84,8 +89,10 @@ def test_create_buildargs_other(mocker):
     """Assert"""
     assert exp_value["UID"] == str(exp_uid)
     assert exp_value["GID"] == str(exp_id)
-    assert exp_value["UNAME"] == "Bob"
+    assert exp_value["UNAME"] == Constants.user
     assert exp_value["key"] == "value"
+    assert exp_value["TOOLKIT_BASE_IMAGE"] == Constants.base_label
+    assert exp_value["VSCODE_BASE_IMAGE"] == Constants.toolkit_label
 
 
 def test_print_preamble_normal_execution(mocker):
@@ -344,6 +351,7 @@ class MockArgs:
         self.check_only = check_only
         self.enable = enable
         self.id = 1
+        self.version = "2.0.0"
 
 
 class MockDockerTools:
