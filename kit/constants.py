@@ -1,7 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module defines constants that are used in version and docker build commands"""
+"""This module defines constants that are used in the version and docker build commands"""
 
 from dataclasses import dataclass
 from getpass import getuser
