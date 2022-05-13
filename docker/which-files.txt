@@ -117,6 +117,7 @@ kit/command_docker_build.py
 kit/command_init.py
 kit/command_install.py
 kit/command_list.py
+kit/command_new.py
 kit/command_remove.py
 kit/component_builder.py
 kit/config.py
