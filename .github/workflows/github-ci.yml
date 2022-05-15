@@ -39,8 +39,6 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit and pylint
@@ -57,8 +55,6 @@ jobs:
   test-hekit:
     name: Test hekit commands
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -75,8 +71,6 @@ jobs:
     name: Build, test and run PALISADE dependent HE Toolkit
     if: ${{ false }} # Disable this job for now as it fails due to HEXL-PALISADE issue
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -114,8 +108,6 @@ jobs:
   build-and-test-toolkit-helib:
     name: Build, test and run HElib dependent HE Toolkit
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -147,8 +139,6 @@ jobs:
   build-and-test-toolkit-seal:
     name: Build, test and run SEAL dependent HE Toolkit
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -204,8 +194,6 @@ jobs:
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     steps:
       - uses: actions/checkout@v2
         # Add local bin for cpplint
@@ -219,8 +207,6 @@ jobs:
   test-hekit-icelake:
     name: Test hekit commands (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
@@ -235,8 +221,6 @@ jobs:
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
