@@ -67,7 +67,7 @@ def parse_cmdline():
     set_docker_subparser(subparsers, hekit_root_dir)
     set_gen_primes_subparser(subparsers)
     set_gen_algebras_subparser(subparsers)
-    set_new_subparser(subparsers, hekit_root_dir)
+    set_new_subparser(subparsers)
 
     # try to enable tab completion
     enable_tab_completion(parser)
