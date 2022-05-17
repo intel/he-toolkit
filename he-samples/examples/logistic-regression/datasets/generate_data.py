@@ -10,10 +10,10 @@ Provides base functionality of the following:
 """
 from enum import Enum
 import csv
-import numpy as np
 import argparse
-import sklearn.datasets
+import numpy as np
 import lr_base as lrb
+import sklearn.datasets
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
@@ -174,8 +174,19 @@ def parse_cmdline_args():
 
 
 def main(args):
+    """Base script to generate samples for LRHE example
+
+    This script generates a set of synthetic dataset with various sizes, train
+    a logistic regression model with each data, then stores them in csv files.
+    Generation and training happens during he-samples build time.
+
+    This script can also be used to generate user-defined synthetic dataset.
+    If --samples and --features flags are set via command line, it will instead
+    generate a synthetic data set and train LR model accordingly.
+    """
+
     # if no flags, proceed to preset generation
-    if args.samples == 0 and args.features == 0 and args.name == None:
+    if args.samples == 0 and args.features == 0 and args.name is None:
         print("=== Synthetic data generation for logistic regression HE example ===")
         l_dataname = ["lrtest_small", "lrtest_mid", "lrtest_large", "lrtest_xlarge"]
         l_features = [40, 80, 120, 200]
@@ -196,7 +207,7 @@ def main(args):
             saveData(dataname, X_eval, y_eval)
         print("=== Data generation complete ===")
     # if all arguments are set, make custom data
-    elif args.samples > 0 and args.features > 0 and args.name != None:
+    elif args.samples > 0 and args.features > 0 and args.name is not None:
         print("=== Synthetic data generation for logistic regression HE example ===")
         print(
             " - Generating custom dataset :",
@@ -223,16 +234,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    """Base script to generate samples for LRHE example
-
-  This script generates a set of synthetic dataset with various sizes, train
-  a logistic regression model with each data, then stores them in csv files.
-  Generation and training happens during he-samples build time.
-
-  This script can also be used to generate user-defined synthetic dataset.
-  If --samples and --features flags are set via command line, it will instead
-  generate a synthetic data set and train LR model accordingly.
-  """
-
     args = parse_cmdline_args()
     main(args)
