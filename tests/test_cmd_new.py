@@ -93,7 +93,7 @@ def test_create_new_project(tmp_path):
     assert toml_path.exists()
 
 
-def test_create_new_project(mocker, tmp_path):
+def test_create_new_project_FileExistsError(mocker, tmp_path):
     """Arrange"""
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     mock_mkdir.side_effect = FileExistsError()
