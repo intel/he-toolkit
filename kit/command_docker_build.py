@@ -11,8 +11,24 @@ from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
 from archive import archive_and_compress
-from docker_tools import DockerTools, DockerException
 from constants import Constants
+
+try:
+    # docker-py is optional and will not be used from within a docker container
+    from docker_tools import DockerTools, DockerException
+except ImportError:
+
+    def try_setup_docker(args):  # pylint: disable=unused-argument
+        """Informs that this command can't be used due to missing dependencies"""
+        print("This command is disabled. To enable it install the docker-py dependency")
+        print("  pip install docker")
+
+
+else:
+
+    def try_setup_docker(args):
+        """Set up the docker environment"""
+        setup_docker(args)
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
@@ -208,4 +224,4 @@ def set_docker_subparser(subparsers, hekit_root_dir):
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"
     )
-    parser_docker_build.set_defaults(fn=setup_docker, hekit_root_dir=hekit_root_dir)
+    parser_docker_build.set_defaults(fn=try_setup_docker, hekit_root_dir=hekit_root_dir)
