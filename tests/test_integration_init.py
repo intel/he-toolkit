@@ -3,9 +3,9 @@
 
 import pytest
 from pathlib import Path
-from .context import hekit, command_init
+from .context import hekit, init
 from hekit import main
-from command_init import init_hekit
+from init import init_hekit
 
 
 def test_init_hekit_config_file_exists(mocker):
@@ -123,15 +123,15 @@ class Mockers:
         self.mock_mkdir = mocker.patch.object(Path, "mkdir")
         self.mock_open = mocker.patch.object(Path, "open")
         # mocking included functions
-        self.mock_print = mocker.patch("command_init.print")
-        self.mock_copyfile = mocker.patch("command_init.copyfile")
-        self.mock_same_files = mocker.patch("command_init.same_files")
+        self.mock_print = mocker.patch("init.print")
+        self.mock_copyfile = mocker.patch("init.copyfile")
+        self.mock_same_files = mocker.patch("init.same_files")
         # mocking internal functions
         self.mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
-        self.mock_get_rc_file = mocker.patch("command_init.get_rc_file")
-        self.mock_exists = mocker.patch("command_init.file_exists")
-        self.mock_remove_from_rc = mocker.patch("command_init.remove_from_rc")
-        self.mock_append_to_rc = mocker.patch("command_init.append_to_rc")
+        self.mock_get_rc_file = mocker.patch("init.get_rc_file")
+        self.mock_exists = mocker.patch("init.file_exists")
+        self.mock_remove_from_rc = mocker.patch("init.remove_from_rc")
+        self.mock_append_to_rc = mocker.patch("init.append_to_rc")
 
 
 class MockArgs:

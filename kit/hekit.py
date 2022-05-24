@@ -19,13 +19,13 @@ from pathlib import Path
 from tools.healg import healg, set_gen_primes, set_gen_algebras
 from utils.constants import Constants  # pylint: disable=no-name-in-module
 from utils.config import load_config  # pylint: disable=no-name-in-module
-from utils.tab_completion import (
+from utils.tab_completion import (  # pylint: disable=no-name-in-module
     enable_tab_completion,
-)  # pylint: disable=no-name-in-module
-from commands.command_init import init_hekit, set_init_subparser
-from commands.command_remove import set_remove_subparser
-from commands.command_list import set_list_subparser
-from commands.command_install import set_install_subparser
+)
+from commands.init import init_hekit, set_init_subparser
+from commands.remove import set_remove_subparser
+from commands.list import set_list_subparser
+from commands.install import set_install_subparser
 from commands.check_deps import set_check_dep_subparser
 
 

@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import command_list
-from command_list import list_components, RepoProperties, _SEP_SPACES
+from .context import list
+from list import list_components, RepoProperties, _SEP_SPACES
 
 
 def test_get_repo_properties_max_width(mocker):
@@ -12,7 +12,7 @@ def test_get_repo_properties_max_width(mocker):
     exp_inst1 = ["123"]
     exp_inst2 = ["1", "1234567890123456"]
     exp_inst3 = ["123456"]
-    mock_list_dirs = mocker.patch("command_list.list_dirs")
+    mock_list_dirs = mocker.patch("list.list_dirs")
     mock_list_dirs.side_effect = [exp_comps, exp_inst1, exp_inst2, exp_inst3]
 
     exp_repo_structure = {
@@ -36,7 +36,7 @@ def test_get_repo_properties_without_instances(mocker):
     """Arrange"""
     exp_comps = ["12345678901234567890"]
     exp_inst1 = []
-    mock_list_dirs = mocker.patch("command_list.list_dirs")
+    mock_list_dirs = mocker.patch("list.list_dirs")
     mock_list_dirs.side_effect = [exp_comps, exp_inst1]
 
     exp_repo_structure = {exp_comps[0]: exp_inst1}
@@ -56,7 +56,7 @@ def test_get_repo_properties_without_components(mocker):
     """Arrange"""
     exp_comps = []
     exp_inst1 = []
-    mock_list_dirs = mocker.patch("command_list.list_dirs")
+    mock_list_dirs = mocker.patch("list.list_dirs")
     mock_list_dirs.side_effect = [exp_comps, exp_inst1]
 
     exp_repo_structure = {}
@@ -78,10 +78,10 @@ def test_list_components_several_correct_items(
     """Arrange"""
     """list_dirs function is called several times, first
     it returns the libraries, then the version of each one"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=tree_directory)
+    mock_walk = mocker.patch("list.walk", side_effect=tree_directory)
     """load function returns success as status of the all the actions"""
-    mock_load = mocker.patch("command_list.load", return_value=all_actions_success)
-    mock_print = mocker.patch("command_list.print")
+    mock_load = mocker.patch("list.load", return_value=all_actions_success)
+    mock_print = mocker.patch("list.print")
 
     """Act"""
     list_components(args)
@@ -98,11 +98,11 @@ def test_list_components_incorrect_fetch(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("list.walk", side_effect=lib_directory)
     """load function returns failure as status of fetch"""
-    mock_load = mocker.patch("command_list.load", return_value=fetch_failure)
+    mock_load = mocker.patch("list.load", return_value=fetch_failure)
     """print functions reports the failure for fetch"""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
     exp_lib, exp_version = name_version_lib
     arg1, arg2, arg3, arg4 = get_print_args(exp_lib, exp_version, fetch_failure)
 
@@ -122,11 +122,11 @@ def test_list_components_incorrect_build(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("list.walk", side_effect=lib_directory)
     """load function returns failure as status of build"""
-    mock_load = mocker.patch("command_list.load", return_value=build_failure)
+    mock_load = mocker.patch("list.load", return_value=build_failure)
     """print functions reports the failure for build"""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
     exp_lib, exp_version = name_version_lib
     arg1, arg2, arg3, arg4 = get_print_args(exp_lib, exp_version, build_failure)
 
@@ -146,11 +146,11 @@ def test_list_components_incorrect_install(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("list.walk", side_effect=lib_directory)
     """load function returns failure as status of install"""
-    mock_load = mocker.patch("command_list.load", return_value=install_failure)
+    mock_load = mocker.patch("list.load", return_value=install_failure)
     """print functions reports the failure for install"""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
     exp_lib, exp_version = name_version_lib
     arg1, arg2, arg3, arg4 = get_print_args(exp_lib, exp_version, install_failure)
 
@@ -168,9 +168,9 @@ def test_list_components_without_version(mocker, without_version_directory, args
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then it tries its version"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=without_version_directory)
-    mock_load = mocker.patch("command_list.load")
-    mock_print = mocker.patch("command_list.print")
+    mock_walk = mocker.patch("list.walk", side_effect=without_version_directory)
+    mock_load = mocker.patch("list.load")
+    mock_print = mocker.patch("list.print")
 
     """Act"""
     list_components(args)
@@ -185,9 +185,9 @@ def test_list_components_without_libraries(mocker, args, without_lib_directory):
     """Arrange"""
     """list_dirs function is called once but
     there are not libraries"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=without_lib_directory)
-    mock_load = mocker.patch("command_list.load")
-    mock_print = mocker.patch("command_list.print")
+    mock_walk = mocker.patch("list.walk", side_effect=without_lib_directory)
+    mock_load = mocker.patch("list.load")
+    mock_print = mocker.patch("list.print")
 
     """Act"""
     list_components(args)
@@ -202,9 +202,9 @@ def test_list_components_StopIteration_exception(mocker, args):
     """Arrange"""
     """list_dirs function triggers a StopIteration exception
     and returns an empty list"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=StopIteration)
-    mock_load = mocker.patch("command_list.load")
-    mock_print = mocker.patch("command_list.print")
+    mock_walk = mocker.patch("list.walk", side_effect=StopIteration)
+    mock_load = mocker.patch("list.load")
+    mock_print = mocker.patch("list.print")
 
     """Act"""
     list_components(args)
@@ -221,11 +221,11 @@ def test_list_components_FileNotFoundError_exception(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns the library then its version"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("list.walk", side_effect=lib_directory)
     """ load triggers an FileNotFoundError exception"""
-    mock_load = mocker.patch("command_list.load", side_effect=FileNotFoundError)
+    mock_load = mocker.patch("list.load", side_effect=FileNotFoundError)
     """print functions reports the exception"""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
     exp_lib, exp_version = name_version_lib
     info_filepath = f"{args.config.repo_location}/{exp_lib}/{exp_version}/hekit.info"
     arg1, arg2, arg3, arg4, arg5 = util_print_file_error_args(
@@ -248,11 +248,11 @@ def test_list_components_KeyError_exception(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("command_list.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("list.walk", side_effect=lib_directory)
     """load function triggers a KeyError exception"""
-    mock_load = mocker.patch("command_list.load", side_effect=KeyError)
+    mock_load = mocker.patch("list.load", side_effect=KeyError)
     """print functions reports the exception"""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
     exp_lib, exp_version = name_version_lib
     arg1, arg2, arg3, arg4, arg5 = util_print_key_error_args(exp_lib, exp_version, "")
 

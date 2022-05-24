@@ -5,22 +5,22 @@ import pytest
 from os import getcwd, chdir
 from pathlib import Path
 
-from .context import hekit, command_list, command_remove, command_install
+from .context import hekit, list, remove, install
 from hekit import main
-from command_list import list_components, _SEP_SPACES
-from command_remove import remove_components
-from command_install import install_components
+from list import list_components, _SEP_SPACES
+from remove import remove_components
+from install import install_components
 
 # Due to install command changes current directory,
 # the other commands need to restore the current path
 cwd_test = getcwd()
 
 
-def test_command_install_fetch(mocker, args_fetch):
+def test_install_fetch(mocker, args_fetch):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("command_install.print")
+    mock_print = mocker.patch("install.print")
     mock_input = mocker.patch("utils.spec.input")
     mock_input.side_effect = [args_fetch.toml_arg_build, args_fetch.toml_arg_version]
 
@@ -34,11 +34,11 @@ def test_command_install_fetch(mocker, args_fetch):
     assert 2 == mock_input.call_count
 
 
-def test_command_list_after_fetch(mocker, args_list, restore_pwd):
+def test_list_after_fetch(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg2 = f"{'success':{width}}"
@@ -51,11 +51,11 @@ def test_command_list_after_fetch(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg2, arg34, arg34)
 
 
-def test_command_install_build(mocker, args_build):
+def test_install_build(mocker, args_build):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_build, ""
-    mock_print = mocker.patch("command_install.print")
+    mock_print = mocker.patch("install.print")
     mock_input = mocker.patch("utils.spec.input")
     mock_input.side_effect = [args_build.toml_arg_build, args_build.toml_arg_version]
 
@@ -69,11 +69,11 @@ def test_command_install_build(mocker, args_build):
     assert 2 == mock_input.call_count
 
 
-def test_command_list_after_build(mocker, args_list, restore_pwd):
+def test_list_after_build(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg23 = f"{'success':{width}}"
@@ -86,11 +86,11 @@ def test_command_list_after_build(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg23, arg23, arg4)
 
 
-def test_command_remove_after_build(mocker, args_remove, restore_pwd):
+def test_remove_after_build(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("command_remove.print")
+    mock_print = mocker.patch("remove.print")
 
     arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
 
@@ -101,11 +101,11 @@ def test_command_remove_after_build(mocker, args_remove, restore_pwd):
     mock_print.assert_called_with(arg1)
 
 
-def test_command_install_execution(mocker, args_install):
+def test_install_execution(mocker, args_install):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_install, ""
-    mock_print = mocker.patch("command_install.print")
+    mock_print = mocker.patch("install.print")
     mock_input = mocker.patch("utils.spec.input")
     mock_input.side_effect = [
         args_install.toml_arg_build,
@@ -122,11 +122,11 @@ def test_command_install_execution(mocker, args_install):
     assert 2 == mock_input.call_count
 
 
-def test_command_list_after_install(mocker, args_list, restore_pwd):
+def test_list_after_install(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("command_list.print")
+    mock_print = mocker.patch("list.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg234 = f"{'success':{width}}"
@@ -138,12 +138,12 @@ def test_command_list_after_install(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg234, arg234, arg234)
 
 
-def test_command_remove_all_after_install(mocker, args_remove, restore_pwd):
+def test_remove_all_after_install(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("command_remove.print")
-    mock_input = mocker.patch("command_remove.input", return_value="y")
+    mock_print = mocker.patch("remove.print")
+    mock_input = mocker.patch("remove.input", return_value="y")
 
     args_remove.all = True
     args_remove.instance = ""

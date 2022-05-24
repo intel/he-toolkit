@@ -114,10 +114,10 @@ kit/__init__.py
 kit/utils/archive.py
 kit/commands/check_deps.py
 kit/commands/docker_build.py
-kit/commands/command_init.py
-kit/commands/command_install.py
-kit/commands/command_list.py
-kit/commands/command_remove.py
+kit/commands/init.py
+kit/commands/install.py
+kit/commands/list.py
+kit/commands/remove.py
 kit/utils/component_builder.py
 kit/utils/config.py
 kit/utils/constants.py

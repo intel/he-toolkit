@@ -6,9 +6,7 @@ from sys import path as sys_path
 
 sys_path.append(os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/")))
 
-
 import hekit
-
 
 sys_path.append(
     os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/commands/"))
@@ -16,10 +14,10 @@ sys_path.append(
 
 import docker_build
 import check_deps
-import command_init
-import command_install
-import command_list
-import command_remove
+import init
+import install
+import list
+import remove
 
 sys_path.append(
     os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/utils/"))

@@ -10,11 +10,11 @@ from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
-from utils.archive import archive_and_compress
-from utils.docker_tools import (
+from utils.archive import archive_and_compress  # pylint: disable=no-name-in-module
+from utils.docker_tools import (  # pylint: disable=no-name-in-module
     DockerTools,
     DockerException,
-)  # pylint: disable=no-name-in-module
+)
 from utils.constants import Constants  # pylint: disable=no-name-in-module
 
 
