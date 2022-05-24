@@ -5,11 +5,11 @@ environment to evaluate homomorphic encryption technology.
 ## Usage
 `hekit` can be executed using the following options:
 ```
-hekit [--config CONFIG_FILE] {init, list, install, build, fetch, remove}
+hekit [-h] [--version] [--config CONFIG] {init,list,install,build,fetch,remove,check-dependencies,docker-build,gen-primes,algebras}
 ```
 where the options and input files are explained in the following sections.
 
-### Flags
+### Global Options
 
 `-h, --help`: Shows the help message.
 
@@ -18,24 +18,21 @@ where the options and input files are explained in the following sections.
 `--config CONFIG_FILE`: Use non-default [configuration
 file](#configuration-file).  Default is `~/.hekit/default.config`.
 
-`init`: Initializes hekit.
+### Commands
+The option -h can be used to get details about the arguments and usage of each command. 
 
-`list`: Lists installed components.
-
-`install RECIPE_FILE`: Installs components defined in [recipe
-file](#recipe-file).
-
-`build RECIPE_FILE`: Builds components defined in [recipe file](#recipe-file).
-
-`fetch RECIPE_FILE`: Fetches components defined in [recipe file](#recipe-file).
-
-`remove component instance`: Uninstalls a specific component.
-
-`--recipe_arg "key=value"`: Optional argument to replace data marked as !key!
-in a [recipe file](#recipe-file).
-
-`docker-build`: Builds the HE Toolkit Docker container. See [Docker
-Build](../docker/README.md).
+| Command | Description | Usage 
+|-----------|-----------|-----------|
+| init | Initializes hekit. | hekit init [--default-config]
+| list | Lists installed components. |  hekit list 
+| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] recipe-file
+| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] recipe-file
+| fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--recipe_arg RECIPE_ARG] recipe-file
+| remove | Uninstalls instances or components. | hekit remove [--all] [component] [instance]
+| check-dependencies | check system dependencies. | hekit check-dependencies dependencies-file
+| docker-build | Builds the HE Toolkit Docker container. See [Docker Build](../docker/README.md). | hekit docker-build [--id ID] [--clean] [--check-only] [--enable {vscode}]
+| gen-primes | generate primes in range [n, m] where n, m are positive integers. See [Tools](./tools/README.md). | hekit gen-primes start stop
+| algebras  | generate ZZ_p[x]/phi(X) algebras. . See [Tools](./tools/README.md). | hekit algebras [-p P] [-d D] [--no-corrected] [--no-header]
 
 ### Configuration file
 
@@ -119,18 +116,33 @@ hekit list
 The install command can be used to fetch, build, and install the required
 libraries.
 ```bash
-hekit install ../recipes/default.toml
+hekit install ./recipes/default.toml
 ```
 
 Using fetch and build commands, the user has access to perform specific
 actions. For example, for fetching libraries:
 ```bash
-hekit fetch ../recipes/default.toml --recipe_arg "version=v1.2.3"
+hekit fetch ./recipes/examples.toml --recipe_arg "version=v1.2.3"
 ```
 
-In order to uninstall a specific component, execute the remove command
+In order to uninstall a specific instance, execute the remove command
 ```bash
 hekit remove hexl 1.2.3
+```
+
+For uninstalling all the instances of a component, execute
+```bash
+hekit remove hexl
+```
+
+Also, to uninstall all component, use
+```bash
+hekit remove --all
+```
+
+To check system dependencies, execute:
+```bash
+hekit check-dependencies dependencies.txt
 ```
 
 ## Tab completion
