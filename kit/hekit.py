@@ -16,6 +16,14 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
+from utils.config import load_config  # pylint: disable=no-name-in-module
+from utils.tab_completion import enable_tab_completion
+from commands.init import init_hekit, set_init_subparser
+from commands.remove import set_remove_subparser
+from commands.list import set_list_subparser
+from commands.install import set_install_subparser
+from commands.check_deps import set_check_dep_subparser
+from commands.docker_build import set_docker_subparser
 from tools.healg import healg, set_gen_primes, set_gen_algebras
 from utils.constants import Constants  # pylint: disable=no-name-in-module
 from utils.config import load_config  # pylint: disable=no-name-in-module
