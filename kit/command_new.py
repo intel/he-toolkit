@@ -9,7 +9,9 @@ from re import findall
 from spec import Spec
 
 
-def create_toml_template(project_name: str, project_path: Path, toml_path: Path):
+def create_toml_template(
+    project_name: str, project_path: Path, toml_path: Path
+) -> None:
     """Create a template of a toml file"""
     toml_path.parent.mkdir(parents=True, exist_ok=False)
 
@@ -26,7 +28,7 @@ def create_toml_template(project_name: str, project_path: Path, toml_path: Path)
     specs.to_toml_file(toml_path)
 
 
-def create_cmake_template(project_name: str, cmake_path: Path):
+def create_cmake_template(project_name: str, cmake_path: Path) -> None:
     """Create a template of a cmake file"""
     lines = (
         f"project({project_name} LANGUAGES CXX)\n\n"
@@ -49,7 +51,7 @@ def create_cmake_template(project_name: str, cmake_path: Path):
             cmake_file.write(line)
 
 
-def modify_cmake_file(project_name: str, cmake_path: Path):
+def modify_cmake_file(project_name: str, cmake_path: Path) -> None:
     """Modify a cmake file with the project name"""
     text = cmake_path.read_text()
     executable_name = findall(r"add_executable\((.*) .*\)", text)
@@ -72,7 +74,7 @@ def create_directory_structure(project_name: str, project_path: Path) -> None:
         file_path.touch(mode=438, exist_ok=False)
 
 
-def create_new_project(args):
+def create_new_project(args) -> None:
     """create a new project"""
     project_name = args.name
     project_path = Path(args.directory).resolve().expanduser()
@@ -82,9 +84,10 @@ def create_new_project(args):
 
     try:
         if args.based_on:
-            # Create a project based on an example
-            base_project_path = Path(args.based_on).resolve().expanduser()
-            copytree(base_project_path, project_path, dirs_exist_ok=False)
+            example_path = (
+                args.hekit_root_dir / "he-samples" / "examples" / args.based_on
+            )
+            copytree(example_path, project_path, dirs_exist_ok=False)
             modify_cmake_file(project_name, cmake_path)
         else:
             # Create a new project
@@ -97,12 +100,17 @@ def create_new_project(args):
         print(f"Project {project_path} already exists")
 
 
-def set_new_subparser(subparsers):
+def set_new_subparser(subparsers, hekit_root_dir):
     """create the parser for the 'new' command"""
     parser_new = subparsers.add_parser("new", description="create a new project")
     parser_new.add_argument("name", type=str, help="project name")
     parser_new.add_argument(
         "--directory", type=str, default=".", help="location of the new project"
     )
-    parser_new.add_argument("--based-on", type=str, help="location of the base project")
-    parser_new.set_defaults(fn=create_new_project)
+    parser_new.add_argument(
+        "--based-on",
+        type=str,
+        help="base project",
+        choices=["logistic-regression", "psi", "secure-query"],
+    )
+    parser_new.set_defaults(fn=create_new_project, hekit_root_dir=hekit_root_dir)
