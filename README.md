@@ -35,6 +35,7 @@ utilize the latest Intel hardware features.
   - [Known Issues](#known-issues)
 - [Contributing](#contributing)
   - [Troubleshooting](#troubleshooting)
+  - [Adding a new command](#adding-a-new-command)
 - [Contributors](#contributors)
 
 
@@ -269,6 +270,47 @@ We encourage feedback and suggestions via
 [GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
 [GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
 
+## Adding a new command
+
+Please follow the next steps to add a new command where `TODO-ACTION` must be replaced by a word or set of words that described the function of the new command.
+
+a) Create a new python file inside [kit](kit) directory and peform the following steps:
+
+* Name the file as command_TODO-ACTION.py
+
+* Create a function to define the arguments of the command. Also, the parameter of the function set_defaults (fn) must be set to the function defined in the next step. Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
+```bash
+	def set_TODO-ACTION_subparser(subparsers):
+		"""create the parser for the 'TODO-ACTION' command"""
+		parser_TODO-ACTION = subparsers.add_parser(
+			"ARG1", description="ADD-DESCRIPTION"
+		)
+		parser_TODO-ACTION = subparsers.add_parser(
+			"ARG2", description="ADD-DESCRIPTION"
+		)		
+		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
+```
+
+* Create the functions that implement the new funtionality, but the entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
+```bash
+	def NEW_FUNCTIONALITY(args) -> None:
+		"""Executes new funtionality"""
+		if(args.ARG1)
+			pass
+		elif(args.ARG2)
+			pass
+```
+
+b) Perform the following changes in [hekit.py](kit/hekit.py)
+
+* Add the import statement of the new function
+```bash
+from command_TODO-ACTION import set_ACTION_subparser
+```
+* Add the calling statement inside the parse_cmdline() function
+```bash
+set_TODO-ACTION_subparser(subparsers)
+```
 
 ## Troubleshooting
 
