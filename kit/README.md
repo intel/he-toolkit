@@ -19,12 +19,12 @@ where the options and input files are explained in the following sections.
 file](#configuration-file).  Default is `~/.hekit/default.config`.
 
 ### Commands
-The option -h can be used to get details about the arguments and usage of each command. 
+The option -h can be used to get details about the arguments and usage of each command.
 
-| Command | Description | Usage 
+| Command | Description | Usage
 |-----------|-----------|-----------|
 | init | Initializes hekit. | hekit init [--default-config]
-| list | Lists installed components. |  hekit list 
+| list | Lists installed components. |  hekit list
 | install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] recipe-file
 | build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] recipe-file
 | fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--recipe_arg RECIPE_ARG] recipe-file

@@ -5,7 +5,7 @@ The File `healg.py` contains useful commands to finds HE parameters based on use
 ## Dependencies
 - python >= 3.8
 
-## gen-primes 
+## gen-primes
 
 The command `hekit gen-primes` generates a list of sorted primes in range [n, m] where n and m are positive integers
 
@@ -26,7 +26,7 @@ To run the tool, simply provide start and stop arguments.  For example:
 hekit gen-primes 1 100
 ```
 
-## healg 
+## healg
 
 The command `hekit healg` given the plaintext prime `p` and the required number of
 p-boxes `d` returns the available algebras.
@@ -80,4 +80,3 @@ with their meanings,
 | `m` | order of the cyclotomic polynomial |
 | `phi(m)` | the Euler totient of m which is the degree of the ciphertext and plaintext polynomial |
 | `nslots` | the number of slots in a ciphertext and plaintext polynomial (`phi(m)` / `d`) |
-
