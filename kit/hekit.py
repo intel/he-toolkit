@@ -25,17 +25,8 @@ from command_install import set_install_subparser
 from command_check_deps import set_check_dep_subparser
 from command_new import set_new_subparser
 from tools.healg import healg, set_gen_primes_subparser, set_gen_algebras_subparser
+from command_docker_build import set_docker_subparser
 from constants import Constants
-
-try:
-    # docker-py is optional and will not be used from within a docker container
-    from command_docker_build import set_docker_subparser
-except ImportError:
-
-    def set_docker_subparser(arg1, arg2):  # pylint: disable=unused-argument
-        """Informs that this command can't be used due to missing dependencies"""
-        print("This command is disabled. To enable it install the docker-py dependency")
-        print("  pip install docker")
 
 
 def parse_cmdline():
