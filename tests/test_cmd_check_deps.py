@@ -3,8 +3,8 @@
 
 import pytest
 from pathlib import Path
-from .context import command_check_deps
-from command_check_deps import (
+from .context import check_deps
+from check_deps import (
     version_string_to_tuple,
     parse_dependencies,
     check_dependency,
@@ -114,8 +114,8 @@ def test_check_dependency_not_found_any(mocker):
     exp_op = Op.ANY
     exp_vers = "1.2.3"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = False
 
     """Act"""
@@ -131,8 +131,8 @@ def test_check_dependency_not_found_exact(mocker):
     exp_op = Op.EXACT
     exp_vers = "4.5.6"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = False
 
     """Act"""
@@ -150,8 +150,8 @@ def test_check_dependency_not_found_min(mocker):
     exp_op = Op.MIN
     exp_vers = "7.8.9"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = False
 
     """Act"""
@@ -169,8 +169,8 @@ def test_check_dependency_found_any(mocker):
     exp_op = Op.ANY
     exp_vers = "1.2.3"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = True
 
     """Act"""
@@ -186,10 +186,10 @@ def test_check_dependency_found_exact(mocker):
     exp_op = Op.EXACT
     exp_vers = "1.2.3"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = True
-    mock_run = mocker.patch("command_check_deps.subprocess_run")
+    mock_run = mocker.patch("check_deps.subprocess_run")
     mock_run.return_value = MockSubprocess(exp_name, exp_vers)
 
     """Act"""
@@ -206,10 +206,10 @@ def test_check_dependency_found_exact_wrong_version(mocker):
     exp_vers = "1.2.3"
     act_vers = "5.6.3"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = True
-    mock_run = mocker.patch("command_check_deps.subprocess_run")
+    mock_run = mocker.patch("check_deps.subprocess_run")
     mock_run.return_value = MockSubprocess(exp_name, act_vers)
 
     """Act"""
@@ -227,10 +227,10 @@ def test_check_dependency_found_min(mocker):
     exp_op = Op.MIN
     exp_vers = "1.2.3"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = True
-    mock_run = mocker.patch("command_check_deps.subprocess_run")
+    mock_run = mocker.patch("check_deps.subprocess_run")
     mock_run.return_value = MockSubprocess(exp_name, exp_vers)
 
     """Act"""
@@ -247,10 +247,10 @@ def test_check_dependency_found_min_wrong_version(mocker):
     exp_vers = "7.2.3"
     act_vers = "5.6.3"
     dep = MockDep(exp_name, exp_op, exp_vers)
-    mock_print = mocker.patch("command_check_deps.print")
-    mock_which = mocker.patch("command_check_deps.which")
+    mock_print = mocker.patch("check_deps.print")
+    mock_which = mocker.patch("check_deps.which")
     mock_which.return_value = True
-    mock_run = mocker.patch("command_check_deps.subprocess_run")
+    mock_run = mocker.patch("check_deps.subprocess_run")
     mock_run.return_value = MockSubprocess(exp_name, act_vers)
 
     """Act"""
@@ -266,7 +266,7 @@ def test_check_dependencies(mocker):
     """Arrange"""
     args = MockArgs()
 
-    mock_check = mocker.patch("command_check_deps.check_dependencies_list")
+    mock_check = mocker.patch("check_deps.check_dependencies_list")
     mock_open = mocker.patch.object(Path, "open")
     mock_readlines = mock_open.return_value
     mock_readlines.readlines.return_value = "lib >= 1.2.3"
@@ -282,8 +282,8 @@ def test_check_dependencies_FileNotFoundError(mocker):
     """Arrange"""
     args = MockArgs()
 
-    mock_check = mocker.patch("command_check_deps.check_dependencies_list")
-    mock_print = mocker.patch("command_check_deps.print")
+    mock_check = mocker.patch("check_deps.check_dependencies_list")
+    mock_print = mocker.patch("check_deps.print")
     mock_open = mocker.patch.object(Path, "open")
     mock_open.side_effect = FileNotFoundError()
 

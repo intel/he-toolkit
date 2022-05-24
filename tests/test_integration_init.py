@@ -136,7 +136,8 @@ class Mockers:
 
 class MockArgs:
     def __init__(self):
-        self.config = "default.config"
+        self.tests_path = Path(__file__).resolve().parent
+        self.config = f"{self.tests_path}/input_files/default.config"
         self.default_config = True
         self.fn = init_hekit
         self.hekit_root_dir = Path("/home")

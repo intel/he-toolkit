@@ -10,9 +10,12 @@ from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
-from archive import archive_and_compress
-from docker_tools import DockerTools, DockerException
-from constants import Constants
+from utils.archive import archive_and_compress
+from utils.docker_tools import (
+    DockerTools,
+    DockerException,
+)  # pylint: disable=no-name-in-module
+from utils.constants import Constants  # pylint: disable=no-name-in-module
 
 
 def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:

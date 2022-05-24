@@ -16,19 +16,22 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
-from config import load_config  # pylint: disable=no-name-in-module
-from tab_completion import enable_tab_completion
-from command_init import init_hekit, set_init_subparser
-from command_remove import set_remove_subparser
-from command_list import set_list_subparser
-from command_install import set_install_subparser
-from command_check_deps import set_check_dep_subparser
 from tools.healg import healg, set_gen_primes, set_gen_algebras
-from constants import Constants
+from utils.constants import Constants  # pylint: disable=no-name-in-module
+from utils.config import load_config  # pylint: disable=no-name-in-module
+from utils.tab_completion import (
+    enable_tab_completion,
+)  # pylint: disable=no-name-in-module
+from commands.command_init import init_hekit, set_init_subparser
+from commands.command_remove import set_remove_subparser
+from commands.command_list import set_list_subparser
+from commands.command_install import set_install_subparser
+from commands.check_deps import set_check_dep_subparser
+
 
 try:
     # docker-py is optional and will not be used from within a docker container
-    from command_docker_build import set_docker_subparser
+    from commands.docker_build import set_docker_subparser
 except ImportError:
 
     def set_docker_subparser(arg1, arg2):  # pylint: disable=unused-argument

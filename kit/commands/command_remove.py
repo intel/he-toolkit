@@ -5,7 +5,10 @@
 
 from shutil import rmtree
 from os import listdir
-from tab_completion import components_completer, instances_completer
+from utils.tab_completion import (
+    components_completer,
+    instances_completer,
+)  # pylint: disable=no-name-in-module
 
 
 def remove_components(args):
