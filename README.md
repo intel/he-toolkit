@@ -272,7 +272,7 @@ We encourage feedback and suggestions via
 
 ## Adding a new command
 
-Please follow the next steps to add a new command where `TODO-ACTION` must be replaced by a word or set of words that described the function of the new command.
+Please follow the next steps to add a new command where `TODO-ACTION` must be replaced by a word or set of words that described the functionality of the new command.
 
 a) Create a new python file inside [kit](kit) directory and peform the following steps:
 
