@@ -133,8 +133,8 @@ In order to uninstall a specific component, execute the remove command
 hekit remove hexl 1.2.3
 ```
 
-The command new can be used to create a new application. When it is executed 
-with the option `-–based-on`, it will create a copy of the base project, 
+The command new can be used to create a new application. When it is executed
+with the option `-–based-on`, it will create a copy of the base project,
 keeping its directory structure.
 ```bash
 hekit new my-secure-query --based-on secure-query
