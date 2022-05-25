@@ -7,6 +7,7 @@ from shutil import copytree
 from pathlib import Path
 from re import findall
 from spec import Spec
+from constants import Constants
 
 
 def create_toml_template(
@@ -32,8 +33,8 @@ def create_cmake_template(project_name: str, cmake_path: Path) -> None:
     """Create a template of a cmake file"""
     lines = (
         f"project({project_name} LANGUAGES CXX)\n\n"
-        "cmake_minimum_required(VERSION 3.13 FATAL_ERROR)\n\n"
-        "set(CMAKE_CXX_STANDARD 17)\n"
+        f"cmake_minimum_required(VERSION {Constants.cmake_min_version} FATAL_ERROR)\n\n"
+        f"set(CMAKE_CXX_STANDARD {Constants.cmake_cxx_standard})\n"
         "set(CMAKE_CXX_EXTENSIONS OFF)\n"
         "set(CMAKE_CXX_STANDARD_REQUIRED ON)\n\n"
         "#find_package(helib REQUIRED)\n"
