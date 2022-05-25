@@ -18,6 +18,6 @@ class Constants:
     toolkit_label: str = f"{user}/ubuntu_he_toolkit:{version}"
     vscode_label: str = f"{user}/ubuntu_he_vscode:{version}"
 
-    # cmakes properties
+    # cmake properties
     cmake_min_version: str = "3.13"
     cmake_cxx_standard: str = "17"
