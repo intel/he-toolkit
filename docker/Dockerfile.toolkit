@@ -33,7 +33,6 @@ WORKDIR $HOME/he-toolkit
 RUN ./hekit init --default-config && \
     ./hekit install recipes/default.toml && \
     ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
-    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
-    . docker/runners.sh
+    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
 
-ENTRYPOINT welcome_message && cd $HOME && /bin/bash
+ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash

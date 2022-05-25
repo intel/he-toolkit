@@ -159,13 +159,13 @@ Projects
             └── example.cpp
 ```
 
-The following actions should be completed to build the new application:
+The following actions should be completed to build the new project:
 
-* Open the toml file inside the recipes directory and replace `-DFLAG=TBD` with the desired CMake flags for your project.
+* Open the `toml` file inside the recipes directory and replace `-DFLAG=TBD` with the desired CMake flags for your project.
 
 * Open `CMakeLists.txt` and uncomment the statements for `find_package` and `target_link_libraries` of the required library. If other dependencies are needed, for instance `Threads`, the file must be updated to include and compile them.
 
-* Add and/or write the code of the new application in the `.cpp` and `.h` files created by the command.
+* Add and/or write the code of the new project in the `.cpp` and `.h` files created by the command.
 
 ## Tab completion
 As an optional feature, the user is able to enable tab completion feature using
