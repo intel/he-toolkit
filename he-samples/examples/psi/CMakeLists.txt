@@ -18,7 +18,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(helib REQUIRED)
 
-add_executable(psi psi.cpp)
+file(GLOB CODE_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_executable(psi ${CODE_SRCS})
 
 target_link_libraries(psi PRIVATE helib)
 

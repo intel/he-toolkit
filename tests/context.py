@@ -11,6 +11,7 @@ import command_docker_build
 import command_init
 import command_install
 import command_list
+import command_new
 import command_remove
 import component_builder
 import config

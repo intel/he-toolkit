@@ -133,6 +133,40 @@ In order to uninstall a specific component, execute the remove command
 hekit remove hexl 1.2.3
 ```
 
+The command `new` can be used to create a new project. When it is executed
+with the option `-–based-on`, it will create a copy of the base project,
+keeping its directory structure.
+```bash
+hekit new my-secure-query --based-on secure-query
+```
+
+However, when the command is executed without `-–based-on`
+```bash
+hekit new example
+```
+
+It will create the following directory structure:
+```bash
+Projects
+└── example
+      |- CMakeLists.txt
+      |- README.md
+      └── include
+            └── example.h
+      └── recipes
+            └── example.toml
+      └── src
+            └── example.cpp
+```
+
+The following actions should be completed to build the new project:
+
+* Open the `toml` file inside the recipes directory and replace `-DFLAG=TBD` with the desired CMake flags for your project.
+
+* Open `CMakeLists.txt` and uncomment the statements for `find_package` and `target_link_libraries` of the required library. If other dependencies are needed, for instance `Threads`, the file must be updated to include and compile them.
+
+* Add and/or write the code of the new project in the `.cpp` and `.h` files created by the command.
+
 ## Tab completion
 As an optional feature, the user is able to enable tab completion feature using
 [argcomplete](https://kislyuk.github.io/argcomplete/) library.

@@ -23,8 +23,9 @@ from command_remove import set_remove_subparser
 from command_list import set_list_subparser
 from command_install import set_install_subparser
 from command_check_deps import set_check_dep_subparser
+from command_new import set_new_subparser
+from tools.healg import healg, set_gen_primes_subparser, set_gen_algebras_subparser
 from command_docker_build import set_docker_subparser
-from tools.healg import healg, set_gen_primes, set_gen_algebras
 from constants import Constants
 
 
@@ -55,8 +56,9 @@ def parse_cmdline():
     set_remove_subparser(subparsers)
     set_check_dep_subparser(subparsers)
     set_docker_subparser(subparsers, hekit_root_dir)
-    set_gen_primes(subparsers)
-    set_gen_algebras(subparsers)
+    set_gen_primes_subparser(subparsers)
+    set_gen_algebras_subparser(subparsers)
+    set_new_subparser(subparsers, hekit_root_dir)
 
     # try to enable tab completion
     enable_tab_completion(parser)

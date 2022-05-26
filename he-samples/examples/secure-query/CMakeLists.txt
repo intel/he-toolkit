@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 #####################################################################
-## secure-query Binary:
+## Secure Query Binary:
 #####################################################################
 
 project(secure-query LANGUAGES CXX)
@@ -26,8 +26,8 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
 
-file(GLOB SQ_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-add_executable(secure-query ${SQ_SRCS})
+file(GLOB CODE_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_executable(secure-query ${CODE_SRCS})
 
 target_include_directories(secure-query PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
