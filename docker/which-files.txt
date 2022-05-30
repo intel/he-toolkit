@@ -53,7 +53,7 @@ he-samples/examples/psi/README.md
 he-samples/examples/psi/datasets/ancient_egyptian_gods.set
 he-samples/examples/psi/datasets/fruits.set
 he-samples/examples/psi/datasets/us_states.set
-he-samples/examples/psi/psi.cpp
+he-samples/examples/psi/src/psi.cpp
 he-samples/examples/secure-query/CMakeLists.txt
 he-samples/examples/secure-query/README.md
 he-samples/examples/secure-query/datasets/us_state_capitals.csv
@@ -116,7 +116,7 @@ kit/commands/check_deps.py
 kit/commands/docker_build.py
 kit/commands/init.py
 kit/commands/install.py
-kit/commands/list.py
+kit/commands/list_cmd.py
 kit/commands/remove.py
 kit/utils/component_builder.py
 kit/utils/config.py
@@ -147,6 +147,7 @@ tests/test_cmd_docker_build.py
 tests/test_cmd_init.py
 tests/test_cmd_install.py
 tests/test_cmd_list.py
+tests/test_cmd_new.py
 tests/test_cmd_remove.py
 tests/test_comp_builder.py
 tests/test_docker_tool.py

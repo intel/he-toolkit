@@ -16,8 +16,9 @@ import docker_build
 import check_deps
 import init
 import install
-import list
+import list_cmd
 import remove
+import new
 
 sys_path.append(
     os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/utils/"))

@@ -5,7 +5,7 @@
 ## Logistic Regression Homomorphic Encryption Binary
 ########################################################
 
-project(logistic-regression LANGUAGES CXX)
+project(lr_test LANGUAGES CXX)
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
@@ -28,8 +28,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
-file(GLOB LR_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-add_executable(lr_test ${LR_SRCS})
+file(GLOB CODE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+add_executable(lr_test ${CODE_SRCS})
 
 target_include_directories(lr_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

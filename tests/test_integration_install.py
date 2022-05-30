@@ -5,9 +5,9 @@ import pytest
 from os import getcwd, chdir
 from pathlib import Path
 
-from .context import hekit, list, remove, install
+from .context import hekit, list_cmd, remove, install
 from hekit import main
-from list import list_components, _SEP_SPACES
+from list_cmd import list_components, _SEP_SPACES
 from remove import remove_components
 from install import install_components
 
@@ -38,7 +38,7 @@ def test_list_after_fetch(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("list.print")
+    mock_print = mocker.patch("list_cmd.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg2 = f"{'success':{width}}"
@@ -73,7 +73,7 @@ def test_list_after_build(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("list.print")
+    mock_print = mocker.patch("list_cmd.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg23 = f"{'success':{width}}"
@@ -126,7 +126,7 @@ def test_list_after_install(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("list.print")
+    mock_print = mocker.patch("list_cmd.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg234 = f"{'success':{width}}"

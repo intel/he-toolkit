@@ -14,7 +14,7 @@ from collections import Counter
 from pathlib import Path
 
 
-def set_gen_primes(subparsers):
+def set_gen_primes_subparser(subparsers):
     """Register subparser to generate primes"""
 
     parser = subparsers.add_parser(
@@ -159,7 +159,7 @@ def compute_prime_factors(numbers, factor_util="factor"):
     return (parse_factor_line(line)[1] for line in factor_lines)
 
 
-def set_gen_algebras(subparsers):
+def set_gen_algebras_subparser(subparsers):
     """Register subparser to generate algebras"""
     parser = subparsers.add_parser(
         "algebras", description="generate ZZ_p[x]/phi(X) algebras"
