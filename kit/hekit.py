@@ -11,24 +11,19 @@ import sys
 
 assert sys.version_info >= (3, 8)
 
-from os import geteuid
+from os import geteuid, walk as files_in_dir
 from sys import stderr, exit as sys_exit
+from importlib import import_module
 from argparse import ArgumentParser
 from pathlib import Path
 
+from commands.init import init_hekit
 from tools.healg import healg, set_gen_primes_subparser, set_gen_algebras_subparser
 from utils.constants import Constants  # pylint: disable=no-name-in-module
 from utils.config import load_config  # pylint: disable=no-name-in-module
 from utils.tab_completion import (  # pylint: disable=no-name-in-module
     enable_tab_completion,
 )
-from commands.init import init_hekit, set_init_subparser
-from commands.remove import set_remove_subparser
-from commands.list_cmd import set_list_subparser
-from commands.install import set_install_subparser
-from commands.check_deps import set_check_dep_subparser
-from commands.docker_build import set_docker_subparser
-from commands.new import set_new_subparser
 
 
 def parse_cmdline():
@@ -52,15 +47,27 @@ def parse_cmdline():
 
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
-    set_init_subparser(subparsers, hekit_root_dir)
-    set_list_subparser(subparsers)
-    set_install_subparser(subparsers)
-    set_remove_subparser(subparsers)
-    set_check_dep_subparser(subparsers)
-    set_docker_subparser(subparsers, hekit_root_dir)
     set_gen_primes_subparser(subparsers)
     set_gen_algebras_subparser(subparsers)
-    set_new_subparser(subparsers, hekit_root_dir)
+
+    module_path = Path("./kit/commands")
+    py_filenames = next(files_in_dir(module_path))[2]
+    py_filenames = [f[:-3] for f in py_filenames if f.endswith(".py") and f[0] != "_"]
+
+    for f in py_filenames:
+        imported_module = import_module(f"commands.{f}")
+        funcnames = [
+            fname
+            for fname in dir(imported_module)
+            if fname.endswith("_subparser") and fname.startswith("set_")
+        ]
+        for funcname in funcnames:
+            func = getattr(imported_module, funcname)
+            print("adding subparser", funcname)
+            try:
+                func(subparsers)
+            except TypeError:
+                func(subparsers, hekit_root_dir)
 
     # try to enable tab completion
     enable_tab_completion(parser)
