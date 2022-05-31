@@ -28,9 +28,14 @@ from utils.tab_completion import (  # pylint: disable=no-name-in-module
 )
 
 
-def files_in_dir(path: str) -> List[str]:
+def files_in_dir(path: str, cond) -> List[str]:
+    """Returns a list of filenames in the directory given by path. Can be filtered by cond"""
     try:
-        return next(walk(path))[2]
+        filenames = next(walk(path))[2]
+        if cond is None:
+            return filenames
+        else:
+            return list(filter(cond, filenames))
     except StopIteration:
         return []
 
@@ -38,10 +43,11 @@ def files_in_dir(path: str) -> List[str]:
 def discover_subparsers_from(module_paths: List[str], root: str):
     """Import modules in module_paths, and discover and return a generator of set_.*_subparser functions"""
     for module_path in module_paths:
-        filenames = files_in_dir(f"{root}/kit/{module_path}")
-        py_filenames = [f[:-3] for f in filenames if f[0] != "_" and f.endswith(".py")]
-        imported_modules = list(
-            import_module(f"{module_path}.{fname}") for fname in py_filenames
+        filenames = files_in_dir(
+            f"{root}/kit/{module_path}", lambda f: f[0] != "_" and f.endswith(".py")
+        )
+        imported_modules = (
+            import_module(f"{module_path}.{fname[:-3]}") for fname in filenames
         )
         funcs = (
             (getattr(imported_module, funcname), funcname)
