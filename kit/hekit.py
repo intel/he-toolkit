@@ -11,19 +11,45 @@ import sys
 
 assert sys.version_info >= (3, 8)
 
-from os import geteuid, walk as files_in_dir
+from os import geteuid, walk
 from sys import stderr, exit as sys_exit
 from importlib import import_module
+from importlib.util import spec_from_file_location, module_from_spec
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import List
 
 from commands.init import init_hekit
-from tools.healg import healg, set_gen_primes_subparser, set_gen_algebras_subparser
+from tools.healg import healg
 from utils.constants import Constants  # pylint: disable=no-name-in-module
 from utils.config import load_config  # pylint: disable=no-name-in-module
 from utils.tab_completion import (  # pylint: disable=no-name-in-module
     enable_tab_completion,
 )
+
+
+def files_in_dir(path: str) -> List[str]:
+    try:
+        return next(walk(path))[2]
+    except StopIteration:
+        return []
+
+
+def discover_subparsers_from(module_paths: List[str], root: str):
+    """Import modules in module_paths, and discover and return a generator of set_.*_subparser functions"""
+    for module_path in module_paths:
+        filenames = files_in_dir(f"{root}/kit/{module_path}")
+        py_filenames = [f[:-3] for f in filenames if f[0] != "_" and f.endswith(".py")]
+        imported_modules = list(
+            import_module(f"{module_path}.{fname}") for fname in py_filenames
+        )
+        funcs = (
+            (getattr(imported_module, funcname), funcname)
+            for imported_module in imported_modules
+            for funcname in dir(imported_module)
+            if funcname.startswith("set_") and funcname.endswith("_subparser")
+        )
+        yield from funcs
 
 
 def parse_cmdline():
@@ -47,25 +73,12 @@ def parse_cmdline():
 
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
-    set_gen_primes_subparser(subparsers)
-    set_gen_algebras_subparser(subparsers)
 
-    module_path = Path("./kit/commands")
-    py_filenames = next(files_in_dir(module_path))[2]
-    py_filenames = [f[:-3] for f in py_filenames if f.endswith(".py") and f[0] != "_"]
-
-    modules_to_import = (import_module(f"commands.{f}") for f in py_filenames)
-    for imported_module in modules_to_import:
-        funcs = [
-            getattr(imported_module, fname)
-            for fname in dir(imported_module)
-            if fname.startswith("set_") and fname.endswith("_subparser")
-        ]
-        for func in funcs:
-            try:
-                func(subparsers)
-            except TypeError:
-                func(subparsers, hekit_root_dir)
+    for func, name in discover_subparsers_from(["commands", "tools"], hekit_root_dir):
+        try:
+            func(subparsers)
+        except TypeError:
+            func(subparsers, hekit_root_dir)
 
     # try to enable tab completion
     enable_tab_completion(parser)
@@ -73,7 +86,7 @@ def parse_cmdline():
     return parser.parse_args(), parser.print_help
 
 
-def main():
+def main() -> None:
     """Starting point for program execution"""
     args, print_help = parse_cmdline()
 
