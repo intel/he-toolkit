@@ -31,7 +31,6 @@ def install_components(args):
     components = components_to_build_from(
         args.recipe_file, args.config.repo_location, args.recipe_arg
     )
-
     the_stages = _stages(args.upto_stage)
 
     for component in components:
@@ -41,6 +40,10 @@ def install_components(args):
             print("Skipping", comp_label)
             continue
 
+        # upto_stage value must be always executed. But if previous
+        # stages were already executed, they are going to be skipped.
+        # For example, fetch and build could be skipped when executing build.
+        component.reset_stage_info_file(args.upto_stage)
         chain_run(the_stages(component))
 
 

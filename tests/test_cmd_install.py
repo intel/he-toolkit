@@ -197,6 +197,9 @@ class MockComponent:
     def install(self):
         return self._result
 
+    def reset_stage_info_file(self, stage):
+        pass
+
 
 @pytest.fixture
 def args():
