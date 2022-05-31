@@ -40,14 +40,14 @@ def files_in_dir(path: str, cond) -> List[str]:
         return []
 
 
-def discover_subparsers_from(module_paths: List[str], root: str):
-    """Import modules in module_paths, and discover and return a generator of set_.*_subparser functions"""
-    for module_path in module_paths:
+def discover_subparsers_from(module_dirs: List[str], kit_root: str):
+    """Import modules in module_dirs, and discover and return a generator of set_.*_subparser functions"""
+    for module_dir in module_dirs:
         filenames = files_in_dir(
-            f"{root}/kit/{module_path}", lambda f: f[0] != "_" and f.endswith(".py")
+            f"{kit_root}/{module_dir}", lambda f: f[0] != "_" and f.endswith(".py")
         )
         imported_modules = (
-            import_module(f"{module_path}.{fname[:-3]}") for fname in filenames
+            import_module(f"{module_dir}.{fname[:-3]}") for fname in filenames
         )
         funcs = (
             (getattr(imported_module, funcname), funcname)
@@ -80,7 +80,9 @@ def parse_cmdline():
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
 
-    for func, name in discover_subparsers_from(["commands", "tools"], hekit_root_dir):
+    for func, name in discover_subparsers_from(
+        ["commands", "tools"], hekit_root_dir / "kit"
+    ):
         try:
             func(subparsers)
         except TypeError:
