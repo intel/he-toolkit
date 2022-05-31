@@ -14,7 +14,6 @@ assert sys.version_info >= (3, 8)
 from os import geteuid, walk
 from sys import stderr, exit as sys_exit
 from importlib import import_module
-from importlib.util import spec_from_file_location, module_from_spec
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import List
@@ -34,8 +33,7 @@ def files_in_dir(path: str, cond) -> List[str]:
         filenames = next(walk(path))[2]
         if cond is None:
             return filenames
-        else:
-            return list(filter(cond, filenames))
+        return list(filter(cond, filenames))
     except StopIteration:
         return []
 
@@ -50,7 +48,7 @@ def discover_subparsers_from(module_dirs: List[str], kit_root: str):
             import_module(f"{module_dir}.{fname[:-3]}") for fname in filenames
         )
         funcs = (
-            (getattr(imported_module, funcname), funcname)
+            getattr(imported_module, funcname)
             for imported_module in imported_modules
             for funcname in dir(imported_module)
             if funcname.startswith("set_") and funcname.endswith("_subparser")
@@ -80,9 +78,7 @@ def parse_cmdline():
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
 
-    for func, name in discover_subparsers_from(
-        ["commands", "tools"], hekit_root_dir / "kit"
-    ):
+    for func in discover_subparsers_from(["commands", "tools"], hekit_root_dir / "kit"):
         try:
             func(subparsers)
         except TypeError:
