@@ -54,16 +54,14 @@ def parse_cmdline():
     py_filenames = next(files_in_dir(module_path))[2]
     py_filenames = [f[:-3] for f in py_filenames if f.endswith(".py") and f[0] != "_"]
 
-    for f in py_filenames:
-        imported_module = import_module(f"commands.{f}")
-        funcnames = [
-            fname
+    modules_to_import = (import_module(f"commands.{f}") for f in py_filenames)
+    for imported_module in modules_to_import:
+        funcs = [
+            getattr(imported_module, fname)
             for fname in dir(imported_module)
-            if fname.endswith("_subparser") and fname.startswith("set_")
+            if fname.startswith("set_") and fname.endswith("_subparser")
         ]
-        for funcname in funcnames:
-            func = getattr(imported_module, funcname)
-            print("adding subparser", funcname)
+        for func in funcs:
             try:
                 func(subparsers)
             except TypeError:
