@@ -42,7 +42,7 @@ def install_components(args):
 
         # upto_stage value must be always executed. But if previous
         # stages were already executed, they are going to be skipped.
-        # For example, fetch and build could be skipped when executing build.
+        # For example, fetch and build could be skipped when executing install.
         component.reset_stage_info_file(args.upto_stage)
         chain_run(the_stages(component))
 
