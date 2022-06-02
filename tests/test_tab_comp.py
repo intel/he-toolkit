@@ -17,6 +17,7 @@ from install import install_components
 cwd_test = getcwd()
 
 
+@pytest.mark.xdist_group(name="group1")
 def execute_action(mocker, args_action):
     global cwd_test
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -25,6 +26,7 @@ def execute_action(mocker, args_action):
     chdir(cwd_test)
 
 
+@pytest.mark.xdist_group(name="group1")
 def test_get_instances_after_fetch(mocker, args_fetch, args_tab, comp_data):
     """Arrange"""
     execute_action(mocker, args_fetch)
@@ -40,6 +42,7 @@ def test_get_instances_after_fetch(mocker, args_fetch, args_tab, comp_data):
     assert act_inst == exp_inst
 
 
+@pytest.mark.xdist_group(name="group1")
 def test_get_instances_after_remove_v1(mocker, args_remove_v1, args_tab, comp_data):
     """Arrange"""
     execute_action(mocker, args_remove_v1)
@@ -55,6 +58,7 @@ def test_get_instances_after_remove_v1(mocker, args_remove_v1, args_tab, comp_da
     assert act_inst == exp_inst
 
 
+@pytest.mark.xdist_group(name="group1")
 def test_get_instances_after_remove_v2(mocker, args_remove_v2, args_tab):
     """Arrange"""
     execute_action(mocker, args_remove_v2)
@@ -79,7 +83,7 @@ class MockArgs:
         self.version = False
         self.component = component
         self.instance = instance
-        self.config = f"{self.tests_path}/input_files/default.config"
+        self.config = f"{self.tests_path}/input_files/default_v2.config"
         self.recipe_file = f"{self.tests_path}/input_files/test_two_instances.toml"
         self.fn = fn
         self.upto_stage = upto_stage

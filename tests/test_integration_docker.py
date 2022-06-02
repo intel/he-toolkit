@@ -15,6 +15,7 @@ from docker_build import setup_docker
 cwd_test = getcwd()
 
 
+@pytest.mark.xdist_group(name="group3")
 def test_docker_build_check_build(mocker):
     """Arrange"""
     args = MockArgs(check_only=False, clean=False, enable=None)
@@ -43,6 +44,7 @@ def test_docker_build_check_build(mocker):
     mock_print_tools.assert_any_call(client.value.replace('"', ""))
 
 
+@pytest.mark.xdist_group(name="group3")
 def test_docker_build_check_enable(mocker, restore_pwd):
     """Arrange"""
     args = MockArgs(check_only=False, clean=False, enable="vscode")
@@ -73,6 +75,7 @@ def test_docker_build_check_enable(mocker, restore_pwd):
     mock_print_tools.assert_any_call(client.value.replace('"', ""))
 
 
+@pytest.mark.xdist_group(name="group3")
 def test_docker_build_check_only(mocker, restore_pwd):
     """Arrange"""
     args = MockArgs(check_only=True, clean=False, enable=None)
@@ -101,6 +104,7 @@ def test_docker_build_check_only(mocker, restore_pwd):
     assert exc_info.value.code == 0
 
 
+@pytest.mark.xdist_group(name="group3")
 def test_docker_build_clean(mocker, restore_pwd):
     """Arrange"""
     args = MockArgs(check_only=False, clean=True, enable=None)

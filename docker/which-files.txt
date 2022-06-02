@@ -138,6 +138,7 @@ requirements.txt
 tests/__init__.py
 tests/context.py
 tests/input_files/default.config
+tests/input_files/default_v2.config
 tests/input_files/dependencies.txt
 tests/input_files/test.toml
 tests/input_files/test_tsort.toml
