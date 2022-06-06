@@ -22,19 +22,22 @@ class RepoProperties:
         # Get the components and instances
         self._repo_structure = RepoProperties._repo_struct(repo_location)
 
-        max_len = lambda iterable: max(map(len, iterable), default=0)
         # Get the width of the widest component
-        self.width_comp = max_len(self._repo_structure.keys())
+        self.width_comp = self.max_len(self._repo_structure.keys())
 
         # Get the width of the widest instance
         all_instances = self._repo_structure.values()
-        self.width_inst = max_len(chain.from_iterable(all_instances))
+        self.width_inst = self.max_len(chain.from_iterable(all_instances))
 
         # Include column separation
         self.width_comp += separation_spaces
         self.width_inst += separation_spaces
         self.width_status = 10
         self.separation_spaces = separation_spaces
+
+    def max_len(self, iterable):
+        """Return the width of the widest string"""
+        return max(map(len, iterable), default=0)
 
     @property
     def structure(self) -> Dict[str, List[str]]:
