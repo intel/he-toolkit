@@ -35,7 +35,8 @@ class RepoProperties:
         self.width_status = 10
         self.separation_spaces = separation_spaces
 
-    def max_len(self, iterable):
+    @staticmethod
+    def max_len(iterable):
         """Return the width of the widest string"""
         return max(map(len, iterable), default=0)
 
