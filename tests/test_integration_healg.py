@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-
+from pathlib import Path
 from .context import hekit, healg
 from hekit import main
 from healg import healg
@@ -112,10 +112,12 @@ def test_main_arg_no_corrected(mocker):
 
 class MockArgs:
     def __init__(self):
+        self.tests_path = Path(__file__).resolve().parent
         self.p = [2]
         self.d = [1]
         self.no_corrected = True
         self.no_header = True
         self.version = False
         self.fn = healg
-        self.config = "default.config"
+        self.config = f"{self.tests_path}/input_files/default.config"
+        self.tests_path = Path(__file__).resolve().parent

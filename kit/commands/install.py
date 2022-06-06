@@ -4,7 +4,10 @@
 """This module fetches, builds, or installs the requested libraries"""
 
 from typing import Dict
-from component_builder import components_to_build_from, chain_run
+from utils.component_builder import (  # pylint: disable=no-name-in-module
+    components_to_build_from,
+    chain_run,
+)
 
 
 def _stages(upto_stage: str):
