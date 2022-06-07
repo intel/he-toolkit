@@ -132,7 +132,7 @@ kit/utils/docker_tools.py
 kit/utils/spec.py
 kit/utils/tab_completion.py
 kit/utils/tsort.py
-pylintrc
+.pylintrc
 recipes/default.toml
 recipes/examples.toml
 recipes/sample-kernels.toml
