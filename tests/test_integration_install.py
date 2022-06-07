@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+
+from tracemalloc import start
 import pytest
 from os import getcwd, chdir
 from pathlib import Path
@@ -16,7 +18,6 @@ from install import install_components
 cwd_test = getcwd()
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_install_fetch(mocker, args_fetch):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -35,7 +36,6 @@ def test_install_fetch(mocker, args_fetch):
     assert 2 == mock_input.call_count
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_list_after_fetch(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -53,7 +53,6 @@ def test_list_after_fetch(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg2, arg34, arg34)
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_install_build(mocker, args_build):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -72,7 +71,6 @@ def test_install_build(mocker, args_build):
     assert 2 == mock_input.call_count
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_list_after_build(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -90,7 +88,6 @@ def test_list_after_build(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg23, arg23, arg4)
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_remove_after_build(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -106,7 +103,6 @@ def test_remove_after_build(mocker, args_remove, restore_pwd):
     mock_print.assert_called_with(arg1)
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_install_execution(mocker, args_install):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -128,7 +124,6 @@ def test_install_execution(mocker, args_install):
     assert 2 == mock_input.call_count
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_list_after_install(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
@@ -145,7 +140,6 @@ def test_list_after_install(mocker, args_list, restore_pwd):
     mock_print.assert_called_with(arg1, arg234, arg234, arg234)
 
 
-@pytest.mark.xdist_group(name="group2")
 def test_remove_all_after_install(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
