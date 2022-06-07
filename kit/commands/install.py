@@ -31,10 +31,11 @@ def _stages(upto_stage: str):
 
 def install_components(args):
     """Install command"""
+    the_stages = _stages(args.upto_stage)
+
     components = components_to_build_from(
         args.recipe_file, args.config.repo_location, args.recipe_arg
     )
-    the_stages = _stages(args.upto_stage)
 
     for component in components:
         comp_label = f"{component.component_name()}/{component.instance_name()}"
@@ -43,10 +44,12 @@ def install_components(args):
             print("Skipping", comp_label)
             continue
 
-        # upto_stage value must be always executed. But if previous
-        # stages were already executed, they are going to be skipped.
+        # upto_stage is re-executed only when "force" flag is set.
+        # if previous stages were executed successfully, they are going to be skipped.
         # For example, fetch and build could be skipped when executing install.
-        component.reset_stage_info_file(args.upto_stage)
+        if args.force:
+            component.reset_stage_info_file(args.upto_stage)
+
         chain_run(the_stages(component))
 
 
@@ -80,5 +83,8 @@ def set_install_subparser(subparsers):
             default={},
             type=get_recipe_arg_dict,
             help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data.",
+        )
+        parser.add_argument(
+            "-f", "--force", action="store_true", help=f"Re-execute {action}"
         )
         parser.set_defaults(fn=install_components, upto_stage=action)
