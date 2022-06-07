@@ -156,7 +156,7 @@ Acceleration Library enabled.
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
 
-The [sample kernels](kernels) and [examples](examples) can also be built in a
+The [sample kernels](he-samples/sample-kernels) and [examples](he-samples/examples) can also be built in a
 similar manner using
 ```bash
 hekit build recipes/sample-kernels.toml
@@ -272,11 +272,12 @@ We encourage feedback and suggestions via
 
 ## Adding a new command
 
-Please follow the next steps to add a new command where `TODO-ACTION` must be replaced by a word or set of words that described the functionality of the new command.
+Please follow the next steps to add a new command where `TODO-ACTION` must be 
+replaced by a word or set of words that described the functionality of the new command.
 
-a) Create a new python file inside [kit](kit) directory and perform the following steps:
+a) Create a new python file inside [commands](kit/commands) directory and perform the following steps:
 
-* Name the file as command_TODO-ACTION.py
+* Name the file as TODO-ACTION.py
 
 * Create a function to define the arguments of the command. Also, the parameter of the function set_defaults (fn) must be set to the function defined in the next step. Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
 ```bash
@@ -291,7 +292,7 @@ a) Create a new python file inside [kit](kit) directory and perform the followin
 		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
 ```
 
-* Create the functions that implement the new functionality, but the entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
+* Create the set of functions that implement the new functionality, but the entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
 ```bash
 	def NEW_FUNCTIONALITY(args) -> None:
 		"""Executes new functionality"""
@@ -301,16 +302,9 @@ a) Create a new python file inside [kit](kit) directory and perform the followin
 			pass
 ```
 
-b) Perform the following changes in [hekit.py](kit/hekit.py)
+* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the function `set_TODO-ACTION_subparser` and enable the options of the new command.
 
-* Add the import statement of the new function
-```bash
-from command_TODO-ACTION import set_ACTION_subparser
-```
-* Add the calling statement inside the parse_cmdline() function
-```bash
-set_TODO-ACTION_subparser(subparsers)
-```
+* Generic utilities or helper functions that can be used for several commands must be in [utils](kit/utils).
 
 ## Troubleshooting
 
