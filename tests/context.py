@@ -12,24 +12,25 @@ sys_path.append(
     os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/commands/"))
 )
 
-import docker_build
 import check_deps
+import docker_build
 import init
 import install
 import list_cmd
-import remove
 import new
+import remove
 
 sys_path.append(
     os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/utils/"))
 )
 
-import config
-import tab_completion
-import constants
 import component_builder
+import config
+import constants
 import docker_tools
 import spec
+import subparsers
+import tab_completion
 import tsort
 
 sys_path.append(
