@@ -5,7 +5,7 @@ environment to evaluate homomorphic encryption technology.
 ## Usage
 `hekit` can be executed using the following options:
 ```
-hekit [-h] [--version] [--config CONFIG] {init,list,install,build,fetch,remove,check-dependencies,docker-build,gen-primes,algebras}
+hekit [-h] [--version] [--config CONFIG] {docker-build,check-dependencies,install,build,fetch,init,remove,new,list,algebras,gen-primes}
 ```
 where the options and input files are explained in the following sections.
 
@@ -25,14 +25,15 @@ The option -h can be used to get details about the arguments and usage of each c
 |-----------|-----------|-----------|
 | init | Initializes hekit. | hekit init [--default-config]
 | list | Lists installed components. |  hekit list
-| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] recipe-file
-| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] recipe-file
+| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] [-f] recipe-file
 | fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--recipe_arg RECIPE_ARG] recipe-file
 | remove | Uninstalls instances or components. | hekit remove [--all] [component] [instance]
-| check-dependencies | check system dependencies. | hekit check-dependencies dependencies-file
+| new | Create a new project. | hekit new [--directory DIRECTORY] [--based-on {logistic-regression,psi,secure-query}] name|
+| check-dependencies | Checks system dependencies. | hekit check-dependencies dependencies-file
 | docker-build | Builds the HE Toolkit Docker container. See [Docker Build](../docker/README.md). | hekit docker-build [--id ID] [--clean] [--check-only] [--enable {vscode}]
-| gen-primes | generate primes in range [n, m] where n, m are positive integers. See [Tools](./tools/README.md). | hekit gen-primes start stop
-| algebras  | generate ZZ_p[x]/phi(X) algebras. . See [Tools](./tools/README.md). | hekit algebras [-p P] [-d D] [--no-corrected] [--no-header]
+| gen-primes | Generates primes in range [n, m] where n, m are positive integers. See [Tools](./tools/README.md). | hekit gen-primes start stop
+| algebras  | Generates ZZ_p[x]/phi(X) algebras. . See [Tools](./tools/README.md). | hekit algebras [-p P] [-d D] [--no-corrected] [--no-header]
 
 ### Configuration file
 
@@ -108,6 +109,14 @@ cd <he-toolkit-root-directory>
 Afterwards source your shell initialization file e.g. `~/.bashrc`. Now you can
 run the `hekit` commands from anywhere.
 
+Also, the init command can be executed with `--default-config` flag. This will create 
+a directory ~/.hekit in the user's home directory and create the default.config. 
+This directory will be where all components built and installed by hekit will be kept.
+```bash
+cd <he-toolkit-root-directory>
+./hekit init --default-config
+```
+
 In order to check the installed components, execute the list command
 ```bash
 hekit list
@@ -123,6 +132,13 @@ Using fetch and build commands, the user has access to perform specific
 actions. For example, for fetching libraries:
 ```bash
 hekit fetch ./recipes/examples.toml --recipe_arg "version=v1.2.3"
+```
+
+By default, if actions as build or install were executed successfully,
+the next time that the command is executed, they are going to be skipped.
+For re-executing actions as build or install, the flag "--force" must be set.
+```bash
+hekit build ./recipes/examples.toml --force
 ```
 
 In order to uninstall a specific instance, execute the remove command
