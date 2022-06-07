@@ -5,6 +5,7 @@
 .github/workflows/github-ci.yml
 .gitignore
 .pre-commit-config.yaml
+.pylintrc
 .typos.toml
 CODEOWNERS
 CODE_OF_CONDUCT.md
@@ -112,6 +113,7 @@ hekit
 kit/README.md
 kit/__init__.py
 kit/utils/archive.py
+kit/commands/__init__.py
 kit/commands/check_deps.py
 kit/commands/docker_build.py
 kit/commands/init.py
@@ -130,6 +132,22 @@ kit/tools/__init__.py
 kit/tools/healg.py
 kit/utils/tsort.py
 pylintrc
+kit/commands/new.py
+kit/commands/remove.py
+kit/hekit.py
+kit/tools/README.md
+kit/tools/__init__.py
+kit/tools/healg.py
+kit/utils/__init__.py
+kit/utils/archive.py
+kit/utils/component_builder.py
+kit/utils/config.py
+kit/utils/constants.py
+kit/utils/docker_tools.py
+kit/utils/spec.py
+kit/utils/subparsers.py
+kit/utils/tab_completion.py
+kit/utils/tsort.py
 recipes/default.toml
 recipes/examples.toml
 recipes/sample-kernels.toml
@@ -138,7 +156,6 @@ requirements.txt
 tests/__init__.py
 tests/context.py
 tests/input_files/default.config
-tests/input_files/default_v2.config
 tests/input_files/dependencies.txt
 tests/input_files/test.toml
 tests/input_files/test_tsort.toml
@@ -159,5 +176,6 @@ tests/test_integration_healg.py
 tests/test_integration_init.py
 tests/test_integration_install.py
 tests/test_spec.py
+tests/test_subparsers.py
 tests/test_tab_comp.py
 tests/test_tsort.py
