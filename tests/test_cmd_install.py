@@ -168,6 +168,7 @@ class MockArgs:
         self.config = MockArgs.Config()
         self.recipe_file = "file_test"
         self.upto_stage = "install"
+        self.force = False
         self.recipe_arg = {"version": "1.2.3"}
 
 
