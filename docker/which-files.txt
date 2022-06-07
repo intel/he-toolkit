@@ -5,6 +5,7 @@
 .github/workflows/github-ci.yml
 .gitignore
 .pre-commit-config.yaml
+.pylintrc
 .typos.toml
 CODEOWNERS
 CODE_OF_CONDUCT.md
@@ -133,7 +134,6 @@ kit/utils/spec.py
 kit/utils/subparsers.py
 kit/utils/tab_completion.py
 kit/utils/tsort.py
-pylintrc
 recipes/default.toml
 recipes/examples.toml
 recipes/sample-kernels.toml
@@ -162,5 +162,6 @@ tests/test_integration_healg.py
 tests/test_integration_init.py
 tests/test_integration_install.py
 tests/test_spec.py
+tests/test_subparsers.py
 tests/test_tab_comp.py
 tests/test_tsort.py
