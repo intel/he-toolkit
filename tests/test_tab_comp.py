@@ -5,11 +5,11 @@ import pytest
 from os import getcwd, chdir
 from pathlib import Path
 
-from .context import hekit, tab_completion, command_remove, command_install
+from .context import hekit, tab_completion, remove, install
 from hekit import main
 from tab_completion import components_completer, instances_completer
-from command_remove import remove_components
-from command_install import install_components
+from remove import remove_components
+from install import install_components
 
 
 # Due to install command changes current directory,

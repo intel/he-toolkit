@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-import subprocess
 import os.path
 from sys import maxsize
 from argparse import ArgumentTypeError
