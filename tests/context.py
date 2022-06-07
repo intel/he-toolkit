@@ -4,25 +4,36 @@
 from os import path as os_path
 from sys import path as sys_path
 
-sys_path.insert(0, os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit")))
+sys_path.append(os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/")))
 
-import command_check_deps
-import command_docker_build
-import command_init
-import command_install
-import command_list
-import command_remove
-import component_builder
-import config
-import constants
-import docker_tools
 import hekit
-import spec
+
+sys_path.append(
+    os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/commands/"))
+)
+
+import docker_build
+import check_deps
+import init
+import install
+import list_cmd
+import remove
+import new
+
+sys_path.append(
+    os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/utils/"))
+)
+
+import config
 import tab_completion
+import constants
+import component_builder
+import docker_tools
+import spec
 import tsort
 
-sys_path.insert(
-    0, os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/tools"))
+sys_path.append(
+    os_path.abspath(os_path.join(os_path.dirname(__file__), "../kit/tools"))
 )
 
 import healg

@@ -37,6 +37,7 @@ RUN apt update && \
                    htop                           \
                    jq                             \
                    libgmp-dev                     \
+                   libomp-dev                     \
                    libterm-readline-gnu-perl      \
                    m4                             \
                    man                            \

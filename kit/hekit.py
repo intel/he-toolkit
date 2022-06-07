@@ -16,16 +16,19 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
-from config import load_config  # pylint: disable=no-name-in-module
-from tab_completion import enable_tab_completion
-from command_init import init_hekit, set_init_subparser
-from command_remove import set_remove_subparser
-from command_list import set_list_subparser
-from command_install import set_install_subparser
-from command_check_deps import set_check_dep_subparser
-from command_docker_build import set_docker_subparser
-from tools.healg import healg, set_gen_primes, set_gen_algebras
-from constants import Constants
+from commands.init import init_hekit, set_init_subparser
+from commands.remove import set_remove_subparser
+from commands.list_cmd import set_list_subparser
+from commands.install import set_install_subparser
+from commands.check_deps import set_check_dep_subparser
+from commands.docker_build import set_docker_subparser
+from commands.new import set_new_subparser
+from tools.healg import healg, set_gen_primes_subparser, set_gen_algebras_subparser
+from utils.constants import Constants  # pylint: disable=no-name-in-module
+from utils.config import load_config  # pylint: disable=no-name-in-module
+from utils.tab_completion import (  # pylint: disable=no-name-in-module
+    enable_tab_completion,
+)
 
 
 def parse_cmdline():
@@ -55,8 +58,9 @@ def parse_cmdline():
     set_remove_subparser(subparsers)
     set_check_dep_subparser(subparsers)
     set_docker_subparser(subparsers, hekit_root_dir)
-    set_gen_primes(subparsers)
-    set_gen_algebras(subparsers)
+    set_gen_primes_subparser(subparsers)
+    set_gen_algebras_subparser(subparsers)
+    set_new_subparser(subparsers, hekit_root_dir)
 
     # try to enable tab completion
     enable_tab_completion(parser)
