@@ -16,14 +16,9 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
-from commands.init import init_hekit, set_init_subparser
-from commands.remove import set_remove_subparser
-from commands.list_cmd import set_list_subparser
-from commands.install import set_install_subparser
-from commands.check_deps import set_check_dep_subparser
-from commands.docker_build import set_docker_subparser
-from commands.new import set_new_subparser
-from tools.healg import healg, set_gen_primes_subparser, set_gen_algebras_subparser
+from commands.init import init_hekit
+from tools.healg import healg
+from utils.subparsers import discover_subparsers_from
 from utils.constants import Constants  # pylint: disable=no-name-in-module
 from utils.config import load_config  # pylint: disable=no-name-in-module
 from utils.tab_completion import (  # pylint: disable=no-name-in-module
@@ -52,15 +47,12 @@ def parse_cmdline():
 
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
-    set_init_subparser(subparsers, hekit_root_dir)
-    set_list_subparser(subparsers)
-    set_install_subparser(subparsers)
-    set_remove_subparser(subparsers)
-    set_check_dep_subparser(subparsers)
-    set_docker_subparser(subparsers, hekit_root_dir)
-    set_gen_primes_subparser(subparsers)
-    set_gen_algebras_subparser(subparsers)
-    set_new_subparser(subparsers, hekit_root_dir)
+
+    for func in discover_subparsers_from(["commands", "tools"], hekit_root_dir / "kit"):
+        try:
+            func(subparsers)
+        except TypeError:
+            func(subparsers, hekit_root_dir)
 
     # try to enable tab completion
     enable_tab_completion(parser)
@@ -68,7 +60,7 @@ def parse_cmdline():
     return parser.parse_args(), parser.print_help
 
 
-def main():
+def main() -> None:
     """Starting point for program execution"""
     args, print_help = parse_cmdline()
 
