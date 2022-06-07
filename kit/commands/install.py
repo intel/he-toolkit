@@ -84,7 +84,8 @@ def set_install_subparser(subparsers):
             type=get_recipe_arg_dict,
             help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data.",
         )
-        parser.add_argument(
-            "-f", "--force", action="store_true", help=f"Re-execute {action}"
-        )
+        if action != "fetch":
+            parser.add_argument(
+                "-f", "--force", action="store_true", help=f"Re-execute {action}"
+            )
         parser.set_defaults(fn=install_components, upto_stage=action)
