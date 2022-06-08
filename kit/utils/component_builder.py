@@ -125,6 +125,10 @@ class ComponentBuilder:
             self._info_file["status"][stage] = "success" if success else "failure"
             toml.dump(self._info_file, info_file)
 
+    def reset_stage_info_file(self, stage):
+        """Reset the stage value that was read from hekit.info file"""
+        self._info_file["status"][stage] = ""
+
     def _stage(self, stage: str):
         print(stage)
         if self.already_successful(stage):

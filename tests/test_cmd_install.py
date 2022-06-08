@@ -168,6 +168,7 @@ class MockArgs:
         self.config = MockArgs.Config()
         self.recipe_file = "file_test"
         self.upto_stage = "install"
+        self.force = False
         self.recipe_arg = {"version": "1.2.3"}
 
 
@@ -196,6 +197,9 @@ class MockComponent:
 
     def install(self):
         return self._result
+
+    def reset_stage_info_file(self, stage):
+        pass
 
 
 @pytest.fixture
