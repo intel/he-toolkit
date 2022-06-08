@@ -270,18 +270,20 @@ described the functionality of the new command.
 	or the [tools](kit/tools) directory.
 
 * Create a function to set the parser of the subcommand (the subparser to `hekit` parser).
+  The function must begin and end with `set_` and `\_subparser`, respectively.
   Define the arguments of the command. The parameter of
   the function set_defaults (fn) must be set to the function defined in the
-  next step. Check
-  [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
+  next step.
+  Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
 ```python
 	def set_TODO-ACTION_subparser(subparsers):
 		"""create the parser for the 'TODO-ACTION' command"""
-		parser_TODO-ACTION = subparsers.add_parser(
-			"ARG1", description="ADD-DESCRIPTION"
+		parser_TODO-ACTION = subparsers.add_parser("TODO-ACTION", description="ADD-SUBPARSER-DESCRIPTION")
+		subparsers.add_argument(
+			"ARG1", description="ADD-ARG-DESCRIPTION"
 		)
-		parser_TODO-ACTION = subparsers.add_parser(
-			"ARG2", description="ADD-DESCRIPTION"
+		subparsers.add_argument(
+			"ARG2", description="ADD-ARG-DESCRIPTION"
 		)
 		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
 ```
