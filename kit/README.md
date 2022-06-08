@@ -2,13 +2,6 @@
 The `hekit` tool can be used by the user to easily set up the required
 environment to evaluate homomorphic encryption technology.
 
-## Usage
-`hekit` can be executed using the following options:
-```
-hekit [-h] [--version] [--config CONFIG] {docker-build,check-dependencies,install,build,fetch,init,remove,new,list,algebras,gen-primes}
-```
-where the options and input files are explained in the following sections.
-
 ### Global Options
 
 `-h, --help`: Shows the help message.
