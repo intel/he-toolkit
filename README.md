@@ -44,18 +44,18 @@ Intel HE toolkit has been tested on Ubuntu 20.04
 
 Must have system dependencies for the toolkit include,
 ```
-git
 python >= 3.8
+git
 pip
 ```
 
 Further Python dependencies include,
 ```
 toml
-argcomplete (optional for tab completion)
-docker      (optional for building docker containers)
-pytest      (optional for running tests)
-pytest-mock (optional for running tests)
+argcomplete (optional: tab completion)
+docker      (optional: building docker containers)
+pytest      (optional: running tests)
+pytest-mock (optional: running tests)
 ```
 
 For faster setup, a `requirements.txt` file is provided for recommended user
@@ -272,14 +272,16 @@ We encourage feedback and suggestions via
 
 ## Adding a new command
 
-Please follow the next steps to add a new command where `TODO-ACTION` must be
-replaced by a word or set of words that described the functionality of the new command.
+The foolowing steps allows to add a new subcommand to `hekit` as a command or
+tool. Below `TODO-ACTION` must be replaced by a word or set of words that
+described the functionality of the new command.
 
-a) Create a new python file inside [commands](kit/commands) directory and perform the following steps:
+a) Create a new python file inside either the [commands](kit/commands) directory
+or the [tools](kit/tools) directory and perform the following steps:
 
 * Name the file as TODO-ACTION.py
 
-* Create a function to define the arguments of the command. Also, the parameter of the function set_defaults (fn) must be set to the function defined in the next step. Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
+* Create a function to define the arguments of the command. The parameter of the function set_defaults (fn) must be set to the function defined in the next step. Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
 ```bash
 	def set_TODO-ACTION_subparser(subparsers):
 		"""create the parser for the 'TODO-ACTION' command"""
@@ -292,7 +294,7 @@ a) Create a new python file inside [commands](kit/commands) directory and perfor
 		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
 ```
 
-* Create the set of functions that implement the new functionality, but the entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
+* Create the set of functions that implement the new functionality. The entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
 ```bash
 	def NEW_FUNCTIONALITY(args) -> None:
 		"""Executes new functionality"""
@@ -304,7 +306,7 @@ a) Create a new python file inside [commands](kit/commands) directory and perfor
 
 * The file [hekit.py](kit/hekit.py) has the logic to automatically discover the function `set_TODO-ACTION_subparser` and enable the options of the new command.
 
-* Generic utilities or helper functions that can be used for several commands must be in [utils](kit/utils).
+* Generic utilities or helper functions that can be used for several commands should be in [utils](kit/utils).
 
 ## Troubleshooting
 
@@ -335,6 +337,7 @@ The Intel past and present contributors to this project, sorted by last name, ar
   - [Dennis Calderon Vega](https://www.linkedin.com/in/dennis-calderon-996840a9/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - [Tomas Gonzalez Aragon]
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Manasa Kilari](www.linkedin.com/in/manasakilari/)
