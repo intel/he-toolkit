@@ -34,6 +34,7 @@ utilize the latest Intel hardware features.
     - [Private Set Intersection](#private-set-intersection)
   - [Known Issues](#known-issues)
 - [Contributing](#contributing)
+  - [Adding a New Command](#adding-a-new-command)
   - [Troubleshooting](#troubleshooting)
   - [Adding a new command](#adding-a-new-command)
 - [Contributors](#contributors)
@@ -260,45 +261,47 @@ We encourage feedback and suggestions via
 [GitHub Issues](https://github.com/intel/he-toolkit/issues) as well as via
 [GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
 
-## Adding a new command
+
+## Adding a New Command
 
 The following steps allows to add a new subcommand to `hekit` as a command or
 tool. Below `ACTION` must be replaced by a word or set of words that
 described the functionality of the new command.
 
-* Create a new python file ACTION.py inside either the [commands](kit/commands) directory
-	or the [tools](kit/tools) directory.
+* Create a new python file ACTION.py inside either the [commands](kit/commands)
+  directory or the [tools](kit/tools) directory.
 
-* Create a function to set the parser of the subcommand (the subparser to `hekit` parser).
-  The function must begin and end with `set_` and `\_subparser`, respectively.
-  Define the arguments of the command. The parameter of
-  the function set_defaults (fn) must be set to the function defined in the
-  next step.
-  Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
-```python
-	def set_ACTION_subparser(subparsers):
-		"""create the parser for the 'ACTION' command"""
-		parser_ACTION = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
-		parser_ACTION.add_argument(
-			"ARG1", description="ADD-ARG-DESCRIPTION"
-		)
-		parser_ACTION.add_argument(
-			"ARG2", description="ADD-ARG-DESCRIPTION"
-		)
-		parser_ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
-```
+* Create a function to set the parser of the subcommand (the subparser to
+  `hekit` parser).  The function must begin and end with `set_` and
+  `\_subparser`, respectively.  Define the arguments of the command. The
+  parameter of the function `set_defaults(fn)` must be set to the function
+  defined in the next step.  Check
+  [argparse](https://docs.python.org/3/library/argparse.html#action) for API
+  reference information.
+  ```python
+  def set_ACTION_subparser(subparsers):
+      """create the parser for the 'ACTION' command"""
+      parser_ACTION = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
+      parser_ACTION.add_argument(
+          "ARG1", description="ADD-ARG-DESCRIPTION"
+      )
+      parser_ACTION.add_argument(
+          "ARG2", description="ADD-ARG-DESCRIPTION"
+      )
+      parser_ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
+  ```
 
 * Create the set of functions that implement the new functionality. The entry
   point must be a function that has `args` as parameter and it will use the
   arguments defined in the previous step.
-```python
-	def NEW_FUNCTIONALITY(args) -> None:
-		"""Executes new functionality"""
-		if(args.ARG1)
-			pass
-		elif(args.ARG2)
-			pass
-```
+  ```python
+  def NEW_FUNCTIONALITY(args) -> None:
+      """Executes new functionality"""
+      if(args.ARG1)
+          pass
+      elif(args.ARG2)
+          pass
+  ```
 
 * The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
   function `set_ACTION_subparser` and enable the options of the new
@@ -321,8 +324,8 @@ described the functionality of the new command.
 
 * When attempting to sign a commit
   ```
-     error: gpg failed to sign the data
-     fatal: failed to write commit object
+  error: gpg failed to sign the data
+  fatal: failed to write commit object
   ```
   Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
   as `~/.bashrc`.
@@ -337,7 +340,7 @@ The Intel past and present contributors to this project, sorted by last name, ar
   - [Dennis Calderon Vega](https://www.linkedin.com/in/dennis-calderon-996840a9/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
-  - [Tomas Gonzalez Aragon]
+  - Tomas Gonzalez Aragon
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Manasa Kilari](www.linkedin.com/in/manasakilari/)

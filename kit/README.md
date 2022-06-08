@@ -102,9 +102,10 @@ cd <he-toolkit-root-directory>
 Afterwards source your shell initialization file e.g. `~/.bashrc`. Now you can
 run the `hekit` commands from anywhere.
 
-Also, the init command can be executed with `--default-config` flag. This will create
-a directory ~/.hekit in the user's home directory and create the default.config.
-This directory will be where all components built and installed by hekit will be kept.
+Also, the `init` command can be executed with `--default-config` flag. This
+will create a directory `~/.hekit` in the user's home directory and create the
+`default.config`.  This directory will be where all components built and
+installed by `hekit` will be kept.
 ```bash
 cd <he-toolkit-root-directory>
 ./hekit init --default-config
@@ -122,14 +123,15 @@ hekit install ./recipes/default.toml
 ```
 
 Using fetch and build commands, the user has access to perform specific
-actions. For example, for fetching libraries:
+actions. For example, for fetching libraries
 ```bash
 hekit fetch ./recipes/examples.toml --recipe_arg "version=v1.2.3"
 ```
 
 By default, if actions as build or install were executed successfully,
 the next time that the command is executed, they are going to be skipped.
-For re-executing actions as build or install, the flag "--force" must be set.
+For re-executing actions such as build or install, the flag `--force` must be
+set.
 ```bash
 hekit build ./recipes/examples.toml --force
 ```
@@ -149,7 +151,7 @@ Also, to uninstall all component, use
 hekit remove --all
 ```
 
-To check system dependencies, execute:
+To check system dependencies, execute
 ```bash
 hekit check-dependencies dependencies.txt
 ```
@@ -182,11 +184,16 @@ Projects
 
 The following actions should be completed to build the new project:
 
-* Open the `toml` file inside the recipes directory and replace `-DFLAG=TBD` with the desired CMake flags for your project.
+* Open the `toml` file inside the recipes directory and replace `-DFLAG=TBD`
+  with the desired CMake flags for your project.
 
-* Open `CMakeLists.txt` and uncomment the statements for `find_package` and `target_link_libraries` of the required library. If other dependencies are needed, for instance `Threads`, the file must be updated to include and compile them.
+* Open `CMakeLists.txt` and uncomment the statements for `find_package` and
+  `target_link_libraries` of the required library. If other dependencies are
+  needed, for instance `Threads`, the file must be updated to include and
+  compile them.
 
-* Add and/or write the code of the new project in the `.cpp` and `.h` files created by the command.
+* Add and/or write the code of the new project in the `.cpp` and `.h` files
+  created by the command.
 
 ## Tab completion
 As an optional feature, the user is able to enable tab completion feature using
@@ -201,7 +208,7 @@ enable this functionality
 
 - If you have used `hekit init` command than you are set to go. Otherwise, if
   you would like to set it manually adding the following line in your shell
-  initialization script e.g. .bashrc file.
+  initialization script e.g. `.bashrc` file.
   ```
   eval "$(register-python-argcomplete hekit.py)"
   ```
