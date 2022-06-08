@@ -105,23 +105,13 @@ or directly on your system.
 The `hekit` command is a command-line tool that can be used by the user to
 easily set up an HE environment in a configurable and intuitive manner.
 
-The `hekit` command has a help option which lists all sub-commands and flags
+The `hekit` command has a help option which lists all subcommands and flags
 ```bash
 hekit -h
-usage: hekit [-h] [--version] [--config CONFIG] {docker-build,check-dependencies,install,build,fetch,init,remove,new,list,algebras,gen-primes} ...
-
-positional arguments:
-  {docker-build,check-dependencies,install,build,fetch,init,remove,new,list,algebras,gen-primes}
-                        sub-command help
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --version             display Intel HE toolkit version
-  --config CONFIG       use a non-default configuration file instead
 ```
 
-Moreover, each sub-command has a help option that can be invoked with `hekit
-<sub-command> -h`.
+Moreover, each subcommand has a help option that can be invoked with `hekit
+<subcommand> -h`.
 
 The `hekit` subcommands consist of utility commands such as
 `check-dependencies` and `docker-build` as well as commands for managing the
@@ -224,12 +214,12 @@ all within the HE domain. See the
 information.
 
 ### Private Set Intersection
-The [Private Set Intersection (PSI)](he-samples/examples/psi) example computes the intersection of two
-given sets. The program computes a hash value for each entry of both the client
-and the server sets, then using the HElib BGV scheme, it encrypts the client
-set and computes the intersection, returning all the encrypted elements that
-are common to both sets. See the [README](he-samples/examples/psi/README.md)
-for usage information.
+The [Private Set Intersection (PSI)](he-samples/examples/psi) example computes
+the intersection of two given sets. The program computes a hash value for each
+entry of both the client and the server sets, then using the HElib BGV scheme,
+it encrypts the client set and computes the intersection, returning all the
+encrypted elements that are common to both sets. See the
+[README](he-samples/examples/psi/README.md) for usage information.
 
 ## Known Issues
 * Running ```./hekit init --default-config``` produces the error
@@ -276,12 +266,14 @@ The following steps allows to add a new subcommand to `hekit` as a command or
 tool. Below `TODO-ACTION` must be replaced by a word or set of words that
 described the functionality of the new command.
 
-a) Create a new python file inside either the [commands](kit/commands) directory
-or the [tools](kit/tools) directory and perform the following steps:
+* Create a new python file TODO_ACTION.py inside either the [commands](kit/commands) directory
+	or the [tools](kit/tools) directory.
 
-* Name the file as TODO-ACTION.py
-
-* Create a function to define the arguments of the command. The parameter of the function set_defaults (fn) must be set to the function defined in the next step. Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
+* Create a function to set the parser of the subcommand (the subparser to `hekit` parser).
+  Define the arguments of the command. The parameter of
+  the function set_defaults (fn) must be set to the function defined in the
+  next step. Check
+  [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
 ```bash
 	def set_TODO-ACTION_subparser(subparsers):
 		"""create the parser for the 'TODO-ACTION' command"""
@@ -294,7 +286,9 @@ or the [tools](kit/tools) directory and perform the following steps:
 		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
 ```
 
-* Create the set of functions that implement the new functionality. The entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
+* Create the set of functions that implement the new functionality. The entry
+  point must be a function that has `args` as parameter and it will use the
+  arguments defined in the previous step.
 ```bash
 	def NEW_FUNCTIONALITY(args) -> None:
 		"""Executes new functionality"""
@@ -304,7 +298,9 @@ or the [tools](kit/tools) directory and perform the following steps:
 			pass
 ```
 
-* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the function `set_TODO-ACTION_subparser` and enable the options of the new command.
+* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
+  function `set_TODO-ACTION_subparser` and enable the options of the new
+  command.
 
 * Generic utilities or helper functions that can be used for several commands should be in [utils](kit/utils).
 
