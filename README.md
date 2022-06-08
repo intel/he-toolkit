@@ -108,10 +108,10 @@ easily set up an HE environment in a configurable and intuitive manner.
 The `hekit` command has a help option which lists all sub-commands and flags
 ```bash
 hekit -h
-usage: hekit [-h] [--version] [--config CONFIG] {init,list,install,build,fetch,remove,check-dependencies,docker-build} ...
+usage: hekit [-h] [--version] [--config CONFIG] {docker-build,check-dependencies,install,build,fetch,init,remove,new,list,algebras,gen-primes} ...
 
 positional arguments:
-  {init,list,install,build,fetch,remove,check-dependencies,docker-build}
+  {docker-build,check-dependencies,install,build,fetch,init,remove,new,list,algebras,gen-primes}
                         sub-command help
 
 optional arguments:
