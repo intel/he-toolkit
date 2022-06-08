@@ -274,7 +274,7 @@ described the functionality of the new command.
   the function set_defaults (fn) must be set to the function defined in the
   next step. Check
   [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
-```bash
+```python
 	def set_TODO-ACTION_subparser(subparsers):
 		"""create the parser for the 'TODO-ACTION' command"""
 		parser_TODO-ACTION = subparsers.add_parser(
@@ -289,7 +289,7 @@ described the functionality of the new command.
 * Create the set of functions that implement the new functionality. The entry
   point must be a function that has `args` as parameter and it will use the
   arguments defined in the previous step.
-```bash
+```python
 	def NEW_FUNCTIONALITY(args) -> None:
 		"""Executes new functionality"""
 		if(args.ARG1)
@@ -302,7 +302,9 @@ described the functionality of the new command.
   function `set_TODO-ACTION_subparser` and enable the options of the new
   command.
 
-* Generic utilities or helper functions that can be used for several commands should be in [utils](kit/utils).
+* Generic utilities or helper functions that can be used for several commands
+  should be in [utils](kit/utils).
+
 
 ## Troubleshooting
 
