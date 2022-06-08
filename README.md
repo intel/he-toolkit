@@ -272,7 +272,7 @@ We encourage feedback and suggestions via
 
 ## Adding a new command
 
-The foolowing steps allows to add a new subcommand to `hekit` as a command or
+The following steps allows to add a new subcommand to `hekit` as a command or
 tool. Below `TODO-ACTION` must be replaced by a word or set of words that
 described the functionality of the new command.
 
