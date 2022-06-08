@@ -276,37 +276,48 @@ The following steps allows to add a new subcommand to `hekit` as a command or
 tool. Below `TODO-ACTION` must be replaced by a word or set of words that
 described the functionality of the new command.
 
-a) Create a new python file inside either the [commands](kit/commands) directory
-or the [tools](kit/tools) directory and perform the following steps:
+a) Create a new python file inside either the [commands](kit/commands)
+   directory or the [tools](kit/tools) directory and perform the following
+   steps:
 
-* Name the file as TODO-ACTION.py
+* Name the file as `TODO-ACTION.py`
 
-* Create a function to define the arguments of the command. The parameter of the function set_defaults (fn) must be set to the function defined in the next step. Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
-```bash
-	def set_TODO-ACTION_subparser(subparsers):
-		"""create the parser for the 'TODO-ACTION' command"""
-		parser_TODO-ACTION = subparsers.add_parser(
-			"ARG1", description="ADD-DESCRIPTION"
-		)
-		parser_TODO-ACTION = subparsers.add_parser(
-			"ARG2", description="ADD-DESCRIPTION"
-		)
-		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
-```
+* Create a function to define the arguments of the command. The parameter of
+  the function `set_defaults (fn)` must be set to the function defined in the
+  next step. Check
+  [argparse](https://docs.python.org/3/library/argparse.html#action) for API
+  reference information.
+  ```python
+  def set_TODO-ACTION_subparser(subparsers):
+      """create the parser for the 'TODO-ACTION' command"""
+      parser_TODO-ACTION = subparsers.add_parser(
+          "ARG1", description="ADD-DESCRIPTION"
+      )
+      parser_TODO-ACTION = subparsers.add_parser(
+          "ARG2", description="ADD-DESCRIPTION"
+      )
+      parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
+  ```
 
-* Create the set of functions that implement the new functionality. The entry point must be a function that has `args` as parameter and it will use the arguments defined in the previous step.
-```bash
-	def NEW_FUNCTIONALITY(args) -> None:
-		"""Executes new functionality"""
-		if(args.ARG1)
-			pass
-		elif(args.ARG2)
-			pass
-```
+* Create the functions that implement the new functionality, but the entry
+  point must be a function that has `args` as parameter and it will use the
+  arguments defined in the previous step.
+  ```python
+  def NEW_FUNCTIONALITY(args) -> None:
+      """Executes new functionality"""
+      if(args.ARG1)
+          pass
+      elif(args.ARG2)
+          pass
+  ```
 
-* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the function `set_TODO-ACTION_subparser` and enable the options of the new command.
+* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
+  function `set_TODO-ACTION_subparser` and enable the options of the new
+  command.
 
-* Generic utilities or helper functions that can be used for several commands should be in [utils](kit/utils).
+* Generic utilities or helper functions that can be used for several commands
+  should be in [utils](kit/utils).
+
 
 ## Troubleshooting
 
