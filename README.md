@@ -263,10 +263,10 @@ We encourage feedback and suggestions via
 ## Adding a new command
 
 The following steps allows to add a new subcommand to `hekit` as a command or
-tool. Below `TODO-ACTION` must be replaced by a word or set of words that
+tool. Below `ACTION` must be replaced by a word or set of words that
 described the functionality of the new command.
 
-* Create a new python file TODO_ACTION.py inside either the [commands](kit/commands) directory
+* Create a new python file ACTION.py inside either the [commands](kit/commands) directory
 	or the [tools](kit/tools) directory.
 
 * Create a function to set the parser of the subcommand (the subparser to `hekit` parser).
@@ -276,16 +276,16 @@ described the functionality of the new command.
   next step.
   Check [argparse](https://docs.python.org/3/library/argparse.html#action) for API reference information.
 ```python
-	def set_TODO-ACTION_subparser(subparsers):
-		"""create the parser for the 'TODO-ACTION' command"""
-		parser_TODO-ACTION = subparsers.add_parser("TODO-ACTION", description="ADD-SUBPARSER-DESCRIPTION")
-		subparsers.add_argument(
+	def set_ACTION_subparser(subparsers):
+		"""create the parser for the 'ACTION' command"""
+		parser_ACTION = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
+		parser_ACTION.add_argument(
 			"ARG1", description="ADD-ARG-DESCRIPTION"
 		)
-		subparsers.add_argument(
+		parser_ACTION.add_argument(
 			"ARG2", description="ADD-ARG-DESCRIPTION"
 		)
-		parser_TODO-ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
+		parser_ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
 ```
 
 * Create the set of functions that implement the new functionality. The entry
@@ -301,7 +301,7 @@ described the functionality of the new command.
 ```
 
 * The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
-  function `set_TODO-ACTION_subparser` and enable the options of the new
+  function `set_ACTION_subparser` and enable the options of the new
   command.
 
 * Generic utilities or helper functions that can be used for several commands
