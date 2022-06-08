@@ -36,7 +36,6 @@ utilize the latest Intel hardware features.
 - [Contributing](#contributing)
   - [Adding a New Command](#adding-a-new-command)
   - [Troubleshooting](#troubleshooting)
-  - [Adding a new command](#adding-a-new-command)
 - [Contributors](#contributors)
 
 
