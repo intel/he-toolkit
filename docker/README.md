@@ -9,11 +9,12 @@
     - [Requirements](#requirements)
       - [Running the Docker Build on MacOS](#running-the-docker-build-on-macos)
     - [Steps](#steps)
+    - [Using VS Code Server](#using-vs-code-server)
   - [Running the Examples](#running-the-examples)
     - [Docker Controls](#docker-controls)
       - [Commands used inside the Docker Container](#commands-used-inside-the-docker-container)
       - [Commands used outside of the Docker Container](#commands-used-outside-of-the-docker-container)
-  - [Modifying the Examples](#modifying-the-examples)
+  - [Getting Started with a Project](#getting-started-with-a-project)
   - [Common Issues](#common-issues)
     - [System config](#system-config)
     - [Proxy](#proxy)
@@ -133,7 +134,7 @@ Successfully tagged <username>/ubuntu_he_vscode:2.0.0
 
 RUN DOCKER CONTAINER ...
 Run container with
-docker run -d -p <ip addr>:<port>:8888 jcrawford/ubuntu_he_vscode:2.0.0
+docker run -d -p <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:2.0.0
 Then to open vscode navigate to <ip addr>:<port> in your chosen browser
 ```
 
@@ -149,16 +150,15 @@ docker stop <container id>
 After the container has been run navigate to the chosen `<ip addr>:<port>` in
 your chosen browser to gain access to the Docker container via code server. You
 shall initially be prompted to accept the certificate to gain access to the
-webpage. Once accepted, you will directed to the IDE.
+webpage. Once accepted, you will be directed to the IDE.
 
-The default workspace, `HE Workspace`, contains a copy of the he-samples
-directory which the user is free to modify. Upon initial opening of the IDE,
-the user may be prompted to locate a CMake file. Clicking on `Locate` shall
-open a drop-down menu with a list of CMake files that have been detected.
-Select the CMake of a project that you are interested in and this can be built
-and run through the IDE. To change the target, open the `.vscode/settings.json`
-file and change the `cmake.sourceDirectory` path to the location of another
-CMake project you are interested in.
+The default workspace, `HE-WORKSPACE`, begins empty. To create a new project
+see [Getting Started with a Project](#getting-started-with-a-project).
+
+After using the terminal to create a new project you can use VS Code to build
+the project by opening the Command Palette with `F1` or `Ctrl/Cmd + Shift + P`
+and typing `CMake: Configure`. This will go through the steps of selecting a
+compiler, CMake source directory, etc.
 
 Alternatively, the container comes with pre-built examples and sample-kernels.
 These have all been built via the `hekit` command and are located in
@@ -232,26 +232,18 @@ docker controls. Some tips are provided below.
   [Running the Examples](#running-the-examples) to locate and run examples from
   this point.
 
-## Modifying the Examples
-The included source code allows for modification or existing workloads and
-creations of new ones. All Intel HE Toolkit code can be found in
-`/home/$USER/he-samples` with a directory structure directly reflected in this
-repository.
+## Getting Started with a Project
+Upon initial creation of a container the user will be in an empty workspace
+directory where they are free to carry out development.
+To create a new project use the `hekit new` command documented
+[here](../kit/README.md). This can either be used to create a generic template
+for an HE project or a project based on one of the existing examples provided
+by HE Toolkit.
 
-`he-samples` consists of three different sub-components:
-1. **Sample Kernels**: Sample kernels created through a combination of various
-  micro kernels. They are meant as samples of how the  micro kernels can be
-  used together. A few sample kernels (but is not limited to): Matrix
-  Multiplication and Logistic Regression.
-2. **Unit Tests**: A collection of unit tests meant to test the validity of the
-  various sample kernels described above by comparing their results to the
-  same operation in the non-HE space.
-3. **Examples**: A collection of high-level examples that utilize the sample
-  kernels to provide a peek into what a real-world example may look like.
-  Currently three examples are implemented:
-    - [Secure Query](../he-samples/examples/secure-query)
-    - [Private Set Intersection](../he-samples/examples/psi)
-    - [Logistic Regression](../he-samples/examples/logistic-regression)
+Provided examples include:
+- [Secure Query](../he-samples/examples/secure-query)
+- [Private Set Intersection](../he-samples/examples/psi)
+- [Logistic Regression](../he-samples/examples/logistic-regression)
 
 ## Common Issues
 The following documents common issues, causes, and potential solutions.

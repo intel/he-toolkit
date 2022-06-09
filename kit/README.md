@@ -2,14 +2,7 @@
 The `hekit` tool can be used by the user to easily set up the required
 environment to evaluate homomorphic encryption technology.
 
-## Usage
-`hekit` can be executed using the following options:
-```
-hekit [--config CONFIG_FILE] {init, list, install, build, fetch, remove}
-```
-where the options and input files are explained in the following sections.
-
-### Flags
+### Global Options
 
 `-h, --help`: Shows the help message.
 
@@ -18,24 +11,22 @@ where the options and input files are explained in the following sections.
 `--config CONFIG_FILE`: Use non-default [configuration
 file](#configuration-file).  Default is `~/.hekit/default.config`.
 
-`init`: Initializes hekit.
+### Commands
+The option -h can be used to get details about the arguments and usage of each command.
 
-`list`: Lists installed components.
-
-`install RECIPE_FILE`: Installs components defined in [recipe
-file](#recipe-file).
-
-`build RECIPE_FILE`: Builds components defined in [recipe file](#recipe-file).
-
-`fetch RECIPE_FILE`: Fetches components defined in [recipe file](#recipe-file).
-
-`remove component instance`: Uninstalls a specific component.
-
-`--recipe_arg "key=value"`: Optional argument to replace data marked as !key!
-in a [recipe file](#recipe-file).
-
-`docker-build`: Builds the HE Toolkit Docker container. See [Docker
-Build](../docker/README.md).
+| Command | Description | Usage
+|-----------|-----------|-----------|
+| init | Initializes hekit. | hekit init [--default-config]
+| list | Lists installed components. |  hekit list
+| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--recipe_arg RECIPE_ARG] recipe-file
+| remove | Uninstalls instances or components. | hekit remove [--all] [component] [instance]
+| new | Create a new project. | hekit new [--directory DIRECTORY] [--based-on {logistic-regression,psi,secure-query}] name|
+| check-dependencies | Checks system dependencies. | hekit check-dependencies dependencies-file
+| docker-build | Builds the HE Toolkit Docker container. See [Docker Build](../docker/README.md). | hekit docker-build [--id ID] [--clean] [--check-only] [--enable {vscode}]
+| gen-primes | Generates primes in range [n, m] where n, m are positive integers. See [Tools](./tools/README.md). | hekit gen-primes start stop
+| algebras  | Generates ZZ_p[x]/phi(X) algebras. . See [Tools](./tools/README.md). | hekit algebras [-p P] [-d D] [--no-corrected] [--no-header]
 
 ### Configuration file
 
@@ -111,6 +102,15 @@ cd <he-toolkit-root-directory>
 Afterwards source your shell initialization file e.g. `~/.bashrc`. Now you can
 run the `hekit` commands from anywhere.
 
+Also, the `init` command can be executed with `--default-config` flag. This
+will create a directory `~/.hekit` in the user's home directory and create the
+`default.config`.  This directory will be where all components built and
+installed by `hekit` will be kept.
+```bash
+cd <he-toolkit-root-directory>
+./hekit init --default-config
+```
+
 In order to check the installed components, execute the list command
 ```bash
 hekit list
@@ -119,18 +119,41 @@ hekit list
 The install command can be used to fetch, build, and install the required
 libraries.
 ```bash
-hekit install ../recipes/default.toml
+hekit install ./recipes/default.toml
 ```
 
 Using fetch and build commands, the user has access to perform specific
-actions. For example, for fetching libraries:
+actions. For example, for fetching libraries
 ```bash
-hekit fetch ../recipes/default.toml --recipe_arg "version=v1.2.3"
+hekit fetch ./recipes/examples.toml --recipe_arg "version=v1.2.3"
 ```
 
-In order to uninstall a specific component, execute the remove command
+By default, if actions as build or install were executed successfully,
+the next time that the command is executed, they are going to be skipped.
+For re-executing actions such as build or install, the flag `--force` must be
+set.
+```bash
+hekit build ./recipes/examples.toml --force
+```
+
+In order to uninstall a specific instance, execute the remove command
 ```bash
 hekit remove hexl 1.2.3
+```
+
+For uninstalling all the instances of a component, execute
+```bash
+hekit remove hexl
+```
+
+Also, to uninstall all component, use
+```bash
+hekit remove --all
+```
+
+To check system dependencies, execute
+```bash
+hekit check-dependencies dependencies.txt
 ```
 
 The command `new` can be used to create a new project. When it is executed
@@ -161,11 +184,16 @@ Projects
 
 The following actions should be completed to build the new project:
 
-* Open the `toml` file inside the recipes directory and replace `-DFLAG=TBD` with the desired CMake flags for your project.
+* Open the `toml` file inside the recipes directory and replace `-DFLAG=TBD`
+  with the desired CMake flags for your project.
 
-* Open `CMakeLists.txt` and uncomment the statements for `find_package` and `target_link_libraries` of the required library. If other dependencies are needed, for instance `Threads`, the file must be updated to include and compile them.
+* Open `CMakeLists.txt` and uncomment the statements for `find_package` and
+  `target_link_libraries` of the required library. If other dependencies are
+  needed, for instance `Threads`, the file must be updated to include and
+  compile them.
 
-* Add and/or write the code of the new project in the `.cpp` and `.h` files created by the command.
+* Add and/or write the code of the new project in the `.cpp` and `.h` files
+  created by the command.
 
 ## Tab completion
 As an optional feature, the user is able to enable tab completion feature using
@@ -180,7 +208,7 @@ enable this functionality
 
 - If you have used `hekit init` command than you are set to go. Otherwise, if
   you would like to set it manually adding the following line in your shell
-  initialization script e.g. .bashrc file.
+  initialization script e.g. `.bashrc` file.
   ```
   eval "$(register-python-argcomplete hekit.py)"
   ```

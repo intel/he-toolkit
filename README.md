@@ -34,6 +34,7 @@ utilize the latest Intel hardware features.
     - [Private Set Intersection](#private-set-intersection)
   - [Known Issues](#known-issues)
 - [Contributing](#contributing)
+  - [Adding a New Command](#adding-a-new-command)
   - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
 
@@ -43,18 +44,18 @@ Intel HE toolkit has been tested on Ubuntu 20.04
 
 Must have system dependencies for the toolkit include,
 ```
-git
 python >= 3.8
+git
 pip
 ```
 
 Further Python dependencies include,
 ```
 toml
-argcomplete (optional for tab completion)
-docker      (optional for building docker containers)
-pytest      (optional for running tests)
-pytest-mock (optional for running tests)
+argcomplete (optional: tab completion)
+docker      (optional: building docker containers)
+pytest      (optional: running tests)
+pytest-mock (optional: running tests)
 ```
 
 For faster setup, a `requirements.txt` file is provided for recommended user
@@ -104,23 +105,13 @@ or directly on your system.
 The `hekit` command is a command-line tool that can be used by the user to
 easily set up an HE environment in a configurable and intuitive manner.
 
-The `hekit` command has a help option which lists all sub-commands and flags
+The `hekit` command has a help option which lists all subcommands and flags
 ```bash
 hekit -h
-usage: hekit [-h] [--version] [--config CONFIG] {init,list,install,build,fetch,remove,check-dependencies,docker-build} ...
-
-positional arguments:
-  {init,list,install,build,fetch,remove,check-dependencies,docker-build}
-                        sub-command help
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --version             display Intel HE toolkit version
-  --config CONFIG       use a non-default configuration file instead
 ```
 
-Moreover, each sub-command has a help option that can be invoked with `hekit
-<sub-command> -h`.
+Moreover, each subcommand has a help option that can be invoked with `hekit
+<subcommand> -h`.
 
 The `hekit` subcommands consist of utility commands such as
 `check-dependencies` and `docker-build` as well as commands for managing the
@@ -155,7 +146,7 @@ Acceleration Library enabled.
 **Note:** You will be responsible for installing all of the required
 [dependencies](#dependencies).
 
-The [sample kernels](kernels) and [examples](examples) can also be built in a
+The [sample kernels](he-samples/sample-kernels) and [examples](he-samples/examples) can also be built in a
 similar manner using
 ```bash
 hekit build recipes/sample-kernels.toml
@@ -223,12 +214,12 @@ all within the HE domain. See the
 information.
 
 ### Private Set Intersection
-The [Private Set Intersection (PSI)](he-samples/examples/psi) example computes the intersection of two
-given sets. The program computes a hash value for each entry of both the client
-and the server sets, then using the HElib BGV scheme, it encrypts the client
-set and computes the intersection, returning all the encrypted elements that
-are common to both sets. See the [README](he-samples/examples/psi/README.md)
-for usage information.
+The [Private Set Intersection (PSI)](he-samples/examples/psi) example computes
+the intersection of two given sets. The program computes a hash value for each
+entry of both the client and the server sets, then using the HElib BGV scheme,
+it encrypts the client set and computes the intersection, returning all the
+encrypted elements that are common to both sets. See the
+[README](he-samples/examples/psi/README.md) for usage information.
 
 ## Known Issues
 * Running ```./hekit init --default-config``` produces the error
@@ -270,6 +261,55 @@ We encourage feedback and suggestions via
 [GitHub Discussions](https://github.com/intel/he-toolkit/discussions).
 
 
+## Adding a New Command
+
+The following steps allows to add a new subcommand to `hekit` as a command or
+tool. Below `ACTION` must be replaced by a word or set of words that
+described the functionality of the new command.
+
+* Create a new python file ACTION.py inside either the [commands](kit/commands)
+  directory or the [tools](kit/tools) directory.
+
+* Create a function to set the parser of the subcommand (the subparser to
+  `hekit` parser).  The function must begin and end with `set_` and
+  `\_subparser`, respectively.  Define the arguments of the command. The
+  parameter of the function `set_defaults(fn)` must be set to the function
+  defined in the next step.  Check
+  [argparse](https://docs.python.org/3/library/argparse.html#action) for API
+  reference information.
+  ```python
+  def set_ACTION_subparser(subparsers):
+      """create the parser for the 'ACTION' command"""
+      parser_ACTION = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
+      parser_ACTION.add_argument(
+          "ARG1", description="ADD-ARG-DESCRIPTION"
+      )
+      parser_ACTION.add_argument(
+          "ARG2", description="ADD-ARG-DESCRIPTION"
+      )
+      parser_ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
+  ```
+
+* Create the set of functions that implement the new functionality. The entry
+  point must be a function that has `args` as parameter and it will use the
+  arguments defined in the previous step.
+  ```python
+  def NEW_FUNCTIONALITY(args) -> None:
+      """Executes new functionality"""
+      if(args.ARG1)
+          pass
+      elif(args.ARG2)
+          pass
+  ```
+
+* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
+  function `set_ACTION_subparser` and enable the options of the new
+  command.
+
+* Generic utilities or helper functions that can be used for several commands
+  should be in [utils](kit/utils).
+
+
 ## Troubleshooting
 
 * ```Executable `cpplint` not found```
@@ -283,8 +323,8 @@ We encourage feedback and suggestions via
 
 * When attempting to sign a commit
   ```
-     error: gpg failed to sign the data
-     fatal: failed to write commit object
+  error: gpg failed to sign the data
+  fatal: failed to write commit object
   ```
   Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
   as `~/.bashrc`.
@@ -299,6 +339,7 @@ The Intel past and present contributors to this project, sorted by last name, ar
   - [Dennis Calderon Vega](https://www.linkedin.com/in/dennis-calderon-996840a9/)
   - [Jack Crawford](https://www.linkedin.com/in/jacklhcrawford/) (lead)
   - [Fillipe D.M. de Souza](https://www.linkedin.com/in/fillipe-d-m-de-souza-a8281820/)
+  - Tomas Gonzalez Aragon
   - [Hamish Hunt](https://www.linkedin.com/in/hamish-hunt/)
   - [Jingyi Jin](https://www.linkedin.com/in/jingyi-jin-655735/)
   - [Manasa Kilari](www.linkedin.com/in/manasakilari/)
