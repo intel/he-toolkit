@@ -117,6 +117,7 @@ def set_gen_algebras_subparser(subparsers) -> None:
     parser.add_argument(
         "-d", type=parse_range, default="1", help="number of coefficients in a slot"
     )
+    parser.add_argument("--m-max", type=int, help="max m")
     parser.add_argument(
         "--no-corrected", action="store_false", help="include corrected d orders"
     )
@@ -171,6 +172,8 @@ def algebras(args):
         )
     for p, d, m_factors in find_ms(args.p, args.d, compute_prime_factors):
         m = math.prod(m_factors)
+        if args.m_max and m > args.m_max:
+            continue
         e, corrected = correct_for_d(p, d, m)
         soln = (p, e, m)
         if soln not in solns:
