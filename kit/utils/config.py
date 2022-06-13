@@ -16,7 +16,25 @@ class Config(NamedTuple):
     repo_location: str
 
 
-def load_config(filename: str):
+class ConfigFileError(Exception):
+    """Error for when config file """
+
+
+def config_required(func):
+    """Decorator that loads the config file before running the actual function"""
+
+    def inner(args):
+        try:
+            # replace the filename with the actual config
+            args.config = load_config(args.config)
+            return func(args)
+        except KeyError as e:
+            raise ConfigFileError("Error while parsing config file\n", f"  {e!r}")
+
+    return inner
+
+
+def load_config(filename: str) -> Config:
     """Load a config file in TOML format"""
     expand = path.expanduser  # alias
     expanded_filename = expand(filename)
