@@ -27,7 +27,6 @@ if sys.version_info < (3, 8):
 =======
 from utils.subparsers import discover_subparsers_from
 from utils.constants import Constants  # pylint: disable=no-name-in-module
-from utils.config import load_config  # pylint: disable=no-name-in-module
 from utils.tab_completion import (  # pylint: disable=no-name-in-module
     enable_tab_completion,
 )

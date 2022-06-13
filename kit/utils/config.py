@@ -29,7 +29,9 @@ def config_required(func):
             args.config = load_config(args.config)
             return func(args)
         except KeyError as e:
-            raise ConfigFileError("Error while parsing config file\n", f"  {e!r}")
+            raise ConfigFileError(
+                "Error while parsing config file\n", f"  {e!r}"
+            ) from e
 
     return inner
 
