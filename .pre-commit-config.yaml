@@ -59,3 +59,8 @@ repos:
           entry: black
           language: system
           files: \.py$
+        - id: which-files
+          name: which-files
+          entry: .whichfile-format
+          language: system
+          files: docker/which-files.txt
