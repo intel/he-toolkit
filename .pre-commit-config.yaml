@@ -64,3 +64,4 @@ repos:
           entry: .github/scripts/check-whichfile.sh
           language: script
           always_run: true
+          files: docker/which-files.txt

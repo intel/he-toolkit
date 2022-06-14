@@ -12,7 +12,7 @@ if ! git ls-files > "$WHICHFILES"; then
   exit $FAILURE
 fi
 
-if [ -n "$(git diff "$WHICHFILES")" ]; then
+if [ -n "$(git diff -- "$WHICHFILES")" ]; then
   echo "FAILURE: $WHICHFILES was not up to date. Updated now!"
   exit $FAILURE
 fi
