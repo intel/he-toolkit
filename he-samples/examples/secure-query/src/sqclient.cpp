@@ -161,50 +161,42 @@ size_t SQClient::determineMaxKeyLengthForCurrentContext() {
 }
 
 bool SQClient::isKeyLengthValid(int key_length) {
-  auto keygen = new seal::KeyGenerator(**m_context);
-  auto public_key = new seal::PublicKey();
-  keygen->create_public_key(*public_key);
-  auto secret_key = new seal::SecretKey(keygen->secret_key());
-  auto relin_keys = new seal::RelinKeys();
-  keygen->create_relin_keys(*relin_keys);
+  seal::KeyGenerator keygen = seal::KeyGenerator(**m_context);
+  seal::PublicKey public_key = seal::PublicKey();
+  keygen.create_public_key(public_key);
+  seal::SecretKey secret_key = seal::SecretKey(keygen.secret_key());
+  seal::RelinKeys relin_keys = seal::RelinKeys();
+  keygen.create_relin_keys(relin_keys);
 
-  auto encryptor = new seal::Encryptor(**m_context, *public_key);
-  auto evaluator = new seal::Evaluator(**m_context);
-  auto decryptor = new seal::Decryptor(**m_context, *secret_key);
+  seal::Encryptor encryptor = seal::Encryptor(**m_context, public_key);
+  seal::Evaluator evaluator = seal::Evaluator(**m_context);
+  seal::Decryptor decryptor = seal::Decryptor(**m_context, secret_key);
 
   seal::Ciphertext result;
 
   seal::Ciphertext one;
-  encryptor->encrypt_zero(one);
+  encryptor.encrypt_zero(one);
 
   std::vector<seal::Ciphertext> query_vector_test;
   query_vector_test.push_back(one);
 
   for (int x = 0; x < key_length * 2; x++) {
     seal::Ciphertext zero;
-    encryptor->encrypt_zero(zero);
+    encryptor.encrypt_zero(zero);
     query_vector_test.push_back(zero);
 
     seal::Ciphertext m;
-    encryptor->encrypt_zero(m);
-    evaluator->sub_inplace(query_vector_test.back(), m);
-    evaluator->exponentiate_inplace(query_vector_test.back(),
-                                    m_seal_params.plain_modulus().value() - 1,
-                                    *relin_keys);
-    evaluator->negate_inplace(query_vector_test.back());
-    evaluator->add_inplace(query_vector_test.back(), one);
+    encryptor.encrypt_zero(m);
+    evaluator.sub_inplace(query_vector_test.back(), m);
+    evaluator.exponentiate_inplace(query_vector_test.back(),
+                                   m_seal_params.plain_modulus().value() - 1,
+                                   relin_keys);
+    evaluator.negate_inplace(query_vector_test.back());
+    evaluator.add_inplace(query_vector_test.back(), one);
   }
 
-  evaluator->multiply_many(query_vector_test, *relin_keys, result);
-  int noise_budget = decryptor->invariant_noise_budget(result);
-
-  delete keygen;
-  delete encryptor;
-  delete evaluator;
-  delete decryptor;
-  delete public_key;
-  delete secret_key;
-  delete relin_keys;
+  evaluator.multiply_many(query_vector_test, relin_keys, result);
+  int noise_budget = decryptor.invariant_noise_budget(result);
 
   return (noise_budget > 0);
 }
