@@ -61,6 +61,6 @@ repos:
           files: \.py$
         - id: which-files
           name: which-files
-          entry: .whichfile-format
+          entry: .github/scripts/check-whichfile.sh
           language: system
-          files: docker/which-files.txt
+          always_run: true
