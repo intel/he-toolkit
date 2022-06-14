@@ -62,5 +62,5 @@ repos:
         - id: which-files
           name: which-files
           entry: .github/scripts/check-whichfile.sh
-          language: system
+          language: script
           always_run: true
