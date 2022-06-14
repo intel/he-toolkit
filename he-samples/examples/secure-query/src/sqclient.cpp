@@ -3,7 +3,14 @@
 
 #include "sqclient.h"
 
-SQClient::SQClient() {}
+SQClient::SQClient()
+    : m_key_length{0},
+      m_keygen{nullptr},
+      m_public_key{nullptr},
+      m_secret_key{nullptr},
+      m_relin_keys{nullptr},
+      m_encryptor{nullptr},
+      m_decryptor{nullptr} {}
 
 void SQClient::initializeSealContext(size_t _polymodulus_degree,
                                      size_t _plaintext_modulus,
@@ -190,6 +197,14 @@ bool SQClient::isKeyLengthValid(int key_length) {
 
   evaluator->multiply_many(query_vector_test, *relin_keys, result);
   int noise_budget = decryptor->invariant_noise_budget(result);
+
+  delete keygen;
+  delete encryptor;
+  delete evaluator;
+  delete decryptor;
+  delete public_key;
+  delete secret_key;
+  delete relin_keys;
 
   return (noise_budget > 0);
 }
