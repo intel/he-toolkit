@@ -161,16 +161,16 @@ size_t SQClient::determineMaxKeyLengthForCurrentContext() {
 }
 
 bool SQClient::isKeyLengthValid(int key_length) {
-  seal::KeyGenerator keygen = seal::KeyGenerator(**m_context);
-  seal::PublicKey public_key = seal::PublicKey();
+  auto keygen = seal::KeyGenerator(**m_context);
+  auto public_key = seal::PublicKey();
   keygen.create_public_key(public_key);
-  seal::SecretKey secret_key = seal::SecretKey(keygen.secret_key());
-  seal::RelinKeys relin_keys = seal::RelinKeys();
+  auto secret_key = seal::SecretKey(keygen.secret_key());
+  auto relin_keys = seal::RelinKeys();
   keygen.create_relin_keys(relin_keys);
 
-  seal::Encryptor encryptor = seal::Encryptor(**m_context, public_key);
-  seal::Evaluator evaluator = seal::Evaluator(**m_context);
-  seal::Decryptor decryptor = seal::Decryptor(**m_context, secret_key);
+  auto encryptor = seal::Encryptor(**m_context, public_key);
+  auto evaluator = seal::Evaluator(**m_context);
+  auto decryptor = seal::Decryptor(**m_context, secret_key);
 
   seal::Ciphertext result;
 
