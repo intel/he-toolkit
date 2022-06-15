@@ -3,7 +3,8 @@
 
 #include "sqserver.h"
 
-SQServer::SQServer() {}
+SQServer::SQServer()
+    : m_key_length{0}, m_encryptor{nullptr}, m_evaluator{nullptr} {}
 
 void SQServer::initializeSealContext(size_t _polymodulus_degree,
                                      size_t _plaintext_modulus) {
