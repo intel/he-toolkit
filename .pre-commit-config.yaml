@@ -61,6 +61,14 @@ repos:
           files: \.py$
         - id: which-files
           name: which-files
-          entry: .github/scripts/check-whichfile.sh
-          language: system
+          entry: .github/scripts/check-repo-contents-file.sh
+          language: script
+          # Always run because other renamed, modified, or deleted files need to
+          # be reflected in the contents file.
           always_run: true
+          # This forces only docker/which-files.txt to be considered and passed
+          # in the an arg. Not having at least 'files' defined can lead to
+          # overwrite of other files.
+          pass_filenames: false
+          files: docker/which-files.txt
+          args: [docker/which-files.txt]
