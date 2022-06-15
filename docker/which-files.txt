@@ -2,6 +2,7 @@
 .github/hekit-recipes/helib.toml
 .github/hekit-recipes/palisade.toml
 .github/hekit-recipes/seal.toml
+.github/scripts/check-repo-contents-file.sh
 .github/workflows/github-ci.yml
 .gitignore
 .pre-commit-config.yaml
