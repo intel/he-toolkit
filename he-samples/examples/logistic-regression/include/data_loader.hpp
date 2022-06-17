@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <sys/stat.h>
 #include <unistd.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -22,8 +22,8 @@ enum class DataMode { TRAIN, TEST, EVAL };
 enum class WeightType { W, V };
 
 inline bool file_exists(const std::string& fn) {
-  struct stat buffer;
-  return (stat(fn.c_str(), &buffer) == 0);
+  const std::filesystem::path p = fn;
+  return std::filesystem::exists(p);
 }
 
 std::vector<std::string> readCSVRow(const std::string& row);
