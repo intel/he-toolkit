@@ -1,4 +1,4 @@
 pip==22.0
 numpy==1.22
 urllib3==1.26
-scikit-learn>=0.22
+scikit-learn==1.1
