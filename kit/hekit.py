@@ -19,11 +19,9 @@ from pathlib import Path
 from commands.init import init_hekit
 from tools.healg import healg
 from utils.subparsers import discover_subparsers_from
-from utils.constants import Constants  # pylint: disable=no-name-in-module
-from utils.config import load_config  # pylint: disable=no-name-in-module
-from utils.tab_completion import (  # pylint: disable=no-name-in-module
-    enable_tab_completion,
-)
+from utils.constants import Constants
+from utils.config import load_config
+from utils.tab_completion import enable_tab_completion
 
 
 def parse_cmdline():

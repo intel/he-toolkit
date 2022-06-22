@@ -10,7 +10,7 @@ from subprocess import Popen, PIPE, STDOUT
 from typing import Iterable, Callable, Union, List
 from typing import Dict
 import toml
-from utils.spec import Spec  # pylint: disable=no-name-in-module
+from utils.spec import Spec
 
 
 class BuildError(Exception):
