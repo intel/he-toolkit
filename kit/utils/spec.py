@@ -9,7 +9,7 @@ from re import findall
 from dataclasses import dataclass
 from typing import Dict
 from toml import dump, load
-from utils.tsort import tsort  # pylint: disable=no-name-in-module
+from kit.utils.tsort import tsort  # pylint: disable=no-name-in-module
 
 RecipeArgDict = Dict[str, str]
 

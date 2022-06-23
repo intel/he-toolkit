@@ -4,7 +4,7 @@
 """This module provides tab completion if the dependencies are installed"""
 
 from commands.list_cmd import list_dirs
-from utils.config import load_config  # pylint: disable=no-name-in-module
+from kit.utils.config import load_config  # pylint: disable=no-name-in-module
 
 try:
     # Tab completion is an optional feature, this means that
