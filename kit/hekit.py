@@ -16,8 +16,8 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
 
-from commands.init import init_hekit
-from tools.healg import healg
+from kit.commands.init import init_hekit
+from kit.tools.healg import healg
 from kit.utils.subparsers import discover_subparsers_from
 from kit.utils.constants import Constants  # pylint: disable=no-name-in-module
 from kit.utils.config import load_config  # pylint: disable=no-name-in-module
