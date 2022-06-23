@@ -19,7 +19,7 @@ cwd_test = getcwd()
 
 def execute_action(mocker, args_action):
     global cwd_test
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_action, ""
     main()
     chdir(cwd_test)
