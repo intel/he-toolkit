@@ -6,6 +6,7 @@ from pathlib import Path
 from os import getcwd, chdir
 from getpass import getuser
 
+import tests.context
 from kit.hekit import main
 from kit.commands.docker_build import setup_docker
 
