@@ -3,7 +3,7 @@
 
 import pytest
 from pathlib import Path
-from .context import hekit, init
+import tests.context
 from hekit import main
 from init import init_hekit
 

@@ -5,8 +5,8 @@ import pytest
 from filecmp import cmp as compare_files
 from pathlib import Path
 
-from .context import spec
-from spec import Spec, InvalidSpecError
+import tests.context
+from kit.utils.spec import Spec, InvalidSpecError
 
 
 def test_transform_spec_to_toml_dict():

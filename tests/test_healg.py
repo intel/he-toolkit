@@ -6,7 +6,7 @@ import os.path
 from sys import maxsize
 from argparse import ArgumentTypeError
 
-from .context import healg
+import tests.context
 from healg import *
 
 

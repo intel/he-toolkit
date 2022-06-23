@@ -3,8 +3,8 @@
 
 import pytest
 from pathlib import Path
-from .context import check_deps
-from check_deps import (
+import tests.context
+from kit.commands.check_deps import (
     version_string_to_tuple,
     parse_dependencies,
     check_dependency,

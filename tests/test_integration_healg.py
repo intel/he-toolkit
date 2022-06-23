@@ -3,7 +3,7 @@
 
 import pytest
 from pathlib import Path
-from .context import hekit, healg
+import tests.context
 from hekit import main
 from healg import healg
 

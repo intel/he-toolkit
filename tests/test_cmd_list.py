@@ -3,7 +3,7 @@
 
 from multiprocessing import context
 import pytest
-from .context import list_cmd
+import tests.context
 from list_cmd import list_components, RepoProperties, _SEP_SPACES
 
 

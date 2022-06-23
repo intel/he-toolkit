@@ -5,7 +5,7 @@ import pytest
 from os import getcwd, chdir
 from pathlib import Path
 
-from .context import hekit, list_cmd, remove, install
+import tests.context
 from hekit import main
 from list_cmd import list_components, _SEP_SPACES
 from remove import remove_components

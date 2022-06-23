@@ -3,10 +3,10 @@
 
 import pytest
 from pathlib import Path
-from .context import docker_build, docker_tools, constants
-from docker_tools import DockerException
-from constants import Constants
-from docker_build import (
+import tests.context
+from kit.utils.docker_tools import DockerException
+from kit.utils.constants import Constants
+from kit.commands.docker_build import (
     copyfiles,
     create_buildargs,
     print_preamble,
@@ -24,7 +24,7 @@ def test_copyfiles_execution(mocker):
     exp_arg1 = Path(src_dir) / files[2]
     exp_arg2 = Path(dst_dir) / files[2]
 
-    mock_copyfile = mocker.patch("docker_build.copyfile")
+    mock_copyfile = mocker.patch("kit.commands.docker_build.copyfile")
 
     """Act"""
     copyfiles(files, src_dir, dst_dir)
@@ -56,7 +56,7 @@ def test_create_buildargs_Darwin(mocker):
     act_env = {"key": "value"}
     act_ID = 0
     exp_ID = "1000"
-    mock_os_name = mocker.patch("docker_build.os_name")
+    mock_os_name = mocker.patch("kit.commands.docker_build.os_name")
     mock_os_name.return_value = "Darwin"
 
     """Act"""
@@ -76,11 +76,11 @@ def test_create_buildargs_other(mocker):
     act_env = {"key": "value"}
     act_ID = 0
     exp_uid, exp_id = 1234, 5678
-    mock_os_name = mocker.patch("docker_build.os_name")
+    mock_os_name = mocker.patch("kit.commands.docker_build.os_name")
     mock_os_name.return_value = "other"
-    mock_getuid = mocker.patch("docker_build.getuid")
+    mock_getuid = mocker.patch("kit.commands.docker_build.getuid")
     mock_getuid.return_value = exp_uid
-    mock_getgid = mocker.patch("docker_build.getgid")
+    mock_getgid = mocker.patch("kit.commands.docker_build.getgid")
     mock_getgid.return_value = exp_id
 
     """Act"""
@@ -97,9 +97,9 @@ def test_create_buildargs_other(mocker):
 
 def test_print_preamble_normal_execution(mocker):
     """Arrange"""
-    mock_print = mocker.patch("docker_build.print")
-    mock_exit = mocker.patch("docker_build.sys_exit")
-    mock_input = mocker.patch("docker_build.input")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_exit = mocker.patch("kit.commands.docker_build.sys_exit")
+    mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
 
     """Act"""
@@ -112,9 +112,9 @@ def test_print_preamble_normal_execution(mocker):
 
 def test_print_preamble_KeyboardInterrupt(mocker):
     """Arrange"""
-    mock_print = mocker.patch("docker_build.print")
-    mock_exit = mocker.patch("docker_build.sys_exit")
-    mock_input = mocker.patch("docker_build.input")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_exit = mocker.patch("kit.commands.docker_build.sys_exit")
+    mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.side_effect = KeyboardInterrupt()
 
     """Act"""
@@ -146,11 +146,11 @@ def test_create_tar_gz_file_execution(mocker):
 
     mock_exists = mocker.patch.object(Path, "exists")
     mock_exists.return_value = False
-    mock_print = mocker.patch("docker_build.print")
-    mock_open = mocker.patch("docker_build.open")
-    mock_filter = mocker.patch("docker_build.filter_file_list")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_open = mocker.patch("kit.commands.docker_build.open")
+    mock_filter = mocker.patch("kit.commands.docker_build.filter_file_list")
     mock_filter.return_value = exp_files
-    mock_compress = mocker.patch("docker_build.archive_and_compress")
+    mock_compress = mocker.patch("kit.commands.docker_build.archive_and_compress")
 
     """Act"""
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
@@ -170,11 +170,11 @@ def test_create_tar_gz_file_FileExistsError(mocker):
 
     mock_exists = mocker.patch.object(Path, "exists")
     mock_exists.return_value = False
-    mock_print = mocker.patch("docker_build.print")
-    mock_open = mocker.patch("docker_build.open")
-    mock_filter = mocker.patch("docker_build.filter_file_list")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_open = mocker.patch("kit.commands.docker_build.open")
+    mock_filter = mocker.patch("kit.commands.docker_build.filter_file_list")
     mock_filter.return_value = exp_files
-    mock_compress = mocker.patch("docker_build.archive_and_compress")
+    mock_compress = mocker.patch("kit.commands.docker_build.archive_and_compress")
     mock_compress.side_effect = FileExistsError()
 
     """Act"""
@@ -194,10 +194,10 @@ def test_create_tar_gz_file_File_Exists(mocker):
 
     mock_exists = mocker.patch.object(Path, "exists")
     mock_exists.return_value = True
-    mock_print = mocker.patch("docker_build.print")
-    mock_open = mocker.patch("docker_build.open")
-    mock_filter = mocker.patch("docker_build.filter_file_list")
-    mock_compress = mocker.patch("docker_build.archive_and_compress")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_open = mocker.patch("kit.commands.docker_build.open")
+    mock_filter = mocker.patch("kit.commands.docker_build.filter_file_list")
+    mock_compress = mocker.patch("kit.commands.docker_build.archive_and_compress")
 
     """Act"""
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
@@ -212,10 +212,10 @@ def test_create_tar_gz_file_File_Exists(mocker):
 def test_setup_docker_clean(mocker):
     """Arrange"""
     args = MockArgs(clean=True, y=True, check_only=True, enable="vscode")
-    mock_rmtree = mocker.patch("docker_build.rmtree")
-    mock_print = mocker.patch("docker_build.print")
-    mock_print_preamble = mocker.patch("docker_build.print_preamble")
-    mock_DockerTools = mocker.patch("docker_build.DockerTools")
+    mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
+    mock_DockerTools = mocker.patch("kit.commands.docker_build.DockerTools")
 
     """Act"""
     with pytest.raises(SystemExit) as exc_info:
@@ -232,10 +232,10 @@ def test_setup_docker_clean(mocker):
 def test_setup_docker_docker_error(mocker):
     """Arrange"""
     args = MockArgs(clean=False, y=True, check_only=True, enable="vscode")
-    mock_rmtree = mocker.patch("docker_build.rmtree")
-    mock_print = mocker.patch("docker_build.print")
-    mock_print_preamble = mocker.patch("docker_build.print_preamble")
-    mock_DockerTools = mocker.patch("docker_build.DockerTools")
+    mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
+    mock_DockerTools = mocker.patch("kit.commands.docker_build.DockerTools")
     mock_DockerTools.side_effect = DockerException()
 
     """Act"""
@@ -253,10 +253,10 @@ def test_setup_docker_check_only(mocker):
     """Arrange"""
     args = MockArgs(clean=False, y=False, check_only=True, enable="vscode")
     doc_build = MockDockerTools()
-    mock_rmtree = mocker.patch("docker_build.rmtree")
-    mock_print = mocker.patch("docker_build.print")
-    mock_print_preamble = mocker.patch("docker_build.print_preamble")
-    mock_DockerTools = mocker.patch("docker_build.DockerTools")
+    mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
+    mock_DockerTools = mocker.patch("kit.commands.docker_build.DockerTools")
     mock_DockerTools.return_value = doc_build
 
     """Act"""
@@ -275,15 +275,15 @@ def test_setup_docker_vscode(mocker):
     """Arrange"""
     args = MockArgs(clean=False, y=False, check_only=False, enable="vscode")
     doc_build = MockDockerTools()
-    mock_rmtree = mocker.patch("docker_build.rmtree")
-    mock_print = mocker.patch("docker_build.print")
-    mock_print_preamble = mocker.patch("docker_build.print_preamble")
-    mock_DockerTools = mocker.patch("docker_build.DockerTools")
+    mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
+    mock_DockerTools = mocker.patch("kit.commands.docker_build.DockerTools")
     mock_DockerTools.return_value = doc_build
     mock_mkdir = mocker.patch.object(Path, "mkdir")
-    mock_create_tar_gz = mocker.patch("docker_build.create_tar_gz_file")
-    mock_copyfiles = mocker.patch("docker_build.copyfiles")
-    mock_change_dir = mocker.patch("docker_build.change_directory_to")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
 
     """Act"""
     setup_docker(args)
@@ -314,15 +314,15 @@ def test_setup_docker_build(mocker):
     archived_files = docker_filepaths / "which-files.txt"
     files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
 
-    mock_rmtree = mocker.patch("docker_build.rmtree")
-    mock_print = mocker.patch("docker_build.print")
-    mock_print_preamble = mocker.patch("docker_build.print_preamble")
-    mock_DockerTools = mocker.patch("docker_build.DockerTools")
+    mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
+    mock_print = mocker.patch("kit.commands.docker_build.print")
+    mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
+    mock_DockerTools = mocker.patch("kit.commands.docker_build.DockerTools")
     mock_DockerTools.return_value = doc_build
     mock_mkdir = mocker.patch.object(Path, "mkdir")
-    mock_create_tar_gz = mocker.patch("docker_build.create_tar_gz_file")
-    mock_copyfiles = mocker.patch("docker_build.copyfiles")
-    mock_change_dir = mocker.patch("docker_build.change_directory_to")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
 
     """Act"""
     setup_docker(args)

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import docker_tools
+import tests.context
 from docker_tools import DockerTools, DockerBuildError
 
 

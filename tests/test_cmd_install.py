@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import install
+import tests.context
 from install import install_components, _stages, get_recipe_arg_dict
 
 

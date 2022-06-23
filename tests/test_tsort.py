@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import tsort
-from tsort import tsort, CycleError
+import tests.context
+from kit.utils.tsort import tsort, CycleError
 
 
 def test_tsort_libraries():

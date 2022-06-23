@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import component_builder
+import tests.context
 from component_builder import chain_run, run, BuildError, components_to_build_from
 
 

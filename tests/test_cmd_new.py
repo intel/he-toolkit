@@ -4,8 +4,8 @@
 import pytest
 from pathlib import Path
 from filecmp import cmp as compare_files
-from .context import new
-from new import (
+import tests.context
+from kit.commands.new import (
     create_toml_template,
     create_cmake_template,
     modify_cmake_file,
@@ -97,7 +97,7 @@ def test_create_new_project_FileExistsError(mocker, tmp_path):
     """Arrange"""
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     mock_mkdir.side_effect = FileExistsError()
-    mock_print = mocker.patch("new.print")
+    mock_print = mocker.patch("kit.commands.new.print")
 
     project_name = "test2"
     directory = tmp_path.resolve()

@@ -4,7 +4,7 @@
 import pytest
 from pathlib import Path
 
-from .context import subparsers
+import tests.context
 from subparsers import files_in_dir, discover_subparsers_from
 
 
