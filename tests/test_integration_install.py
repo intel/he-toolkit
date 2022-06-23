@@ -88,7 +88,7 @@ def test_list_after_build(mocker, args_list, restore_pwd):
 
 def test_remove_after_build(mocker, args_remove, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
     mock_print = mocker.patch("kit.commands.remove.print")
 
@@ -103,7 +103,7 @@ def test_remove_after_build(mocker, args_remove, restore_pwd):
 
 def test_install_execution(mocker, args_install):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_install, ""
     mock_print = mocker.patch("kit.commands.install.print")
     mock_input = mocker.patch("utils.spec.input")
@@ -124,7 +124,7 @@ def test_install_execution(mocker, args_install):
 
 def test_list_after_install(mocker, args_list, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
@@ -140,7 +140,7 @@ def test_list_after_install(mocker, args_list, restore_pwd):
 
 def test_remove_all_after_install(mocker, args_remove, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
     mock_print = mocker.patch("kit.commands.remove.print")
     mock_input = mocker.patch("kit.commands.remove.input", return_value="y")

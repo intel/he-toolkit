@@ -16,7 +16,7 @@ def test_main_arg_header(mocker):
     mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
     mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
     """Act"""

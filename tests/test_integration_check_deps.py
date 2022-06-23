@@ -14,7 +14,7 @@ def test_check_dependencies_not_found(mocker):
     args = MockArgs()
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from check_deps
     mock_print = mocker.patch("kit.commands.check_deps.print")
@@ -39,7 +39,7 @@ def test_check_dependencies_found(mocker):
     args = MockArgs()
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from check_deps
     mock_print = mocker.patch("kit.commands.check_deps.print")
@@ -64,7 +64,7 @@ def test_check_dependencies_found_wrong_version(mocker):
     args = MockArgs()
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from check_deps
     mock_print = mocker.patch("kit.commands.check_deps.print")
@@ -94,7 +94,7 @@ def test_check_dependencies_FileNotFoundError(mocker):
     args.dependencies_file = "/tests/input_files/no_a_file.txt"
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
     """Act"""

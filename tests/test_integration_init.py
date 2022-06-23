@@ -127,7 +127,7 @@ class Mockers:
         self.mock_copyfile = mocker.patch("kit.commands.init.copyfile")
         self.mock_same_files = mocker.patch("kit.commands.init.same_files")
         # mocking internal functions
-        self.mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+        self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
         self.mock_get_rc_file = mocker.patch("kit.commands.init.get_rc_file")
         self.mock_exists = mocker.patch("kit.commands.init.file_exists")
         self.mock_remove_from_rc = mocker.patch("kit.commands.init.remove_from_rc")
