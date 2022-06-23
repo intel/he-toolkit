@@ -5,8 +5,8 @@ import pytest
 from pathlib import Path
 
 import tests.context
-from hekit import main
-from check_deps import check_dependencies
+from kit.hekit import main
+from kit.commands.check_deps import check_dependencies
 
 
 def test_check_dependencies_not_found(mocker):

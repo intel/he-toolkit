@@ -3,7 +3,7 @@
 
 import pytest
 import tests.context
-from remove import remove_components
+from kit.commands.remove import remove_components
 
 
 def test_remove_instance_of_component_with_many_instances(mocker, args):

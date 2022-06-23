@@ -3,7 +3,7 @@
 
 import pytest
 import tests.context
-from docker_tools import DockerTools, DockerBuildError
+from kit.utils.docker_tools import DockerTools, DockerBuildError
 
 
 def test_build_image_response_stream(mocker):

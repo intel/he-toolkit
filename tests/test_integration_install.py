@@ -6,10 +6,10 @@ from os import getcwd, chdir
 from pathlib import Path
 
 import tests.context
-from hekit import main
-from list_cmd import list_components, _SEP_SPACES
-from remove import remove_components
-from install import install_components
+from kit.hekit import main
+from kit.commands.list_cmd import list_components, _SEP_SPACES
+from kit.commands.remove import remove_components
+from kit.commands.install import install_components
 
 # Due to install command changes current directory,
 # the other commands need to restore the current path

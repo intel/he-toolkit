@@ -7,7 +7,7 @@ from pathlib import Path
 
 import tests.context
 from kit.hekit import main
-from kit.commands.tab_completion import components_completer, instances_completer
+from kit.utils.tab_completion import components_completer, instances_completer
 from kit.commands.remove import remove_components
 from kit.commands.install import install_components
 

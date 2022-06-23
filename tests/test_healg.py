@@ -7,7 +7,7 @@ from sys import maxsize
 from argparse import ArgumentTypeError
 
 import tests.context
-from healg import *
+from kit.tools.healg import *
 
 
 def test_powerset():

@@ -3,7 +3,7 @@
 
 import pytest
 import tests.context
-from install import install_components, _stages, get_recipe_arg_dict
+from kit.commands.install import install_components, _stages, get_recipe_arg_dict
 
 
 def test_install_components_all_unskipped(mocker, args, unskipped_components):

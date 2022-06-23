@@ -4,7 +4,7 @@
 from multiprocessing import context
 import pytest
 import tests.context
-from list_cmd import list_components, RepoProperties, _SEP_SPACES
+from kit.commands.list_cmd import list_components, RepoProperties, _SEP_SPACES
 
 
 def test_get_repo_properties_max_width(mocker):

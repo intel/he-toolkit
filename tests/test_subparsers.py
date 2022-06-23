@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 import tests.context
-from subparsers import files_in_dir, discover_subparsers_from
+from kit.utils.subparsers import files_in_dir, discover_subparsers_from
 
 
 def test_discover_subparsers_from_commands_all():

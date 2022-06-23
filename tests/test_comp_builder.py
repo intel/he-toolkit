@@ -3,7 +3,12 @@
 
 import pytest
 import tests.context
-from component_builder import chain_run, run, BuildError, components_to_build_from
+from kit.utils.component_builder import (
+    chain_run,
+    run,
+    BuildError,
+    components_to_build_from,
+)
 
 
 def test_chain_run_all_success(mocker, funcs_success):

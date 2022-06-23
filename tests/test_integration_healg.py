@@ -4,8 +4,8 @@
 import pytest
 from pathlib import Path
 import tests.context
-from hekit import main
-from healg import healg
+from kit.hekit import main
+from kit.tools.healg import healg
 
 
 def test_main_arg_header(mocker):

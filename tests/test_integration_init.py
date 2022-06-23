@@ -4,8 +4,8 @@
 import pytest
 from pathlib import Path
 import tests.context
-from hekit import main
-from init import init_hekit
+from kit.hekit import main
+from kit.commands.init import init_hekit
 
 
 def test_init_hekit_config_file_exists(mocker):
