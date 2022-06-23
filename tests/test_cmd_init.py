@@ -83,11 +83,11 @@ def test_append_to_rc_when_file_does_not_exist():
 
 def test_create_default_config_file_exist(mocker):
     """Arrange"""
-    mock_exists = mocker.patch("init.file_exists")
+    mock_exists = mocker.patch("kit.commands.init.file_exists")
     mock_exists.return_value = True
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     mock_open = mocker.patch.object(Path, "open")
-    mock_print = mocker.patch("init.print")
+    mock_print = mocker.patch("kit.commands.init.print")
 
     """Act"""
     create_default_config()
@@ -100,11 +100,11 @@ def test_create_default_config_file_exist(mocker):
 
 def test_create_default_config_file_created(mocker):
     """Arrange"""
-    mock_exists = mocker.patch("init.file_exists")
+    mock_exists = mocker.patch("kit.commands.init.file_exists")
     mock_exists.return_value = False
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     mock_open = mocker.patch.object(Path, "open")
-    mock_print = mocker.patch("init.print")
+    mock_print = mocker.patch("kit.commands.init.print")
 
     """Act"""
     create_default_config()

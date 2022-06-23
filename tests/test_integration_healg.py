@@ -13,9 +13,9 @@ def test_main_arg_header(mocker):
     args = MockArgs()
     width = 20
     exp_output = f"{'p' :^{width}} {'d' :^{width}} {'m' :^{width}} {'phim' :^{width}} {'nslots' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
+    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("healg.print")
+    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
@@ -31,9 +31,9 @@ def test_main_arg_no_header(mocker):
     """Arrange"""
     args = MockArgs()
     args.no_header = False
-    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
+    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("healg.print")
+    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
@@ -51,9 +51,9 @@ def test_main_arg_p(mocker):
     args.p = [7]
     width = 20
     exp_output = f"{'7' :^{width}} {'1' :^{width}} {'6' :^{width}} {'2' :^{width}} {'2' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
+    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("healg.print")
+    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
@@ -73,9 +73,9 @@ def test_main_arg_d(mocker):
     args.p = [2]
     width = 20
     exp_output = f"{'2' :^{width}} {'5' :^{width}} {'31' :^{width}} {'30' :^{width}} {'6' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
+    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("healg.print")
+    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
@@ -96,9 +96,9 @@ def test_main_arg_no_corrected(mocker):
     args.p = [11, 13, 17, 19, 23]
     width = 20
     exp_output = f"{'23' :^{width}} {'5' :^{width}} {'6436342' :^{width}} {'2925600' :^{width}} {'585120' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("healg.PrimesFromFile")
+    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("healg.print")
+    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 

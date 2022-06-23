@@ -18,10 +18,10 @@ cwd_test = getcwd()
 
 def test_install_fetch(mocker, args_fetch):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("install.print")
-    mock_input = mocker.patch("utils.spec.input")
+    mock_print = mocker.patch("kit.commands.install.print")
+    mock_input = mocker.patch("kit.utils.spec.input")
     mock_input.side_effect = [args_fetch.toml_arg_build, args_fetch.toml_arg_version]
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
@@ -36,9 +36,9 @@ def test_install_fetch(mocker, args_fetch):
 
 def test_list_after_fetch(mocker, args_list, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("list_cmd.print")
+    mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg2 = f"{'success':{width}}"
@@ -53,10 +53,10 @@ def test_list_after_fetch(mocker, args_list, restore_pwd):
 
 def test_install_build(mocker, args_build):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_build, ""
-    mock_print = mocker.patch("install.print")
-    mock_input = mocker.patch("utils.spec.input")
+    mock_print = mocker.patch("kit.commands.install.print")
+    mock_input = mocker.patch("kit.utils.spec.input")
     mock_input.side_effect = [args_build.toml_arg_build, args_build.toml_arg_version]
 
     arg1 = f"{args_build.component}/{args_build.instance}"
@@ -71,9 +71,9 @@ def test_install_build(mocker, args_build):
 
 def test_list_after_build(mocker, args_list, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("list_cmd.print")
+    mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg23 = f"{'success':{width}}"
@@ -90,7 +90,7 @@ def test_remove_after_build(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("remove.print")
+    mock_print = mocker.patch("kit.commands.remove.print")
 
     arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
 
@@ -105,7 +105,7 @@ def test_install_execution(mocker, args_install):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_install, ""
-    mock_print = mocker.patch("install.print")
+    mock_print = mocker.patch("kit.commands.install.print")
     mock_input = mocker.patch("utils.spec.input")
     mock_input.side_effect = [
         args_install.toml_arg_build,
@@ -126,7 +126,7 @@ def test_list_after_install(mocker, args_list, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("list_cmd.print")
+    mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
     arg234 = f"{'success':{width}}"
@@ -142,8 +142,8 @@ def test_remove_all_after_install(mocker, args_remove, restore_pwd):
     """Arrange"""
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("remove.print")
-    mock_input = mocker.patch("remove.input", return_value="y")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
 
     args_remove.all = True
     args_remove.instance = ""

@@ -36,7 +36,7 @@ def test_discover_subparsers_from_commands_some(mocker):
     # Arrange
     exp_func = {"set_check_dep_subparser", "set_remove_subparser", "set_list_subparser"}
     hekit_root_dir = Path(__file__).resolve().parent.parent
-    mocker_files_in_dir = mocker.patch("subparsers.files_in_dir")
+    mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
     mocker_files_in_dir.return_value = ["check_deps.py", "remove.py", "list_cmd.py"]
 
     # Act
@@ -99,7 +99,7 @@ def test_discover_subparsers_from_tools_some(mocker):
     # Arrange
     exp_func = {"set_gen_algebras_subparser", "set_gen_primes_subparser"}
     hekit_root_dir = Path(__file__).resolve().parent.parent
-    mocker_files_in_dir = mocker.patch("subparsers.files_in_dir")
+    mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
     mocker_files_in_dir.return_value = ["healg.py"]
 
     # Act

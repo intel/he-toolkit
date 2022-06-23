@@ -9,9 +9,9 @@ from kit.commands.install import install_components, _stages, get_recipe_arg_dic
 def test_install_components_all_unskipped(mocker, args, unskipped_components):
     """Arrange"""
     """chain_run function is executed because skip is equal to False"""
-    mock_component = mocker.patch("install.components_to_build_from")
+    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
     mock_component.return_value = unskipped_components
-    mock_chain_run = mocker.patch("install.chain_run")
+    mock_chain_run = mocker.patch("kit.commands.install.chain_run")
 
     """Act"""
     install_components(args)
@@ -27,9 +27,9 @@ def test_install_components_all_unskipped(mocker, args, unskipped_components):
 def test_install_components_all_skipped(mocker, args, skipped_components):
     """Arrange"""
     """chain_run function is not executed because skip is equal to True"""
-    mock_component = mocker.patch("install.components_to_build_from")
+    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
     mock_component.return_value = skipped_components
-    mock_chain_run = mocker.patch("install.chain_run")
+    mock_chain_run = mocker.patch("kit.commands.install.chain_run")
 
     """Act"""
     install_components(args)
@@ -45,9 +45,9 @@ def test_install_components_all_skipped(mocker, args, skipped_components):
 def test_install_components_one_unskipped(mocker, args, one_unskipped_component):
     """Arrange"""
     """chain_run function is executed once when skip is equal to False"""
-    mock_component = mocker.patch("install.components_to_build_from")
+    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
     mock_component.return_value = one_unskipped_component
-    mock_chain_run = mocker.patch("install.chain_run")
+    mock_chain_run = mocker.patch("kit.commands.install.chain_run")
 
     """Act"""
     install_components(args)

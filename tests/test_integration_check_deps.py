@@ -17,8 +17,8 @@ def test_check_dependencies_not_found(mocker):
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from check_deps
-    mock_print = mocker.patch("check_deps.print")
-    mock_which = mocker.patch("check_deps.which")
+    mock_print = mocker.patch("kit.commands.check_deps.print")
+    mock_which = mocker.patch("kit.commands.check_deps.which")
     mock_which.side_effect = [False, False, False]
 
     """Act"""
@@ -42,10 +42,10 @@ def test_check_dependencies_found(mocker):
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from check_deps
-    mock_print = mocker.patch("check_deps.print")
-    mock_which = mocker.patch("check_deps.which")
+    mock_print = mocker.patch("kit.commands.check_deps.print")
+    mock_which = mocker.patch("kit.commands.check_deps.which")
     mock_which.side_effect = [True, True, True]
-    mock_run = mocker.patch("check_deps.subprocess_run")
+    mock_run = mocker.patch("kit.commands.check_deps.subprocess_run")
     subp_1 = MockSubprocess("programA", 3.8)
     subp_2 = MockSubprocess("programC", 0.1)
     mock_run.side_effect = [subp_1, subp_2]
@@ -67,10 +67,10 @@ def test_check_dependencies_found_wrong_version(mocker):
     mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from check_deps
-    mock_print = mocker.patch("check_deps.print")
-    mock_which = mocker.patch("check_deps.which")
+    mock_print = mocker.patch("kit.commands.check_deps.print")
+    mock_which = mocker.patch("kit.commands.check_deps.which")
     mock_which.side_effect = [True, False, True]
-    mock_run = mocker.patch("check_deps.subprocess_run")
+    mock_run = mocker.patch("kit.commands.check_deps.subprocess_run")
     subp_1 = MockSubprocess("programA", 3.5)
     subp_2 = MockSubprocess("programC", 0.5)
     mock_run.side_effect = [subp_1, subp_2]
