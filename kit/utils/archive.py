@@ -5,9 +5,8 @@
 
 import tarfile
 from pathlib import Path
-from typing import Iterable, Union
-
-PathType = Union[str, Path]
+from typing import Iterable
+from kit.utils.typing import PathType
 
 
 def archive_and_compress(

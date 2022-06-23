@@ -12,7 +12,7 @@ from platform import system as os_name
 from typing import Dict, Iterable
 from kit.utils.archive import archive_and_compress  # pylint: disable=no-name-in-module
 from kit.utils.constants import Constants  # pylint: disable=no-name-in-module
-
+from kit.utils.typing import PathType
 
 try:
     # docker-py is optional and will not be used from within a docker container
@@ -109,8 +109,11 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
             yield filename.rstrip()
 
 
-def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
+def create_tar_gz_file(
+    toolkit_tar_gz: PathType, archived_files: str, ROOT: str
+) -> None:
     """Archive several files in a tar.gz file"""
+    toolkit_tar_gz = Path(toolkit_tar_gz)
     if not toolkit_tar_gz.exists():
         print("MAKING TOOLKIT.TAR.GZ ...")
         with open(archived_files, encoding="utf-8") as f:

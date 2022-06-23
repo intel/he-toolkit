@@ -135,13 +135,13 @@ kit/utils/spec.py
 kit/utils/subparsers.py
 kit/utils/tab_completion.py
 kit/utils/tsort.py
+kit/utils/typing.py
 recipes/default.toml
 recipes/examples.toml
 recipes/sample-kernels.toml
 recipes/test.toml
 requirements.txt
 tests/__init__.py
-tests/context.py
 tests/input_files/default.config
 tests/input_files/dependencies.txt
 tests/input_files/test.toml
