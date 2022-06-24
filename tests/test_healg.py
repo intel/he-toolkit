@@ -156,7 +156,7 @@ def primes_file_obj(tmp_path):
     f_primes = tmp_path / "primes.txt"
 
     with f_primes.open("w") as f:
-        gen_primes(2, 140_000, outfile=f)
+        write_primes(2, 140_000, outfile=f)
 
     primesObj = PrimesFromFile(f_primes)
     return f_primes, primesObj
