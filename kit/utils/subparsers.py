@@ -27,7 +27,7 @@ def discover_subparsers_from(module_dirs: List[str], kit_root: str):
             f"{kit_root}/{module_dir}", lambda f: f[0] != "_" and f.endswith(".py")
         )
         imported_modules = (
-            import_module(f"{module_dir}.{fname[:-3]}") for fname in filenames
+            import_module(f"kit.{module_dir}.{fname[:-3]}") for fname in filenames
         )
         funcs = (
             getattr(imported_module, funcname)
