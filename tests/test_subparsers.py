@@ -3,7 +3,6 @@
 
 import pytest
 
-# import tests.context
 from pathlib import Path
 from kit.utils.subparsers import files_in_dir, discover_subparsers_from
 
