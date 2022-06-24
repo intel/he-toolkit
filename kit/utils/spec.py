@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from re import findall
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict
 from toml import dump, load
 from kit.utils.tsort import tsort  # pylint: disable=no-name-in-module
@@ -176,7 +176,7 @@ class Spec:
         "init_install_dir": "build",
     }
 
-    recipe_arg_dict: RecipeArgDict = {}
+    recipe_arg_dict: RecipeArgDict = field(default_factory=dict)
 
     # Factory from TOML file
     @classmethod

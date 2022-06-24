@@ -49,6 +49,8 @@ def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
         if proc.stdout is not None:
             for line in proc.stdout:
                 print(f"[{basename}]", line.decode("utf-8"), end="")
+        else:
+            raise ValueError("STDOUT is None")
     success = proc.returncode == 0
     return success, proc.returncode
 
