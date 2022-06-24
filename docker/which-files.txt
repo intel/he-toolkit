@@ -3,6 +3,8 @@
 .github/hekit-recipes/palisade.toml
 .github/hekit-recipes/seal.toml
 .github/scripts/check-repo-contents-file.sh
+.github/scripts/run-mypy.sh
+.github/scripts/run-pylint.sh
 .github/workflows/github-ci.yml
 .gitignore
 .pre-commit-config.yaml
