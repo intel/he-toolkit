@@ -46,8 +46,9 @@ def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
         print(" ".join(cmd_and_args))
     basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
-        for line in proc.stdout:
-            print(f"[{basename}]", line.decode("utf-8"), end="")
+        if proc.stdout is not None:
+            for line in proc.stdout:
+                print(f"[{basename}]", line.decode("utf-8"), end="")
     success = proc.returncode == 0
     return success, proc.returncode
 

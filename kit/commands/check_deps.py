@@ -29,7 +29,7 @@ class Dep:
 
     name: str
     operation: Op
-    version: Tuple[int]
+    version: Tuple[int, ...]
     ver_str: str
 
     @classmethod
@@ -51,7 +51,7 @@ class Dep:
         return cls(dep_str, Op.ANY, tuple(), "")
 
 
-def version_string_to_tuple(ver_str: str) -> Tuple[int]:
+def version_string_to_tuple(ver_str: str) -> Tuple[int, ...]:
     """version '10.11.12' -> (10, 11, 12) """
     try:
         return tuple(int(i) for i in ver_str.split("."))

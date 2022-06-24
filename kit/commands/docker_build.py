@@ -35,7 +35,7 @@ else:
         setup_docker(args)
 
 
-def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
+def copyfiles(files: Iterable[PathType], src_dir: PathType, dst_dir: PathType) -> None:
     """Copies several files from a source to a destination"""
     src_dir, dst_dir = Path(src_dir), Path(dst_dir)
     for filename in files:
