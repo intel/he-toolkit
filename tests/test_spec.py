@@ -4,8 +4,6 @@
 import pytest
 from filecmp import cmp as compare_files
 from pathlib import Path
-
-import tests.context
 from kit.utils.spec import Spec, InvalidSpecError
 
 

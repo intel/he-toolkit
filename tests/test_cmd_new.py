@@ -4,7 +4,6 @@
 import pytest
 from pathlib import Path
 from filecmp import cmp as compare_files
-import tests.context
 from kit.commands.new import (
     create_toml_template,
     create_cmake_template,

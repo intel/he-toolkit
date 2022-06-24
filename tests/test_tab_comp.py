@@ -4,8 +4,6 @@
 import pytest
 from os import getcwd, chdir
 from pathlib import Path
-
-import tests.context
 from kit.hekit import main
 from kit.utils.tab_completion import components_completer, instances_completer
 from kit.commands.remove import remove_components

@@ -3,7 +3,6 @@
 
 import pytest
 from pathlib import Path
-import tests.context
 from kit.utils.docker_tools import DockerException
 from kit.utils.constants import Constants
 from kit.commands.docker_build import (

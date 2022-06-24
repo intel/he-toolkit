@@ -4,7 +4,6 @@
 import pytest
 from pathlib import Path
 from filecmp import cmp as compare_files
-import tests.context
 from kit.commands.init import (
     create_backup,
     remove_from_rc,

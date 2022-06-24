@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-import tests.context
 from kit.commands.remove import remove_components
 
 

@@ -4,7 +4,6 @@
 import pytest
 from pathlib import Path
 
-import tests.context
 from kit.hekit import main
 from kit.commands.check_deps import check_dependencies
 
