@@ -5,7 +5,6 @@ import pytest
 from os import getcwd, chdir
 from pathlib import Path
 
-import tests.context
 from kit.hekit import main
 from kit.commands.list_cmd import list_components, _SEP_SPACES
 from kit.commands.remove import remove_components
@@ -106,7 +105,7 @@ def test_install_execution(mocker, args_install):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_install, ""
     mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("utils.spec.input")
+    mock_input = mocker.patch("kit.utils.spec.input")
     mock_input.side_effect = [
         args_install.toml_arg_build,
         args_install.toml_arg_version,
