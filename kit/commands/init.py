@@ -8,6 +8,8 @@ from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
 
+from kit.utils.typing import PathType
+
 
 class Tags:
     """Defines opening and closing tags to be added in the shell init file"""
@@ -22,7 +24,7 @@ def file_exists(file: Path) -> bool:
     return file.exists()
 
 
-def get_expanded_path(path: str) -> Path:
+def get_expanded_path(path: PathType) -> Path:
     """Return the expanded path of a file if it exists,
     otherwise raise an exception"""
     path_file = Path(path).expanduser().resolve()

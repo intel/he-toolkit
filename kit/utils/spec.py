@@ -152,7 +152,7 @@ class Spec:
 
     component: str
     _instance_spec: dict
-    repo_location: str
+    repo_location: PathType
 
     # Keys will act as property methods
     # Values will be used as defaults in Spec obj creation
@@ -176,7 +176,7 @@ class Spec:
         "init_install_dir": "build",
     }
 
-    recipe_arg_dict = {}
+    recipe_arg_dict: RecipeArgDict = {}
 
     # Factory from TOML file
     @classmethod
@@ -208,7 +208,7 @@ class Spec:
                 yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod
-    def _expand_instance(component: str, instance: dict, rloc: str):
+    def _expand_instance(component: str, instance: dict, rloc: PathType):
         """Expansion operations"""
         # substitution from user must come before rloc expansion
         # to avoid asking for the same data several times
@@ -239,7 +239,9 @@ class Spec:
                 raise InvalidSpecError(f"'{attrib}' is not a string")
 
     @staticmethod
-    def _validate_unique_instance(component: str, instance: dict, rloc: str) -> None:
+    def _validate_unique_instance(
+        component: str, instance: dict, rloc: PathType
+    ) -> None:
         # load previous spec from info file
         try:
             instance_name = instance["name"]
@@ -253,7 +255,9 @@ class Spec:
 
     # Factory given parsed TOML python dict
     @classmethod
-    def from_instance_spec(cls, component: str, instance_spec: dict, rloc: str) -> Spec:
+    def from_instance_spec(
+        cls, component: str, instance_spec: dict, rloc: PathType
+    ) -> Spec:
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
         cls._validate_instance(instance_spec)
@@ -271,7 +275,7 @@ class Spec:
         # {'component': [instance]} -> [[component]]
         return {self.component: [self._instance_spec]}
 
-    def to_toml_file(self, filename: str) -> None:
+    def to_toml_file(self, filename: PathType) -> None:
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
         with open(filename, "w", encoding="utf-8") as f:

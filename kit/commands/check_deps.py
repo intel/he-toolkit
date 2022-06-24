@@ -11,7 +11,7 @@ from shutil import which
 from enum import Enum, auto
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple, Iterable
 from sys import exit as sys_exit
 
 
@@ -121,7 +121,7 @@ def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
         pass
 
 
-def check_dependencies_list(deps: List[str]) -> None:
+def check_dependencies_list(deps: Iterable[str]) -> None:
     """Check list of dependencies and prints out if found"""
     for dep in map(parse_dependencies, deps):
         check_dependency(dep)
