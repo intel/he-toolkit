@@ -119,7 +119,7 @@ def create_default_config() -> None:
         print(f"{file_path} created")
 
 
-def init_hekit(args):
+def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
         create_default_config()
@@ -135,14 +135,15 @@ def init_hekit(args):
 
     # Add new lines in the rc_file:
     # 1-Add hekit directory as part of environmental variable PATH
-    path_line = f"PATH={args.hekit_root_dir}:$PATH"
+    export_line = f"export HEKITPATH={args.hekit_root_dir}\n"
+    path_line = "PATH=$HEKITPATH:$PATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
         "if [ -n $(type -p register-python-argcomplete) ]; then\n"
         '  eval "$(register-python-argcomplete hekit.py hekit)"\n'
         "fi\n"
     )
-    content = "\n".join([path_line, eval_lines])
+    content = "".join([export_line, path_line, eval_lines])
     append_to_rc(rc_path, content)
 
     # Instructions for user
@@ -150,7 +151,7 @@ def init_hekit(args):
     print(f"source {rc_file}")
 
 
-def set_init_subparser(subparsers, hekit_root_dir):
+def set_init_subparser(subparsers, hekit_root_dir) -> None:
     """create the parser for the 'init' command"""
     parser_init = subparsers.add_parser("init", description="initialize hekit")
     parser_init.add_argument(

@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Dict
 from toml import dump, load
 from kit.utils.tsort import tsort  # pylint: disable=no-name-in-module
+from kit.utils.typing import PathType
 
 RecipeArgDict = Dict[str, str]
 
@@ -179,7 +180,9 @@ class Spec:
 
     # Factory from TOML file
     @classmethod
-    def from_toml_file(cls, filename: str, rloc: str, recipe_arg_dict: RecipeArgDict):
+    def from_toml_file(
+        cls, filename: PathType, rloc: PathType, recipe_arg_dict: RecipeArgDict
+    ):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
 

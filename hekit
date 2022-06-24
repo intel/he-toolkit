@@ -1,1 +1,3 @@
-kit/hekit.py
+#!/bin/sh
+
+PYTHONPATH="$HEKITPATH/kit" python -m hekit $@

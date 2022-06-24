@@ -3,7 +3,7 @@
 
 """This module fetches, builds, or installs the requested libraries"""
 
-from typing import Dict
+from typing import Dict, Union
 from kit.utils.component_builder import (  # pylint: disable=no-name-in-module
     components_to_build_from,
     chain_run,
@@ -53,7 +53,7 @@ def install_components(args):
         chain_run(the_stages(component))
 
 
-def get_recipe_arg_dict(recipe_arg: str) -> Dict[str, str]:
+def get_recipe_arg_dict(recipe_arg: str) -> Union[Dict[str, str], None]:
     """Returns a dictionary filled with recipe_arg values"""
 
     pairs = [pair.split("=") for pair in recipe_arg.replace(" ", "").split(",")]
