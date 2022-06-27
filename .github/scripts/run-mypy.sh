@@ -5,6 +5,11 @@
 SUCCESS=0
 FAILURE=1
 
+if ! type -p mypy; then
+  echo "FAILURE: mypy not found."
+  exit $FAILURE
+fi
+
 # Generate new file, overwrite old file
 if ! MYPYPATH=kit mypy -p kit --ignore-missing-imports; then
   echo "FAILURE: mypy failed. You need to manually correct the errors."
