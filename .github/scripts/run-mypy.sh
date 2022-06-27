@@ -5,7 +5,7 @@
 SUCCESS=0
 FAILURE=1
 
-if ! type -p mypy; then
+if ! type -p mypy > /dev/null; then
   echo "FAILURE: mypy not found."
   exit $FAILURE
 fi
