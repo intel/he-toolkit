@@ -16,10 +16,7 @@ from kit.utils.typing import PathType
 
 try:
     # docker-py is optional and will not be used from within a docker container
-    from kit.utils.docker_tools import (  # pylint: disable=no-name-in-module
-        DockerTools,
-        DockerException,
-    )
+    from kit.utils.docker_tools import DockerTools, DockerException
 except ImportError:
 
     def try_setup_docker(args):  # pylint: disable=unused-argument

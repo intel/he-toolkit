@@ -9,8 +9,9 @@ from re import findall
 from dataclasses import dataclass, field
 from typing import Dict
 from toml import dump, load
-from kit.utils.tsort import tsort  # pylint: disable=no-name-in-module
+from kit.utils.tsort import tsort
 from kit.utils.typing import PathType
+
 
 RecipeArgDict = Dict[str, str]
 

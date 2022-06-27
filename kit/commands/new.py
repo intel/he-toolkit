@@ -6,8 +6,8 @@
 from shutil import copytree
 from pathlib import Path
 from re import findall
-from kit.utils.spec import Spec  # pylint: disable=no-name-in-module
-from kit.utils.constants import Constants  # pylint: disable=no-name-in-module
+from kit.utils.spec import Spec
+from kit.utils.constants import Constants
 
 
 def create_toml_template(
