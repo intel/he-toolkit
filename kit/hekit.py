@@ -13,6 +13,7 @@ from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Tuple
 
 from kit.commands.init import init_hekit
 from kit.tools.healg import healg
@@ -22,7 +23,7 @@ from kit.utils.config import load_config
 from kit.utils.tab_completion import enable_tab_completion
 
 
-def parse_cmdline():
+def parse_cmdline() -> Tuple:
     """Parse commandline commands"""
 
     # resolve first to follow the symlink, if any
