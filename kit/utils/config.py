@@ -19,6 +19,10 @@ def load_config(filename: str):
     """Load a config file in TOML format"""
     expand = path.expanduser  # alias
     expanded_filename = expand(filename)
+
+    if path.islink(expanded_filename):
+        raise TypeError("The config file cannot be a symlink")
+
     toml_dict = load(expanded_filename)
     toml_dict = {k: expand(v) for k, v in toml_dict.items()}
     # deref kwargs this way, get exceptions unknown key for free

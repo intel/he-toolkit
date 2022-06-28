@@ -3,6 +3,7 @@
 
 """This module fetches, builds, or installs the requested libraries"""
 
+from os import path
 from typing import Dict, Union
 from kit.utils.component_builder import components_to_build_from, chain_run
 
@@ -28,6 +29,9 @@ def _stages(upto_stage: str):
 
 def install_components(args):
     """Install command"""
+    if path.islink(args.recipe_file):
+        raise TypeError("The TOML like cannot be a symlink")
+
     the_stages = _stages(args.upto_stage)
 
     components = components_to_build_from(
@@ -44,7 +48,7 @@ def install_components(args):
         # upto_stage is re-executed only when "force" flag is set.
         # if previous stages were executed successfully, they are going to be skipped.
         # For example, fetch and build could be skipped when executing install.
-        if args.force:
+        if args.upto_stage != "fetch" and args.force:
             component.reset_stage_info_file(args.upto_stage)
 
         chain_run(the_stages(component))
