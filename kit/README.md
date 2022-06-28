@@ -97,7 +97,7 @@ variable and enable the [tab completion](#tab-completion) feature.
 To initialize `hekit` for the first time run
 ```bash
 cd <he-toolkit-root-directory>
-HEKITPATH=. ./hekit init
+./hekit init
 ```
 Afterwards source your shell initialization file e.g. `~/.bashrc`. Now you can
 run the `hekit` commands from anywhere.
@@ -108,7 +108,7 @@ will create a directory `~/.hekit` in the user's home directory and create the
 installed by `hekit` will be kept.
 ```bash
 cd <he-toolkit-root-directory>
-HEKITPATH=. ./hekit init --default-config
+./hekit init --default-config
 ```
 
 In order to check the installed components, execute the list command

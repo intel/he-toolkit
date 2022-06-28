@@ -85,7 +85,7 @@ To set up the toolkit users must first initialize the `hekit` command using
 ```bash
 git clone https://github.com/intel/he-toolkit.git
 cd he-toolkit
-HEKITPATH=. ./hekit init --default-config
+./hekit init --default-config
 ```
 
 This will create a directory `~/.hekit` in the user's home directory and create
