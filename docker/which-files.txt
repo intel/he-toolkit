@@ -3,6 +3,8 @@
 .github/hekit-recipes/palisade.toml
 .github/hekit-recipes/seal.toml
 .github/scripts/check-repo-contents-file.sh
+.github/scripts/run-mypy.sh
+.github/scripts/run-pylint.sh
 .github/workflows/github-ci.yml
 .gitignore
 .pre-commit-config.yaml
@@ -135,13 +137,13 @@ kit/utils/spec.py
 kit/utils/subparsers.py
 kit/utils/tab_completion.py
 kit/utils/tsort.py
+kit/utils/typing.py
 recipes/default.toml
 recipes/examples.toml
 recipes/sample-kernels.toml
 recipes/test.toml
 requirements.txt
 tests/__init__.py
-tests/context.py
 tests/input_files/default.config
 tests/input_files/depend_wrong.txt
 tests/input_files/dependencies.txt

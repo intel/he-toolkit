@@ -6,8 +6,8 @@
 from shutil import copytree
 from pathlib import Path
 from re import findall
-from utils.spec import Spec
-from utils.constants import Constants
+from kit.utils.spec import Spec
+from kit.utils.constants import Constants
 
 
 def create_toml_template(

@@ -2,13 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+
 from pathlib import Path
-
-from .context import subparsers
-from subparsers import files_in_dir, discover_subparsers_from
+from kit.utils.subparsers import files_in_dir, discover_subparsers_from
 
 
-def test_discover_subparsers_from_commands_all():
+def test_discover_subparsers_from_commands_all(get_toolkit_path):
     # Arrange
     exp_func = {
         "set_docker_subparser",
@@ -19,10 +18,9 @@ def test_discover_subparsers_from_commands_all():
         "set_new_subparser",
         "set_list_subparser",
     }
-    hekit_root_dir = Path(__file__).resolve().parent.parent
 
     # Act
-    act_funcs = discover_subparsers_from(["commands"], hekit_root_dir / "kit")
+    act_funcs = discover_subparsers_from(["commands"], get_toolkit_path / "kit")
 
     # Assert
     for func in act_funcs:
@@ -32,15 +30,14 @@ def test_discover_subparsers_from_commands_all():
     assert 0 == len(exp_func)
 
 
-def test_discover_subparsers_from_commands_some(mocker):
+def test_discover_subparsers_from_commands_some(mocker, get_toolkit_path):
     # Arrange
     exp_func = {"set_check_dep_subparser", "set_remove_subparser", "set_list_subparser"}
-    hekit_root_dir = Path(__file__).resolve().parent.parent
-    mocker_files_in_dir = mocker.patch("subparsers.files_in_dir")
+    mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
     mocker_files_in_dir.return_value = ["check_deps.py", "remove.py", "list_cmd.py"]
 
     # Act
-    act_funcs = discover_subparsers_from(["commands"], hekit_root_dir / "kit")
+    act_funcs = discover_subparsers_from(["commands"], get_toolkit_path / "kit")
 
     # Assert
     for func in act_funcs:
@@ -50,7 +47,7 @@ def test_discover_subparsers_from_commands_some(mocker):
     assert 0 == len(exp_func)
 
 
-def test_files_in_dir_commands_filter_py(mocker):
+def test_files_in_dir_commands_filter_py(get_toolkit_path):
     # Arrange
     exp_files = {
         "docker_build.py",
@@ -61,8 +58,7 @@ def test_files_in_dir_commands_filter_py(mocker):
         "new.py",
         "list_cmd.py",
     }
-    hekit_root_dir = Path(__file__).resolve().parent.parent
-    module = hekit_root_dir / "kit" / "commands"
+    module = get_toolkit_path / "kit" / "commands"
     filter = lambda f: f[0] != "_" and f.endswith(".py")
 
     # Act
@@ -72,7 +68,7 @@ def test_files_in_dir_commands_filter_py(mocker):
     assert exp_files == set(filenames)
 
 
-def test_files_in_dir_commands_filter_None(mocker):
+def test_files_in_dir_commands_filter_None(get_toolkit_path):
     # Arrange
     exp_files = {
         "docker_build.py",
@@ -84,8 +80,7 @@ def test_files_in_dir_commands_filter_None(mocker):
         "new.py",
         "list_cmd.py",
     }
-    hekit_root_dir = Path(__file__).resolve().parent.parent
-    module = hekit_root_dir / "kit" / "commands"
+    module = get_toolkit_path / "kit" / "commands"
     filter = None
 
     # Act
@@ -95,15 +90,14 @@ def test_files_in_dir_commands_filter_None(mocker):
     assert exp_files == set(filenames)
 
 
-def test_discover_subparsers_from_tools_some(mocker):
+def test_discover_subparsers_from_tools_some(mocker, get_toolkit_path):
     # Arrange
     exp_func = {"set_gen_algebras_subparser", "set_gen_primes_subparser"}
-    hekit_root_dir = Path(__file__).resolve().parent.parent
-    mocker_files_in_dir = mocker.patch("subparsers.files_in_dir")
+    mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
     mocker_files_in_dir.return_value = ["healg.py"]
 
     # Act
-    act_funcs = discover_subparsers_from(["tools"], hekit_root_dir / "kit")
+    act_funcs = discover_subparsers_from(["tools"], get_toolkit_path / "kit")
 
     # Assert
     for func in act_funcs:
@@ -113,11 +107,10 @@ def test_discover_subparsers_from_tools_some(mocker):
     assert 0 == len(exp_func)
 
 
-def test_files_in_dir_tools_filter_py(mocker):
+def test_files_in_dir_tools_filter_py(get_toolkit_path):
     # Arrange
     exp_files = {"healg.py"}
-    hekit_root_dir = Path(__file__).resolve().parent.parent
-    module = hekit_root_dir / "kit" / "tools"
+    module = get_toolkit_path / "kit" / "tools"
     filter = lambda f: f[0] != "_" and f.endswith(".py")
 
     # Act
@@ -125,3 +118,8 @@ def test_files_in_dir_tools_filter_py(mocker):
 
     # Assert
     assert exp_files == set(filenames)
+
+
+@pytest.fixture
+def get_toolkit_path():
+    return Path(__file__).resolve().parent.parent

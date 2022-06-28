@@ -8,6 +8,8 @@ from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
 
+from kit.utils.typing import PathType
+
 
 class Tags:
     """Defines opening and closing tags to be added in the shell init file"""
@@ -22,7 +24,7 @@ def file_exists(file: Path) -> bool:
     return file.exists()
 
 
-def get_expanded_path(path: str) -> Path:
+def get_expanded_path(path: PathType) -> Path:
     """Return the expanded path of a file if it exists,
     otherwise raise an exception"""
     path_file = Path(path).expanduser().resolve()
@@ -32,7 +34,7 @@ def get_expanded_path(path: str) -> Path:
     return path_file
 
 
-def create_backup(path: Path, ext: str = ".hekit.bak") -> str:
+def create_backup(path: Path, ext: str = ".hekit.bak") -> Path:
     """Create a backup of the input file"""
     backup = path.with_suffix(ext)
     copyfile(path, backup)
@@ -82,7 +84,7 @@ def append_to_rc(path: Path, content: str) -> None:
             rc_file.write(line)
 
 
-def get_rc_file() -> str:
+def get_rc_file() -> Path:
     """ Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
@@ -90,7 +92,7 @@ def get_rc_file() -> str:
         # if bash_profile file does not exist, try bashrc file
         rc_file = Path("~/.bash_profile").expanduser().resolve()
         if not file_exists(rc_file):
-            rc_file = "~/.bashrc"
+            rc_file = Path("~/.bashrc")
     # TODO add support for other popular shells
     #    elif active_shell_path == "zsh":
     #        rc_file = ""
@@ -119,7 +121,7 @@ def create_default_config() -> None:
         print(f"{file_path} created")
 
 
-def init_hekit(args):
+def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
         create_default_config()
@@ -135,14 +137,15 @@ def init_hekit(args):
 
     # Add new lines in the rc_file:
     # 1-Add hekit directory as part of environmental variable PATH
-    path_line = f"PATH={args.hekit_root_dir}:$PATH"
+    export_line = f"export HEKITPATH={args.hekit_root_dir}\n"
+    path_line = "PATH=$HEKITPATH:$PATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
         "if [ -n $(type -p register-python-argcomplete) ]; then\n"
         '  eval "$(register-python-argcomplete hekit.py hekit)"\n'
         "fi\n"
     )
-    content = "\n".join([path_line, eval_lines])
+    content = "".join([export_line, path_line, eval_lines])
     append_to_rc(rc_path, content)
 
     # Instructions for user
@@ -150,7 +153,7 @@ def init_hekit(args):
     print(f"source {rc_file}")
 
 
-def set_init_subparser(subparsers, hekit_root_dir):
+def set_init_subparser(subparsers, hekit_root_dir) -> None:
     """create the parser for the 'init' command"""
     parser_init = subparsers.add_parser("init", description="initialize hekit")
     parser_init.add_argument(

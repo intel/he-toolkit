@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -15,16 +13,17 @@ from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Tuple
 
-from commands.init import init_hekit
-from tools.healg import healg
-from utils.subparsers import discover_subparsers_from
-from utils.constants import Constants
-from utils.config import load_config
-from utils.tab_completion import enable_tab_completion
+from kit.commands.init import init_hekit
+from kit.tools.healg import healg
+from kit.utils.subparsers import discover_subparsers_from
+from kit.utils.constants import Constants
+from kit.utils.config import load_config
+from kit.utils.tab_completion import enable_tab_completion
 
 
-def parse_cmdline():
+def parse_cmdline() -> Tuple:
     """Parse commandline commands"""
 
     # resolve first to follow the symlink, if any

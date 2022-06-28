@@ -7,10 +7,10 @@ import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
-from typing import Iterable, Callable, Union, List
+from typing import Iterable, Callable, Union, List, Tuple
 from typing import Dict
 import toml
-from utils.spec import Spec
+from kit.utils.spec import Spec
 
 
 class BuildError(Exception):
@@ -33,7 +33,7 @@ def chain_run(funcs: Iterable[Callable]):
             )
 
 
-def run(cmd_and_args: Union[str, List[str]]):
+def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
     """Takes either a string or list of strings and runs as command."""
     if not cmd_and_args:
         return True, 0
@@ -46,8 +46,11 @@ def run(cmd_and_args: Union[str, List[str]]):
         print(" ".join(cmd_and_args))
     basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
-        for line in proc.stdout:
-            print(f"[{basename}]", line.decode("utf-8"), end="")
+        if proc.stdout is not None:
+            for line in proc.stdout:
+                print(f"[{basename}]", line.decode("utf-8"), end="")
+        else:
+            raise ValueError("STDOUT is None")
     success = proc.returncode == 0
     return success, proc.returncode
 

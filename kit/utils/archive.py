@@ -6,10 +6,14 @@
 import tarfile
 from pathlib import Path
 from typing import Iterable
+from kit.utils.typing import PathType
 
 
 def archive_and_compress(
-    name: str, filepaths: Iterable[str], root: str, exist_ok: bool = False
+    name: PathType,
+    filepaths: Iterable[PathType],
+    root: PathType,
+    exist_ok: bool = False,
 ) -> None:
     """Archive and compress files and directories into tar.gz file"""
     root = Path(root if root else ".")
