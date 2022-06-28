@@ -30,6 +30,27 @@ def test_main_config_is_symlink(mocker, args_fetch):
     )
 
 
+def test_main_config_name_has_null(mocker, args_fetch):
+    """Arrange"""
+    args_fetch.config = f"{args_fetch.tests_path}/input_files/web.xml\0default.config"
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_fetch, ""
+    mock_print = mocker.patch("kit.hekit.print")
+
+    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+
+    """Act"""
+    with pytest.raises(SystemExit):
+        main()
+
+    """Assert"""
+    mock_print.assert_called_with(
+        "Error while parsing config file\n",
+        "ValueError('embedded null byte')",
+        file=stderr,
+    )
+
+
 def test_main_toml_is_symlink(mocker, args_fetch):
     """Arrange"""
     args_fetch.recipe_file = f"{args_fetch.tests_path}/input_files/test_symlink.toml"
@@ -44,6 +65,22 @@ def test_main_toml_is_symlink(mocker, args_fetch):
 
     """Assert"""
     assert str(exc_info.value) == "The TOML like cannot be a symlink"
+
+
+def test_main_toml_name_has_null(mocker, args_fetch):
+    """Arrange"""
+    args_fetch.recipe_file = f"{args_fetch.tests_path}/input_files/web.xml\0test.toml"
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args_fetch, ""
+    mock_print = mocker.patch("kit.commands.install.print")
+
+    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+
+    with pytest.raises(ValueError) as exc_info:
+        main()
+
+    """Assert"""
+    assert str(exc_info.value) == "embedded null byte"
 
 
 def test_main_toml_wrong_format(mocker, args_fetch):
