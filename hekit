@@ -1,3 +1,3 @@
 #!/bin/sh
 
-PYTHONPATH="$HEKITPATH/kit" python -m hekit $@
+PYTHONPATH="$HEKITPATH/kit" python3 -m hekit $@
