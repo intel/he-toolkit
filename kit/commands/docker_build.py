@@ -10,13 +10,13 @@ from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
-from utils.archive import archive_and_compress
-from utils.constants import Constants
-
+from kit.utils.archive import archive_and_compress
+from kit.utils.constants import Constants
+from kit.utils.typing import PathType
 
 try:
     # docker-py is optional and will not be used from within a docker container
-    from utils.docker_tools import DockerTools, DockerException
+    from kit.utils.docker_tools import DockerTools, DockerException
 except ImportError:
 
     def try_setup_docker(args):  # pylint: disable=unused-argument
@@ -32,7 +32,7 @@ else:
         setup_docker(args)
 
 
-def copyfiles(files: Iterable[str], src_dir: str, dst_dir: str) -> None:
+def copyfiles(files: Iterable[PathType], src_dir: PathType, dst_dir: PathType) -> None:
     """Copies several files from a source to a destination"""
     src_dir, dst_dir = Path(src_dir), Path(dst_dir)
     for filename in files:
@@ -106,8 +106,11 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
             yield filename.rstrip()
 
 
-def create_tar_gz_file(toolkit_tar_gz: str, archived_files: str, ROOT: str):
+def create_tar_gz_file(
+    toolkit_tar_gz: PathType, archived_files: str, ROOT: str
+) -> None:
     """Archive several files in a tar.gz file"""
+    toolkit_tar_gz = Path(toolkit_tar_gz)
     if not toolkit_tar_gz.exists():
         print("MAKING TOOLKIT.TAR.GZ ...")
         with open(archived_files, encoding="utf-8") as f:

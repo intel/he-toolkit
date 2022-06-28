@@ -3,8 +3,9 @@
 
 """This module provides tab completion if the dependencies are installed"""
 
-from commands.list_cmd import list_dirs
-from utils.config import load_config
+from kit.commands.list_cmd import list_dirs
+from kit.utils.config import load_config
+
 
 try:
     # Tab completion is an optional feature, this means that
