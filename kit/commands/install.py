@@ -30,7 +30,7 @@ def _stages(upto_stage: str):
 def install_components(args):
     """Install command"""
     if path.islink(args.recipe_file):
-        raise TypeError("The TOML like cannot be a symlink")
+        raise TypeError("The TOML file cannot be a symlink")
 
     the_stages = _stages(args.upto_stage)
 

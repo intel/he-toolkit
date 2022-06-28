@@ -155,8 +155,8 @@ tests/input_files/test_symlink.toml
 tests/input_files/test_tsort.toml
 tests/input_files/test_two_instances.toml
 tests/input_files/test_wrong_format.toml
-"tests/input_files/web.xml\\0default.config"
-"tests/input_files/web.xml\\0test.toml"
+tests/input_files/web.xml__default.config
+tests/input_files/web.xml__test.toml
 tests/test_cmd_check_deps.py
 tests/test_cmd_docker_build.py
 tests/test_cmd_init.py
