@@ -4,10 +4,8 @@
 import pytest
 from os import getcwd, chdir
 from pathlib import Path
-
-from .context import hekit, install
-from hekit import main
-from install import install_components
+from kit.hekit import main
+from kit.commands.install import install_components
 
 
 def test_fetch_toml_wrong_format(mocker, args_fetch):
@@ -15,9 +13,9 @@ def test_fetch_toml_wrong_format(mocker, args_fetch):
     args_fetch.recipe_file = (
         f"{args_fetch.tests_path}/input_files/test_wrong_format.toml"
     )
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("install.print")
+    mock_print = mocker.patch("kit.commands.install.print")
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
@@ -34,9 +32,9 @@ def test_fetch_toml_missing_value(mocker, args_fetch):
     args_fetch.recipe_file = (
         f"{args_fetch.tests_path}/input_files/test_missing_value.toml"
     )
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("install.print")
+    mock_print = mocker.patch("kit.commands.install.print")
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
@@ -53,9 +51,9 @@ def test_fetch_toml_missing_quotes(mocker, args_fetch):
     args_fetch.recipe_file = (
         f"{args_fetch.tests_path}/input_files/test_missing_quotes.toml"
     )
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("install.print")
+    mock_print = mocker.patch("kit.commands.install.print")
 
     arg1 = f"{args_fetch.component}/{args_fetch.instance}"
 
