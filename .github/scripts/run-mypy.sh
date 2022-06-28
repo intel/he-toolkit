@@ -11,7 +11,7 @@ if ! type -p mypy > /dev/null; then
 fi
 
 # Generate new file, overwrite old file
-if ! MYPYPATH=kit mypy -p kit --ignore-missing-imports; then
+if ! MYPYPATH=kit mypy -p kit --ignore-missing-imports --install-types; then
   echo "FAILURE: mypy failed. You need to manually correct the errors."
   exit $FAILURE
 fi
