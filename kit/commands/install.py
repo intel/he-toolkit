@@ -3,7 +3,7 @@
 
 """This module fetches, builds, or installs the requested libraries"""
 
-from os import path
+from pathlib import Path
 from typing import Dict, Union
 from kit.utils.component_builder import components_to_build_from, chain_run
 
@@ -29,7 +29,7 @@ def _stages(upto_stage: str):
 
 def install_components(args):
     """Install command"""
-    if path.islink(args.recipe_file):
+    if Path(args.recipe_file).is_symlink():
         raise TypeError("The TOML file cannot be a symlink")
 
     the_stages = _stages(args.upto_stage)
