@@ -3,6 +3,8 @@
 
 """Module providing a topological sort"""
 
+from typing import Set, Any
+
 
 class CycleError(Exception):
     """Error for indicating a cycle found in an DAG"""
@@ -27,7 +29,7 @@ def tsort(G: dict):
             pass
         yield node
 
-    visited = set()
+    visited: Set[Any] = set()
 
     for node in G.keys():
         yield from dfs(node, [node])

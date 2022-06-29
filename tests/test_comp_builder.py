@@ -2,8 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import component_builder
-from component_builder import chain_run, run, BuildError, components_to_build_from
+from kit.utils.component_builder import (
+    chain_run,
+    run,
+    BuildError,
+    components_to_build_from,
+    ComponentBuilder,
+)
 
 
 def test_chain_run_all_success(mocker, funcs_success):
@@ -35,7 +40,7 @@ def test_chain_run_all_failure(mocker, funcs_failure):
 def test_run_success(mocker, cmd_and_args, Popen_success):
     """Arrange"""
     exp_status, exp_code = Popen_success
-    mock_Popen = mocker.patch("component_builder.Popen")
+    mock_Popen = mocker.patch("kit.utils.component_builder.Popen")
     mock_proc = mock_Popen.return_value.__enter__.return_value
     mock_proc.returncode = exp_code
 
@@ -51,7 +56,7 @@ def test_run_success(mocker, cmd_and_args, Popen_success):
 def test_run_failure(mocker, cmd_and_args, Popen_failure):
     """Arrange"""
     exp_status, exp_code = Popen_failure
-    mock_Popen = mocker.patch("component_builder.Popen")
+    mock_Popen = mocker.patch("kit.utils.component_builder.Popen")
     mock_proc = mock_Popen.return_value.__enter__.return_value
     mock_proc.returncode = exp_code
 
@@ -66,7 +71,7 @@ def test_run_failure(mocker, cmd_and_args, Popen_failure):
 
 def test_run_without_arguments(mocker):
     """Arrange"""
-    mock_Popen = mocker.patch("component_builder.Popen")
+    mock_Popen = mocker.patch("kit.utils.component_builder.Popen")
 
     """Act"""
     act_status, act_code = run("")
@@ -80,11 +85,9 @@ def test_run_without_arguments(mocker):
 def test_components_to_build_from_(mocker, specs_data):
     """Arrange"""
     exp_filename, exp_repo, exp_recipe_arg, exp_spec = specs_data
-    mock_Spec = mocker.patch("component_builder.Spec.from_toml_file")
+    mock_Spec = mocker.patch("kit.utils.component_builder.Spec.from_toml_file")
     mock_Spec.return_value = exp_spec
-    mock_ComponentBuilder = mocker.patch.object(
-        component_builder.ComponentBuilder, "__init__"
-    )
+    mock_ComponentBuilder = mocker.patch.object(ComponentBuilder, "__init__")
     mock_ComponentBuilder.return_value = None
 
     """Act"""
@@ -92,7 +95,7 @@ def test_components_to_build_from_(mocker, specs_data):
 
     """Assert"""
     for result in act_result:
-        assert type(result) == component_builder.ComponentBuilder
+        assert type(result) == ComponentBuilder
     assert mock_ComponentBuilder.call_count == 3
     mock_Spec.assert_called_with(exp_filename, exp_repo, exp_recipe_arg)
 

@@ -10,6 +10,8 @@ from typing import Dict, List
 
 from toml import load
 
+from kit.utils.typing import PathType
+
 # Number of separation spaces for columns
 _SEP_SPACES = 2
 
@@ -46,7 +48,7 @@ class RepoProperties:
         return self._repo_structure
 
     @staticmethod
-    def _repo_struct(path: str) -> Dict[str, List[str]]:
+    def _repo_struct(path: PathType) -> Dict[str, List[str]]:
         """Return a dictionary with sorted keys as components and values as
            sorted list of instances"""
         path = Path(path)
@@ -55,7 +57,7 @@ class RepoProperties:
 
 # TODO move out into some util module
 # This is a util func also used for tab completion
-def list_dirs(path: str) -> List[str]:
+def list_dirs(path: PathType) -> List[str]:
     """Return list of directories in path."""
     try:
         dirs = next(walk(path))[1]  # dirs in a list

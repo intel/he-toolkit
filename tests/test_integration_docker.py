@@ -6,9 +6,8 @@ from pathlib import Path
 from os import getcwd, chdir
 from getpass import getuser
 
-from .context import hekit, docker_build
-from hekit import main
-from docker_build import setup_docker
+from kit.hekit import main
+from kit.commands.docker_build import setup_docker
 
 # Due to install command changes current directory,
 # the other commands need to restore the current path
@@ -22,16 +21,16 @@ def test_docker_build_check_build(mocker):
     derived_label = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from docker_build
-    mock_input = mocker.patch("docker_build.input")
+    mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
-    mock_print_build = mocker.patch("docker_build.print")
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
     # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("utils.docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print_tools = mocker.patch("utils.docker_tools.print")
+    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     main()
@@ -49,16 +48,16 @@ def test_docker_build_check_enable(mocker, restore_pwd):
     client = MockClient()
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from docker_build
-    mock_input = mocker.patch("docker_build.input")
+    mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
-    mock_print_build = mocker.patch("docker_build.print")
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
     # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("utils.docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print_tools = mocker.patch("utils.docker_tools.print")
+    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     main()
@@ -79,16 +78,16 @@ def test_docker_build_check_only(mocker, restore_pwd):
     client = MockClient()
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from docker_build
-    mock_input = mocker.patch("docker_build.input")
+    mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
-    mock_print_build = mocker.patch("docker_build.print")
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
     # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("utils.docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print_tools = mocker.patch("utils.docker_tools.print")
+    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     with pytest.raises(SystemExit) as exc_info:
@@ -107,14 +106,14 @@ def test_docker_build_clean(mocker, restore_pwd):
     client = MockClient()
 
     # Mocking command line args
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     # Mocking objects from docker_build
-    mock_input = mocker.patch("docker_build.input")
+    mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
-    mock_print_build = mocker.patch("docker_build.print")
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
     # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""

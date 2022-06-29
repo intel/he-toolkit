@@ -11,7 +11,7 @@ from shutil import which
 from enum import Enum, auto
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple, Iterable
 from sys import exit as sys_exit
 
 
@@ -29,7 +29,7 @@ class Dep:
 
     name: str
     operation: Op
-    version: Tuple[int]
+    version: Tuple[int, ...]
     ver_str: str
 
     @classmethod
@@ -51,7 +51,7 @@ class Dep:
         return cls(dep_str, Op.ANY, tuple(), "")
 
 
-def version_string_to_tuple(ver_str: str) -> Tuple[int]:
+def version_string_to_tuple(ver_str: str) -> Tuple[int, ...]:
     """version '10.11.12' -> (10, 11, 12) """
     try:
         return tuple(int(i) for i in ver_str.split("."))
@@ -121,7 +121,7 @@ def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
         pass
 
 
-def check_dependencies_list(deps: List[str]) -> None:
+def check_dependencies_list(deps: Iterable[str]) -> None:
     """Check list of dependencies and prints out if found"""
     for dep in map(parse_dependencies, deps):
         check_dependency(dep)

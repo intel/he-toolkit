@@ -2,15 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import remove
-from remove import remove_components
+from kit.commands.remove import remove_components
 
 
 def test_remove_instance_of_component_with_many_instances(mocker, args):
     """Arrange"""
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=["v2.3.2"])
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=["v2.3.2"])
     text = f"Instance '{args.instance}' of component '{args.component}' successfully removed"
     path = f"{args.config.repo_location}/{args.component}/{args.instance}"
 
@@ -27,9 +26,9 @@ def test_remove_instance_of_component_with_many_instances(mocker, args):
 
 def test_remove_instance_of_component_with_single_instance(mocker, args):
     """Arrange"""
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
     text = f"Instance '{args.instance}' of component '{args.component}' successfully removed"
     path = f"{args.config.repo_location}/{args.component}"
 
@@ -47,10 +46,10 @@ def test_remove_instance_of_component_with_single_instance(mocker, args):
 def test_remove_all_instances_answer_yes(mocker, args):
     """Arrange"""
     args.instance = None
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
-    mock_input = mocker.patch("remove.input", return_value="y")
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
     text = f"All instances of component '{args.component}' successfully removed"
     path = f"{args.config.repo_location}/{args.component}"
 
@@ -69,10 +68,10 @@ def test_remove_all_instances_answer_yes(mocker, args):
 def test_remove_all_instances_answer_no(mocker, args):
     """Arrange"""
     args.instance = None
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
-    mock_input = mocker.patch("remove.input", return_value="n")
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="n")
 
     """Act"""
     remove_components(args)
@@ -89,10 +88,10 @@ def test_remove_all_components_answer_yes(mocker, args):
     args.all = True
     args.instance = ""
     args.component = ""
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
-    mock_input = mocker.patch("remove.input", return_value="y")
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
     text = f"All components successfully removed"
     path = f"{args.config.repo_location}"
 
@@ -113,10 +112,10 @@ def test_remove_all_components_answer_no(mocker, args):
     args.all = True
     args.instance = ""
     args.component = ""
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
-    mock_input = mocker.patch("remove.input", return_value="n")
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="n")
 
     """Act"""
     remove_components(args)
@@ -131,10 +130,10 @@ def test_remove_all_components_answer_no(mocker, args):
 def test_remove_all_ValueError_exception(mocker, args):
     """Arrange"""
     args.all = True
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
-    mock_input = mocker.patch("remove.input", return_value="n")
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="n")
 
     """Act"""
     with pytest.raises(ValueError) as execinfo:
@@ -150,10 +149,10 @@ def test_remove_all_ValueError_exception(mocker, args):
 def test_remove_component_ValueError_exception(mocker, args):
     """Arrange"""
     args.component = ""
-    mock_rmtree = mocker.patch("remove.rmtree")
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
-    mock_input = mocker.patch("remove.input", return_value="n")
+    mock_rmtree = mocker.patch("kit.commands.remove.rmtree")
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
+    mock_input = mocker.patch("kit.commands.remove.input", return_value="n")
 
     """Act"""
     with pytest.raises(ValueError) as execinfo:
@@ -168,9 +167,11 @@ def test_remove_component_ValueError_exception(mocker, args):
 
 def test_remove_components_FileNotFoundError_exception(mocker, args):
     """Arrange"""
-    mock_rmtree = mocker.patch("remove.rmtree", side_effect=FileNotFoundError)
-    mock_print = mocker.patch("remove.print")
-    mock_listdir = mocker.patch("remove.listdir", return_value=[])
+    mock_rmtree = mocker.patch(
+        "kit.commands.remove.rmtree", side_effect=FileNotFoundError
+    )
+    mock_print = mocker.patch("kit.commands.remove.print")
+    mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
     text = f"Instance '{args.instance}' of component '{args.component}' not found."
     path = f"{args.config.repo_location}/{args.component}/{args.instance}"
 

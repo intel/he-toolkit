@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from .context import docker_tools
-from docker_tools import DockerTools, DockerBuildError
+from kit.utils.docker_tools import DockerTools, DockerBuildError
 
 
 def test_build_image_response_stream(mocker):
@@ -13,7 +12,7 @@ def test_build_image_response_stream(mocker):
     client = Client()
     client.set_API(key, value)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -32,7 +31,7 @@ def test_build_image_response_aux(mocker):
     client = Client()
     client.set_API(key, value)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -50,7 +49,7 @@ def test_build_image_response_error(mocker):
     client = Client()
     client.set_API(key, value)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -70,7 +69,7 @@ def test_build_image_response_other(mocker):
     client = Client()
     client.set_API(key, value)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -89,7 +88,7 @@ def test_image_exists_empty_list(mocker):
     client = Client()
     client.set_images(list)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -106,7 +105,7 @@ def test_image_exists_not_empty_list(mocker):
     client = Client()
     client.set_images(list)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -123,7 +122,7 @@ def test_image_exists_some_elements_list(mocker):
     client = Client()
     client.set_images(list)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -141,7 +140,7 @@ def test_run_script_in_container_normal_execution(mocker):
     client = Client()
     client.set_container(exp_log, exp_code)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
 
     """Act"""
@@ -161,9 +160,9 @@ def test_try_build_new_image_build_skipped(mocker):
     client = Client()
     client.set_images(list)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print = mocker.patch("docker_tools.print")
+    mock_print = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     act_docker = DockerTools()
@@ -182,9 +181,9 @@ def test_try_build_new_image_build_executed(mocker):
     client.set_images(list)
     client.set_API(key, value)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print = mocker.patch("docker_tools.print")
+    mock_print = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     act_docker = DockerTools()
@@ -201,10 +200,10 @@ def test_test_connection_no_error(mocker):
     client = Client()
     client.set_container(exp_log, exp_code)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print = mocker.patch("docker_tools.print")
-    mock_exit = mocker.patch("docker_tools.sys_exit")
+    mock_print = mocker.patch("kit.utils.docker_tools.print")
+    mock_exit = mocker.patch("kit.utils.docker_tools.sys_exit")
 
     """Act"""
     act_docker = DockerTools()
@@ -223,10 +222,10 @@ def test_test_connection_error(mocker):
     client = Client()
     client.set_container(exp_log, exp_code)
 
-    mock_from_env = mocker.patch("docker_tools.docker_from_env")
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
-    mock_print = mocker.patch("docker_tools.print")
-    mock_exit = mocker.patch("docker_tools.sys_exit")
+    mock_print = mocker.patch("kit.utils.docker_tools.print")
+    mock_exit = mocker.patch("kit.utils.docker_tools.sys_exit")
 
     """Act"""
     act_docker = DockerTools()

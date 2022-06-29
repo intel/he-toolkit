@@ -4,12 +4,10 @@
 import pytest
 from os import getcwd, chdir
 from pathlib import Path
-
-from .context import hekit, tab_completion, remove, install
-from hekit import main
-from tab_completion import components_completer, instances_completer
-from remove import remove_components
-from install import install_components
+from kit.hekit import main
+from kit.utils.tab_completion import components_completer, instances_completer
+from kit.commands.remove import remove_components
+from kit.commands.install import install_components
 
 
 # Due to install command changes current directory,
@@ -19,7 +17,7 @@ cwd_test = getcwd()
 
 def execute_action(mocker, args_action):
     global cwd_test
-    mock_parse_cmdline = mocker.patch("hekit.parse_cmdline")
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_action, ""
     main()
     chdir(cwd_test)

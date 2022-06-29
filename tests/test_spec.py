@@ -4,9 +4,7 @@
 import pytest
 from filecmp import cmp as compare_files
 from pathlib import Path
-
-from .context import spec
-from spec import Spec, InvalidSpecError
+from kit.utils.spec import Spec, InvalidSpecError
 
 
 def test_transform_spec_to_toml_dict():
@@ -149,7 +147,7 @@ def test_basic_user_substitutions_are_expanded(mocker):
     # Purposely put 'another' before 'something'.
     exp_version = "2.3.6"
     exp_name = "Charles"
-    mock_input = mocker.patch("spec.input")
+    mock_input = mocker.patch("kit.utils.spec.input")
     mock_input.side_effect = [exp_name, exp_version]
 
     expected = {
@@ -174,7 +172,7 @@ def test_user_substitutions_are_expanded_to_init(mocker):
     that can be changed"""
     exp_name = "bob"
     exp_version = "1.2.5"
-    mock_input = mocker.patch("spec.input")
+    mock_input = mocker.patch("kit.utils.spec.input")
     mock_input.return_value = exp_name
 
     expected = {
@@ -211,7 +209,7 @@ def test_validate_unique_instance_no_file():
 def test_validate_unique_instance_same_values(mocker):
     """Verify that the function continues without errors
     if the instance is the same as the previous one"""
-    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec = mocker.patch("kit.utils.spec.read_spec")
     mock_read_spec.return_value = {"name": "test", "option": "debug"}
     act_comp = "comp"
     act_inst = {"name": "test", "option": "debug"}
@@ -225,7 +223,7 @@ def test_validate_unique_instance_same_values(mocker):
 def test_validate_unique_instance_different_values(mocker):
     """Verify it triggers InvalidSpec exception when
     the instance is not the same as the previous one"""
-    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec = mocker.patch("kit.utils.spec.read_spec")
     mock_read_spec.return_value = {"name": "test", "option": "debug"}
     act_comp = "comp"
     act_inst = {"name": "test", "option": "release"}
@@ -244,9 +242,9 @@ def test_validate_unique_instance_different_values(mocker):
 def test_from_toml_file_tsort(mocker):
     """Verify dependencies are installed first"""
     tests_path = Path(__file__).resolve().parent
-    mock_read_spec = mocker.patch("spec.read_spec")
+    mock_read_spec = mocker.patch("kit.utils.spec.read_spec")
     mock_read_spec.return_value = {"export_install_dir": "", "export_cmake": ""}
-    mock_validate_unique = mocker.patch("spec.Spec._validate_unique_instance")
+    mock_validate_unique = mocker.patch("kit.utils.spec.Spec._validate_unique_instance")
     exp_keys_list = ["ntl", "hexl", "hexl", "helib", "palisade", "gsl", "zstd", "seal"]
     filepath = f"{tests_path}/input_files/test_tsort.toml"
 

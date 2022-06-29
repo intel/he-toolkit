@@ -7,9 +7,10 @@
 from os import walk
 from importlib import import_module
 from typing import List, Callable
+from kit.utils.typing import PathType
 
 
-def files_in_dir(path: str, cond: Callable) -> List[str]:
+def files_in_dir(path: PathType, cond: Callable) -> List[str]:
     """Returns a list of filenames in the directory given by path. Can be filtered by cond"""
     try:
         filenames = next(walk(path))[2]
@@ -20,14 +21,14 @@ def files_in_dir(path: str, cond: Callable) -> List[str]:
         return []
 
 
-def discover_subparsers_from(module_dirs: List[str], kit_root: str):
+def discover_subparsers_from(module_dirs: List[str], kit_root: PathType):
     """Import modules in module_dirs, and discover and return a generator of set_.*_subparser functions"""
     for module_dir in module_dirs:
         filenames = files_in_dir(
             f"{kit_root}/{module_dir}", lambda f: f[0] != "_" and f.endswith(".py")
         )
         imported_modules = (
-            import_module(f"{module_dir}.{fname[:-3]}") for fname in filenames
+            import_module(f"kit.{module_dir}.{fname[:-3]}") for fname in filenames
         )
         funcs = (
             getattr(imported_module, funcname)
