@@ -145,10 +145,16 @@ recipes/test.toml
 requirements.txt
 tests/__init__.py
 tests/input_files/default.config
+tests/input_files/default_symlink.config
+tests/input_files/depend_wrong.txt
 tests/input_files/dependencies.txt
 tests/input_files/test.toml
+tests/input_files/test_missing_quotes.toml
+tests/input_files/test_missing_value.toml
+tests/input_files/test_symlink.toml
 tests/input_files/test_tsort.toml
 tests/input_files/test_two_instances.toml
+tests/input_files/test_wrong_format.toml
 tests/test_cmd_check_deps.py
 tests/test_cmd_docker_build.py
 tests/test_cmd_init.py
@@ -164,6 +170,7 @@ tests/test_integration_docker.py
 tests/test_integration_healg.py
 tests/test_integration_init.py
 tests/test_integration_install.py
+tests/test_integration_wrong_inputs.py
 tests/test_spec.py
 tests/test_subparsers.py
 tests/test_tab_comp.py
