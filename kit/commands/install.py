@@ -6,6 +6,7 @@
 from pathlib import Path
 from typing import Dict, Union
 from kit.utils.component_builder import components_to_build_from, chain_run
+from kit.utils.subparsers import validate_input
 
 
 def _stages(upto_stage: str):
@@ -76,7 +77,7 @@ def set_install_subparser(subparsers):
         parser.add_argument(
             "recipe_file",
             metavar="recipe-file",
-            type=str,
+            type=validate_input,
             help=f"TOML file for {action}",
         )
         parser.add_argument(

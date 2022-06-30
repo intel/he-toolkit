@@ -6,6 +6,7 @@
 from shutil import rmtree
 from os import listdir
 from kit.utils.tab_completion import components_completer, instances_completer
+from kit.utils.subparsers import validate_input
 
 
 def remove_components(args):
@@ -73,9 +74,17 @@ def set_remove_subparser(subparsers):
     )
     parser_remove.add_argument("-y", action="store_false", help="say yes to prompts")
     parser_remove.add_argument(
-        "component", type=str, help="component to be removed", nargs="?", default=""
+        "component",
+        type=validate_input,
+        help="component to be removed",
+        nargs="?",
+        default="",
     ).completer = components_completer
     parser_remove.add_argument(
-        "instance", type=str, help="instance to be removed", nargs="?", default=""
+        "instance",
+        type=validate_input,
+        help="instance to be removed",
+        nargs="?",
+        default="",
     ).completer = instances_completer
     parser_remove.set_defaults(fn=remove_components)

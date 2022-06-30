@@ -8,6 +8,7 @@ from pathlib import Path
 from re import findall
 from kit.utils.spec import Spec
 from kit.utils.constants import Constants
+from kit.utils.subparsers import validate_input
 
 
 def create_toml_template(
@@ -104,9 +105,12 @@ def create_new_project(args) -> None:
 def set_new_subparser(subparsers, hekit_root_dir):
     """create the parser for the 'new' command"""
     parser_new = subparsers.add_parser("new", description="create a new project")
-    parser_new.add_argument("name", type=str, help="project name")
+    parser_new.add_argument("name", type=validate_input, help="project name")
     parser_new.add_argument(
-        "--directory", type=str, default=".", help="location of the new project"
+        "--directory",
+        type=validate_input,
+        default=".",
+        help="location of the new project",
     )
     parser_new.add_argument(
         "--based-on",
