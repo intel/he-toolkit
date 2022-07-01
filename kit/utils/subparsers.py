@@ -42,6 +42,6 @@ def discover_subparsers_from(module_dirs: List[str], kit_root: PathType):
 def validate_input(input_value: str) -> str:
     """Raises an exception if input has non-printable characters"""
     if not input_value.isprintable():
-        raise ValueError(f"{input_value} is not valid due to non-printable characters")
+        raise ValueError("Input is not valid due to non-printable characters")
 
     return input_value

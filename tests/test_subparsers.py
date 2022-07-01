@@ -129,9 +129,7 @@ def test_validate_input_non_printable_char():
         validate_input(input)
 
     # Assert
-    assert f"{input} is not valid due to non-printable characters" == str(
-        execinfo.value
-    )
+    assert "Input is not valid due to non-printable characters" == str(execinfo.value)
 
 
 @pytest.fixture
