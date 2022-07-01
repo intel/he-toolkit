@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
-      - run: pip3 install cpplint pylint mypy types-toml docker
+      - run: pip3 install cpplint pylint mypy types-toml docker bandit
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck black
       # NOTE: This is deprecated in favor of pre-commit.ci
