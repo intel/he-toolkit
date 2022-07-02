@@ -7,7 +7,7 @@ import math
 import re
 import shutil
 from argparse import ArgumentTypeError
-from subprocess import CalledProcessError, run, PIPE
+from subprocess import CalledProcessError, run, PIPE  # nosec B404
 from sys import stdout, stderr, exit as sys_exit
 from itertools import chain, combinations
 from collections import Counter
@@ -147,7 +147,7 @@ def compute_prime_factors(numbers, factor_util="factor"):
     command_and_args = [factor_util, *map(str, numbers)]
 
     try:
-        out = run(command_and_args, stdout=PIPE, check=True)
+        out = run(command_and_args, stdout=PIPE, check=True)  # nosec B603
     except CalledProcessError as error:
         # Was it a negative number on the input?
         if any(number < 0 for number in numbers):

@@ -5,8 +5,8 @@
 SUCCESS=0
 FAILURE=1
 
-if ! pylint kit; then
-  echo "FAILURE: pylint failed. You need to manually correct the errors."
+if ! bandit -r kit; then
+  echo "FAILURE: bandit failed. You need to manually correct the errors."
   exit $FAILURE
 fi
 

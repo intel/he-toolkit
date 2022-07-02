@@ -7,8 +7,6 @@ configuring the HE Toolkit environment
 
 import sys
 
-assert sys.version_info >= (3, 8)
-
 from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
@@ -21,6 +19,10 @@ from kit.utils.subparsers import discover_subparsers_from, validate_input
 from kit.utils.constants import Constants
 from kit.utils.config import load_config
 from kit.utils.tab_completion import enable_tab_completion
+
+if sys.version_info < (3, 8):
+    print("Intel HE Toolkit requires Python version 3.8 or above", file=sys.stderr)
+    sys_exit(1)
 
 
 def parse_cmdline() -> Tuple:

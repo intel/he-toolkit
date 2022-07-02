@@ -82,3 +82,8 @@ repos:
           entry: .github/scripts/run-pylint.sh
           language: script
           pass_filenames: false
+        - id: bandit
+          name: bandit
+          entry: .github/scripts/run-bandit.sh
+          language: script
+          pass_filenames: false

@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from subprocess import CalledProcessError, run as subprocess_run
+from subprocess import CalledProcessError, run as subprocess_run  # nosec B404
 from re import search
 from shutil import which
 from enum import Enum, auto
@@ -96,7 +96,7 @@ def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
     version_flag = "--version"
 
     try:
-        output = subprocess_run(
+        output = subprocess_run(  # nosec B603
             [dep.name, version_flag], capture_output=True, check=True
         )
         stdout = output.stdout.decode("utf-8")
