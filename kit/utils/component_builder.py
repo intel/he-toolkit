@@ -6,7 +6,7 @@
 import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT  # nosec B404
 from typing import Iterable, Callable, Union, List, Tuple
 from typing import Dict
 import toml
@@ -45,7 +45,7 @@ def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
         cmd_and_args_list = cmd_and_args
         print(" ".join(cmd_and_args))
     basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
-    with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:
+    with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:  # nosec B603
         if proc.stdout is not None:
             for line in proc.stdout:
                 print(f"[{basename}]", line.decode("utf-8"), end="")
