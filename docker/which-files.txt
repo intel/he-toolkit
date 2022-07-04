@@ -26,6 +26,11 @@ docker/basic-docker-test.sh
 docker/ide-config/settings.json
 docker/runners.sh
 docker/which-files.txt
+expr/README.md
+expr/scripts/README.md
+expr/scripts/decode.py
+expr/scripts/encode.py
+expr/scripts/ptxt.py
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
 he-samples/cmake/gtest.cmake
