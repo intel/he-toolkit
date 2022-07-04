@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple, Iterable
 from sys import exit as sys_exit
+from kit.utils.subparsers import validate_input
 
 
 class Op(Enum):
@@ -152,7 +153,7 @@ def set_check_dep_subparser(subparsers):
     parser_check_dependencies.add_argument(
         "dependencies_file",
         metavar="dependencies-file",
-        type=str,
+        type=validate_input,
         help="dependencies file",
     )
     parser_check_dependencies.set_defaults(fn=check_dependencies)

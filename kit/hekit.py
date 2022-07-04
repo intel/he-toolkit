@@ -15,7 +15,7 @@ from typing import Tuple
 
 from kit.commands.init import init_hekit
 from kit.tools.healg import healg
-from kit.utils.subparsers import discover_subparsers_from
+from kit.utils.subparsers import discover_subparsers_from, validate_input
 from kit.utils.constants import Constants
 from kit.utils.config import load_config
 from kit.utils.tab_completion import enable_tab_completion
@@ -39,7 +39,7 @@ def parse_cmdline() -> Tuple:
     )
     parser.add_argument(
         "--config",
-        type=str,
+        type=validate_input,
         default="~/.hekit/default.config",
         help="use a non-default configuration file instead",
     )
