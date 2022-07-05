@@ -4,7 +4,7 @@
 import pytest
 
 from pathlib import Path
-from kit.utils.subparsers import files_in_dir, discover_subparsers_from
+from kit.utils.subparsers import files_in_dir, discover_subparsers_from, validate_input
 
 
 def test_discover_subparsers_from_commands_all(get_toolkit_path):
@@ -118,6 +118,18 @@ def test_files_in_dir_tools_filter_py(get_toolkit_path):
 
     # Assert
     assert exp_files == set(filenames)
+
+
+def test_validate_input_non_printable_char():
+    # Arrange
+    input = "test\02file.config"
+
+    # Act
+    with pytest.raises(ValueError) as execinfo:
+        validate_input(input)
+
+    # Assert
+    assert "Input is not valid due to non-printable characters" == str(execinfo.value)
 
 
 @pytest.fixture

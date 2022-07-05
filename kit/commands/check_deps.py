@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from subprocess import CalledProcessError, run as subprocess_run
+from subprocess import CalledProcessError, run as subprocess_run  # nosec B404
 from re import search
 from shutil import which
 from enum import Enum, auto
@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple, Iterable
 from sys import exit as sys_exit
+from kit.utils.subparsers import validate_input
 
 
 class Op(Enum):
@@ -95,7 +96,7 @@ def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
     version_flag = "--version"
 
     try:
-        output = subprocess_run(
+        output = subprocess_run(  # nosec B603
             [dep.name, version_flag], capture_output=True, check=True
         )
         stdout = output.stdout.decode("utf-8")
@@ -152,7 +153,7 @@ def set_check_dep_subparser(subparsers):
     parser_check_dependencies.add_argument(
         "dependencies_file",
         metavar="dependencies-file",
-        type=str,
+        type=validate_input,
         help="dependencies file",
     )
     parser_check_dependencies.set_defaults(fn=check_dependencies)

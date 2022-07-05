@@ -45,8 +45,8 @@ Intel HE toolkit has been tested on Ubuntu 20.04
 Must have system dependencies for the toolkit include,
 ```
 python >= 3.8
-git
 pip
+git
 ```
 
 Further Python dependencies include,
@@ -60,7 +60,8 @@ pytest-mock (optional: running tests)
 
 For faster setup, a `requirements.txt` file is provided for recommended user
 python dependencies and a `dev_reqs.txt` is provided for all python dependencies
-listed above. Either file can install dependencies with
+listed above and pre-commit tools for development. Either file can install
+dependencies with
 
 ```bash
 pip install -r <requirements-file>

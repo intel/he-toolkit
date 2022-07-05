@@ -42,9 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # Required for pre-commit
-      - run: pip3 install cpplint pylint mypy types-toml docker
+      - run: pip3 install bandit cpplint docker mypy pylint types-toml
       - run: sudo snap install shfmt
-      - run: sudo apt install shellcheck black
+      - run: sudo apt install black shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v2.0.3
         with:
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup
         run: |
-          pip3 install pytest pytest-mock toml docker
+          pip3 install docker pytest pytest-mock toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
         run: pytest tests/

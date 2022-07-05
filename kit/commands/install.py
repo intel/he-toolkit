@@ -3,8 +3,10 @@
 
 """This module fetches, builds, or installs the requested libraries"""
 
+from pathlib import Path
 from typing import Dict, Union
 from kit.utils.component_builder import components_to_build_from, chain_run
+from kit.utils.subparsers import validate_input
 
 
 def _stages(upto_stage: str):
@@ -28,6 +30,9 @@ def _stages(upto_stage: str):
 
 def install_components(args):
     """Install command"""
+    if Path(args.recipe_file).is_symlink():
+        raise TypeError("The TOML file cannot be a symlink")
+
     the_stages = _stages(args.upto_stage)
 
     components = components_to_build_from(
@@ -44,7 +49,7 @@ def install_components(args):
         # upto_stage is re-executed only when "force" flag is set.
         # if previous stages were executed successfully, they are going to be skipped.
         # For example, fetch and build could be skipped when executing install.
-        if args.force:
+        if args.upto_stage != "fetch" and args.force:
             component.reset_stage_info_file(args.upto_stage)
 
         chain_run(the_stages(component))
@@ -72,7 +77,7 @@ def set_install_subparser(subparsers):
         parser.add_argument(
             "recipe_file",
             metavar="recipe-file",
-            type=str,
+            type=validate_input,
             help=f"TOML file for {action}",
         )
         parser.add_argument(

@@ -1,0 +1,16 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[hexl]]
+skip = false
+version = "!version!"
+name = "!name!"
+fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+init_fetch_dir = "fetch
+init_build_dir = "!build!"
+init_install_dir = "!build!"
+pre-build = "ls"
+build = "ls"
+install = "ls"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"

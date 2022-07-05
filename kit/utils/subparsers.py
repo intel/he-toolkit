@@ -37,3 +37,11 @@ def discover_subparsers_from(module_dirs: List[str], kit_root: PathType):
             if funcname.startswith("set_") and funcname.endswith("_subparser")
         )
         yield from funcs
+
+
+def validate_input(input_value: str) -> str:
+    """Raises an exception if input has non-printable characters"""
+    if not input_value.isprintable():
+        raise ValueError("Input is not valid due to non-printable characters")
+
+    return input_value

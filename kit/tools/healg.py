@@ -7,7 +7,7 @@ import math
 import re
 import shutil
 from argparse import ArgumentTypeError
-from subprocess import CalledProcessError, run, PIPE
+from subprocess import CalledProcessError, run, PIPE  # nosec B404
 from sys import stdout, stderr, exit as sys_exit
 from itertools import chain, combinations
 from collections import Counter
@@ -23,12 +23,16 @@ def set_gen_primes_subparser(subparsers):
     )
     parser.add_argument("start", type=int, default=2, help="start number")
     parser.add_argument("stop", type=int, default=100, help="stop number")
-    parser.set_defaults(fn=lambda args: gen_primes(args.start, args.stop))
+    parser.set_defaults(fn=gen_primes)
 
 
-def gen_primes(start: int, stop: int, outfile=stdout):
+def gen_primes(args):
+    """Generates a list of primes from start to stop values inclusive"""
+    write_primes(args.start, args.stop)
+
+
+def write_primes(start: int, stop: int, outfile=stdout):
     """Writes to outfile a list of primes from start to stop values inclusive"""
-
     numbers = range(start, stop + 1)
     primes = [
         factors[0] for factors in compute_prime_factors(numbers) if len(factors) == 1
@@ -99,7 +103,7 @@ def parse_range_for_primes(string):
         primes_list = PrimesFromFile(default_primes_filepath)
     except FileNotFoundError:
         with default_primes_filepath.open("w", encoding="utf-8") as f:
-            gen_primes(2, 140_000, outfile=f)
+            write_primes(2, 140_000, outfile=f)
         primes_list = PrimesFromFile(default_primes_filepath)
 
     return parse_range(string, filter_fn=primes_list.is_prime)
@@ -143,7 +147,7 @@ def compute_prime_factors(numbers, factor_util="factor"):
     command_and_args = [factor_util, *map(str, numbers)]
 
     try:
-        out = run(command_and_args, stdout=PIPE, check=True)
+        out = run(command_and_args, stdout=PIPE, check=True)  # nosec B603
     except CalledProcessError as error:
         # Was it a negative number on the input?
         if any(number < 0 for number in numbers):
