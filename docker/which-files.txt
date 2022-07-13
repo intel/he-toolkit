@@ -176,3 +176,4 @@ tests/test_spec.py
 tests/test_subparsers.py
 tests/test_tab_comp.py
 tests/test_tsort.py
+tools/README.md
