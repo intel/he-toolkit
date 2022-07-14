@@ -8,8 +8,7 @@ from itertools import chain
 from typing import Dict, List
 
 from toml import load
-from utils.files import list_dirs
-
+from kit.utils.files import list_dirs
 from kit.utils.typing import PathType
 
 # Number of separation spaces for columns
