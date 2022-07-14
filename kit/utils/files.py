@@ -1,12 +1,16 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""This module provides functions to list files and directories."""
+
 from os import walk
 from typing import Callable, List
 from enum import Enum
 
 
 class FileType(Enum):
+    """Categories of files"""
+
     DIRS = 1
     FILES = 2
 

@@ -5,7 +5,7 @@
 """
 
 from importlib import import_module
-from typing import List, Callable
+from typing import List
 from kit.utils.typing import PathType
 from kit.utils.files import files_in_dir
 

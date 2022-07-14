@@ -134,6 +134,7 @@ kit/utils/component_builder.py
 kit/utils/config.py
 kit/utils/constants.py
 kit/utils/docker_tools.py
+kit/utils/files.py
 kit/utils/spec.py
 kit/utils/subparsers.py
 kit/utils/tab_completion.py
