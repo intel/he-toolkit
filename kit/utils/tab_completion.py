@@ -3,7 +3,6 @@
 
 """This module provides tab completion if the dependencies are installed"""
 
-from kit.commands.list_cmd import list_dirs
 from kit.utils.config import load_config
 from kit.utils.files import list_dirs
 
