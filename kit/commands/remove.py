@@ -9,6 +9,7 @@ from kit.utils.tab_completion import components_completer, instances_completer
 from kit.utils.subparsers import validate_input
 from kit.utils.config import config_required
 
+
 @config_required
 def remove_components(args):
     """Remove component instances"""

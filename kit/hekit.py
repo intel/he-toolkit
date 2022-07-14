@@ -13,24 +13,13 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Tuple
 
-from kit.commands.init import init_hekit
-from kit.tools.healg import healg
 from kit.utils.subparsers import discover_subparsers_from, validate_input
 from kit.utils.constants import Constants
-from kit.utils.config import load_config
 from kit.utils.tab_completion import enable_tab_completion
 
-<<<<<<< HEAD
 if sys.version_info < (3, 8):
     print("Intel HE Toolkit requires Python version 3.8 or above", file=sys.stderr)
     sys_exit(1)
-=======
-from utils.subparsers import discover_subparsers_from
-from utils.constants import Constants  # pylint: disable=no-name-in-module
-from utils.tab_completion import (  # pylint: disable=no-name-in-module
-    enable_tab_completion,
-)
->>>>>>> 07138df... removed FIXME in hekit. required loading of config now a simple decorator
 
 
 def parse_cmdline() -> Tuple:
