@@ -89,7 +89,7 @@ def saveData(dataName, X, y, datamode: DataMode = DataMode.eval):
     features = [f"feature_{i}" for i in range(nFeatures)]
     features.append("target")
     data = [features]
-    data.append(np.concatenate((X, np.transpose([y])), axis=1).tolist())
+    data += np.concatenate((X, np.transpose([y])), axis=1).tolist()
 
     # Save to csv
     with open(f"{dataName}_{suffix}.csv", "w") as csvfile:
