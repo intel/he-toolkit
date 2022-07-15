@@ -3,13 +3,12 @@
 
 """This module lists the libraries that were installed with hekit"""
 
-from os import walk
 from pathlib import Path
 from itertools import chain
 from typing import Dict, List
 
 from toml import load
-
+from kit.utils.files import list_dirs
 from kit.utils.typing import PathType
 
 # Number of separation spaces for columns
@@ -53,17 +52,6 @@ class RepoProperties:
            sorted list of instances"""
         path = Path(path)
         return {component: list_dirs(path / component) for component in list_dirs(path)}
-
-
-# TODO move out into some util module
-# This is a util func also used for tab completion
-def list_dirs(path: PathType) -> List[str]:
-    """Return list of directories in path."""
-    try:
-        dirs = next(walk(path))[1]  # dirs in a list
-        return sorted(dirs)
-    except StopIteration:
-        return []
 
 
 def list_components(args):

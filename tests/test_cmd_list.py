@@ -78,7 +78,7 @@ def test_list_components_several_correct_items(
     """Arrange"""
     """list_cmd_dirs function is called several times, first
     it returns the libraries, then the version of each one"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=tree_directory)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=tree_directory)
     """load function returns success as status of the all the actions"""
     mock_load = mocker.patch(
         "kit.commands.list_cmd.load", return_value=all_actions_success
@@ -100,7 +100,7 @@ def test_list_components_incorrect_fetch(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of fetch"""
     mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=fetch_failure)
     """print functions reports the failure for fetch"""
@@ -124,7 +124,7 @@ def test_list_components_incorrect_build(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of build"""
     mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=build_failure)
     """print functions reports the failure for build"""
@@ -148,7 +148,7 @@ def test_list_components_incorrect_install(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of install"""
     mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=install_failure)
     """print functions reports the failure for install"""
@@ -171,7 +171,7 @@ def test_list_components_without_version(mocker, without_version_directory, args
     """list_dirs function is called two times, first
     it returns a library and then it tries its version"""
     mock_walk = mocker.patch(
-        "kit.commands.list_cmd.walk", side_effect=without_version_directory
+        "kit.utils.files.walk", side_effect=without_version_directory
     )
     mock_load = mocker.patch("kit.commands.list_cmd.load")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
@@ -189,9 +189,7 @@ def test_list_components_without_libraries(mocker, args, without_lib_directory):
     """Arrange"""
     """list_dirs function is called once but
     there are not libraries"""
-    mock_walk = mocker.patch(
-        "kit.commands.list_cmd.walk", side_effect=without_lib_directory
-    )
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=without_lib_directory)
     mock_load = mocker.patch("kit.commands.list_cmd.load")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
@@ -208,7 +206,7 @@ def test_list_components_StopIteration_exception(mocker, args):
     """Arrange"""
     """list_dirs function triggers a StopIteration exception
     and returns an empty list"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=StopIteration)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=StopIteration)
     mock_load = mocker.patch("kit.commands.list_cmd.load")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
@@ -227,7 +225,7 @@ def test_list_components_FileNotFoundError_exception(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns the library then its version"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """ load triggers an FileNotFoundError exception"""
     mock_load = mocker.patch(
         "kit.commands.list_cmd.load", side_effect=FileNotFoundError
@@ -256,7 +254,7 @@ def test_list_components_KeyError_exception(
     """Arrange"""
     """list_dirs function is called two times, first
     it returns a library and then its version"""
-    mock_walk = mocker.patch("kit.commands.list_cmd.walk", side_effect=lib_directory)
+    mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function triggers a KeyError exception"""
     mock_load = mocker.patch("kit.commands.list_cmd.load", side_effect=KeyError)
     """print functions reports the exception"""

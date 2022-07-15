@@ -134,6 +134,7 @@ kit/utils/component_builder.py
 kit/utils/config.py
 kit/utils/constants.py
 kit/utils/docker_tools.py
+kit/utils/files.py
 kit/utils/spec.py
 kit/utils/subparsers.py
 kit/utils/tab_completion.py
@@ -165,6 +166,7 @@ tests/test_cmd_new.py
 tests/test_cmd_remove.py
 tests/test_comp_builder.py
 tests/test_docker_tool.py
+tests/test_files.py
 tests/test_healg.py
 tests/test_integration_check_deps.py
 tests/test_integration_docker.py
