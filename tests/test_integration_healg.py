@@ -3,6 +3,7 @@
 
 import pytest
 import sys
+from sys import stderr
 from pathlib import Path
 from kit.hekit import main
 from kit.tools.healg import healg, gen_primes
@@ -42,36 +43,46 @@ def test_gen_primes_start_greater_than_stop(mocker):
     args = MockArgsGenPrimes()
     args.stop = 10
     args.start = 100
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
     mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
+    mock_print_main = mocker.patch("kit.hekit.print")
 
     """Act"""
-    with pytest.raises(TypeError) as exc_info:
-        main()
+    main()
 
     """Assert"""
+    mock_exit.assert_called_once_with(1)
     mock_print.assert_not_called()
-    assert str(exc_info.value) == "'NoneType' object is not iterable"
+    mock_exit.assert_called_once_with(1)
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        file=stderr,
+    )
 
 
 def test_gen_primes_negative_start(mocker):
     """Arrange"""
     args = MockArgsGenPrimes()
     args.start = -1
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
     mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
+    mock_print_main = mocker.patch("kit.hekit.print")
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
     mock_print.assert_not_called()
-    assert (
-        str(exc_info.value)
-        == "A negative number was found in the input: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+    mock_exit.assert_called_once_with(1)
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n",
+        "ValueError('A negative number was found in the input: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')",
+        file=stderr,
     )
 
 
@@ -80,19 +91,22 @@ def test_gen_primes_negative_stop(mocker):
     args = MockArgsGenPrimes()
     args.start = -5
     args.stop = -1
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
     mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
+    mock_print_main = mocker.patch("kit.hekit.print")
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
+    mock_exit.assert_called_once_with(1)
     mock_print.assert_not_called()
-    assert (
-        str(exc_info.value)
-        == "A negative number was found in the input: [-5, -4, -3, -2, -1]"
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n",
+        "ValueError('A negative number was found in the input: [-5, -4, -3, -2, -1]')",
+        file=stderr,
     )
 
 
@@ -100,17 +114,23 @@ def test_gen_primes_max_stop(mocker):
     """Arrange"""
     args = MockArgsGenPrimes()
     args.stop = sys.maxsize
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
     mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
+    mock_print_main = mocker.patch("kit.hekit.print")
 
     """Act"""
-    with pytest.raises(OverflowError) as exc_info:
-        main()
+    main()
 
     """Assert"""
     mock_print.assert_not_called()
-    assert str(exc_info.value) == "Python int too large to convert to C ssize_t"
+    mock_exit.assert_called_once_with(1)
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n",
+        "OverflowError('Python int too large to convert to C ssize_t')",
+        file=stderr,
+    )
 
 
 def test_healg_arg_header(mocker):
@@ -175,20 +195,23 @@ def test_healg_negative_arg_p(mocker):
     args = MockArgsHealg()
     args.no_header = False
     args.p = [-1]
-    width = 20
-    exp_output = f"{'7' :^{width}} {'1' :^{width}} {'6' :^{width}} {'2' :^{width}} {'2' :^{width}}"
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
     mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
+    mock_print_main = mocker.patch("kit.hekit.print")
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "A negative number was found in the input: [-2]"
+    mock_exit.assert_called_once_with(1)
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n",
+        "ValueError('A negative number was found in the input: [-2]')",
+        file=stderr,
+    )
 
 
 def test_healg_max_arg_p(mocker):
@@ -196,13 +219,11 @@ def test_healg_max_arg_p(mocker):
     args = MockArgsHealg()
     args.no_header = False
     args.p = [sys.maxsize]
-    width = 20
-    exp_output = f"{'7' :^{width}} {'1' :^{width}} {'6' :^{width}} {'2' :^{width}} {'2' :^{width}}"
     mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
+    mock_print = mocker.patch("kit.tools.healg.print")
 
     """Act"""
     main()
@@ -240,19 +261,23 @@ def test_healg_negative_arg_d(mocker):
     args.d = [-1]
     args.p = [2]
     width = 20
-    exp_output = f"{'2' :^{width}} {'5' :^{width}} {'31' :^{width}} {'30' :^{width}} {'6' :^{width}}"
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
     mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
     mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
+    mock_print_main = mocker.patch("kit.hekit.print")
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "A negative number was found in the input: [-0.5]"
+    mock_exit.assert_called_once_with(1)
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n",
+        "ValueError('A negative number was found in the input: [-0.5]')",
+        file=stderr,
+    )
 
 
 @pytest.mark.skip(reason="check later")

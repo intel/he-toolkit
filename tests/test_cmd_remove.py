@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+from pathlib import Path
 from kit.commands.remove import remove_components
 
 
@@ -11,12 +12,12 @@ def test_remove_instance_of_component_with_many_instances(mocker, args):
     mock_print = mocker.patch("kit.commands.remove.print")
     mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=["v2.3.2"])
     text = f"Instance '{args.instance}' of component '{args.component}' successfully removed"
-    path = f"{args.config.repo_location}/{args.component}/{args.instance}"
 
     """Act"""
     remove_components(args)
 
     """Assert"""
+    path = f"{args.config.repo_location}/{args.component}/{args.instance}"
     mock_print.assert_called_once()
     mock_print.assert_called_with(text)
     mock_rmtree.assert_called_once()
@@ -30,12 +31,12 @@ def test_remove_instance_of_component_with_single_instance(mocker, args):
     mock_print = mocker.patch("kit.commands.remove.print")
     mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
     text = f"Instance '{args.instance}' of component '{args.component}' successfully removed"
-    path = f"{args.config.repo_location}/{args.component}"
 
     """Act"""
     remove_components(args)
 
     """Assert"""
+    path = f"{args.config.repo_location}/{args.component}"
     mock_print.assert_called_once()
     mock_print.assert_called_with(text)
     assert 2 == mock_rmtree.call_count
@@ -51,12 +52,12 @@ def test_remove_all_instances_answer_yes(mocker, args):
     mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
     mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
     text = f"All instances of component '{args.component}' successfully removed"
-    path = f"{args.config.repo_location}/{args.component}"
 
     """Act"""
     remove_components(args)
 
     """Assert"""
+    path = f"{args.config.repo_location}/{args.component}"
     mock_print.assert_called_once()
     mock_print.assert_called_with(text)
     mock_rmtree.assert_called_once()
@@ -93,12 +94,12 @@ def test_remove_all_components_answer_yes(mocker, args):
     mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
     mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
     text = f"All components successfully removed"
-    path = f"{args.config.repo_location}"
 
     """Act"""
     remove_components(args)
 
     """Assert"""
+    path = f"{args.config.repo_location}"
     mock_print.assert_called_once()
     mock_print.assert_called_with(text)
     mock_rmtree.assert_called_once()
@@ -173,12 +174,12 @@ def test_remove_components_FileNotFoundError_exception(mocker, args):
     mock_print = mocker.patch("kit.commands.remove.print")
     mock_listdir = mocker.patch("kit.commands.remove.listdir", return_value=[])
     text = f"Instance '{args.instance}' of component '{args.component}' not found."
-    path = f"{args.config.repo_location}/{args.component}/{args.instance}"
 
     """Act"""
     remove_components(args)
 
     """Assert"""
+    path = f"{args.config.repo_location}/{args.component}/{args.instance}"
     mock_print.assert_called_once()
     mock_print.assert_called_with("Nothing to remove", text)
     mock_rmtree.assert_called_once()
@@ -190,12 +191,9 @@ def test_remove_components_FileNotFoundError_exception(mocker, args):
 
 
 class MockArgs:
-    class Config:
-        def __init__(self):
-            self.repo_location = "test_location "
-
     def __init__(self):
-        self.config = MockArgs.Config()
+        self.tests_path = Path(__file__).resolve().parent
+        self.config = f"{self.tests_path}/input_files/default.config"
         self.instance = "test_instance"
         self.component = "component"
         self.all = False

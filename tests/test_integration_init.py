@@ -71,10 +71,10 @@ def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
     mockers.mock_exists.side_effect = [False, False]
 
     """Act"""
-    with pytest.raises(FileNotFoundError) as exc_info:
-        main()
+    main()
 
     """Assert"""
+    mockers.mock_exit.assert_called_once_with(1)
     # create_default_config function
     mockers.mock_mkdir.assert_called_once()
     mockers.mock_open.assert_called_once()
@@ -98,10 +98,10 @@ def test_init_hekit_ValueError_from_create_backup(mocker):
     mockers.mock_exists.side_effect = [True, True]
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
+    mockers.mock_exit.assert_called_once_with(1)
     # create_default_config function
     mockers.mock_mkdir.assert_called_once()
     mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
@@ -125,6 +125,7 @@ class Mockers:
         self.mock_print = mocker.patch("kit.commands.init.print")
         self.mock_copyfile = mocker.patch("kit.commands.init.copyfile")
         self.mock_same_files = mocker.patch("kit.commands.init.same_files")
+        self.mock_exit = mocker.patch("kit.hekit.sys_exit")
         # mocking internal functions
         self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
         self.mock_get_rc_file = mocker.patch("kit.commands.init.get_rc_file")
