@@ -16,22 +16,6 @@ on:
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
-###################
-# Define env vars #
-###################
-env:
-  HEXL_VER: 1.2.3
-  SEAL_VER: 3.7.2
-  PALISADE_VER: 1.11.6
-  HELIB_VER: 2.2.1
-  HEKIT_DIR: ~/.hekit/components
-  HEXL_DIR: ${HEKIT_DIR}/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
-  SEAL_DIR: ${HEKIT_DIR}/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
-  PALISADE_DIR: ${HEKIT_DIR}/palisade/v${PALISADE_VER}/install/lib/Palisade
-  HELIB_DIR: ${HEKIT_DIR}/helib/v${HELIB_VER}/share/cmake/helib
-  GSL_DIR: ${HEKIT_DIR}/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
-  ZSTD_DIR: ${HEKIT_DIR}/zstd/v1.4.5/install/lib/cmake/zstd
-
 ################
 # Ubuntu 20.04 #
 ################
@@ -216,7 +200,6 @@ jobs:
       - name: Init hekit
         run: |
           echo "repo_location = \"$HE_WORKSPACE\"" > CI_default.config
-          cat CI_default.config
 
       - name: Build and install default recipe
         run: |
