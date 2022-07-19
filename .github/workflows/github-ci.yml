@@ -209,15 +209,14 @@ jobs:
       - uses: actions/checkout@v2
         # Add local bin for pip modules
       - name: Setup
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: |
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "HE_WORKSPACE=$GITHUB_WORKSPACE/.hekit/components" >> $GITHUB_ENV
 
       - name: Init hekit
         run: |
-          echo "HE_WORKSPACE=${GITHUB_WORKSPACE}/.hekit/components" >> $GITHUB_ENV
-          echo "repo_location = \"${HE_WORKSPACE}\"" > CI_default.config
+          echo "repo_location = \"$HE_WORKSPACE\"" > CI_default.config
           cat CI_default.config
-          echo $GITHUB_ENV
-          echo $HE_WORKSPACE
 
       - name: Build and install default recipe
         run: |
@@ -228,16 +227,16 @@ jobs:
         run: |
           ./hekit --config CI_default.config build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config CI_default.config list
-          echo "PSI_BUILD_DIR=${HE_WORKSPACE}/examples/psi/build" >> $GITHUB_ENV
-          echo "QUERY_BUILD_DIR=${HE_WORKSPACE}/examples/secure-query/build" >> $GITHUB_ENV
-          echo "LR_BUILD_DIR=${HE_WORKSPACE}/examples/logistic-regression/build" >> $GITHUB_ENV
+          echo "PSI_BUILD_DIR=$HE_WORKSPACE/examples/psi/build" >> $GITHUB_ENV
+          echo "QUERY_BUILD_DIR=$HE_WORKSPACE/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HE_WORKSPACE/examples/logistic-regression/build" >> $GITHUB_ENV
 
       - name: Build sample kernels
         run: |
           ./hekit --config CI_default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config CI_default.config list
-          echo "SEAL_KERNELS_BUILD_DIR=${HE_WORKSPACE}/sample-kernels/seal/build" >> $GITHUB_ENV
-          echo "PALISADE_KERNELS_BUILD_DIR=${HE_WORKSPACE}/sample-kernels/palisade/build" >> $GITHUB_ENV
+          echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run PSI example
         run: |
