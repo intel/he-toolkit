@@ -193,20 +193,32 @@ class Spec:
         # load the recipe file
         toml_specs = load(filename)
 
+        # TODO
         # create dependency graph
-        dependency_dict = {
-            component: fill_dependencies(instance_spec)
-            for component, instance_specs in toml_specs.items()
-            for instance_spec in instance_specs
-        }
+        # dependency_dict = {
+        #    component: fill_dependencies(instance_spec)
+        #    for component, instance_specs in toml_specs.items()
+        #    for instance_spec in instance_specs
+        # }
+        dependency_dict = {}
+        for component, instance_specs in toml_specs.items():
+            for instance_spec in instance_specs:
+                dependency_list = fill_dependencies(instance_spec)
+                if not component in dependency_dict:
+                    dependency_dict[component] = dependency_list
+                else:
+                    dependency_dict[component] = list(
+                        set(dependency_dict[component] + dependency_list)
+                    )
 
         # apply topological sorting
         sorted_components = tsort(dependency_dict)
 
         # create specs
         for component in sorted_components:
-            for instance_spec in toml_specs[component]:
-                yield cls.from_instance_spec(component, instance_spec, rloc)
+            if component in toml_specs:
+                for instance_spec in toml_specs[component]:
+                    yield cls.from_instance_spec(component, instance_spec, rloc)
 
     @staticmethod
     def _expand_instance(component: str, instance: dict, rloc: PathType):
