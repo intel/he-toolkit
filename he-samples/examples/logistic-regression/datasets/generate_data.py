@@ -10,10 +10,10 @@ Provides base functionality of the following:
 """
 from enum import Enum
 import csv
-import numpy as np
 import argparse
-import sklearn.datasets
+import numpy as np
 import lr_base as lrb
+import sklearn.datasets
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
@@ -37,7 +37,8 @@ def doTrain(Xtrain, ytrain, Xtest, ytest, epochs=10, verbose=False):
     weights (numpy.array): weights of logistic regression trained model
   """
 
-    w = v = lrb.get_initweight(Xtrain, ytrain)
+    v = lrb.get_initweight(Xtrain, ytrain)
+    w = v
 
     lmbda = 0
     if verbose:
@@ -54,20 +55,13 @@ def doTrain(Xtrain, ytrain, Xtest, ytest, epochs=10, verbose=False):
         new_v = (1 - smoothing) * new_w + smoothing * w
 
         if verbose:
-            if epochs < 10:
-                if i % (int(epochs / 5)) == 0:
-                    _, acc, _, _ = lrb.test(Xtest, ytest, v)
-                    print("Epoch: %s, - loss: %s - acc: %s" % (i, loss, acc))
-            else:
-                if i % (int(epochs / 10)) == 0:
-                    _, acc, _, _ = lrb.test(Xtest, ytest, v)
-                    print("Epoch: %s, - loss: %s - acc: %s" % (i, loss, acc))
+            denom = 5 if epochs < 10 else 10
+            if i % (epochs // denom) == 0:
+                acc = lrb.test(Xtest, ytest, v)[1]
+                print(f"Epoch: {i}, - loss: {loss} - acc: {acc}")
 
-        v = new_v
-        w = new_w
-
-        bias = v[0]
-        weights = v[1:]
+        v, w = new_v, new_w
+        bias, weights = v[0], v[1:]
     return bias, weights
 
 
@@ -92,11 +86,13 @@ def saveData(dataName, X, y, datamode: DataMode = DataMode.eval):
   """
     nFeatures = X.shape[1]
     suffix = datamode.name
-    features = ["feature_" + str(i) for i in range(nFeatures)] + ["target"]
+    features = [f"feature_{i}" for i in range(nFeatures)]
+    features.append("target")
+    data = [features]
+    data += np.concatenate((X, np.transpose([y])), axis=1).tolist()
 
-    data = [features] + np.concatenate((X, np.transpose([y])), axis=1).tolist()
     # Save to csv
-    with open(dataName + "_" + suffix + ".csv", "w") as csvfile:
+    with open(f"{dataName}_{suffix}.csv", "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=",")
         writer.writerows(data)
 
@@ -113,7 +109,7 @@ def saveModel(dataName, b, w):
     w (numpy.array): weights of LR model
   """
     lr_model = np.concatenate(([b], w), axis=0).tolist()
-    with open(dataName + "_lrmodel.csv", "w") as csvfile:
+    with open(f"{dataName}_lrmodel.csv", "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=",")
         writer.writerow(lr_model)
 
@@ -148,8 +144,7 @@ def generateSynData(nSamples, nFeatures):
         n_redundant=0,
         n_repeated=0,
     )
-    x = data[0]
-    y = data[1]
+    x, y = data[0], data[1]
     scaler = MinMaxScaler(feature_range=(-1.0, 1.0))
     X_scaled = scaler.fit_transform(x)
     Xtrain, Xtest, ytrain, ytest = train_test_split(
@@ -162,17 +157,7 @@ def generateSynData(nSamples, nFeatures):
     return Xtrain, ytrain, Xtest, ytest, Xeval, yeval
 
 
-if __name__ == "__main__":
-    """Base script to generate samples for LRHE example
-
-  This script generates a set of synthetic dataset with various sizes, train
-  a logistic regression model with each data, then stores them in csv files.
-  Generation and training happens during he-samples build time.
-
-  This script can also be used to generate user-defined synthetic dataset.
-  If --samples and --features flags are set via command line, it will instead
-  generate a synthetic data set and train LR model accordingly.
-  """
+def parse_cmdline_args():
     parser = argparse.ArgumentParser(
         description="Synthetic data generation and LR model training"
     )
@@ -185,10 +170,23 @@ if __name__ == "__main__":
         "--verbose", "-v", action="store_true", help="Set to see training progress"
     )
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main(args):
+    """Base script to generate samples for LRHE example
+
+    This script generates a set of synthetic dataset with various sizes, train
+    a logistic regression model with each data, then stores them in csv files.
+    Generation and training happens during he-samples build time.
+
+    This script can also be used to generate user-defined synthetic dataset.
+    If --samples and --features flags are set via command line, it will instead
+    generate a synthetic data set and train LR model accordingly.
+    """
 
     # if no flags, proceed to preset generation
-    if args.samples == 0 and args.features == 0 and args.name == None:
+    if args.samples == 0 and args.features == 0 and args.name is None:
         print("=== Synthetic data generation for logistic regression HE example ===")
         l_dataname = ["lrtest_small", "lrtest_mid", "lrtest_large", "lrtest_xlarge"]
         l_features = [40, 80, 120, 200]
@@ -209,7 +207,7 @@ if __name__ == "__main__":
             saveData(dataname, X_eval, y_eval)
         print("=== Data generation complete ===")
     # if all arguments are set, make custom data
-    elif args.samples > 0 and args.features > 0 and args.name != None:
+    elif args.samples > 0 and args.features > 0 and args.name is not None:
         print("=== Synthetic data generation for logistic regression HE example ===")
         print(
             " - Generating custom dataset :",
@@ -233,3 +231,8 @@ if __name__ == "__main__":
         raise ValueError(
             "All arguments are mutually exclusive. Set none or all, otherwise will not work"
         )
+
+
+if __name__ == "__main__":
+    args = parse_cmdline_args()
+    main(args)

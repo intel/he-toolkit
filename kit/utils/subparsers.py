@@ -4,21 +4,10 @@
 """ This module provides utility functions for importing and registering subparsers.
 """
 
-from os import walk
 from importlib import import_module
-from typing import List, Callable
+from typing import List
 from kit.utils.typing import PathType
-
-
-def files_in_dir(path: PathType, cond: Callable) -> List[str]:
-    """Returns a list of filenames in the directory given by path. Can be filtered by cond"""
-    try:
-        filenames = next(walk(path))[2]
-        if cond is None:
-            return filenames
-        return list(filter(cond, filenames))
-    except StopIteration:
-        return []
+from kit.utils.files import files_in_dir
 
 
 def discover_subparsers_from(module_dirs: List[str], kit_root: PathType):
