@@ -37,7 +37,7 @@ zstd = "zstd/v1.4.5"
 name = "psi"
 src_dir = "!toolkit-path!/he-samples/examples/psi"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
-               -Dhelib_DIR=~/.hekit/components/helib/v2.2.1/install/share/cmake/helib"""
+               -Dhelib_DIR=$%helib%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 # Dependencies
 helib = "helib/v2.2.1"
