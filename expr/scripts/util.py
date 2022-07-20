@@ -71,3 +71,124 @@ def transpose(ls: list, rows: int, cols: int):
     """Transpose list order. List ls is in column major.
        rows and cols are of the current layout in the list."""
     return [ls[c * rows + r] for r in range(rows) for c in range(cols)]
+
+
+def read_txt_worth(data_list, nslots):
+    """Generator. Reads up to a txt worth of entries (== number of slots) of """
+    for txt_worth in grouper(data_list, nslots):
+        yield [item for item in txt_worth if item is not None]
+
+
+def composite_split(column, subcols: int):
+    """Generator. column can be collection type or generator."""
+    # column has many entries
+    if subcols < 1:
+        raise ValueError(
+            f"Sub-columns must be an integer greater than 1, not {subcols}"
+        )
+
+    if subcols == 1:
+        yield from column
+        return
+
+    for chars in column:
+        len_chars = len(chars)
+        chars_per_slot = math.ceil(len_chars / subcols)
+        # Remember slices do not have out of bounds
+        split_datum = [
+            chars[i : i + chars_per_slot] for i in range(0, len_chars, chars_per_slot)
+        ]
+        split_datum.extend([""] * (subcols - len(split_datum)))
+        yield from split_datum
+
+
+def encode_datum(datum: str, policy_to_exec):
+    """Encode a datum. The returned encoded datum is a list."""
+    if isinstance(policy_to_exec, dict):
+        # Translation table
+        encoded_datum = [policy_to_exec[char] for char in datum]
+    elif callable(policy_to_exec):
+        # Assume function to be called to encode slot
+        encoded_datum = policy_to_exec(datum)
+    else:
+        raise TypeError(f"Policy is not a dict or function: '{type(policy_to_exec)}'")
+    return encoded_datum
+
+
+def round_robin_encode(encode, data, composite_columns):
+    """Encode data into composite lists. Uses a round robin approach.
+    encode is a function used to encode one arg, a datum."""
+    if composite_columns == 1:
+        return [[encode(datum) for datum in data]]
+
+    ptxt_data_list = [[] for _ in range(composite_columns)]
+    for i, datum in enumerate(data):
+        ptxt_data_list[i % composite_columns].append(encode(datum))
+    return ptxt_data_list
+
+
+def extend_with_repetitions(ls_of_ls: list, repeat: int):
+    """Modifies lists"""
+    if repeat == 1:
+        return
+
+    for ls in ls_of_ls:
+        ls *= repeat  # NB. objects are repeats not new objects
+
+
+# Treat as a type
+def Encode(
+    policies, params, composite_columns, column_policies, for_server, segment_divisor=1
+):
+    """Closure that returns a function that can encode entries."""
+    repeat = segment_divisor  # Alias for clarity
+
+    def encode(entries):
+        """Encodes the entries. An entry is a dict with columns as attribs."""
+        list_of_ptxts = []
+        for colname, policy in column_policies.items():
+            exec_policy = policies[policy.encode]
+            composite = policy.composite
+            entries_by_column = (entry[colname] for entry in entries)
+            column_data = composite_split(entries_by_column, composite)
+            encode_datum_with_policy = partial(encode_datum, policy_to_exec=exec_policy)
+            list_ptxt_data = round_robin_encode(
+                encode_datum_with_policy, column_data, composite
+            )
+            if for_server is True:
+                # For the server, we must expand each datum into a ptxt.
+                list_of_ptxts.extend(
+                    Ptxt(params).insert_repeated_across_slots(data)
+                    for ptxt_data in list_ptxt_data
+                    for data in grouper(ptxt_data, repeat, [])
+                )
+            else:
+                # TODO refactor so that padding is added maybe before encoding
+                for ptxt_data in list_ptxt_data:
+                    # FIXME surely, not required for each item
+                    padding_size_in_segment = (params.nslots // segment_divisor) - len(
+                        ptxt_data
+                    )
+                    if padding_size_in_segment < 0:
+                        max_queries = params.nslots // segment_divisor
+                        raise ValueError(
+                            f"Cannot have '{len(ptxt_data)}' queries more than a segment allows '{max_queries}'"
+                        )
+                    ptxt_data.extend([] for _ in range(padding_size_in_segment))
+
+                extend_with_repetitions(list_ptxt_data, repeat)
+                list_of_ptxts.extend(
+                    Ptxt(params).insert_data(ptxt_data) for ptxt_data in list_ptxt_data
+                )
+        # Note the above for server has list in column order, we need row order
+        cols = sum(v.composite for v in column_policies.values())
+        rows = math.ceil(len(entries) / repeat)
+        return transpose(list_of_ptxts, rows, cols) if for_server else list_of_ptxts
+
+    return encode
+
+
+def how_many_entries_in_file(filename):
+    """Return number of lines in a file."""
+    with open(filename) as f:
+        return sum(1 for _ in f)
