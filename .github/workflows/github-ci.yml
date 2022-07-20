@@ -163,6 +163,8 @@ jobs:
     runs-on: [self-hosted, Linux, X64, ice-lake]
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
         # Add local bin for cpplint
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
