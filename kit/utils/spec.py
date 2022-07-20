@@ -106,12 +106,12 @@ def fill_self_ref_string_dict(d, repo_path):
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
-def fill_dependencies(d):
+def get_dependencies(instances_list):
     """ Returns a list of dependencies defined
     and used in the recipe file """
     dependency_list = []
 
-    def get_dependencies(s):
+    def fill_dependencies_list(s, d):
         """s can be a string or a list of strings"""
         if isinstance(s, str):
             symbols = findall(r"(\$%(.*?)%/.*\$)", s)
@@ -120,16 +120,17 @@ def fill_dependencies(d):
 
             for _, k in symbols:
                 # Assume dependecies are define as:
-                # name/version
+                # component/instance
                 dependency, _ = d[k].split("/")
                 dependency_list.append(dependency)
 
         elif isinstance(s, list):
             for e in s:
-                get_dependencies(e)
+                fill_dependencies_list(e, d)
 
-    for v in d.values():
-        get_dependencies(v)
+    for instance in instances_list:
+        for v in instance.values():
+            fill_dependencies_list(v, instance)
 
     return dependency_list
 
@@ -193,23 +194,11 @@ class Spec:
         # load the recipe file
         toml_specs = load(filename)
 
-        # TODO
         # create dependency graph
-        # dependency_dict = {
-        #    component: fill_dependencies(instance_spec)
-        #    for component, instance_specs in toml_specs.items()
-        #    for instance_spec in instance_specs
-        # }
-        dependency_dict = {}
-        for component, instance_specs in toml_specs.items():
-            for instance_spec in instance_specs:
-                dependency_list = fill_dependencies(instance_spec)
-                if not component in dependency_dict:
-                    dependency_dict[component] = dependency_list
-                else:
-                    dependency_dict[component] = list(
-                        set(dependency_dict[component] + dependency_list)
-                    )
+        dependency_dict = {
+            component: get_dependencies(instances_list)
+            for component, instances_list in toml_specs.items()
+        }
 
         # apply topological sorting
         sorted_components = tsort(dependency_dict)
