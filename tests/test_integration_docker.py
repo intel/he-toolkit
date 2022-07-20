@@ -27,6 +27,10 @@ def test_docker_build_check_build(mocker):
     mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
     mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
     # Mocking objects from docker_tools
     mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
@@ -36,6 +40,10 @@ def test_docker_build_check_build(mocker):
     main()
 
     """Assert"""
+    assert 1 == mock_create_tar_gz.call_count
+    assert 1 == mock_copyfiles.call_count
+    assert 1 == mock_change_dir.call_count
+    assert 1 == mock_mkdir.call_count
     mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
     mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
     mock_print_build.assert_any_call(f"docker run -it {derived_label}")
@@ -54,6 +62,10 @@ def test_docker_build_check_enable(mocker, restore_pwd):
     mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
     mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
     # Mocking objects from docker_tools
     mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
@@ -63,6 +75,10 @@ def test_docker_build_check_enable(mocker, restore_pwd):
     main()
 
     """Assert"""
+    assert 1 == mock_create_tar_gz.call_count
+    assert 1 == mock_copyfiles.call_count
+    assert 1 == mock_change_dir.call_count
+    assert 1 == mock_mkdir.call_count
     mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
     mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
     mock_print_build.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
@@ -84,6 +100,10 @@ def test_docker_build_check_only(mocker, restore_pwd):
     mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
     mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
     # Mocking objects from docker_tools
     mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
@@ -94,6 +114,10 @@ def test_docker_build_check_only(mocker, restore_pwd):
         main()
 
     """Assert"""
+    assert 0 == mock_create_tar_gz.call_count
+    assert 0 == mock_copyfiles.call_count
+    assert 0 == mock_change_dir.call_count
+    assert 0 == mock_mkdir.call_count
     mock_print_build.assert_any_call("CHECKING IN-DOCKER CONNECTIVITY ...")
     mock_print_tools.assert_any_call("[CONTAINER]", client.log.decode("utf-8"), end="")
     mock_print_tools.assert_any_call("[CONTAINER]", "\n", end="")
@@ -112,6 +136,10 @@ def test_docker_build_clean(mocker, restore_pwd):
     mock_input = mocker.patch("kit.commands.docker_build.input")
     mock_input.return_value = "a"
     mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
     # Mocking objects from docker_tools
     mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
     mock_from_env.return_value = client
@@ -121,6 +149,10 @@ def test_docker_build_clean(mocker, restore_pwd):
         main()
 
     """Assert"""
+    assert 0 == mock_create_tar_gz.call_count
+    assert 0 == mock_copyfiles.call_count
+    assert 0 == mock_change_dir.call_count
+    assert 0 == mock_mkdir.call_count
     mock_print_build.assert_any_call("Staging area deleted")
     assert exc_info.value.code == 0
 

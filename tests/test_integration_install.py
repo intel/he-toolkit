@@ -2,217 +2,228 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from os import getcwd, chdir
 from pathlib import Path
+from os import getcwd, chdir
+from getpass import getuser
 
 from kit.hekit import main
-from kit.commands.list_cmd import list_components, _SEP_SPACES
-from kit.commands.remove import remove_components
-from kit.commands.install import install_components
+from kit.commands.docker_build import setup_docker
 
 # Due to install command changes current directory,
 # the other commands need to restore the current path
 cwd_test = getcwd()
 
 
-def test_install_fetch(mocker, args_fetch):
+def test_docker_build_check_build(mocker):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("kit.utils.spec.input")
-    mock_input.side_effect = [args_fetch.toml_arg_build, args_fetch.toml_arg_version]
+    args = MockArgs(check_only=False, clean=False, enable=None)
+    client = MockClient()
+    derived_label = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
 
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    # Mocking command line args
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args, ""
+    # Mocking objects from docker_build
+    mock_input = mocker.patch("kit.commands.docker_build.input")
+    mock_input.return_value = "a"
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
+    # Mocking objects from docker_tools
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     main()
 
     """Assert"""
-    mock_print.assert_called_with(arg1)
-    assert 2 == mock_input.call_count
+    assert 1 == mock_create_tar_gz.call_count
+    assert 1 == mock_copyfiles.call_count
+    assert 1 == mock_change_dir.call_count
+    assert 1 == mock_mkdir.call_count
+    mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
+    mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
+    mock_print_build.assert_any_call(f"docker run -it {derived_label}")
+    mock_print_tools.assert_any_call(client.value.replace('"', ""))
 
 
-def test_list_after_fetch(mocker, args_list, restore_pwd):
+def test_docker_build_check_enable(mocker, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("kit.commands.list_cmd.print")
+    args = MockArgs(check_only=False, clean=False, enable="vscode")
+    client = MockClient()
 
-    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
-    arg2 = f"{'success':{width}}"
-    arg34 = f"{'':{width}}"
+    # Mocking command line args
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args, ""
+    # Mocking objects from docker_build
+    mock_input = mocker.patch("kit.commands.docker_build.input")
+    mock_input.return_value = "a"
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
+    # Mocking objects from docker_tools
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
     main()
 
     """Assert"""
-    mock_print.assert_called_with(arg1, arg2, arg34, arg34)
+    assert 1 == mock_create_tar_gz.call_count
+    assert 1 == mock_copyfiles.call_count
+    assert 1 == mock_change_dir.call_count
+    assert 1 == mock_mkdir.call_count
+    mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
+    mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
+    mock_print_build.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
+    mock_print_build.assert_any_call(
+        "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
+    )
+    mock_print_tools.assert_any_call(client.value.replace('"', ""))
 
 
-def test_install_build(mocker, args_build):
+def test_docker_build_check_only(mocker, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_build, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("kit.utils.spec.input")
-    mock_input.side_effect = [args_build.toml_arg_build, args_build.toml_arg_version]
+    args = MockArgs(check_only=True, clean=False, enable=None)
+    client = MockClient()
 
-    arg1 = f"{args_build.component}/{args_build.instance}"
+    # Mocking command line args
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args, ""
+    # Mocking objects from docker_build
+    mock_input = mocker.patch("kit.commands.docker_build.input")
+    mock_input.return_value = "a"
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
+    # Mocking objects from docker_tools
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
+    mock_from_env.return_value = client
+    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
     """Act"""
-    main()
+    with pytest.raises(SystemExit) as exc_info:
+        main()
 
     """Assert"""
-    mock_print.assert_called_with(arg1)
-    assert 2 == mock_input.call_count
+    assert 0 == mock_create_tar_gz.call_count
+    assert 0 == mock_copyfiles.call_count
+    assert 0 == mock_change_dir.call_count
+    assert 0 == mock_mkdir.call_count
+    mock_print_build.assert_any_call("CHECKING IN-DOCKER CONNECTIVITY ...")
+    mock_print_tools.assert_any_call("[CONTAINER]", client.log.decode("utf-8"), end="")
+    mock_print_tools.assert_any_call("[CONTAINER]", "\n", end="")
+    assert exc_info.value.code == 0
 
 
-def test_list_after_build(mocker, args_list, restore_pwd):
+def test_docker_build_clean(mocker, restore_pwd):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("kit.commands.list_cmd.print")
+    args = MockArgs(check_only=False, clean=True, enable=None)
+    client = MockClient()
 
-    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
-    arg23 = f"{'success':{width}}"
-    arg4 = f"{'':{width}}"
+    # Mocking command line args
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = args, ""
+    # Mocking objects from docker_build
+    mock_input = mocker.patch("kit.commands.docker_build.input")
+    mock_input.return_value = "a"
+    mock_print_build = mocker.patch("kit.commands.docker_build.print")
+    mock_create_tar_gz = mocker.patch("kit.commands.docker_build.create_tar_gz_file")
+    mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+    mock_change_dir = mocker.patch("kit.commands.docker_build.change_directory_to")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
+    # Mocking objects from docker_tools
+    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
+    mock_from_env.return_value = client
 
     """Act"""
-    main()
+    with pytest.raises(SystemExit) as exc_info:
+        main()
 
     """Assert"""
-    mock_print.assert_called_with(arg1, arg23, arg23, arg4)
-
-
-def test_remove_after_build(mocker, args_remove, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("kit.commands.remove.print")
-
-    arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-
-
-def test_install_execution(mocker, args_install):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_install, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("kit.utils.spec.input")
-    mock_input.side_effect = [
-        args_install.toml_arg_build,
-        args_install.toml_arg_version,
-    ]
-
-    arg1 = f"{args_install.component}/{args_install.instance}"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-    assert 2 == mock_input.call_count
-
-
-def test_list_after_install(mocker, args_list, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("kit.commands.list_cmd.print")
-
-    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
-    arg234 = f"{'success':{width}}"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1, arg234, arg234, arg234)
-
-
-def test_remove_all_after_install(mocker, args_remove, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("kit.commands.remove.print")
-    mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
-
-    args_remove.all = True
-    args_remove.instance = ""
-    args_remove.component = ""
-    arg1 = "All components successfully removed"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-    mock_input.assert_called_once()
+    assert 0 == mock_create_tar_gz.call_count
+    assert 0 == mock_copyfiles.call_count
+    assert 0 == mock_change_dir.call_count
+    assert 0 == mock_mkdir.call_count
+    mock_print_build.assert_any_call("Staging area deleted")
+    assert exc_info.value.code == 0
 
 
 """Utilities used by the tests"""
 
 
 class MockArgs:
-    def __init__(self, fn, upto_stage):
+    def __init__(self, check_only, clean, enable):
         self.tests_path = Path(__file__).resolve().parent
-        self.version = False
-        self.component = "hexl"
-        self.instance = "1.2.3"
+        self.check_only = check_only
+        self.clean = clean
+        self.enable = enable
         self.config = f"{self.tests_path}/input_files/default.config"
-        self.recipe_file = f"{self.tests_path}/input_files/test.toml"
-        self.fn = fn
-        self.upto_stage = upto_stage
-        self.force = False
-        self.all = False
+        self.hekit_root_dir = self.tests_path.parent
+        self.fn = setup_docker
+        self.id = None
+        self.version = False
         self.y = True
-        # back substitution
-        self.recipe_arg = {"name": self.instance}
-        self.toml_arg_version = self.instance
-        self.toml_arg_build = "build"
 
 
-@pytest.fixture
-def args_fetch():
-    return MockArgs(install_components, "fetch")
+class MockClient:
+    def __init__(self):
+        self.key = f'"stream"'
+        self.value = f'"Step 1/1 : ARG UNAME"'
+        self.api = API(self.key, self.value)
+        self.list = []
+        self.images = Images(self.list)
+        self.log = b"A generic log"
+        self.code = 0
+        self.containers = Container(self.log, self.code)
 
 
-@pytest.fixture
-def args_build():
-    return MockArgs(install_components, "build")
+class API:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+    def build(self, dockerfile, rm, buildargs, tag, path):
+        str_key_value = f"{{{self.key} : {self.value}}}"
+        return iter([str_key_value])
 
 
-@pytest.fixture
-def args_install():
-    return MockArgs(install_components, "install")
+class Images:
+    def __init__(self, image_list):
+        self.image_list = image_list
+
+    def list(self, name):
+        return self.image_list
 
 
-@pytest.fixture
-def args_list():
-    return MockArgs(list_components, "")
+class Container:
+    class Container_return:
+        def __init__(self, log, stauts_code):
+            self.log = log
+            self.stauts_code = stauts_code
 
+        def logs(self, stream):
+            return iter([self.log])
 
-@pytest.fixture
-def args_remove():
-    return MockArgs(remove_components, "")
+        def wait(self):
+            return {"Error": None, "StatusCode": self.stauts_code}
+
+    def __init__(self, logs, stauts_code):
+        self.result = self.Container_return(logs, stauts_code)
+
+    def run(self, volumes, detach, stream, environment, image, command):
+        return self.result
 
 
 @pytest.fixture
 def restore_pwd():
     global cwd_test
     chdir(cwd_test)
-
-
-def get_width_and_arg1(comp: str, inst: str, separation_spaces: int = _SEP_SPACES):
-    width = 10
-    width_comp = len(comp) + separation_spaces
-    width_inst = len(inst) + separation_spaces
-
-    return width, f"{comp:{width_comp}} {inst:{width_inst}}"
