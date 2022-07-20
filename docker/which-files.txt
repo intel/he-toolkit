@@ -31,6 +31,7 @@ expr/scripts/README.md
 expr/scripts/decode.py
 expr/scripts/encode.py
 expr/scripts/ptxt.py
+expr/scripts/util.py
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
 he-samples/cmake/gtest.cmake
