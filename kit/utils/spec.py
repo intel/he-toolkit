@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from re import findall
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, List
 from toml import dump, load
 from kit.utils.tsort import tsort
 from kit.utils.typing import PathType
@@ -16,7 +16,7 @@ from kit.utils.typing import PathType
 RecipeArgDict = Dict[str, str]
 
 
-def read_spec(component, instance, repo_location):
+def read_spec(component: str, instance: str, repo_location: PathType):
     """Return hekit.spec file as a dict"""
     path = f"{repo_location}/{component}/{instance}/hekit.spec"
     spec = load(path)
@@ -24,11 +24,11 @@ def read_spec(component, instance, repo_location):
     return spec[component][0]
 
 
-def fill_user_string_dict(d, recipe_arg_dict: RecipeArgDict):
+def fill_user_string_dict(d: dict, recipe_arg_dict: RecipeArgDict) -> dict:
     """Returns a dict with str values written by the user.
     NB. Only works for flat str value dict."""
 
-    def fill_user_str(s):
+    def fill_user_str(s: str) -> str:
         """s can be a string or a list of strings"""
         if isinstance(s, str):
             symbols = findall(r"(!(.*?)!)", s)
@@ -58,11 +58,11 @@ def fill_user_string_dict(d, recipe_arg_dict: RecipeArgDict):
     return {k: fill_user_str(v) for k, v in d.items()}
 
 
-def fill_self_ref_string_dict(d, repo_path):
+def fill_self_ref_string_dict(d: dict, repo_path: PathType) -> dict:
     """Returns a dict with str values.
     NB. Only works for flat str value dict."""
 
-    def fill_str(s):
+    def fill_str(s: str) -> str:
         """s can be a string or a list of strings"""
         if isinstance(s, str):
             symbols = findall(r"(%(.*?)%)", s)
@@ -81,7 +81,7 @@ def fill_self_ref_string_dict(d, repo_path):
         # Not str or list
         return s
 
-    def fill_dep_str(s):
+    def fill_dep_str(s: str) -> str:
         """s can be a string or a list of strings"""
         if isinstance(s, str):
             symbols = findall(r"(\$(.*?)/(.*?)/(.*?)\$)", s)
@@ -106,23 +106,21 @@ def fill_self_ref_string_dict(d, repo_path):
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
-def get_dependencies(instances_list):
+def get_dependencies(instances_list: List) -> List[str]:
     """ Returns a list of dependencies defined
     and used in the recipe file """
-    dependency_list = []
+    dependency_list: List[str] = []
 
-    def fill_dependencies_list(s, d):
+    def fill_dependencies_list(s: str, d: dict) -> None:
         """s can be a string or a list of strings"""
         if isinstance(s, str):
             symbols = findall(r"(\$%(.*?)%/.*\$)", s)
             if not symbols:
                 return
 
-            for _, k in symbols:
-                # Assume dependecies are define as:
-                # component/instance
-                dependency, _ = d[k].split("/")
-                dependency_list.append(dependency)
+            # Assume dependecies are define as:
+            # component/instance
+            dependency_list.extend(d[k].split("/")[0] for _, k in symbols)
 
         elif isinstance(s, list):
             for e in s:
@@ -135,7 +133,7 @@ def get_dependencies(instances_list):
     return dependency_list
 
 
-def fill_rloc_paths(d, repo_location):
+def fill_rloc_paths(d: dict, repo_location: PathType) -> dict:
     """Create absolute path for the top-level attribs that begin
        with 'init_' or '_export_' by prepending repo location"""
     for k, v in d.items():
@@ -205,6 +203,10 @@ class Spec:
 
         # create specs
         for component in sorted_components:
+            # Some dependencies for the components of the current toml file
+            # could be defined in a separated toml file. Therefore, SW
+            # will only install the components in the current toml file
+            # TODO: Add else case to check that dependency is already installed
             if component in toml_specs:
                 for instance_spec in toml_specs[component]:
                     yield cls.from_instance_spec(component, instance_spec, rloc)
