@@ -162,7 +162,7 @@ jobs:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         # Add local bin for cpplint
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -176,7 +176,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         # Add local bin for pytest
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -190,7 +190,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         # Add local bin for pip modules
       - name: Setup
         run: |
