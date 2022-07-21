@@ -255,7 +255,7 @@ def test_healg_negative_arg_d(mocker):
     assert str(exc_info.value) == "A negative number was found in the input: [-0.5]"
 
 
-@pytest.mark.skip(reason="check later")
+@pytest.mark.skip(reason="Not realistic test because SW cannot handle that amount in d")
 def test_healg_max_arg_d(mocker):
     """Arrange"""
     args = MockArgsHealg()
