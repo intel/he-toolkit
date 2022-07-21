@@ -196,7 +196,7 @@ jobs:
         run: |
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "HE_WORKSPACE=$GITHUB_WORKSPACE/.hekit/components" >> $GITHUB_ENV
-          echo "CONFIG_FILE=$GITHUB_WORKSPACE/.hekit/default.config" >> $GITHUB_ENV
+          echo "CONFIG_FILE=$GITHUB_WORKSPACE/default.config" >> $GITHUB_ENV
 
       - name: Init hekit
         run: |
