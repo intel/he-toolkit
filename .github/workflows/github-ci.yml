@@ -168,7 +168,7 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: pre-commit
         run: pre-commit run --all-files
-      
+
       # Cleanup runner for next job
       - name: Cleanup workspace
         if: always()
@@ -189,7 +189,7 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
         run: pytest tests/
-      
+
       # Cleanup runner for next job
       - name: Cleanup workspace
         if: always()
