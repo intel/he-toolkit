@@ -168,6 +168,13 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: pre-commit
         run: pre-commit run --all-files
+      
+      # Cleanup runner for next job
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          cd ..
+          rm -rf he-toolkit
 
   test-hekit-icelake:
     name: Test hekit commands (IceLake)
@@ -182,6 +189,13 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
         run: pytest tests/
+      
+      # Cleanup runner for next job
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          cd ..
+          rm -rf he-toolkit
 
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
@@ -273,4 +287,7 @@ jobs:
     needs: [build-and-test-toolkit-icelake]
     if: always()
     steps:
-      - run: ./hekit --config $CONFIG_FILE remove --all -y
+      - run: |
+        ./hekit --config $CONFIG_FILE remove --all -y
+        cd ..
+        rm -rf he-toolkit
