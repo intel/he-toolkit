@@ -16,22 +16,6 @@ on:
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
-###################
-# Define env vars #
-###################
-env:
-  HEXL_VER: 1.2.3
-  SEAL_VER: 3.7.2
-  PALISADE_VER: 1.11.6
-  HELIB_VER: 2.2.1
-  HEKIT_DIR: ~/.hekit/components
-  HEXL_DIR: ${HEKIT_DIR}/hexl/${HEXL_VER}/lib/cmake/hexl-${HEXL_VER}
-  SEAL_DIR: ${HEKIT_DIR}/seal/v${SEAL_VER}/install/lib/cmake/SEAL-3.7
-  PALISADE_DIR: ${HEKIT_DIR}/palisade/v${PALISADE_VER}/install/lib/Palisade
-  HELIB_DIR: ${HEKIT_DIR}/helib/v${HELIB_VER}/share/cmake/helib
-  GSL_DIR: ${HEKIT_DIR}/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
-  ZSTD_DIR: ${HEKIT_DIR}/zstd/v1.4.5/install/lib/cmake/zstd
-
 ################
 # Ubuntu 20.04 #
 ################
@@ -79,15 +63,10 @@ jobs:
           pip3 install toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Init hekit
-        run: |
-          mkdir -p ~/.hekit
-          cp default.config ~/.hekit/default.config
-
       - name: Build and install PALISADE and sample kernels recipe
         run: |
-          ./hekit install .github/hekit-recipes/palisade.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit list
+          ./hekit --config default.config install .github/hekit-recipes/palisade.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
           echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run unit tests
@@ -116,15 +95,10 @@ jobs:
           pip3 install toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Init hekit
-        run: |
-          mkdir -p ~/.hekit
-          cp default.config ~/.hekit/default.config
-
       - name: Build and install HElib and example recipe
         run: |
-          ./hekit install .github/hekit-recipes/helib.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit list
+          ./hekit --config default.config install .github/hekit-recipes/helib.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
           echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
 
       - name: Run PSI example
@@ -147,15 +121,10 @@ jobs:
           pip3 install toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Init hekit
-        run: |
-          mkdir -p ~/.hekit
-          cp default.config ~/.hekit/default.config
-
       - name: Build and install SEAL, examples, and sample kernels recipe
         run: |
-          ./hekit install .github/hekit-recipes/seal.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit list
+          ./hekit --config default.config install .github/hekit-recipes/seal.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
           echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
           echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
           echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
@@ -193,7 +162,9 @@ jobs:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
         # Add local bin for cpplint
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -207,7 +178,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         # Add local bin for pytest
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -221,28 +192,36 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         # Add local bin for pip modules
       - name: Setup
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: |
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "HE_WORKSPACE=$GITHUB_WORKSPACE/.hekit/components" >> $GITHUB_ENV
 
       - name: Init hekit
         run: |
-          mkdir -p ~/.hekit
-          cp default.config ~/.hekit
+          echo "repo_location = \"$HE_WORKSPACE\"" > CI_default.config
 
       - name: Build and install default recipe
         run: |
-          ./hekit install recipes/default.toml
-          ./hekit list
+          ./hekit --config CI_default.config install recipes/default.toml
+          ./hekit --config CI_default.config list
 
       - name: Build examples
         run: |
-          ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit list
-          echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
-          echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
-          echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
+          ./hekit --config CI_default.config build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config CI_default.config list
+          echo "PSI_BUILD_DIR=$HE_WORKSPACE/examples/psi/build" >> $GITHUB_ENV
+          echo "QUERY_BUILD_DIR=$HE_WORKSPACE/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HE_WORKSPACE/examples/logistic-regression/build" >> $GITHUB_ENV
+
+      - name: Build sample kernels
+        run: |
+          ./hekit --config CI_default.config build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config CI_default.config list
+          echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run PSI example
         run: |
@@ -262,13 +241,6 @@ jobs:
         run: |
           cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
-
-      - name: Build sample kernels
-        run: |
-          ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit list
-          echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
-          echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run unit tests
         run: |
@@ -302,4 +274,4 @@ jobs:
     needs: [build-and-test-toolkit-icelake]
     if: always()
     steps:
-      - run: ./hekit remove --all -y
+      - run: ./hekit --config CI_default.config remove --all -y
