@@ -5,27 +5,39 @@
 name = "logistic-regression"
 src_dir = "!toolkit-path!/he-samples/examples/logistic-regression"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
-            -DSEAL_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7
-            -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
-            -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
-            -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+               -DSEAL_DIR=$%seal%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
+# Dependencies
+seal = "seal/v3.7.2"
+hexl = "hexl/1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"
 
 
 [[examples]]
 name = "secure-query"
 src_dir = "!toolkit-path!/he-samples/examples/secure-query"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
-            -DSEAL_DIR=~/.hekit/components/seal/v3.7.2/install/lib/cmake/SEAL-3.7
-            -DMicrosoft.GSL_DIR=~/.hekit/components/gsl/v3.1.0/install/share/cmake/Microsoft.GSL
-            -Dzstd_DIR=~/.hekit/components/zstd/v1.4.5/install/lib/cmake/zstd
-            -DHEXL_DIR=~/.hekit/components/hexl/1.2.3/install/lib/cmake/hexl-1.2.3"""
+               -DSEAL_DIR=$%seal%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
+# Dependencies
+seal = "seal/v3.7.2"
+hexl = "hexl/1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"
 
 
 [[examples]]
 name = "psi"
 src_dir = "!toolkit-path!/he-samples/examples/psi"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
-            -Dhelib_DIR=~/.hekit/components/helib/v2.2.1/install/share/cmake/helib"""
+               -Dhelib_DIR=$%helib%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
+# Dependencies
+helib = "helib/v2.2.1"
