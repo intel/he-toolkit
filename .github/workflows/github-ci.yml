@@ -288,6 +288,6 @@ jobs:
     if: always()
     steps:
       - run: |
-        ./hekit --config $CONFIG_FILE remove --all -y
-        cd ..
-        rm -rf he-toolkit
+          ./hekit --config $CONFIG_FILE remove --all -y
+          cd ..
+          rm -rf he-toolkit
