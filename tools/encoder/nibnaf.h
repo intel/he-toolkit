@@ -35,7 +35,7 @@ inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
   tem = std::min(tem, 0L);
 
   // We shift the exponents to turn it into a polynomial.
-  std::vector<double> b(sz, 0.0);
+  std::vector<double> b(sz/2-tem, 0.0);
   for (long i = 0; i < sz / 2 - tem; ++i) {
     b[i] = a[i + tem + sz / 2];
   }
