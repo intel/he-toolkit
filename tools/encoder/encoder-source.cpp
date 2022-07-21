@@ -1,31 +1,29 @@
-//A source file that calls the header and returns the coeffiecients and the corresponding exponents.
+// Copyright (C) 2020 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+// A source file that calls the header and returns the coefficients and the
+// corresponding exponents.
+#include <array>
 #include <iostream>
-#include <cmath>
-#include<array>
-#include<list>
-#include<vector>
-#include<string>
-#include"NIBNAF.h"
 
-int main()
-{
-    double theta, bw, epsil;
-    int sz;
-    std::cout<<"Enter the number to encode:";
-    std::cin>>theta;
-    std::cout<<"Enter the base to encode:";
-    std::cin>>bw;
-    std::cout<<"Enter the amount of precision:";
-    std::cin>>epsil;
-    std::cout<<"Enter the size of the array:";
-    std::cin>>sz;
-double enar[sz];	
-std::list<int>en=gap(theta, bw, epsil, sz);
-copy(en.begin(), en.end(), enar);
+#include "nibnaf.h"
 
-for (long i=0; i<sz;++i)
-     if(enar[i]!=0)
-std::cout<<enar[i]<<", "<<i<<std::endl;
+int main() {
+  double theta, bw, epsil;
+  long sz;
+  std::cout << "Enter the number to encode:";
+  std::cin >> theta;
+  std::cout << "Enter the base to encode:";
+  std::cin >> bw;
+  std::cout << "Enter the amount of precision:";
+  std::cin >> epsil;
+  std::cout << "Enter the size of the array:";
+  std::cin >> sz;
 
-return 0;
+  const auto en = gap(theta, bw, epsil, sz);
+
+  for (long i = 0; i < sz; ++i)
+    if (en[i] != 0) std::cout << en[i] << ", " << i << std::endl;
+
+  return 0;
 }
