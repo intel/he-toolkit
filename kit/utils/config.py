@@ -24,14 +24,9 @@ def config_required(func):
     """Decorator that loads the config file before running the actual function"""
 
     def inner(args):
-        try:
-            # replace the filename with the actual config
-            args.config = load_config(args.config)
-            return func(args)
-        except KeyError as e:
-            raise ConfigFileError(
-                "Error while parsing config file\n", f"  {e!r}"
-            ) from e
+        # replace the filename with the actual config
+        args.config = load_config(args.config)
+        return func(args)
 
     return inner
 
@@ -44,7 +39,11 @@ def load_config(filename: str) -> Config:
     if Path(expanded_filename).is_symlink():
         raise TypeError("The config file cannot be a symlink")
 
-    toml_dict = load(expanded_filename)
-    toml_dict = {k: expand(v) for k, v in toml_dict.items()}
+    try:
+        toml_dict = load(expanded_filename)
+        toml_dict = {k: expand(v) for k, v in toml_dict.items()}
+    except Exception as e:
+        raise ConfigFileError("Error while parsing config file\n", f"  {e!r}") from e
+
     # deref kwargs this way, get exceptions unknown key for free
     return Config(expanded_filename, **toml_dict)

@@ -46,7 +46,7 @@ def test_main_config_name_has_null(mocker, args_fetch):
     """Assert"""
     mock_print.assert_called_with(
         "Error while running subcommand\n",
-        "ValueError('embedded null byte')",
+        "ConfigFileError('Error while parsing config file\\n', \"  ValueError('embedded null byte')\")",
         file=stderr,
     )
 
