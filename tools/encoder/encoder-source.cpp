@@ -23,7 +23,7 @@ int main() {
 
   const auto en = gap(theta, bw, epsil, sz);
 
-  for (long i = 0; i < sz; ++i)
+  for (long i = 0; i < en.size(); ++i)
     if (en[i] != 0) std::cout << en[i] << ", " << i << std::endl;
 
   return 0;
