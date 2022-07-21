@@ -4,6 +4,7 @@
 import pytest
 from os import getcwd, chdir
 from pathlib import Path
+from subprocess import run, check_output, STDOUT, PIPE
 
 from kit.hekit import main
 from kit.commands.list_cmd import list_components, _SEP_SPACES
@@ -15,146 +16,76 @@ from kit.commands.install import install_components
 cwd_test = getcwd()
 
 
-def test_install_fetch(mocker, args_fetch):
+def test_install_fetch(tmp_path):
     """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("kit.utils.spec.input")
-    mock_input.side_effect = [args_fetch.toml_arg_build, args_fetch.toml_arg_version]
+    config_file = f"{tmp_path}/default.config"
+    tests_path = Path(__file__).resolve().parent
 
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    args = ["echo", f'repo_location = "{tmp_path}"']
+    with open(f"{config_file}", "w") as f:
+        run(args, stdout=f)
 
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-    assert 2 == mock_input.call_count
-
-
-def test_list_after_fetch(mocker, args_list, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("kit.commands.list_cmd.print")
-
-    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
-    arg2 = f"{'success':{width}}"
-    arg34 = f"{'':{width}}"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1, arg2, arg34, arg34)
-
-
-def test_install_build(mocker, args_build):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_build, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("kit.utils.spec.input")
-    mock_input.side_effect = [args_build.toml_arg_build, args_build.toml_arg_version]
-
-    arg1 = f"{args_build.component}/{args_build.instance}"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-    assert 2 == mock_input.call_count
-
-
-def test_list_after_build(mocker, args_list, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("kit.commands.list_cmd.print")
-
-    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
-    arg23 = f"{'success':{width}}"
-    arg4 = f"{'':{width}}"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1, arg23, arg23, arg4)
-
-
-def test_remove_after_build(mocker, args_remove, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("kit.commands.remove.print")
-
-    arg1 = f"Instance '{args_remove.instance}' of component '{args_remove.component}' successfully removed"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-
-
-def test_install_execution(mocker, args_install):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_install, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_input = mocker.patch("kit.utils.spec.input")
-    mock_input.side_effect = [
-        args_install.toml_arg_build,
-        args_install.toml_arg_version,
+    args = [
+        "hekit",
+        "--config",
+        f"{config_file}",
+        "fetch",
+        f"{tests_path}/input_files/test.toml",
+        "--recipe_arg",
+        '"name=1.2.3,build=build"',
     ]
+    output = run(args, capture_output=True)
+    assert "[GIT] Cloning into 'hexl'..." in output.stdout.decode("utf-8")
 
-    arg1 = f"{args_install.component}/{args_install.instance}"
+    args = ["hekit", "--config", f"{config_file}", "list"]
+    output = run(args, capture_output=True)
+    assert "hexl   1.2.3   success                         " in output.stdout.decode(
+        "utf-8"
+    )
+
+    args = [
+        "hekit",
+        "--config",
+        f"{config_file}",
+        "build",
+        f"{tests_path}/input_files/test.toml",
+        "--recipe_arg",
+        '"name=1.2.3,build=build"',
+    ]
+    output = run(args, capture_output=True)
+    assert "build" in output.stdout.decode("utf-8")
+
+    args = ["hekit", "--config", f"{config_file}", "list"]
+    output = run(args, capture_output=True)
+    assert "hexl   1.2.3   success    success              " in output.stdout.decode(
+        "utf-8"
+    )
+
+    args = [
+        "hekit",
+        "--config",
+        f"{config_file}",
+        "install",
+        f"{tests_path}/input_files/test.toml",
+        "--recipe_arg",
+        '"name=1.2.3,build=build"',
+    ]
+    output = run(args, capture_output=True)
+    assert "build" in output.stdout.decode("utf-8")
+
+    args = ["hekit", "--config", f"{config_file}", "list"]
+    output = run(args, capture_output=True)
+    assert "hexl   1.2.3   success    success    success   " in output.stdout.decode(
+        "utf-8"
+    )
+
+    args = ["hekit", "--config", f"{config_file}", "remove", "hexl", "1.2.3"]
+    output = run(args, capture_output=True)
+    assert "build" not in output.stdout.decode("utf-8")
 
     """Act"""
-    main()
 
     """Assert"""
-    mock_print.assert_called_with(arg1)
-    assert 2 == mock_input.call_count
-
-
-def test_list_after_install(mocker, args_list, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_list, ""
-    mock_print = mocker.patch("kit.commands.list_cmd.print")
-
-    width, arg1 = get_width_and_arg1(args_list.component, args_list.instance)
-    arg234 = f"{'success':{width}}"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1, arg234, arg234, arg234)
-
-
-def test_remove_all_after_install(mocker, args_remove, restore_pwd):
-    """Arrange"""
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_remove, ""
-    mock_print = mocker.patch("kit.commands.remove.print")
-    mock_input = mocker.patch("kit.commands.remove.input", return_value="y")
-
-    args_remove.all = True
-    args_remove.instance = ""
-    args_remove.component = ""
-    arg1 = "All components successfully removed"
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_called_with(arg1)
-    mock_input.assert_called_once()
 
 
 """Utilities used by the tests"""
