@@ -148,6 +148,7 @@ requirements.txt
 tests/__init__.py
 tests/input_files/default.config
 tests/input_files/default_symlink.config
+tests/input_files/default_wrong.config
 tests/input_files/depend_wrong.txt
 tests/input_files/dependencies.txt
 tests/input_files/test.toml
@@ -178,4 +179,5 @@ tests/test_spec.py
 tests/test_subparsers.py
 tests/test_tab_comp.py
 tests/test_tsort.py
+tests/test_util_config.py
 tools/README.md

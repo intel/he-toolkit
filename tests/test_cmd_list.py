@@ -1,8 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from multiprocessing import context
 import pytest
+from pathlib import Path
 from kit.commands.list_cmd import list_components, RepoProperties, _SEP_SPACES
 
 
@@ -223,6 +223,7 @@ def test_list_components_FileNotFoundError_exception(
     mocker, args, lib_directory, name_version_lib
 ):
     """Arrange"""
+    exp_lib, exp_version = name_version_lib
     """list_dirs function is called two times, first
     it returns the library then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
@@ -232,20 +233,19 @@ def test_list_components_FileNotFoundError_exception(
     )
     """print functions reports the exception"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
-    exp_lib, exp_version = name_version_lib
-    info_filepath = f"{args.config.repo_location}/{exp_lib}/{exp_version}/hekit.info"
-    arg1, arg2, arg3, arg4, arg5 = util_print_file_error_args(
-        exp_lib, exp_version, info_filepath
-    )
 
     """Act"""
     list_components(args)
 
     """Assert"""
+    info_filepath = f"{args.config.repo_location}/{exp_lib}/{exp_version}/hekit.info"
+    arg1, arg2, arg3, arg4, arg5 = util_print_file_error_args(
+        exp_lib, exp_version, info_filepath
+    )
+    mock_print.assert_called_with(arg1, arg2, arg3, arg4, arg5)
     assert 2 == mock_walk.call_count
     assert 1 == mock_load.call_count
     assert 2 == mock_print.call_count
-    mock_print.assert_called_with(arg1, arg2, arg3, arg4, arg5)
 
 
 def test_list_components_KeyError_exception(
@@ -277,12 +277,9 @@ def test_list_components_KeyError_exception(
 
 
 class MockArgs:
-    class Config:
-        def __init__(self):
-            self.repo_location = "test"
-
     def __init__(self):
-        self.config = MockArgs.Config()
+        self.tests_path = Path(__file__).resolve().parent
+        self.config = f"{self.tests_path}/input_files/default.config"
 
 
 @pytest.fixture
