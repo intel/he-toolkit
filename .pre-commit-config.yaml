@@ -87,3 +87,6 @@ repos:
           entry: .github/scripts/run-bandit.sh
           language: script
           pass_filenames: false
+          args:
+            - kit
+            - expr
