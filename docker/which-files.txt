@@ -1,3 +1,4 @@
+.bandit
 .clang-format
 .github/hekit-recipes/helib.toml
 .github/hekit-recipes/palisade.toml
