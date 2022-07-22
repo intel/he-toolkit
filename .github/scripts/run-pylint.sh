@@ -5,7 +5,7 @@
 SUCCESS=0
 FAILURE=1
 
-if ! pylint kit; then
+if ! pylint $@; then
   echo "FAILURE: pylint failed. You need to manually correct the errors."
   exit $FAILURE
 fi
