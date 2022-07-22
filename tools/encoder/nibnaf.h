@@ -1,7 +1,6 @@
 // Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-// Header file for encoder.
 // Takes in the number to encode, the base, the precision and the size of the
 // array returns a list of coefficients after the shift. So the list can
 // directly be turned into a polynomial.
@@ -12,20 +11,21 @@
 #include <cmath>
 #include <vector>
 
-inline constexpr double signnum(double x) { return (x > 0.0) - (x < 0.0); }
+inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
 inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
-  double sigma = signnum(theta);
-
+  constexpr double sigma = signum(theta);
+  constexpr double log_bw = std::log(bw);
   std::vector<double> a(sz, 0.0);
-  for (double t = std::abs(theta); t > epsil;) {
-    long r = std::ceil(std::log(t) / std::log(bw));
+  long r;
+  double t_minus_po;
+  for (double t = std::abs(theta); t > epsil; t = std::abs(t_minus_po)) {
+    r = std::ceil(std::log(t) / log_bw);
     r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
-    double t_minus_po = t - std::pow(bw, r);
 
     a[r + sz / 2] = sigma;
-    sigma *= signnum(t_minus_po);
-    t = std::abs(t_minus_po);
+    t_minus_po = t - std::pow(bw, r);
+    sigma *= signum(t_minus_po);
   }
 
   // Find the smallest exponent
