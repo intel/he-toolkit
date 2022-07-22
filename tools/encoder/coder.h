@@ -3,10 +3,10 @@
 
 #pragma once
 
-class PolyRep;
+class PolyRep {};
 
 struct Coder {
-  virtual PolyRep encode(double num) = 0;
-  virtual double decode(const PolyRep& poly_rep) = 0;
-  virtual ~Coder = default;
+  virtual PolyRep encode(double num) const = 0;
+  virtual double decode(const PolyRep& poly_rep) const = 0;
+  virtual ~Coder() = default;
 };

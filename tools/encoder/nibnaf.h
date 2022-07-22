@@ -11,26 +11,38 @@
 #include <cmath>
 #include <vector>
 
+#include "coder.h"
+
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
-  const double log_bw = std::log(bw);
-  std::vector<double> a(sz, 0.0);
-  long r;
-  double t_minus_po;
-  for (double t = std::abs(theta), sigma = signum(theta); t > epsil;
-       t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-    r = std::ceil(std::log(t) / log_bw);
-    r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
+struct NIBNAFCoder : public Coder {
+  long sz;       // array/poly size
+  double epsil;  // absolute error tolerance
+  double bw;     // the b_w base
 
-    a[r + sz / 2] = sigma;
-    t_minus_po = t - std::pow(bw, r);
+  PolyRep encode(double num) const override {
+    const double log_bw = std::log(bw);
+    std::vector<double> a(sz, 0.0);
+    long r;
+    double t_minus_po;
+    for (double t = std::abs(theta), sigma = signum(theta); t > epsil;
+         t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
+      r = std::ceil(std::log(t) / log_bw);
+      r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
+
+      a[r + sz / 2] = sigma;
+      t_minus_po = t - std::pow(bw, r);
+    }
+
+    // Find the smallest exponent
+    const auto it = std::find_if(a.begin(), a.begin() + sz / 2,
+                                 [](double num) { return num != 0.0; });
+
+    // Shift the exponents to turn it into a polynomial
+    return {it, a.end()};
   }
 
-  // Find the smallest exponent
-  const auto it = std::find_if(a.begin(), a.begin() + sz / 2,
-                               [](double num) { return num != 0.0; });
+  double decode(const PolyRep& poly_rep) const override { return 0.0; }
 
-  // Shift the exponents to turn it into a polynomial
-  return {it, a.end()};
-}
+  ~NIBNAFCoder() = default;
+};
