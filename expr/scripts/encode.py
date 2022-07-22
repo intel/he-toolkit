@@ -5,11 +5,13 @@
 
 """Encoder Program"""
 
+import toml
+
 import argparse
 from typing import List, Dict
 
 
-def load_toml(arg: str) -> Dict:
+def load_toml(arg: str) -> Dict[str, str]:
     """"""
 
 
