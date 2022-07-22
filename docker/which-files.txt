@@ -179,5 +179,6 @@ tests/test_subparsers.py
 tests/test_tab_comp.py
 tests/test_tsort.py
 tools/README.md
+tools/encoder/coder.h
 tools/encoder/encoder-source.cpp
 tools/encoder/nibnaf.h
