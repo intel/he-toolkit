@@ -29,16 +29,9 @@ inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
   }
 
   // Find the smallest exponent
-  long tem;
-  for (tem = -sz / 2; a[tem + sz / 2] == 0; ++tem) {
-  }
-  tem = std::min(tem, 0L);
+  const auto it = std::find_if(a.begin(), a.begin() + sz / 2,
+                               [](double num) { return num != 0.0; });
 
-  // We shift the exponents to turn it into a polynomial.
-  std::vector<double> b(sz/2-tem, 0.0);
-  for (long i = 0; i < sz / 2 - tem; ++i) {
-    b[i] = a[i + tem + sz / 2];
-  }
-
-  return {b.begin(), b.end()};
+  // Shift the exponents to turn it into a polynomial
+  return {it, a.end()};
 }
