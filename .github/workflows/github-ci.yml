@@ -186,6 +186,8 @@ jobs:
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
+    outputs:
+      build_id: ${{ steps.init_hekit.outputs.config_file }}
     defaults:
       run:
         shell: bash
@@ -199,8 +201,10 @@ jobs:
           echo "CONFIG_FILE=$GITHUB_WORKSPACE/default.config" >> $GITHUB_ENV
 
       - name: Init hekit
+        id: init_hekit
         run: |
           echo "repo_location = \"$HE_WORKSPACE\"" > $CONFIG_FILE
+          echo "::set-output name=config_file::$CONFIG_FILE"
 
       - name: Build and install default recipe
         run: |
@@ -273,4 +277,4 @@ jobs:
     needs: [build-and-test-toolkit-icelake]
     if: always()
     steps:
-      - run: ./hekit --config $CONFIG_FILE remove --all -y
+      - run: ./hekit --config ${{needs.build-and-test-toolkit-icelake.outputs.build_id}} remove --all -y
