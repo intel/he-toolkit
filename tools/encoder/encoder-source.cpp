@@ -15,7 +15,7 @@ void print_out_results(const T& en) {
 
 void test_integer() {
   double number = 546;
-  double bw = 3;
+  double bw = 2;
   double epsil = 0.4;
   long sz = 200;
 
@@ -25,7 +25,7 @@ void test_integer() {
 
 void test_float() {
   double number = 546.789;
-  double bw = 3;
+  double bw = 2;
   double epsil = 0.4;
   long sz = 200;
 
@@ -35,7 +35,7 @@ void test_float() {
 
 void test_zero() {
   double number = 0;
-  double bw = 3;
+  double bw = 2;
   double epsil = 0.4;
   long sz = 200;
 
