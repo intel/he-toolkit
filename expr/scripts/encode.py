@@ -5,14 +5,15 @@
 
 """Encoder Program"""
 
-import toml
-
 import argparse
 from typing import List, Dict
 
+import toml
+
 
 def load_toml(arg: str) -> Dict[str, str]:
-    """"""
+    """Parse TOML file to python dict"""
+    return toml.load(arg)
 
 
 def parse_args(argv: List[str] = None):
@@ -27,7 +28,7 @@ def parse_args(argv: List[str] = None):
 
 
 def main(args) -> None:
-    """"""
+    """Encoder Program"""
 
 
 if __name__ == "__main__":
