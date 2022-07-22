@@ -5,10 +5,6 @@
 skip = false
 version = "1.2.3"
 name = "1.2.3"
-fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
-init_fetch_dir = "fetch"
-pre-build = "ls"
+fetch = "ls"
 build = "ls"
 install = "ls"
-export_install_dir = "install"
-export_cmake = "install/lib/cmake/hexl-%version%"

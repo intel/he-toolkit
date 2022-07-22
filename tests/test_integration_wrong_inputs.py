@@ -5,50 +5,51 @@ import pytest
 from os import getcwd, chdir
 from sys import stderr
 from pathlib import Path
+from tests.common_utils import create_config_file, execute_process, get_tests_path
 from kit.hekit import main
 from kit.commands.install import install_components
 
 
-def test_main_config_is_symlink(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.config = f"{args_fetch.tests_path}/input_files/default_symlink.config"
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.hekit.print")
+def test_main_config_is_symlink():
+    """Verify that the SW will trigger an exception when
+    the config file is a symlink"""
+    # Arrange
+    tests_path = get_tests_path()
+    cmd = [
+        "hekit",
+        "--config",
+        f"{tests_path}/input_files/default_symlink.config",
+        "fetch",
+        f"{tests_path}/input_files/test.toml",
+    ]
 
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    # Act
+    output = execute_process(cmd)
 
-    """Act"""
-    with pytest.raises(SystemExit):
-        main()
-
-    """Assert"""
-    mock_print.assert_called_with(
-        "Error while parsing config file\n",
-        "TypeError('The config file cannot be a symlink')",
-        file=stderr,
-    )
+    # Assert
+    assert "Error while parsing config file" in output
+    assert "The config file cannot be a symlinK" in output
 
 
 def test_main_config_name_has_null(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.config = f"{args_fetch.tests_path}/input_files/web.xml\0default.config"
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.hekit.print")
+    """Verify that the SW will trigger an exception when
+    the config file has a null character"""
+    # Arrange
+    tests_path = get_tests_path()
+    cmd = [
+        "hekit",
+        "--config",
+        f"{args_fetch.tests_path}/input_files/web.xml\0default.config",
+        "fetch",
+        f"{tests_path}/input_files/test.toml",
+    ]
 
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    # Act
+    output = execute_process(cmd)
 
-    """Act"""
-    with pytest.raises(SystemExit):
-        main()
-
-    """Assert"""
-    mock_print.assert_called_with(
-        "Error while parsing config file\n",
-        "ValueError('embedded null byte')",
-        file=stderr,
-    )
+    # Assert
+    assert "Error while parsing config file" in output
+    assert "embedded null byte" in output
 
 
 def test_main_toml_is_symlink(mocker, args_fetch):
