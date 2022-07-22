@@ -14,18 +14,17 @@
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
 inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
-  constexpr double sigma = signum(theta);
-  constexpr double log_bw = std::log(bw);
+  const double log_bw = std::log(bw);
   std::vector<double> a(sz, 0.0);
   long r;
   double t_minus_po;
-  for (double t = std::abs(theta); t > epsil; t = std::abs(t_minus_po)) {
+  for (double t = std::abs(theta), sigma = signum(theta); t > epsil;
+       t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
     r = std::ceil(std::log(t) / log_bw);
     r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
 
     a[r + sz / 2] = sigma;
     t_minus_po = t - std::pow(bw, r);
-    sigma *= signum(t_minus_po);
   }
 
   // Find the smallest exponent
