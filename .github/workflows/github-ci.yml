@@ -278,6 +278,6 @@ jobs:
     if: always()
     steps:
       - run: |
-          - run: ./hekit --config ${{needs.build-and-test-toolkit-icelake.outputs.build_id}} remove --all -y
+          ./hekit --config ${{needs.build-and-test-toolkit-icelake.outputs.build_id}} remove --all -y
           cd ..
           rm -rf he-toolkit
