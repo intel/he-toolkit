@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, Union
 from kit.utils.component_builder import components_to_build_from, chain_run
 from kit.utils.subparsers import validate_input
+from kit.utils.config import config_required
 
 
 def _stages(upto_stage: str):
@@ -28,6 +29,7 @@ def _stages(upto_stage: str):
     return the_stages
 
 
+@config_required
 def install_components(args):
     """Install command"""
     if Path(args.recipe_file).is_symlink():

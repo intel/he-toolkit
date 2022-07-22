@@ -24,7 +24,7 @@ def test_main_config_is_symlink(mocker, args_fetch):
 
     """Assert"""
     mock_print.assert_called_with(
-        "Error while parsing config file\n",
+        "Error while running subcommand\n",
         "TypeError('The config file cannot be a symlink')",
         file=stderr,
     )
@@ -45,8 +45,8 @@ def test_main_config_name_has_null(mocker, args_fetch):
 
     """Assert"""
     mock_print.assert_called_with(
-        "Error while parsing config file\n",
-        "ValueError('embedded null byte')",
+        "Error while running subcommand\n",
+        "ConfigFileError('Error while parsing config file\\n', \"  ValueError('embedded null byte')\")",
         file=stderr,
     )
 
@@ -57,14 +57,17 @@ def test_main_toml_is_symlink(mocker, args_fetch):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("kit.commands.install.print")
+    mock_print_main = mocker.patch("kit.hekit.print")
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
 
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
-
-    with pytest.raises(TypeError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "The TOML file cannot be a symlink"
+    message = "TypeError('The TOML file cannot be a symlink')"
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n", message, file=stderr
+    )
+    mock_exit.assert_called_once_with(1)
 
 
 def test_main_toml_name_has_null(mocker, args_fetch):
@@ -73,14 +76,17 @@ def test_main_toml_name_has_null(mocker, args_fetch):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("kit.commands.install.print")
+    mock_print_main = mocker.patch("kit.hekit.print")
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
 
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
-
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "embedded null byte"
+    message = "ValueError('embedded null byte')"
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n", message, file=stderr
+    )
+    mock_exit.assert_called_once_with(1)
 
 
 def test_main_toml_wrong_format(mocker, args_fetch):
@@ -91,15 +97,18 @@ def test_main_toml_wrong_format(mocker, args_fetch):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("kit.commands.install.print")
-
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    mock_print_main = mocker.patch("kit.hekit.print")
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
 
     """Act"""
-    with pytest.raises(TypeError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "replace() argument 2 must be str, not float"
+    message = "TypeError('replace() argument 2 must be str, not float')"
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n", message, file=stderr
+    )
+    mock_exit.assert_called_once_with(1)
 
 
 def test_main_toml_missing_value(mocker, args_fetch):
@@ -110,15 +119,18 @@ def test_main_toml_missing_value(mocker, args_fetch):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("kit.commands.install.print")
-
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    mock_print_main = mocker.patch("kit.hekit.print")
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "Empty value is invalid (line 7 column 1 char 122)"
+    message = "TomlDecodeError('Empty value is invalid (line 7 column 1 char 122)')"
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n", message, file=stderr
+    )
+    mock_exit.assert_called_once_with(1)
 
 
 def test_main_toml_missing_quotes(mocker, args_fetch):
@@ -129,15 +141,18 @@ def test_main_toml_missing_quotes(mocker, args_fetch):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args_fetch, ""
     mock_print = mocker.patch("kit.commands.install.print")
-
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
+    mock_print_main = mocker.patch("kit.hekit.print")
+    mock_exit = mocker.patch("kit.hekit.sys_exit")
 
     """Act"""
-    with pytest.raises(ValueError) as exc_info:
-        main()
+    main()
 
     """Assert"""
-    assert str(exc_info.value) == "Unbalanced quotes (line 9 column 24 char 234)"
+    message = "TomlDecodeError('Unbalanced quotes (line 9 column 24 char 234)')"
+    mock_print_main.assert_called_with(
+        "Error while running subcommand\n", message, file=stderr
+    )
+    mock_exit.assert_called_once_with(1)
 
 
 """Utilities used by the tests"""
