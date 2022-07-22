@@ -1,6 +1,8 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""Module for Ptxt helper object"""
+
 import json
 import math
 import toml

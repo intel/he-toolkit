@@ -22,7 +22,7 @@ def int_to_pd_poly(num: int, base: int, no_coeffs: int) -> List[int]:
 
     pd = (base ** i for i in reversed(range(no_coeffs)))
     poly = list(coeffs(pd, num))
-    if poly[0] >= p:
+    if poly[0] >= base:
         raise ValueError(f"Integer cannot fit in {d} slot coeffs: {poly}")
     return poly
 

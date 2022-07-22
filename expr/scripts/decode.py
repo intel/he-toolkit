@@ -6,13 +6,9 @@
 """Decoder Program"""
 
 
-def decode():
-    """"""
-
-
 def main():
-    """"""
+    """Decoder Program"""
 
 
 if __name__ == "__main__":
-    decode()
+    pass
