@@ -17,7 +17,7 @@ class Config(NamedTuple):
 
 
 class ConfigFileError(Exception):
-    """Error for when config file """
+    """Error for when config file is not constructed correctly"""
 
 
 def config_required(func):
