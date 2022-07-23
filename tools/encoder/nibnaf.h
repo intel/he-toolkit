@@ -13,13 +13,21 @@
 
 #include "coder.h"
 
+namespace Coder {
+
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-struct NIBNAFCoder : public Coder {
-  long sz;       // array/poly size
-  double epsil;  // absolute error tolerance
-  double bw;     // the b_w base
+// TODO
+inline constexpr double poly_eval(const PolyRep& poly_rep, double base) {
+  // Expand base
+  // inner product
+  return 0.0;
+}
 
+class rwNIBNAFCoder : public Coder {
+ public:
+  rwNIBNAFCoder(double bw, double epsil, long sz)
+      : bw(bw), epsil(epsil), sz(sz) {}
   PolyRep encode(double num) const override {
     const double log_bw = std::log(bw);
     std::vector<double> a(sz, 0.0);
@@ -42,7 +50,16 @@ struct NIBNAFCoder : public Coder {
     return {it, a.end()};
   }
 
-  double decode(const PolyRep& poly_rep) const override { return 0.0; }
+  double decode(const PolyRep& poly_rep) const override {
+    return poly_eval(poly_rep, bw);
+  }
 
-  ~NIBNAFCoder() = default;
+  ~rwNIBNAFCoder() = default;
+
+ private:
+  double bw;     // the b_w base
+  double epsil;  // absolute error tolerance
+  long sz;       // array/poly size
 };
+
+}  // namespace Coder

@@ -3,6 +3,7 @@
 
 #pragma once
 
+namespace Coder {
 class PolyRep {};
 
 struct Coder {
@@ -10,3 +11,5 @@ struct Coder {
   virtual double decode(const PolyRep& poly_rep) const = 0;
   virtual ~Coder() = default;
 };
+
+}  // namespace Coder
