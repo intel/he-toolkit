@@ -1,4 +1,4 @@
-// Copyright (C) 2020 Intel Corporation
+// Copyright (C) 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 // A program that calls the header and returns the coefficients and the
