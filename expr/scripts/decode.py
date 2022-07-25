@@ -56,8 +56,8 @@ def parse_header(header_line: str) -> Tuple[int, int]:
 def parse_args(argv: List[str] = None):
     """Parse argv either passed in or from cmdline"""
     parser = argparse.ArgumentParser(description="Decode result")
-    parser.add_argument("params", type=str, help="parameters for encoding")
     parser.add_argument("datafile", type=str, help="data file to decode")
+    parser.add_argument("--params", type=str, help="parameters for encoding")
     parser.add_argument(
         "--segment", type=int, default=1, help="set segmentation divisor"
     )
