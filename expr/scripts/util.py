@@ -36,16 +36,23 @@ def inner_prod(vector_a: Sequence[int], vector_b: Sequence[int]) -> int:
     return sum(a * b for a, b in zip(vector_a, vector_b))
 
 
-def BaseFromAlphabet(to_base, size, alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
-    """Closure to do a change str to poly p base."""
-    len_alphabet = len(alphabet)
-    if len_alphabet < 1:
-        raise ValueError(
-            f"Alphabet must have positive integer cardinality, not '{len_alphabet}'"
-        )
-    translation_table = {symbol: code for code, symbol in enumerate(alphabet)}
+class BaseFromAlphabet:
+    def __init__(
+        to_base: int, size: int, alphabet: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    ) -> None:
+        """Closure to do a change str to poly p base."""
+        self.to_base = to_base
+        self.size = size
+        self.alphabet = alphabet
 
-    def _base_from_alphabet(numstr):
+        self.len_alphabet = len(alphabet)
+        if len_alphabet < 1:
+            raise ValueError(
+                f"Alphabet must have positive integer cardinality, not '{len_alphabet}'"
+            )
+        self.translation_table = {symbol: code for code, symbol in enumerate(alphabet)}
+
+    def __call__(numstr: str) -> List[int]:
         # use table to convert to pivot base 10
         converted = [translation_table[c] for c in numstr]
         num_base_10 = inner_prod(
@@ -53,32 +60,29 @@ def BaseFromAlphabet(to_base, size, alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
         )
         return int_to_pd_poly(num_base_10, p=to_base, d=size)
 
-    return _base_from_alphabet
-
-
-def base(numstr: str, from_base: int, to_base: int, size: int):
-    """Change a number in string to different base within finite size"""
-    # Pivot to base 10 - python in does this for us upto base 36
-    num_base10 = int(numstr, base=from_base)
-    return int_to_pd_poly(num_base10, p=to_base, d=size)
+    def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
+        """Change a number in string to different base within finite size"""
+        # Pivot to base 10 - python in does this for us upto base 36
+        num_base10 = int(numstr, base=from_base)
+        return int_to_pd_poly(num_base10, p=to_base, d=size)
 
 
 # This is from a itertools recipe
 # https://docs.python.org/3.8/library/itertools.html
-def grouper(iterable, n, fillvalue=None):
+def grouper(iterable, n: int, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
 
-def transpose(ls: list, rows: int, cols: int):
+def transpose(ls: List, rows: int, cols: int) -> List:
     """Transpose list order. List ls is in column major.
        rows and cols are of the current layout in the list."""
     return [ls[c * rows + r] for r in range(rows) for c in range(cols)]
 
 
-def read_txt_worth(data_list, nslots):
+def read_txt_worth(data_list, nslots: int):
     """Generator. Reads up to a txt worth of entries (== number of slots) of """
     for txt_worth in grouper(data_list, nslots):
         yield [item for item in txt_worth if item is not None]
@@ -141,7 +145,20 @@ def extend_with_repetitions(ls_of_ls: list, repeat: int):
         ls *= repeat  # NB. objects are repeats not new objects
 
 
-# Treat as a type
+@dataclass(frozen=true)
+class Policy:
+    encode: str
+    composite: int
+
+
+class ClientEncoder:
+    """Encoder for client"""
+
+
+class ServerEncoder:
+    """Encoder for server"""
+
+
 def Encode(
     policies, params, composite_columns, column_policies, for_server, segment_divisor=1
 ):
