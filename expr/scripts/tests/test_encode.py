@@ -170,3 +170,159 @@ def test_encode_for_server(encode_obj_for_server, test_vector):
         assert ptxt.slots() == enc
 
 
+def test_edge_case(edge_case_data):
+    p, d, entry, expected_colA, expected_colB, expected_colC = edge_case_data
+    assert base(entry["colA"], from_base=36, to_base=p, size=d) == expected_colA
+    assert BaseFromAlphabet(p, d)(entry["colB"]) == expected_colB
+    # won't fit with d coeffs
+    with pytest.raises(ValueError):
+        int_to_pd_poly(entry["colC"], p, d)
+    # will fit with 2d coeffs
+    assert int_to_pd_poly(entry["colC"], p, d * 2) == expected_colC
+    assert int_to_pd_poly(int(entry["colC"]) - 1, p, d * 2) != expected_colC
+    assert int_to_pd_poly(int(entry["colC"]) + 1, p, d * 2) != expected_colC
+
+
+def test_segmentation_edge_case(edge_case_data):
+    p, d, entry, _, _, _ = edge_case_data
+    colC = entry["colC"]
+    split_entries = composite_split([colC], 2)
+    expected_split = "9" * 11
+    expected_ptxt = [219, 690, 342, 540]
+    for s in split_entries:
+        assert s == expected_split
+        assert int_to_pd_poly(s, p, d) == expected_ptxt
+
+    colC = str(int(entry["colC"]) - 1)
+    split_entries = list(composite_split([colC], 2))
+    assert split_entries == [expected_split, "9" * 10 + "8"]
+    assert split_entries[1] != expected_split  # Should be expected_split - 1
+    assert int_to_pd_poly(split_entries[0], p, d) == expected_ptxt
+    assert int_to_pd_poly(split_entries[1], p, d) != expected_ptxt
+    expected_ptxt[-1] -= 1  # decr the last element
+    assert int_to_pd_poly(split_entries[1], p, d) == expected_ptxt
+
+
+def test_client_segmentation(encode_obj_for_client, test_vector):
+    """Test when number of queries is smaller than the segmentation size."""
+    data_entries, expected_encoding, _ = test_vector
+    encode = encode_obj_for_client
+    data_entries.pop(-1)  # Remove last entry so now 3 entries
+    # Alter expected_encoding accordingly (remove every 4th entry)
+    len_data_entries = len(data_entries) + 1
+    for i, enc in enumerate(expected_encoding):
+        expected_encoding[i] = [
+            [] if (i + 1) % len_data_entries == 0 else e for i, e in enumerate(enc)
+        ]
+
+    ptxts = encode(data_entries)
+    assert len(ptxts) == len(expected_encoding)
+    for ptxt, enc in zip(ptxts, expected_encoding):
+        assert ptxt.slots() == enc
+
+
+def test_more_queries_than_capacity(encode_obj_for_client, test_vector):
+    """Test for when number of entries is larger than max capacity in ptxt"""
+    data_entries, expected_encoding, _ = test_vector
+    encode = encode_obj_for_client
+    # Append extra entry
+    data_entries.append({"colA": "IJ", "colB": "FR", "colC": "89"})
+    with pytest.raises(ValueError):
+        ptxts = encode(data_entries)
+
+
+@pytest.fixture
+def edge_case_data():
+    p = 769
+    d = 4
+    entry = {"colA": "ZZZZ", "colB": "ZZ", "colC": "9" * 22}
+    expected_colA = [0, 2, 646, 119]
+    expected_colB = [0, 0, 0, 675]
+    expected_colC = [62, 677, 49, 84, 254, 438, 535, 460]
+    return p, d, entry, expected_colA, expected_colB, expected_colC
+
+
+@pytest.fixture
+def test_vector():
+    data_entries = [
+        {"colA": "AB", "colB": "NC", "colC": "56"},
+        {"colA": "CD", "colB": "SU", "colC": "22"},
+        {"colA": "EF", "colB": "KU", "colC": "32"},
+        {"colA": "GH", "colB": "ED", "colC": "67"},
+    ]
+    expected_client_encoding = [
+        [[1, 2], [3, 4], [5, 6], [7, 8], [1, 2], [3, 4], [5, 6], [7, 8]],
+        [[21, 19], [3, 14], [21, 11], [4, 5], [21, 19], [3, 14], [21, 11], [4, 5]],
+        [[0, 5], [0, 2], [0, 3], [0, 6], [0, 5], [0, 2], [0, 3], [0, 6]],
+        [[0, 6], [0, 2], [0, 2], [0, 7], [0, 6], [0, 2], [0, 2], [0, 7]],
+    ]
+    expected_server_encoding = [
+        [[1, 2], [1, 2], [1, 2], [1, 2], [3, 4], [3, 4], [3, 4], [3, 4]],
+        [[21, 19], [21, 19], [21, 19], [21, 19], [3, 14], [3, 14], [3, 14], [3, 14]],
+        [[0, 5], [0, 5], [0, 5], [0, 5], [0, 2], [0, 2], [0, 2], [0, 2]],
+        [[0, 6], [0, 6], [0, 6], [0, 6], [0, 2], [0, 2], [0, 2], [0, 2]],
+        [[5, 6], [5, 6], [5, 6], [5, 6], [7, 8], [7, 8], [7, 8], [7, 8]],
+        [[21, 11], [21, 11], [21, 11], [21, 11], [4, 5], [4, 5], [4, 5], [4, 5]],
+        [[0, 3], [0, 3], [0, 3], [0, 3], [0, 6], [0, 6], [0, 6], [0, 6]],
+        [[0, 2], [0, 2], [0, 2], [0, 2], [0, 7], [0, 7], [0, 7], [0, 7]],
+    ]
+    return data_entries, expected_client_encoding, expected_server_encoding
+
+
+@pytest.fixture
+def params_and_policies():
+    Params = namedtuple("Params", ["m", "p", "d", "nslots"])
+    params = Params(m=24, p=37, d=2, nslots=8)
+
+    int_to_poly = partial(int_to_pd_poly, p=params.p, d=params.d)
+    policies = {
+        "alphanumeric": {
+            symbol: code
+            for code, symbol in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 1)
+        },
+        "alphabetical": {
+            symbol: code for code, symbol in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1)
+        },
+        # func must return slot list
+        "numeric": int_to_poly,
+    }
+
+    return params, policies
+
+
+@pytest.fixture
+def encode_obj_for_client(params_and_policies, column_policies):
+    params, policies = params_and_policies
+    composite_columns = [value.composite for value in column_policies.values()]
+    return Encode(
+        policies,
+        params,
+        for_server=False,
+        composite_columns=composite_columns,
+        column_policies=column_policies,
+        segment_divisor=2,
+    )
+
+
+@pytest.fixture
+def encode_obj_for_server(params_and_policies, column_policies):
+    params, policies = params_and_policies
+    composite_columns = [value.composite for value in column_policies.values()]
+    return Encode(
+        policies,
+        params,
+        for_server=True,
+        composite_columns=composite_columns,
+        column_policies=column_policies,
+        segment_divisor=2,
+    )
+
+
+@pytest.fixture
+def column_policies():
+    Policy = namedtuple("Policy", ["encode", "composite"])
+    return {
+        "colA": Policy("alphanumeric", 1),
+        "colB": Policy("alphabetical", 1),
+        "colC": Policy("numeric", 2),
+    }
