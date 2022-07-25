@@ -11,6 +11,7 @@ import argparse
 from itertools import islice
 from functools import reduce
 from ptxt import Ptxt, read_params
+from typing import List, Tuple
 
 
 def sum_vectors(*vectors):
@@ -38,7 +39,7 @@ def sum_segments(slots, segment_divisor):
     return map(sum_vectors, *segments)
 
 
-def parse_header(header_line: str):
+def parse_header(header_line: str) -> Tuple[int, int]:
     """Return the number of rows and columns from the header line"""
     num_cols = 1
     dims = header_line.split()
@@ -52,7 +53,7 @@ def parse_header(header_line: str):
     return int(num_rows), int(num_cols)
 
 
-def parse_args(argv: list = None):
+def parse_args(argv: List[str] = None):
     """Parse argv either passed in or from cmdline"""
     parser = argparse.ArgumentParser(description="Decode result")
     parser.add_argument("params", type=str, help="parameters for encoding")
