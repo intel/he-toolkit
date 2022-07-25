@@ -211,6 +211,9 @@ jobs:
           ./hekit --config $CONFIG_FILE install recipes/default.toml
           ./hekit --config $CONFIG_FILE list
 
+      - name: Test failure to test cleanup step [REMOVE BEFORE MERGE]
+        run: exit 1
+
       - name: Build examples
         run: |
           ./hekit --config $CONFIG_FILE build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
@@ -269,6 +272,10 @@ jobs:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
+      
+      - name: Cleanup hekit directory
+        if: always()
+        run: ./hekit --config $CONFIG_FILE remove --all -y
 
   # Cleanup .hekit directory after build and test job finishes
   cleanup:
