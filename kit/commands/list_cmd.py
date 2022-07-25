@@ -9,6 +9,7 @@ from typing import Dict, List
 
 from toml import load
 from kit.utils.files import list_dirs
+from kit.utils.config import config_required
 from kit.utils.typing import PathType
 
 # Number of separation spaces for columns
@@ -54,6 +55,7 @@ class RepoProperties:
         return {component: list_dirs(path / component) for component in list_dirs(path)}
 
 
+@config_required
 def list_components(args):
     """List to stdout info on components."""
     repo_location = Path(args.config.repo_location)

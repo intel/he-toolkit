@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+from pathlib import Path
 from kit.commands.install import install_components, _stages, get_recipe_arg_dict
 
 
@@ -159,12 +160,9 @@ def test_get_recipe_arg_dict_missing_comma():
 
 
 class MockArgs:
-    class Config:
-        def __init__(self):
-            self.repo_location = "location_test"
-
     def __init__(self):
-        self.config = MockArgs.Config()
+        self.tests_path = Path(__file__).resolve().parent
+        self.config = f"{self.tests_path}/input_files/default.config"
         self.recipe_file = "file_test"
         self.upto_stage = "install"
         self.force = False

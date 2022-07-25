@@ -13,11 +13,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Tuple
 
-from kit.commands.init import init_hekit
-from kit.tools.healg import healg
 from kit.utils.subparsers import discover_subparsers_from, validate_input
 from kit.utils.constants import Constants
-from kit.utils.config import load_config
 from kit.utils.tab_completion import enable_tab_completion
 
 if sys.version_info < (3, 8):
@@ -67,24 +64,16 @@ def main() -> None:
         print(f"Intel HE Toolkit version {Constants.version}")
         sys_exit(0)
 
-    # Load config file
-    try:
-        # FIXME logic convoluted here
-        functions = [init_hekit, healg]
-        if args.fn not in functions:  # pylint: disable=comparison-with-callable
-            # replace the filename with the actual config
-            args.config = load_config(args.config)
-    except Exception as e:  # pylint: disable=broad-except
-        # Exit on any exception from config file
-        print("Error while parsing config file\n", f"{e!r}", file=stderr)
-        sys_exit(1)
-
-    # Run the command
     if args.fn is None:
         print("hekit requires a command", file=stderr)
         print_help(stderr)
         sys_exit(1)
-    args.fn(args)
+
+    try:
+        args.fn(args)  # Run the command
+    except Exception as e:  # pylint: disable=broad-except
+        print("Error while running subcommand\n", f"{e!r}", file=stderr)
+        sys_exit(1)
 
 
 if __name__ == "__main__":
