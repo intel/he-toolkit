@@ -4,13 +4,17 @@
 // A program that calls the header and returns the coefficients and the
 // corresponding exponents.
 #include <iostream>
+#include <map>
+#include <iterator>
 
 #include "nibnaf.h"
 
 template <typename T>
 void print_out_results(const T& en) {
-  for (long i = 0; i < en.size(); ++i)
-    if (en[i] != 0) std::cout << en[i] << ", " << i << std::endl;
+    std::map<long, long>::iterator it;
+  for (it = en.begin(); it!=en.end(); ++it){
+             std::cout << "(" <<it->first <<" , " <<it->second <<")" << std::endl;
+    }
 }
 
 void test_integer() {
@@ -19,7 +23,7 @@ void test_integer() {
   double epsil = 0.4;
   long sz = 200;
 
-  const auto en = gap(number, bw, epsil, sz);
+  const auto en = gap(number, bw, epsil);
   print_out_results(en);
 }
 
@@ -29,7 +33,7 @@ void test_float() {
   double epsil = 0.4;
   long sz = 200;
 
-  const auto en = gap(number, bw, epsil, sz);
+  const auto en = gap(number, bw, epsil);
   print_out_results(en);
 }
 
@@ -39,7 +43,7 @@ void test_zero() {
   double epsil = 0.4;
   long sz = 200;
 
-  const auto en = gap(number, bw, epsil, sz);
+  const auto en = gap(number, bw, epsil);
   print_out_results(en);
 }
 
