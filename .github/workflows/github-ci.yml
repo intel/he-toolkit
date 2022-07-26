@@ -186,8 +186,6 @@ jobs:
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    outputs:
-      build_id: ${{ steps.init_hekit.outputs.config_file }}
     defaults:
       run:
         shell: bash
@@ -204,15 +202,11 @@ jobs:
         id: init_hekit
         run: |
           echo "repo_location = \"$HE_WORKSPACE\"" > $CONFIG_FILE
-          echo "::set-output name=config_file::$CONFIG_FILE"
 
       - name: Build and install default recipe
         run: |
           ./hekit --config $CONFIG_FILE install recipes/default.toml
           ./hekit --config $CONFIG_FILE list
-
-      - name: Test failure to test cleanup step [REMOVE BEFORE MERGE]
-        run: exit 1
 
       - name: Build examples
         run: |
@@ -272,19 +266,7 @@ jobs:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
-      
+
       - name: Cleanup hekit directory
         if: always()
         run: ./hekit --config $CONFIG_FILE remove --all -y
-
-  # Cleanup .hekit directory after build and test job finishes
-  cleanup:
-    name: Cleanup
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    needs: [build-and-test-toolkit-icelake]
-    if: always()
-    steps:
-      - run: |
-          ./hekit --config ${{needs.build-and-test-toolkit-icelake.outputs.build_id}} remove --all -y
-          cd ..
-          rm -rf he-toolkit
