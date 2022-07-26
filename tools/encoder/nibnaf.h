@@ -10,12 +10,14 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#incldue<map>
+#include<iterator>
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
+inline std::map<long,long> gap(double theta, double bw, double epsil) {
   const double log_bw = std::log(bw);
-  std::vector<double> a(sz, 0.0);
+   std::map<long, long> a;
   long r;
   double t_minus_po;
   for (double t = std::abs(theta), sigma = signum(theta); t > epsil;
@@ -23,14 +25,8 @@ inline std::vector<long> gap(double theta, double bw, double epsil, long sz) {
     r = std::ceil(std::log(t) / log_bw);
     r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
 
-    a[r + sz / 2] = sigma;
+    a[r] = sigma;
     t_minus_po = t - std::pow(bw, r);
   }
-
-  // Find the smallest exponent
-  const auto it = std::find_if(a.begin(), a.begin() + sz / 2,
-                               [](double num) { return num != 0.0; });
-
-  // Shift the exponents to turn it into a polynomial
-  return {it, a.end()};
+  return {a};
 }
