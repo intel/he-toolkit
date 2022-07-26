@@ -7,8 +7,7 @@ import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT  # nosec B404
-from typing import Iterable, Callable, Union, List, Tuple
-from typing import Dict
+from typing import Iterable, Callable, Union, List, Tuple, Dict
 import toml
 from kit.utils.spec import Spec
 
