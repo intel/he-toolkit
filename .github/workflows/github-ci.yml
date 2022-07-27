@@ -164,10 +164,6 @@ jobs:
     steps:
       - name: Setup
         run: |
-          temp_workspace=$(date +%s)
-          mkdir $temp_workspace
-          echo "WORKSPACE=$temp_workspace" >> $GITHUB_ENV
-
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - uses: actions/checkout@v3
@@ -185,10 +181,6 @@ jobs:
     steps:
       - name: Setup
         run: |
-          temp_workspace=$(date +%s)
-          mkdir $temp_workspace
-          echo "WORKSPACE=$temp_workspace" >> $GITHUB_ENV
-
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - uses: actions/checkout@v3
@@ -206,10 +198,6 @@ jobs:
     steps:
       - name: Setup
         run: |
-          temp_workspace=$(date +%s)
-          mkdir $temp_workspace
-          echo "WORKSPACE=$temp_workspace" >> $GITHUB_ENV
-
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "HE_WORKSPACE=$GITHUB_WORKSPACE/.hekit/components" >> $GITHUB_ENV
           echo "CONFIG_FILE=$GITHUB_WORKSPACE/default.config" >> $GITHUB_ENV
