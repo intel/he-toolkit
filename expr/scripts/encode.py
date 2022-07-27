@@ -33,6 +33,14 @@ def parse_args(argv: List[str] = None):
 
 def main(args) -> None:
     """Encoder Program"""
+
+    # TODO move to config obj
+    # sanity check
+    if args.config.params.nslots % args.config.segments != 0:
+        sys.stderr.write(
+            f"Segmentation divisor '{args.segment}' does not divide number of slots '{params.nslots}'"
+        )
+        exit(1)
     encode = (
         EncoderServer(args.config)
         if args.server is True

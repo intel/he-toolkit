@@ -2,6 +2,10 @@
 p = 257
 m = 256
 
+[config]
+columns = 3
+segments = 1
+
 [columns.encoding]
 column1 = alphanumeric
 column2 = alphabetical
