@@ -4,23 +4,28 @@
 import pytest
 from sys import stderr
 from kit.hekit import main
-from tests.common_utils import create_config_file, execute_process, get_tests_path
+from tests.common_utils import (
+    create_config_file,
+    execute_process,
+    hekit_path,
+    input_files_path,
+)
 from kit.commands.install import install_components
 
 
-def test_main_config_is_symlink():
+def test_main_config_is_symlink(hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the config file is a symlink"""
-    tests_path = get_tests_path()
-    cmd = f"./hekit --config {tests_path}/input_files/default_symlink.config list"
+    cmd = f"{hekit_path} --config {input_files_path}/default_symlink.config list"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert "The config file cannot be a symlink" in err
 
 
-def test_main_config_name_has_null(mocker):
+def test_main_config_name_has_null(mocker, input_files_path):
     args = MockArgs()
-    args.config = f"{args.tests_path}/input_files/web.xml\0default.config"
+    args.config = f"{input_files_path}/web.xml\0default.config"
+    args.recipe_file = f"{input_files_path}/test.toml"
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
@@ -33,20 +38,20 @@ def test_main_config_name_has_null(mocker):
     )
 
 
-def test_main_toml_is_symlink(tmp_path):
+def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the config file is a symlink"""
     config_file = create_config_file(tmp_path)
-    tests_path = get_tests_path()
-    cmd = f"./hekit --config {config_file} fetch {tests_path}/input_files/test_symlink.toml"
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_symlink.toml"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert "The TOML file cannot be a symlink" in err
 
 
-def test_main_toml_name_has_null(mocker):
+def test_main_toml_name_has_null(mocker, input_files_path):
     args = MockArgs()
-    args.recipe_file = f"{args.tests_path}/input_files/web.xml\0test.toml"
+    args.config = f"{input_files_path}/default.config"
+    args.recipe_file = f"{input_files_path}/web.xml\0test.toml"
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
@@ -59,34 +64,31 @@ def test_main_toml_name_has_null(mocker):
     )
 
 
-def test_main_toml_wrong_format(tmp_path):
+def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file has an float instead of a string"""
     config_file = create_config_file(tmp_path)
-    tests_path = get_tests_path()
-    cmd = f"./hekit --config {config_file} fetch {tests_path}/input_files/test_wrong_format.toml"
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_wrong_format.toml"
     _, err = execute_process(cmd)
     assert "while running subcommand" in err
     assert "TypeError('replace() argument 2 must be str, not float')" in err
 
 
-def test_main_toml_missing_value(tmp_path):
+def test_main_toml_missing_value(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file has wrong format for key=value pair"""
     config_file = create_config_file(tmp_path)
-    tests_path = get_tests_path()
-    cmd = f"./hekit --config {config_file} fetch {tests_path}/input_files/test_missing_value.toml"
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_value.toml"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert "TomlDecodeError('Empty value is invalid (line 7 column 1 char 122)')" in err
 
 
-def test_main_toml_missing_quotes(tmp_path):
+def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file has a missing quote in key="value" pair"""
     config_file = create_config_file(tmp_path)
-    tests_path = get_tests_path()
-    cmd = f"./hekit --config {config_file} fetch {tests_path}/input_files/test_missing_quotes.toml"
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_quotes.toml"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert "TomlDecodeError('Unbalanced quotes (line 9 column 24 char 234)')" in err
@@ -97,12 +99,9 @@ def test_main_toml_missing_quotes(tmp_path):
 
 class MockArgs:
     def __init__(self):
-        self.tests_path = get_tests_path()
         self.version = False
         self.component = "hexl"
         self.instance = "1.2.3"
-        self.config = f"{self.tests_path}/input_files/default.config"
-        self.recipe_file = f"{self.tests_path}/input_files/test.toml"
         self.fn = install_components
         self.upto_stage = "fetch"
         self.force = False

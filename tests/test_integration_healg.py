@@ -3,40 +3,40 @@
 
 import pytest
 import sys
-from tests.common_utils import create_config_file, execute_process, get_tests_path
+from tests.common_utils import execute_process, hekit_path
 
 
-def test_gen_primes_start_less_than_stop():
+def test_gen_primes_start_less_than_stop(hekit_path):
     """Verify that gen-primes cmd is executed correctly when
     start is less than stop"""
-    cmd = "./hekit gen-primes 0 10"
+    cmd = f"{hekit_path} gen-primes 0 10"
     out, err = execute_process(cmd)
     assert "2\n3\n5\n7\n" in out
     assert not err
 
 
-def test_gen_primes_start_equal_to_stop():
+def test_gen_primes_start_equal_to_stop(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     start is equal to stop"""
-    cmd = "./hekit gen-primes 10 10"
+    cmd = f"{hekit_path} gen-primes 10 10"
     out, err = execute_process(cmd)
     assert "\n" in out
     assert not err
 
 
-def test_gen_primes_start_greater_than_stop():
+def test_gen_primes_start_greater_than_stop(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     start is greater than stop"""
-    cmd = "./hekit gen-primes 100 10"
+    cmd = f"{hekit_path} gen-primes 100 10"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert "TypeError(\"'NoneType' object is not iterable\")" in err
 
 
-def test_gen_primes_negative_start():
+def test_gen_primes_negative_start(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     start is negative"""
-    cmd = "./hekit gen-primes -1 10"
+    cmd = f"{hekit_path} gen-primes -1 10"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert (
@@ -45,10 +45,10 @@ def test_gen_primes_negative_start():
     )
 
 
-def test_gen_primes_negative_stop():
+def test_gen_primes_negative_stop(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     start and stop are negative"""
-    cmd = "./hekit gen-primes -5 -1"
+    cmd = f"{hekit_path} gen-primes -5 -1"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert (
@@ -57,20 +57,19 @@ def test_gen_primes_negative_stop():
     )
 
 
-def test_gen_primes_max_stop():
+def test_gen_primes_max_stop(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     stop is equal to sys.maxsize"""
-    cmd = f"./hekit gen-primes -5 {sys.maxsize}"
+    cmd = f"{hekit_path} gen-primes -5 {sys.maxsize}"
     _, err = execute_process(cmd)
     assert "Error while running subcommand" in err
     assert "OverflowError('Python int too large to convert to C ssize_t')" in err
 
 
-def test_healg_arg_header():
+def test_healg_arg_header(hekit_path):
     """Verify that gen-primes cmd is excuted correctly
     when p and d are single numbers"""
-    # Arrange
-    cmd = "./hekit algebras -p 2 -d 3"
+    cmd = f"{hekit_path} algebras -p 2 -d 3"
     out, err = execute_process(cmd)
     assert (
         "2                    3                    7                    6                    2"
@@ -83,10 +82,10 @@ def test_healg_arg_header():
     assert not err
 
 
-def test_healg_arg_no_header():
+def test_healg_arg_no_header(hekit_path):
     """Verify that algebras cmd is excuted correctly when
     --no-header flag is used"""
-    cmd = "./hekit algebras -p 2 -d 3 --no-header"
+    cmd = f"{hekit_path} algebras -p 2 -d 3 --no-header"
     out, err = execute_process(cmd)
     assert (
         "2                    3                    7                    6                    2"
@@ -99,10 +98,10 @@ def test_healg_arg_no_header():
     assert not err
 
 
-def test_healg_arg_p():
+def test_healg_arg_p(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     p is a list of numbers"""
-    cmd = "./hekit algebras -p 7,13 -d 1 --no-header"
+    cmd = f"{hekit_path} algebras -p 7,13 -d 1 --no-header"
     out, err = execute_process(cmd)
     assert (
         "7                    1                    2                    1                    1"
@@ -115,20 +114,20 @@ def test_healg_arg_p():
     assert not err
 
 
-def test_healg_negative_arg_p():
+def test_healg_negative_arg_p(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     p is a negative number"""
-    cmd = "./hekit algebras -p -7 -d 1 --no-header"
+    cmd = f"{hekit_path} algebras -p -7 -d 1 --no-header"
     _, err = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -p: Wrong syntax for range given '-7'" in err
     )
 
 
-def test_healg_max_arg_p():
+def test_healg_max_arg_p(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     p is equal to sys.maxsize"""
-    cmd = f"./hekit algebras -p {sys.maxsize} -d 7 --no-header"
+    cmd = cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
     out, err = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -p: invalid parse_range_for_primes value"
@@ -136,10 +135,10 @@ def test_healg_max_arg_p():
     )
 
 
-def test_healg_arg_d():
+def test_healg_arg_d(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     d is a list of numbers"""
-    cmd = "./hekit algebras -p 2 -d 3,5 --no-header"
+    cmd = f"{hekit_path} algebras -p 2 -d 3,5 --no-header"
     out, err = execute_process(cmd)
     assert (
         "2                    3                    7                    6                    2"
@@ -152,10 +151,10 @@ def test_healg_arg_d():
     assert not err
 
 
-def test_healg_negative_arg_d():
+def test_healg_negative_arg_d(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     d is a negative number"""
-    cmd = "./hekit algebras -p 7 -d -1 --no-header"
+    cmd = f"{hekit_path} algebras -p 7 -d -1 --no-header"
     _, err = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -d: Wrong syntax for range given '-1'" in err
@@ -163,10 +162,10 @@ def test_healg_negative_arg_d():
 
 
 @pytest.mark.skip(reason="Not realistic test because SW cannot handle that amount in d")
-def test_healg_max_arg_d(mocker):
+def test_healg_max_arg_d(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     d is equal to sys.maxsize"""
-    cmd = f"./hekit algebras -p 7 -d {sys.maxsize} --no-header"
+    cmd = cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
     out, err = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -d: invalid parse_range_for_primes value"
@@ -174,10 +173,12 @@ def test_healg_max_arg_d(mocker):
     )
 
 
-def test_healg_arg_no_corrected():
+def test_healg_arg_no_corrected(hekit_path):
     """Verify that algebras cmd is excuted correctly when
     --no-corrected flag is used"""
-    cmd = "./hekit algebras -p 11,13,17,19,23 -d 2,4,5 --no-header --no-corrected "
+    cmd = (
+        f"{hekit_path} algebras -p 11,13,17,19,23 -d 2,4,5 --no-header --no-corrected "
+    )
     out, err = execute_process(cmd)
     assert (
         "11                   2                    3                    2                    1"

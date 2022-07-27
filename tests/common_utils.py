@@ -3,13 +3,10 @@
 
 """Utilities used by the tests"""
 
+import pytest
 from pathlib import Path
 from subprocess import run
 from shlex import split
-
-
-def get_tests_path() -> Path:
-    return Path(__file__).resolve().parent
 
 
 def create_config_file(path: Path) -> Path:
@@ -25,3 +22,13 @@ def create_config_file(path: Path) -> Path:
 def execute_process(cmd: str) -> str:
     out = run(split(cmd), capture_output=True)
     return out.stdout.decode("utf-8"), out.stderr.decode("utf-8")
+
+
+@pytest.fixture
+def input_files_path() -> Path:
+    return Path(__file__).resolve().parent / "input_files"
+
+
+@pytest.fixture
+def hekit_path() -> Path:
+    return Path(__file__).resolve().parent.parent / "hekit"
