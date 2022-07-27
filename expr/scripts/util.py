@@ -150,15 +150,15 @@ class Policy:
     composite: int
 
 
-@dataclass
 class Encoder:
     """Encoder Base class"""
-
-    policies: List[Policy]
-    params: Params
-    composite_columns: List[int]
-    column_policies: List[ColumnPolicies]
-    repeat: int = 1  # segment divisor
+    
+    def __init__(config: Config) -> None:
+        # TODO policies need defining
+        self.params: Params = config.params
+        self.composite_columns: List[int] = config.column.composites
+        self.column_policies: List[ColumnPolicies] = config.column.policies
+        self.repeat: int = config.segments  # segment divisor
 
     def __packing(self,):
         """To be implemented by derived class"""
