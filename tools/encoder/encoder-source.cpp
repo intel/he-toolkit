@@ -4,17 +4,16 @@
 // A program that calls the header and returns the coefficients and the
 // corresponding exponents.
 #include <iostream>
-#include <map>
 #include <iterator>
+#include <map>
 
 #include "nibnaf.h"
 
 template <typename T>
 void print_out_results(const T& en) {
-    std::map<long, long>::iterator it;
-  for (it = en.begin(); it!=en.end(); ++it){
-             std::cout << "(" <<it->first <<" , " <<it->second <<")" << std::endl;
-    }
+  for (const auto& [key, value] : en) {
+    std::cout << "(" << key << " , " << value << ")" << std::endl;
+  }
 }
 
 void test_integer() {
