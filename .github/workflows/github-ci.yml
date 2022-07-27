@@ -198,9 +198,13 @@ jobs:
     steps:
       - name: Setup
         run: |
+          temp_workspace="$(pwd)/../$(date +%s)"
+          mkdir $temp_workspace
+
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "HE_WORKSPACE=$GITHUB_WORKSPACE/.hekit/components" >> $GITHUB_ENV
-          echo "CONFIG_FILE=$GITHUB_WORKSPACE/default.config" >> $GITHUB_ENV
+          echo "TEMP_DIRECTORY=$temp_workspace" >> $GITHUB_ENV
+          echo "HE_WORKSPACE=$temp_workspace/.hekit/components" >> $GITHUB_ENV
+          echo "CONFIG_FILE=$temp_workspace/default.config" >> $GITHUB_ENV
 
       - uses: actions/checkout@v3
         # Add local bin for pip modules
@@ -277,4 +281,6 @@ jobs:
 
       - name: Cleanup hekit directory
         if: always()
-        run: ./hekit --config $CONFIG_FILE remove --all -y
+        run: |
+          ./hekit --config $CONFIG_FILE remove --all -y
+          rm -rf $TEMP_DIRECTORY
