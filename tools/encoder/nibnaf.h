@@ -9,15 +9,15 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iterator>
+#include <map>
 #include <vector>
-#incldue<map>
-#include<iterator>
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-inline std::map<long,long> gap(double theta, double bw, double epsil) {
+inline std::map<long, long> gap(double theta, double bw, double epsil) {
   const double log_bw = std::log(bw);
-   std::map<long, long> a;
+  std::map<long, long> a;
   long r;
   double t_minus_po;
   for (double t = std::abs(theta), sigma = signum(theta); t > epsil;
@@ -28,5 +28,5 @@ inline std::map<long,long> gap(double theta, double bw, double epsil) {
     a[r] = sigma;
     t_minus_po = t - std::pow(bw, r);
   }
-  return {a};
+  return a;
 }
