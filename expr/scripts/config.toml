@@ -1,0 +1,11 @@
+[params]
+p = 257
+m = 256
+
+[columns.encoding]
+column1 = alphanumeric
+column2 = alphabetical
+column3 = numeric
+
+[columns.composite]
+column2 = 4

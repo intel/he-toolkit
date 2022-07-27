@@ -18,19 +18,26 @@ def parse_args(argv: List[str] = None):
     parser = argparse.ArgumentParser(description="Encoder for client and server sides")
     parser.add_argument("datafile", type=Path, help="Data file to encode")
     parser.add_argument(
-        "--server", action="store_true", help="Server encoding. Default is client."
+        "--server",
+        action="store_true",
+        help="Server encoding. Default is client encoding.",
     )
-    parser.add_argument("--params", type=str, help="Parameters for encoding")
     parser.add_argument(
-        "--config", type=Params.from_toml, default=None, help="set composite columns"
+        "--config",
+        type=Config.from_toml,
+        default=None,
+        help="set ptxt params and composite columns",
     )
     return parser.parse_args(argv) if argv else parser.parse_args()
 
 
 def main(args) -> None:
     """Encoder Program"""
-
-    encode = EncoderServer() if args.server is True else EncoderClient()
+    encode = (
+        EncoderServer(args.config)
+        if args.server is True
+        else EncoderClient(args.config)
+    )
     try:
         with open(args.datafile, newline="") as csvfile:
             csv_reader = csv.DictReader(csvfile, delimiter=" ")

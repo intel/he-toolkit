@@ -7,8 +7,8 @@ from functools import partial
 from collections import namedtuple
 from itertools import zip_longest
 from ptxt import Ptxt, Params
-from typing import List, Sequence
 from dataclasses import dataclass
+from typing import List, Sequence, Iterable
 
 
 def int_to_pd_poly(num: int, base: int, no_coeffs: int) -> List[int]:
@@ -87,8 +87,8 @@ def read_txt_worth(data_list, nslots: int):
         yield [item for item in txt_worth if item is not None]
 
 
-def composite_split(column, subcols: int):
-    """Generator. column can be collection type or generator."""
+def composite_split(column: Iterable, subcols: int):
+    """Generator splits a column into composite columns"""
     # column has many entries
     if subcols < 1:
         raise ValueError(
