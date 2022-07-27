@@ -170,13 +170,10 @@ jobs:
 
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Checkout HE-Toolkit
-        uses: actions/checkout@v3
-        working-directory: $WORKSPACE
+      - uses: actions/checkout@v3
         # Add local bin for cpplint
 
       - name: pre-commit
-        working-directory: $WORKSPACE
         run: pre-commit run --all-files
 
   test-hekit-icelake:
@@ -194,13 +191,10 @@ jobs:
 
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Checkout HE-Toolkit
-        uses: actions/checkout@v3
-        working-directory: $WORKSPACE
+      - uses: actions/checkout@v3
         # Add local bin for pytest
 
       - name: Run pytests
-        working-directory: $WORKSPACE
         run: pytest tests/
 
   build-and-test-toolkit-icelake:
@@ -217,27 +211,22 @@ jobs:
           echo "WORKSPACE=$temp_workspace" >> $GITHUB_ENV
 
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "HE_WORKSPACE=$GITHUB_WORKSPACE/$temp_workspace/.hekit/components" >> $GITHUB_ENV
-          echo "CONFIG_FILE=$GITHUB_WORKSPACE/$temp_workspace/default.config" >> $GITHUB_ENV
+          echo "HE_WORKSPACE=$GITHUB_WORKSPACE/.hekit/components" >> $GITHUB_ENV
+          echo "CONFIG_FILE=$GITHUB_WORKSPACE/default.config" >> $GITHUB_ENV
       
-      - name: Checkout HE-Toolkit
-        uses: actions/checkout@v3
-        working-directory: $WORKSPACE
+      - uses: actions/checkout@v3
         # Add local bin for pip modules
 
       - name: Init hekit
-        working-directory: $WORKSPACE
         run: |
           echo "repo_location = \"$HE_WORKSPACE\"" > $CONFIG_FILE
 
       - name: Build and install default recipe
-        working-directory: $WORKSPACE
         run: |
           ./hekit --config $CONFIG_FILE install recipes/default.toml
           ./hekit --config $CONFIG_FILE list
 
       - name: Build examples
-        working-directory: $WORKSPACE
         run: |
           ./hekit --config $CONFIG_FILE build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config $CONFIG_FILE list
@@ -246,7 +235,6 @@ jobs:
           echo "LR_BUILD_DIR=$HE_WORKSPACE/examples/logistic-regression/build" >> $GITHUB_ENV
 
       - name: Build sample kernels
-        working-directory: $WORKSPACE
         run: |
           ./hekit --config $CONFIG_FILE build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config $CONFIG_FILE list
@@ -254,7 +242,6 @@ jobs:
           echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
 
       - name: Run PSI example
-        working-directory: $WORKSPACE
         run: |
           echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
@@ -262,7 +249,6 @@ jobs:
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
 
       - name: Run Secure Query example
-        working-directory: $WORKSPACE
         run: |
           cd ${QUERY_BUILD_DIR}
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
@@ -270,24 +256,20 @@ jobs:
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
 
       - name: Run LR example
-        working-directory: $WORKSPACE
         run: |
           cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
       - name: Run unit tests
-        working-directory: $WORKSPACE
         run: |
           ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
           ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        working-directory: $WORKSPACE
         run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       
       - name: Archive PALISADE sample kernel results
-        working-directory: $WORKSPACE
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
@@ -296,11 +278,9 @@ jobs:
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        working-directory: $WORKSPACE
         run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       
       - name: Archive SEAL sample kernel results
-        working-directory: $WORKSPACE
         uses: actions/upload-artifact@v2
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
@@ -308,6 +288,5 @@ jobs:
           retention-days: 90 # Maximum for free version
 
       - name: Cleanup hekit directory
-        working-directory: $WORKSPACE
         if: always()
         run: ./hekit --config $CONFIG_FILE remove --all -y
