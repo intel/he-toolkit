@@ -3,10 +3,12 @@
 
 """Module for Ptxt helper object"""
 
+from __future__ import annotations
 import json
 import math
 import toml
 from collections import namedtuple
+from dataclasses import dataclass
 from typing import List
 
 
@@ -25,18 +27,22 @@ def order_of_p(p: int, m: int) -> int:
     return d
 
 
-Params = namedtuple("Params", ["m", "p", "d", "nslots"])
+@dataclass(frozen=True,)
+class Params:
+    m: int
+    p: int
+    d: int
+    nslots: int
 
+    @staticmethod
+    def from_toml(filename: str) -> Params:
+        """Reads in a params file equiv a simple TOML file"""
+        with open(filename) as f:
+            toml_params = toml.load(f)
 
-def read_params(filename: str) -> Params:
-    """Reads in a params file equiv a simple TOML file.
-    Returns a namedtuple."""
-    with open(filename) as f:
-        toml_params = toml.load(f)
-
-    m, p = toml_params["m"], toml_params["p"]
-    d = order_of_p(p, m)
-    return Params(m=m, p=p, d=d, nslots=(phi(m) // d))
+        m, p = toml_params["m"], toml_params["p"]
+        d = order_of_p(p, m)
+        return Params(m=m, p=p, d=d, nslots=(phi(m) // d))
 
 
 class Ptxt:
