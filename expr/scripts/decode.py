@@ -17,12 +17,12 @@ from typing import List, Tuple
 from natural import Natural
 
 
-def sum_vectors(*vectors):
+def sum_vectors(*vectors) -> List:
     """Return as list sum of vectors"""
     return [sum(elems) for elems in zip(*vectors)]
 
 
-def sum_segments(slots, segment_divisor):
+def sum_segments(slots, segment_divisor: int):
     """Returns a map object that segments the list of slots and return the sum."""
     if segment_divisor < 1:
         raise ValueError(
@@ -75,26 +75,30 @@ def parse_args(argv: List[str] = None):
 
 def main(args):
     """Decoder Program"""
+    try:
+        with open(args.datafile, newline="") as f:
+            # NOTE do we use the dims info?
+            num_rows, num_cols = parse_header(f.readline())
+            ptxt = Ptxt(args.config.params)
+            line_num = 1
+            for jobj in f:
+                ptxt.from_json(jobj)
+                slots = ptxt.slots()
+                for line_num, slot in enumerate(
+                    sum_segments(slots, args.segment), line_num
+                ):
+                    if args.entries == 0 or line_num <= args.entries:
+                        value = sum(slot)
+                        if value == 1:
+                            print(f"Match on line '{line_num}'")
 
-    with open(args.datafile, newline="") as f:
-        # NOTE do we use the dims info?
-        num_rows, num_cols = parse_header(f.readline())
-        ptxt = Ptxt(params)
-        line_num = 1
-        for jobj in f:
-            ptxt.from_json(jobj)
-            slots = ptxt.slots()
-            for line_num, slot in enumerate(
-                sum_segments(slots, args.segment), line_num
-            ):
-                if args.entries == 0 or line_num <= args.entries:
-                    value = sum(slot)
-                    if value == 1:
-                        print(f"Match on line '{line_num}'")
-                    elif value > 1:
-                        print(f"Corruption line result '{line_num}' with slot '{slot}'")
-                    else:
-                        pass
+                        if value > 1:
+                            print(
+                                f"Corruption line result '{line_num}' with slot '{slot}'"
+                            )
+    except ValueError as e:
+        sys.stderr.write(f"{e!r}\n")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

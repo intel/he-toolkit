@@ -3,11 +3,12 @@
 
 """Module for Ptxt helper object"""
 
+from __future__ import annotations
 import json
 import math
 from collections import namedtuple
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Iterable
 
 
 def phi(m: int) -> int:
@@ -25,22 +26,22 @@ def order_of_p(p: int, m: int) -> int:
     return d
 
 
-@dataclass(frozen=True)
+@dataclass  # (frozen=True)
 class Params:
     m: int
     p: int
     d: int = field(init=False)
     nslots: int = field(init=False)
 
-    def __post_init(self):
-        self.d = order_of_p(p, self.m)
+    def __post_init__(self):
+        self.d = order_of_p(self.p, self.m)
         self.nslots = phi(self.m) // self.d
 
 
 class Ptxt:
     """Represent a ptxt to make it easier to work with when (en/de)coding"""
 
-    def __init__(self, params: Params):
+    def __init__(self, params: Params) -> None:
         """A list is used to store the ptxt.
            Inputs are params and an encode function"""
         self._params = params
@@ -85,7 +86,7 @@ class Ptxt:
         """Return the list of slots."""
         return self._slots
 
-    def insert_data(self, iterable):
+    def insert_data(self, iterable: Iterable) -> Ptxt:
         """Insert given data into ptxt"""
         encoded_data = list(iterable)
         nslots = self._params.nslots
@@ -97,7 +98,7 @@ class Ptxt:
         self._slots = encoded_data
         return self
 
-    def insert_repeated_across_slots(self, data):
+    def insert_repeated_across_slots(self, data) -> Ptxt:
         """Insert the data in all slots."""
         slots = []
         rep_slots = self._params.nslots // len(data)
@@ -110,7 +111,7 @@ class Ptxt:
         self._slots = slots
         return self
 
-    def to_json(self):
+    def to_json(self) -> str:
         """stringify as valid HElib JSON ptxt"""
         encode_dict = {
             "HElibVersion": "2.2.0",
@@ -120,7 +121,7 @@ class Ptxt:
         }
         return json.dumps(encode_dict)
 
-    def from_json(self, string):
+    def from_json(self, string: str) -> None:
         """Make Ptxt form JSON string"""
         jobj = json.loads(string)
         slots = jobj["content"]["slots"]

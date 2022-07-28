@@ -1,9 +1,10 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import pytest
 from collections import namedtuple
 from functools import partial
+
+import pytest
 from encode import *
 
 
