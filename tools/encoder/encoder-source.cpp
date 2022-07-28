@@ -20,8 +20,7 @@ void test_integer() {
   double number = 546;
   double bw = 2;
   double epsil = 0.4;
-  long sz = 200;
-
+  
   const auto en = gap(number, bw, epsil);
   print_out_results(en);
 }
@@ -30,7 +29,6 @@ void test_float() {
   double number = 546.789;
   double bw = 2;
   double epsil = 0.4;
-  long sz = 200;
 
   const auto en = gap(number, bw, epsil);
   print_out_results(en);
@@ -40,8 +38,7 @@ void test_zero() {
   double number = 0;
   double bw = 2;
   double epsil = 0.4;
-  long sz = 200;
-
+  
   const auto en = gap(number, bw, epsil);
   print_out_results(en);
 }
