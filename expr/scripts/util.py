@@ -152,7 +152,7 @@ class Policy:
 
 class Encoder:
     """Encoder Base class"""
-    
+
     def __init__(config: Config) -> None:
         # TODO policies need defining
         self.params: Params = config.params
