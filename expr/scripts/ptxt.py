@@ -6,7 +6,6 @@
 from __future__ import annotations
 import json
 import math
-from collections import namedtuple
 from dataclasses import dataclass, field
 from typing import List, Iterable
 
@@ -28,6 +27,8 @@ def order_of_p(p: int, m: int) -> int:
 
 @dataclass  # (frozen=True)
 class Params:
+    """Ptxt parameters"""
+
     m: int
     p: int
     d: int = field(init=False)
