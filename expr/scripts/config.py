@@ -25,7 +25,7 @@ class Config:
     @classmethod
     def from_toml(cls, filename: str, params_only: bool = False) -> Config:
         """Reads in a params file equiv a simple TOML file"""
-        with open(filename) as f:
+        with open(filename, encoding="UTF-8") as f:
             data: Dict = toml.load(f)
 
         # params

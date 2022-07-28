@@ -4,11 +4,11 @@
 """Encoder utility functions"""
 import math
 from functools import partial
-from collections import namedtuple
 from itertools import zip_longest
-from ptxt import Ptxt, Params
 from dataclasses import dataclass
 from typing import List, Sequence, Iterable
+
+from ptxt import Ptxt, Params
 
 
 def int_to_pd_poly(num: int, base: int, no_coeffs: int) -> List[int]:

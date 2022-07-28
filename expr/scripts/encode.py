@@ -5,12 +5,14 @@
 
 """Encoder Program"""
 
+import sys
 import argparse
-import csv
+from csv import DictReader
 from pathlib import Path
-from typing import List, Dict
+from typing import List
 
-from util import ClientEncoder, ServerEncoder, Params
+from config import Config
+from util import ClientEncoder, ServerEncoder, read_txt_worth
 
 
 def parse_args(argv: List[str] = None):
@@ -42,13 +44,13 @@ def main(args) -> None:
         )
         exit(1)
     encode = (
-        EncoderServer(args.config)
+        ServerEncoder(args.config)
         if args.server is True
-        else EncoderClient(args.config)
+        else ClientEncoder(args.config)
     )
     try:
         with open(args.datafile, newline="") as csvfile:
-            csv_reader = csv.DictReader(csvfile, delimiter=" ")
+            csv_reader = DictReader(csvfile, delimiter=" ")
             for txt in read_txt_worth(csv_reader, params.nslots // args.segment):
                 ptxts = encode(txt)
                 for ptxt in ptxts:
@@ -59,5 +61,5 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    cmdline_args = parse_args()
+    main(cmdline_args)
