@@ -8,19 +8,8 @@ from kit.commands.init import init_hekit
 
 
 def test_init_hekit_config_file_exists(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
     mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = True
-    mockers.mock_exists.side_effect = [True, True]
-
-    """Act"""
     main()
-
-    """Assert"""
     # create_default_config function
     mockers.mock_mkdir.assert_called_once()
     mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
@@ -30,23 +19,13 @@ def test_init_hekit_config_file_exists(mocker):
     # init_hekit function
     mockers.mock_remove_from_rc.assert_called_once()
     mockers.mock_append_to_rc.assert_called_once()
-    mockers.mock_print.assert_any_call(f"source {rc_file}")
+    mockers.mock_print.assert_any_call(f"source {mockers.rc_file}")
 
 
 def test_init_hekit_config_file_is_created(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
     mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = True
     mockers.mock_exists.side_effect = [False, True]
-
-    """Act"""
     main()
-
-    """Assert"""
     # create_default_config function
     mockers.mock_mkdir.assert_called_once()
     mockers.mock_open.assert_called_once()
@@ -57,23 +36,13 @@ def test_init_hekit_config_file_is_created(mocker):
     # init_hekit function
     mockers.mock_remove_from_rc.assert_called_once()
     mockers.mock_append_to_rc.assert_called_once()
-    mockers.mock_print.assert_any_call(f"source {rc_file}")
+    mockers.mock_print.assert_any_call(f"source {mockers.rc_file}")
 
 
 def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
     mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = True
     mockers.mock_exists.side_effect = [False, False]
-
-    """Act"""
     main()
-
-    """Assert"""
     mockers.mock_exit.assert_called_once_with(1)
     # create_default_config function
     mockers.mock_mkdir.assert_called_once()
@@ -88,19 +57,10 @@ def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
 
 
 def test_init_hekit_ValueError_from_create_backup(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
     mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
     mockers.mock_same_files.return_value = False
     mockers.mock_exists.side_effect = [True, True]
-
-    """Act"""
     main()
-
-    """Assert"""
     mockers.mock_exit.assert_called_once_with(1)
     # create_default_config function
     mockers.mock_mkdir.assert_called_once()
@@ -118,18 +78,22 @@ def test_init_hekit_ValueError_from_create_backup(mocker):
 
 class Mockers:
     def __init__(self, mocker):
+        self.rc_file = "~/.mybashfile"
         # mocking functions for Path Objects
         self.mock_mkdir = mocker.patch.object(Path, "mkdir")
         self.mock_open = mocker.patch.object(Path, "open")
-        # mocking included functions
-        self.mock_print = mocker.patch("kit.commands.init.print")
+        # mocking internal functions
+        self.mock_exit = mocker.patch("kit.hekit.sys_exit")
+        self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+        self.mock_parse_cmdline.return_value = MockArgs(), ""
         self.mock_copyfile = mocker.patch("kit.commands.init.copyfile")
         self.mock_same_files = mocker.patch("kit.commands.init.same_files")
-        self.mock_exit = mocker.patch("kit.hekit.sys_exit")
-        # mocking internal functions
-        self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+        self.mock_same_files.return_value = True
         self.mock_get_rc_file = mocker.patch("kit.commands.init.get_rc_file")
+        self.mock_get_rc_file.return_value = self.rc_file
         self.mock_exists = mocker.patch("kit.commands.init.file_exists")
+        self.mock_exists.side_effect = [True, True]
+        self.mock_print = mocker.patch("kit.commands.init.print")
         self.mock_remove_from_rc = mocker.patch("kit.commands.init.remove_from_rc")
         self.mock_append_to_rc = mocker.patch("kit.commands.init.append_to_rc")
 

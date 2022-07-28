@@ -23,6 +23,8 @@ def test_main_config_is_symlink(hekit_path, input_files_path):
 
 
 def test_main_config_name_has_null(mocker, input_files_path):
+    """Verify that the SW triggers an exception when
+    the name of the config file has a null character"""
     args = MockArgs()
     args.config = f"{input_files_path}/web.xml\0default.config"
     args.recipe_file = f"{input_files_path}/test.toml"
@@ -49,6 +51,8 @@ def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
 
 
 def test_main_toml_name_has_null(mocker, input_files_path):
+    """Verify that the SW triggers an exception when
+    the name of the recipe file has a null character"""
     args = MockArgs()
     args.config = f"{input_files_path}/default.config"
     args.recipe_file = f"{input_files_path}/web.xml\0test.toml"
@@ -66,7 +70,7 @@ def test_main_toml_name_has_null(mocker, input_files_path):
 
 def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
-    the recipe file has an float instead of a string"""
+    the recipe file has an float value instead of a string"""
     config_file = create_config_file(tmp_path)
     cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_wrong_format.toml"
     _, err = execute_process(cmd)
@@ -76,7 +80,7 @@ def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
 
 def test_main_toml_missing_value(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
-    the recipe file has wrong format for key=value pair"""
+    the recipe file does not have a value in the key=value pair"""
     config_file = create_config_file(tmp_path)
     cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_value.toml"
     _, err = execute_process(cmd)

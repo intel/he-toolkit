@@ -102,11 +102,10 @@ def get_rc_file() -> Path:
     return rc_file
 
 
-def create_default_config() -> None:
+def create_default_config(dir_path: Path) -> None:
     """Create default config file in ~/.hekit,
     when the user sets the default_config flag"""
     # Create ~/.hekit, this should always exist
-    dir_path = "~/.hekit"
     Path(dir_path).expanduser().mkdir(exist_ok=True)
 
     # Setup config file
@@ -124,7 +123,8 @@ def create_default_config() -> None:
 def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
-        create_default_config()
+        dir_path = Path("~/.hekit")
+        create_default_config(dir_path)
 
     # Backup the shell init file
     rc_file = get_rc_file()
