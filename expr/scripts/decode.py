@@ -8,16 +8,14 @@
 import sys
 import argparse
 from itertools import islice
-from functools import reduce
+from typing import List, Tuple, Iterable
+
 from ptxt import Ptxt
-
 from config import Config
-from typing import List, Tuple
-
 from natural import Natural
 
 
-def sum_vectors(*vectors) -> List:
+def sum_vectors(*vectors: Iterable[int]) -> List:
     """Return as list sum of vectors"""
     return [sum(elems) for elems in zip(*vectors)]
 
@@ -85,7 +83,7 @@ def main(args):
                 ptxt.from_json(jobj)
                 slots = ptxt.slots()
                 for line_num, slot in enumerate(
-                    sum_segments(slots, args.segment), line_num
+                    sum_segments(slots, args.config.segments), line_num
                 ):
                     if args.entries == 0 or line_num <= args.entries:
                         value = sum(slot)

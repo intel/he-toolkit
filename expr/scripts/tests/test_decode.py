@@ -1,10 +1,13 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from decode import *
-import pytest
+from pathlib import Path
 from types import SimpleNamespace
+from typing import Callable
+import pytest
 
+from config import Config
+from decode import *
 
 def test_sum_vectors():
     vectors = [[1, 2, 3], [2, 1, 0], [6, 6, 6]]
@@ -44,9 +47,9 @@ def test_parse_args():
     assert vars(args) == expected_obj
 
 
-def test_main(capfd, empty_obj, example_params_and_data_files):
+def test_main(capfd, empty_obj, example_config_and_data_files):
     args = empty_obj
-    args.params, args.datafile, indices = example_params_and_data_files(
+    args.params, args.datafile, indices = example_config_and_data_files(
         "test.params", "test.data"
     )
     args.segment = 1
@@ -57,9 +60,9 @@ def test_main(capfd, empty_obj, example_params_and_data_files):
     assert captured.out == expected_out
 
 
-def test_ignore_padding(capfd, empty_obj, example_params_and_data_files):
+def test_ignore_padding(capfd, empty_obj, example_config_and_data_files):
     args = empty_obj
-    args.params, args.datafile, indices = example_params_and_data_files(
+    args.params, args.datafile, indices = example_config_and_data_files(
         "test.params", "test.data"
     )
     args.segment = 1
@@ -81,9 +84,9 @@ def test_ignore_padding(capfd, empty_obj, example_params_and_data_files):
     assert captured.out == new_expected_out
 
 
-def test_invalid_entries_arg(empty_obj, example_params_and_data_files):
+def test_invalid_entries_arg(empty_obj, example_config_and_data_files):
     args = empty_obj
-    args.params, args.datafile, _ = example_params_and_data_files(
+    args.params, args.datafile, _ = example_config_and_data_files(
         "test.params", "test.data"
     )
     args.segment = 1
@@ -99,22 +102,28 @@ def empty_obj():
 
 
 @pytest.fixture
-def example_params_and_data_files(tmp_path):
-    """Create in a tmp dir an example params and data file."""
+def example_config_and_data_files(tmp_path: Path) -> Callable:
+    """Create in a tmp dir an example config and data file."""
 
-    def _create_func(params_filename: str, datafile_filename: str):
-        # Create params file
-        params_path = tmp_path / f"{params_filename}"
-        params_path.write_text("m = 45\np = 19\n")
+    def _create_func(config_filename: str, datafile_filename: str):
+        # Create config file
+        config_path = tmp_path / config_filename
+        config_path.write_text(
+        """
+        [params]
+        m = 45
+        p = 19
+        """)
 
         # Create data file
-        datafile_path = tmp_path / f"{datafile_filename}"
-        params = read_params(params_path.resolve())
-        ptxt = Ptxt(params)
+        datafile_path = tmp_path / datafile_filename
+        config = Config.from_toml(config_path.resolve())
+        params = config.params
+        ptxt = Ptxt(config)
         indices = [2, 5, 8]  # sorted unique nums
         ptxt.insert_data([1] if i in indices else [0] for i in range(params.nslots))
         out = f"1\n{ptxt.to_json()}\n"
         datafile_path.write_text(out)
-        return params_path.resolve(), datafile_path.resolve(), indices
+        return config_path.resolve(), datafile_path.resolve(), indices
 
     return _create_func
