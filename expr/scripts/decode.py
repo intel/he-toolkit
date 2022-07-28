@@ -5,13 +5,16 @@
 
 """Decoder Program"""
 
-
 import sys
 import argparse
 from itertools import islice
 from functools import reduce
-from ptxt import Ptxt, read_params
+from ptxt import Ptxt
+
+from config import Config
 from typing import List, Tuple
+
+from natural import Natural
 
 
 def sum_vectors(*vectors):
@@ -20,7 +23,7 @@ def sum_vectors(*vectors):
 
 
 def sum_segments(slots, segment_divisor):
-    """Returns a generator. Segment the list of slots and return the sum."""
+    """Returns a map object that segments the list of slots and return the sum."""
     if segment_divisor < 1:
         raise ValueError(
             f"segment divisor must be a positive integer, not '{segment_divisor}'"
@@ -43,9 +46,10 @@ def parse_header(header_line: str) -> Tuple[int, int]:
     """Return the number of rows and columns from the header line"""
     num_cols = 1
     dims = header_line.split()
-    if len(dims) == 1:
+    len_dims = len(dims)
+    if len_dims == 1:
         num_rows = dims[0]
-    elif len(dims) == 2:
+    elif len_dims == 2:
         num_rows, num_cols = dims
     else:
         raise ValueError(f"Too many dimensions in header line")
@@ -57,12 +61,14 @@ def parse_args(argv: List[str] = None):
     """Parse argv either passed in or from cmdline"""
     parser = argparse.ArgumentParser(description="Decode result")
     parser.add_argument("datafile", type=str, help="data file to decode")
-    parser.add_argument("--params", type=str, help="parameters for encoding")
     parser.add_argument(
-        "--segment", type=int, default=1, help="set segmentation divisor"
+        "--config",
+        type=Config.from_toml,
+        default=None,
+        help="set ptxt params and composite columns",
     )
     parser.add_argument(
-        "--entries", type=int, default=0, help="number of input queries"
+        "--entries", type=Natural, default=0, help="number of input queries"
     )
     return parser.parse_args(argv) if argv else parser.parse_args()
 
@@ -70,15 +76,8 @@ def parse_args(argv: List[str] = None):
 def main(args):
     """Decoder Program"""
 
-    params = read_params(args.params)
-    if args.entries < 0:
-        raise ValueError(
-            f"Number of entries must be a positive integer, not '{args.entries}'"
-        )
-
     with open(args.datafile, newline="") as f:
-        # Read the dims
-        # TODO use this info?
+        # NOTE do we use the dims info?
         num_rows, num_cols = parse_header(f.readline())
         ptxt = Ptxt(params)
         line_num = 1
