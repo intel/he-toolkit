@@ -33,6 +33,7 @@ expr/scripts/config.py
 expr/scripts/config.toml
 expr/scripts/decode.py
 expr/scripts/encode.py
+expr/scripts/example_result.ptxt
 expr/scripts/natural.py
 expr/scripts/ptxt.py
 expr/scripts/tests/test_decode.py

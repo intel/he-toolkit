@@ -119,10 +119,9 @@ def test_how_many_entries_in_file(tmp_path):
     assert how_many_entries_in_file(filepath.resolve()) == num_of_lines
 
 
+# FIXME
 def test_parse_args():
-    cmdline_args = (
-        "some_params.file some_data.file --composite 1 2 3 --segment 2".split()
-    )
+    cmdline_args = "--config some_params.file some_data.file".split()
     args = parse_args(cmdline_args)
 
     expected_obj = {

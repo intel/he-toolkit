@@ -23,20 +23,29 @@ class Config:
     composites: Dict[str, int]
 
     @classmethod
-    def from_toml(cls, filename: str) -> Config:
+    def from_toml(cls, filename: str, params_only: bool = False) -> Config:
         """Reads in a params file equiv a simple TOML file"""
         with open(filename) as f:
             data: Dict = toml.load(f)
+
+        # params
+        params_data = data["params"]
+        m, p = params_data["m"], params_data["p"]
+        params = Params(m, p)
 
         # config
         config_data = data["config"]
         columns = config_data["columns"]
         segments = config_data["segments"]
 
-        # params
-        params_data = data["params"]
-        m, p = params_data["m"], params_data["p"]
-        params = Params(m, p)
+        if params_only is True:
+            return cls(
+                params=params,
+                columns=columns,
+                segments=segments,
+                encodings=None,
+                composites=None,
+            )
 
         # column policies
         encodings = data["columns"]["encoding"]
