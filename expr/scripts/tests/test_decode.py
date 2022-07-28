@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Callable
 import pytest
 
@@ -66,25 +65,24 @@ def test_invalid_entries_arg(example_config_and_data_files):
         parse_args(cmdline_args)
 
 
-def test_main(capfd, empty_obj, example_config_and_data_files):
-    args = empty_obj
-    args.params, args.datafile, indices = example_config_and_data_files(
-        "test.params", "test.data"
+def test_main(capfd, example_config_and_data_files):
+    configfilepath, datafilepath, indices = example_config_and_data_files(
+        "test.config", "test.data"
     )
-    args.config.segments = 1
-    args.entries = 0
+    cmdline_args = f"--config {configfilepath} --entries 0 {datafilepath}".split()
+    args = parse_args(cmdline_args)
     main(args)
     captured = capfd.readouterr()
     expected_out = "\n".join([f"Match on line '{i+1}'" for i in indices]) + "\n"
     assert captured.out == expected_out
 
 
-def test_ignore_padding(capfd, empty_obj, example_config_and_data_files):
-    args = empty_obj
-    args.params, args.datafile, indices = example_config_and_data_files(
-        "test.params", "test.data"
+def test_ignore_padding(capfd, example_config_and_data_files):
+    configfilepath, datafilepath, indices = example_config_and_data_files(
+        "test.config", "test.data"
     )
-    args.segment = 1
+    cmdline_args = f"--config {configfilepath} --entries 0 {datafilepath}".split()
+    args = parse_args(cmdline_args)
     args.entries = 9  # Only count first 9 lines
     main(args)
     captured = capfd.readouterr()
@@ -101,12 +99,6 @@ def test_ignore_padding(capfd, empty_obj, example_config_and_data_files):
         + "\n"
     )
     assert captured.out == new_expected_out
-
-
-@pytest.fixture
-def empty_obj():
-    """Empty object. Useful for late binding attribs."""
-    return SimpleNamespace()
 
 
 @pytest.fixture
