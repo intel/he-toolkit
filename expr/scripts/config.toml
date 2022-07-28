@@ -1,6 +1,6 @@
 [params]
-p = 257
-m = 256
+p = 23
+m = 16 
 
 [config]
 columns = 3
