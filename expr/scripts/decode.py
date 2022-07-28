@@ -8,6 +8,7 @@
 import sys
 import argparse
 from itertools import islice
+from functools import partial
 from typing import List, Tuple, Iterable
 
 from ptxt import Ptxt
@@ -50,7 +51,7 @@ def parse_header(header_line: str) -> Tuple[int, int]:
     elif len_dims == 2:
         num_rows, num_cols = dims
     else:
-        raise ValueError(f"Too many dimensions in header line")
+        raise ValueError("Too many dimensions in header line")
 
     return int(num_rows), int(num_cols)
 
@@ -61,7 +62,7 @@ def parse_args(argv: List[str] = None):
     parser.add_argument("datafile", type=str, help="data file to decode")
     parser.add_argument(
         "--config",
-        type=Config.from_toml,
+        type=partial(Config.from_toml, params_only=True),
         default=None,
         help="set ptxt params and composite columns",
     )
@@ -74,17 +75,14 @@ def parse_args(argv: List[str] = None):
 def main(args):
     """Decoder Program"""
     try:
-        with open(args.datafile, newline="") as f:
-            # NOTE do we use the dims info?
-            num_rows, num_cols = parse_header(f.readline())
+        with open(args.datafile, encoding="UTF-8", newline="") as jobjs:
+            parse_header(jobjs.readline())  # first line not json
             ptxt = Ptxt(args.config.params)
             line_num = 1
-            for jobj in f:
+            for jobj in jobjs:
                 ptxt.from_json(jobj)
-                slots = ptxt.slots()
-                for line_num, slot in enumerate(
-                    sum_segments(slots, args.config.segments), line_num
-                ):
+                summed_segments = sum_segments(ptxt.slots(), args.config.segments)
+                for line_num, slot in enumerate(summed_segments, line_num):
                     if args.entries == 0 or line_num <= args.entries:
                         value = sum(slot)
                         if value == 1:
@@ -94,11 +92,11 @@ def main(args):
                             print(
                                 f"Corruption line result '{line_num}' with slot '{slot}'"
                             )
-    except ValueError as e:
-        sys.stderr.write(f"{e!r}\n")
+    except ValueError as error:
+        sys.stderr.write(f"{error!r}\n")
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    cmdline_args = parse_args()
+    main(cmdline_args)

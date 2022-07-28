@@ -7,7 +7,9 @@ from typing import Callable
 import pytest
 
 from config import Config
+from ptxt import Params
 from decode import *
+
 
 def test_sum_vectors():
     vectors = [[1, 2, 3], [2, 1, 0], [6, 6, 6]]
@@ -35,16 +37,33 @@ def test_parse_header_with_one_number():
     assert (3, 1) == parse_header(header_str)
 
 
-def test_parse_args():
-    cmdline_args = "some_params.file some_data.file".split()
+def test_parse_args(example_config_and_data_files):
+    configfilepath, datafilepath, _ = example_config_and_data_files(
+        "test.config", "test.data"
+    )
+    cmdline_args = f"--config {configfilepath} {datafilepath}".split()
     args = parse_args(cmdline_args)
     expected_obj = {
-        "params": "some_params.file",
-        "datafile": "some_data.file",
-        "segment": 1,
+        "datafile": str(datafilepath),
+        "config": Config(
+            params=Params(m=45, p=19),
+            encodings=None,
+            composites=None,
+            segments=1,
+            columns=1,
+        ),
         "entries": 0,
     }
     assert vars(args) == expected_obj
+
+
+def test_invalid_entries_arg(example_config_and_data_files):
+    configfilepath, datafilepath, _ = example_config_and_data_files(
+        "test.config", "test.data"
+    )
+    cmdline_args = f"--config {configfilepath} --entries -1 {datafilepath}".split()
+    with pytest.raises(SystemExit):
+        parse_args(cmdline_args)
 
 
 def test_main(capfd, empty_obj, example_config_and_data_files):
@@ -52,7 +71,7 @@ def test_main(capfd, empty_obj, example_config_and_data_files):
     args.params, args.datafile, indices = example_config_and_data_files(
         "test.params", "test.data"
     )
-    args.segment = 1
+    args.config.segments = 1
     args.entries = 0
     main(args)
     captured = capfd.readouterr()
@@ -84,17 +103,6 @@ def test_ignore_padding(capfd, empty_obj, example_config_and_data_files):
     assert captured.out == new_expected_out
 
 
-def test_invalid_entries_arg(empty_obj, example_config_and_data_files):
-    args = empty_obj
-    args.params, args.datafile, _ = example_config_and_data_files(
-        "test.params", "test.data"
-    )
-    args.segment = 1
-    args.entries = -1
-    with pytest.raises(ValueError):
-        main(args)
-
-
 @pytest.fixture
 def empty_obj():
     """Empty object. Useful for late binding attribs."""
@@ -109,17 +117,21 @@ def example_config_and_data_files(tmp_path: Path) -> Callable:
         # Create config file
         config_path = tmp_path / config_filename
         config_path.write_text(
-        """
+            """
+        [config]
+        segments = 1
+        columns = 1
         [params]
         m = 45
         p = 19
-        """)
+        """
+        )
 
         # Create data file
         datafile_path = tmp_path / datafile_filename
-        config = Config.from_toml(config_path.resolve())
+        config = Config.from_toml(config_path.resolve(), params_only=True)
         params = config.params
-        ptxt = Ptxt(config)
+        ptxt = Ptxt(params)
         indices = [2, 5, 8]  # sorted unique nums
         ptxt.insert_data([1] if i in indices else [0] for i in range(params.nslots))
         out = f"1\n{ptxt.to_json()}\n"

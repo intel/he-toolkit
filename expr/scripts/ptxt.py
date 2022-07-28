@@ -44,6 +44,8 @@ class Ptxt:
     def __init__(self, params: Params) -> None:
         """A list is used to store the ptxt.
            Inputs are params and an encode function"""
+        if not isinstance(params, Params):
+            raise ValueError("params argument not type Params but type {type(params)}")
         self._params = params
         self._slots = None
 
