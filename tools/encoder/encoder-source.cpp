@@ -38,6 +38,13 @@ double sum=0;
 return sum;
 }
 
+//To print the zero polynomial and the zero results when en is empty, which happens when theta=0 or |theta|<epsil
+void PrintZeroPol() {
+        std::cout<<"0";
+}
+void PrintZeroRes(){
+        std::cout<<"(0,0)";
+}
 
 void test_integer() {
   double number = 546;
@@ -50,7 +57,6 @@ long frac_exp=(en.begin()->first-std::abs(en.begin()->first))/2;
 long max_exp=std::prev(en.end())->first;
 long deg=max_exp-frac_exp;
   print_out_results(en);
- std::cout<<std::endl;
   PrintPolyRep(en, frac_exp, deg);
   std::cout<<std::endl;
  std::cout<<std::fixed<<std::setprecision(10)<<Decoder(en,bw)<<std::endl;
@@ -59,7 +65,7 @@ long deg=max_exp-frac_exp;
 void test_float() {
   double number = 546.789;
   double bw = 2;
-  double epsil = 0.4;
+  double epsil = 0.0001;   //Increased the precision so we can see negative exponents. 
 
   const auto en = gap(number, bw, epsil);
  //Gets back the minimal negative exponent, the maximal degree and the degree of the polynomial
@@ -67,7 +73,6 @@ long frac_exp=(en.begin()->first-std::abs(en.begin()->first))/2;
 long max_exp=std::prev(en.end())->first;
 long deg=max_exp-frac_exp;
   print_out_results(en);
- std::cout<<std::endl;
   PrintPolyRep(en, frac_exp, deg);
   std::cout<<std::endl;
  std::cout<<std::fixed<<std::setprecision(10)<<Decoder(en,bw)<<std::endl;
@@ -80,12 +85,12 @@ void test_zero() {
   
   const auto en = gap(number, bw, epsil);
   //Gets back the minimal negative exponent, the maximal degree and the degree of the polynomial
-long frac_exp=(en.begin()->first-std::abs(en.begin()->first))/2;
-long max_exp=std::prev(en.end())->first;
-long deg=max_exp-frac_exp;
-  print_out_results(en);
- std::cout<<std::endl;
-  PrintPolyRep(en, frac_exp, deg);
+  long frac_exp=en.empty() ? 0: (en.begin()->first-std::abs(en.begin()->first))/2;
+  long max_exp=en.empty() ? 0:std::prev(en.end())->first;
+  long deg=max_exp-frac_exp;
+ en.empty() ? PrintZeroRes() : print_out_results(en); 
+  std::cout<<std::endl;
+  en.empty() ? PrintZeroPol() :PrintPolyRep(en, frac_exp, deg);
   std::cout<<std::endl;
  std::cout<<std::fixed<<std::setprecision(10)<<Decoder(en,bw)<<std::endl;
 }
