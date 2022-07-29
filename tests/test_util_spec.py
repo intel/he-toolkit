@@ -223,7 +223,6 @@ def test_validate_unique_instance_same_values(mocker):
     act_rloc = "/home"
 
     Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
-
     mock_read_spec.assert_called_once()
 
 
@@ -238,7 +237,6 @@ def test_validate_unique_instance_different_values(mocker):
 
     with pytest.raises(InvalidSpecError) as execinfo:
         Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
-
     mock_read_spec.assert_called_once()
     assert (
         "comp/test is already present but it was executed with different options"
@@ -256,7 +254,6 @@ def test_from_toml_file_tsort(mocker):
     filepath = f"{tests_path}/input_files/test_tsort.toml"
 
     specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
-
     assert 6 == mock_read_spec.call_count
     assert 8 == mock_validate_unique.call_count
     assert len(specs) == len(exp_keys_list)

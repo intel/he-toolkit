@@ -105,25 +105,29 @@ def get_rc_file() -> Path:
 def create_default_config(dir_path: Path) -> None:
     """Create default config file in ~/.hekit,
     when the user sets the default_config flag"""
-    # Create ~/.hekit, this should always exist
-    Path(dir_path).expanduser().mkdir(exist_ok=True)
-
     # Setup config file
-    file_path = f"{dir_path}/default.config"
-    default_config_path = Path(file_path).expanduser()
+    default_config_path = dir_path / "default.config"
     if file_exists(default_config_path):
-        print(f"{file_path} file already exists")
+        print(f"{default_config_path} file already exists")
     else:
         line = f'repo_location = "{dir_path}/components"\n'
         with default_config_path.open("w", encoding="utf-8") as f:
             f.write(line)
-        print(f"{file_path} created")
+        print(f"{default_config_path} created")
+
+
+def create_default_workspace(dir_path: str = "~/") -> Path:
+    """Create the directory ~/.hekit,
+    when the user sets the default_config flag"""
+    workspace_path = Path(dir_path).expanduser() / ".hekit"
+    workspace_path.mkdir(exist_ok=True)
+    return workspace_path
 
 
 def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
-        dir_path = Path("~/.hekit")
+        dir_path = create_default_workspace()
         create_default_config(dir_path)
 
     # Backup the shell init file
