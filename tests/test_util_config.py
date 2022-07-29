@@ -7,27 +7,21 @@ from kit.utils.config import Config, config_required, load_config
 
 
 def test_config_required_without_error(args):
-    """Arrange"""
-
     @config_required
     def to_be_decorated(args):
-        """Assert"""
         assert "/tests/input_files/default.config" in args.config.config_filename
         assert "/.hekit_test/components" in args.config.repo_location
 
-    """Act"""
     to_be_decorated(args)
 
 
 def test_config_required_file_error(args):
-    """Arrange"""
     args.config = ""
 
     @config_required
     def to_be_decorated(args):
         pass
 
-    """Act"""
     with pytest.raises(Exception) as exc_info:
         to_be_decorated(args)
 
@@ -35,14 +29,12 @@ def test_config_required_file_error(args):
 
 
 def test_config_required_value_error(args):
-    """Arrange"""
     args.config = f"{args.tests_path}/input_files/default_wrong.config"
 
     @config_required
     def to_be_decorated(args):
         pass
 
-    """Act"""
     with pytest.raises(Exception) as exc_info:
         to_be_decorated(args)
 
@@ -50,14 +42,12 @@ def test_config_required_value_error(args):
 
 
 def test_config_required_symlink_error(args):
-    """Arrange"""
     args.config = f"{args.tests_path}/input_files/default_symlink.config"
 
     @config_required
     def to_be_decorated(args):
         pass
 
-    """Act"""
     with pytest.raises(Exception) as exc_info:
         to_be_decorated(args)
 

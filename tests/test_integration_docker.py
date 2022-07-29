@@ -15,113 +15,72 @@ cwd_test = getcwd()
 
 
 def test_docker_build_check_build(mocker):
-    """Arrange"""
-    args = MockArgs(check_only=False, clean=False, enable=None)
-    client = MockClient()
     derived_label = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
+    args = MockArgs(check_only=False, clean=False, enable=None)
+    mockers = Mockers(mocker)
+    mockers.mock_parse_cmdline.return_value = args, ""
 
-    # Mocking command line args
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    # Mocking objects from docker_build
-    mock_input = mocker.patch("kit.commands.docker_build.input")
-    mock_input.return_value = "a"
-    mock_print_build = mocker.patch("kit.commands.docker_build.print")
-    # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
-    mock_from_env.return_value = client
-    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
-
-    """Act"""
     main()
-
-    """Assert"""
-    mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
-    mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
-    mock_print_build.assert_any_call(f"docker run -it {derived_label}")
-    mock_print_tools.assert_any_call(client.value.replace('"', ""))
+    assert 1 == mockers.mock_create_tar_gz.call_count
+    assert 1 == mockers.mock_copyfiles.call_count
+    assert 1 == mockers.mock_change_dir.call_count
+    assert 1 == mockers.mock_mkdir.call_count
+    mockers.mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call(f"docker run -it {derived_label}")
+    mockers.mock_print_tools.assert_any_call(mockers.client.value.replace('"', ""))
 
 
 def test_docker_build_check_enable(mocker, restore_pwd):
-    """Arrange"""
     args = MockArgs(check_only=False, clean=False, enable="vscode")
-    client = MockClient()
+    mockers = Mockers(mocker)
+    mockers.mock_parse_cmdline.return_value = args, ""
 
-    # Mocking command line args
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    # Mocking objects from docker_build
-    mock_input = mocker.patch("kit.commands.docker_build.input")
-    mock_input.return_value = "a"
-    mock_print_build = mocker.patch("kit.commands.docker_build.print")
-    # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
-    mock_from_env.return_value = client
-    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
-
-    """Act"""
     main()
-
-    """Assert"""
-    mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
-    mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
-    mock_print_build.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
-    mock_print_build.assert_any_call(
+    assert 1 == mockers.mock_create_tar_gz.call_count
+    assert 1 == mockers.mock_copyfiles.call_count
+    assert 1 == mockers.mock_change_dir.call_count
+    assert 1 == mockers.mock_mkdir.call_count
+    mockers.mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call(
         "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
     )
-    mock_print_tools.assert_any_call(client.value.replace('"', ""))
+    mockers.mock_print_tools.assert_any_call(mockers.client.value.replace('"', ""))
 
 
 def test_docker_build_check_only(mocker, restore_pwd):
-    """Arrange"""
     args = MockArgs(check_only=True, clean=False, enable=None)
-    client = MockClient()
+    mockers = Mockers(mocker)
+    mockers.mock_parse_cmdline.return_value = args, ""
 
-    # Mocking command line args
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    # Mocking objects from docker_build
-    mock_input = mocker.patch("kit.commands.docker_build.input")
-    mock_input.return_value = "a"
-    mock_print_build = mocker.patch("kit.commands.docker_build.print")
-    # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
-    mock_from_env.return_value = client
-    mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
-
-    """Act"""
     with pytest.raises(SystemExit) as exc_info:
         main()
-
-    """Assert"""
-    mock_print_build.assert_any_call("CHECKING IN-DOCKER CONNECTIVITY ...")
-    mock_print_tools.assert_any_call("[CONTAINER]", client.log.decode("utf-8"), end="")
-    mock_print_tools.assert_any_call("[CONTAINER]", "\n", end="")
+    assert 0 == mockers.mock_create_tar_gz.call_count
+    assert 0 == mockers.mock_copyfiles.call_count
+    assert 0 == mockers.mock_change_dir.call_count
+    assert 0 == mockers.mock_mkdir.call_count
+    mockers.mock_print_build.assert_any_call("CHECKING IN-DOCKER CONNECTIVITY ...")
+    mockers.mock_print_tools.assert_any_call(
+        "[CONTAINER]", mockers.client.log.decode("utf-8"), end=""
+    )
+    mockers.mock_print_tools.assert_any_call("[CONTAINER]", "\n", end="")
     assert exc_info.value.code == 0
 
 
 def test_docker_build_clean(mocker, restore_pwd):
-    """Arrange"""
     args = MockArgs(check_only=False, clean=True, enable=None)
-    client = MockClient()
+    mockers = Mockers(mocker)
+    mockers.mock_parse_cmdline.return_value = args, ""
 
-    # Mocking command line args
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    # Mocking objects from docker_build
-    mock_input = mocker.patch("kit.commands.docker_build.input")
-    mock_input.return_value = "a"
-    mock_print_build = mocker.patch("kit.commands.docker_build.print")
-    # Mocking objects from docker_tools
-    mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
-    mock_from_env.return_value = client
-
-    """Act"""
     with pytest.raises(SystemExit) as exc_info:
         main()
-
-    """Assert"""
-    mock_print_build.assert_any_call("Staging area deleted")
+    assert 0 == mockers.mock_create_tar_gz.call_count
+    assert 0 == mockers.mock_copyfiles.call_count
+    assert 0 == mockers.mock_change_dir.call_count
+    assert 0 == mockers.mock_mkdir.call_count
+    mockers.mock_print_build.assert_any_call("Staging area deleted")
     assert exc_info.value.code == 0
 
 
@@ -140,6 +99,29 @@ class MockArgs:
         self.id = None
         self.version = False
         self.y = True
+
+
+class Mockers:
+    def __init__(self, mocker):
+        self.client = MockClient()
+        # Mocking command line args
+        self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+        # Mocking objects from docker_build
+        self.mock_input = mocker.patch("kit.commands.docker_build.input")
+        self.mock_input.return_value = "a"
+        self.mock_print_build = mocker.patch("kit.commands.docker_build.print")
+        self.mock_create_tar_gz = mocker.patch(
+            "kit.commands.docker_build.create_tar_gz_file"
+        )
+        self.mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
+        self.mock_change_dir = mocker.patch(
+            "kit.commands.docker_build.change_directory_to"
+        )
+        self.mock_mkdir = mocker.patch.object(Path, "mkdir")
+        # Mocking objects from docker_tools
+        self.mock_from_env = mocker.patch("kit.utils.docker_tools.docker_from_env")
+        self.mock_from_env.return_value = self.client
+        self.mock_print_tools = mocker.patch("kit.utils.docker_tools.print")
 
 
 class MockClient:
