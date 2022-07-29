@@ -13,13 +13,13 @@ from pathlib import Path
 from functools import partial
 from itertools import zip_longest
 from dataclasses import dataclass
-from typing import List, Sequence, Iterable
+from typing import List, Sequence, Iterable, Generator
 
 from config import Config
 from ptxt import Ptxt, Params
 
 
-def int_to_pd_poly(num: int, base: int, numof_coeffs: int) -> List[int]:
+def int_to_poly(num: int, base: int, numof_coeffs: int) -> List[int]:
     """Return a list of coeffs of a polynomial encoded from an integer"""
 
     def coeffs(pd, num):
@@ -65,13 +65,13 @@ class BaseFromAlphabet:
         num_base_10 = inner_prod(
             converted, list(len_alphabet ** i for i in reversed(range(len(numstr))))
         )
-        return int_to_pd_poly(num_base_10, p=to_base, d=size)
+        return int_to_poly(num_base_10, p=to_base, d=size)
 
     def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
         """Change a number in string to different base within finite size"""
         # Pivot to base 10 - python in does this for us upto base 36
         num_base10 = int(numstr, base=from_base)
-        return int_to_pd_poly(num_base10, p=to_base, d=size)
+        return int_to_poly(num_base10, p=to_base, d=size)
 
 
 # This is from a itertools recipe
@@ -89,8 +89,8 @@ def transpose(ls: List, rows: int, cols: int) -> List:
     return [ls[c * rows + r] for r in range(rows) for c in range(cols)]
 
 
-def read_txt_worth(data_list, nslots: int):
-    """Generator. Reads up to a txt worth of entries (== number of slots) of """
+def read_txt_worth(data_list, nslots: int) -> Generator:
+    """Reads up to a txt worth of entries (== number of slots) of """
     for txt_worth in grouper(data_list, nslots):
         yield [item for item in txt_worth if item is not None]
 
@@ -131,7 +131,7 @@ def encode_datum(datum: str, policy_to_exec):
     return encoded_datum
 
 
-def round_robin_encode(encode, data, composite_columns):
+def round_robin_encode(encode: Callable, data, composite_columns: int) -> List:
     """Encode data into composite lists. Uses a round robin approach.
     encode is a function used to encode one arg, a datum."""
     if composite_columns == 1:
@@ -143,13 +143,13 @@ def round_robin_encode(encode, data, composite_columns):
     return ptxt_data_list
 
 
-def extend_with_repetitions(ls_of_ls: list, repeat: int):
+def extend_with_repetitions(ls_of_ls: list, repeat: int) -> None:
     """Modifies lists"""
     if repeat == 1:
         return
 
     for ls in ls_of_ls:
-        ls *= repeat  # NB. objects are repeats not new objects
+        ls *= repeat  # NOTE objects are repeats not new objects
 
 
 @dataclass(frozen=True)
@@ -165,16 +165,16 @@ class Encoder:
         # TODO policies need defining
         self.params: Params = config.params
         self.composite_columns: List[int] = config.column.composites
-        self.column_policies: List[ColumnPolicies] = config.column.policies
+        self.column_policies: List[ColumnPolicies] = config.column.encodings
         self.repeat: int = config.segments  # segment divisor
 
-    def __packing(self,):
+    def __packing(self, ptxts: List[Ptxt]) -> None:
         """To be implemented by derived class"""
         raise NotImplemented
 
-    def __call__(entries):
+    def __call__(self, entries):
         """Encodes the entries. An entry is a dict with columns as attribs."""
-        list_of_ptxts = []
+        ptxts: List[Ptxt] = []
         for colname, policy in column_policies.items():
             exec_policy = policies[policy.encode]
             composite = policy.composite
@@ -184,20 +184,20 @@ class Encoder:
             list_ptxt_data = round_robin_encode(
                 encode_datum_with_policy, column_data, composite
             )
-        self.__packing()  # Will be either Client or Server
+        self.__packing(ptxts)  # Will be either Client or Server
         # Note the above for server has list in column order, we need row order
         cols = sum(v.composite for v in column_policies.values())
         rows = math.ceil(len(entries) / repeat)
-        return list_of_ptxts
+        return ptxts
 
 
 class ClientEncoder(Encoder):
     """Encoder for client"""
 
-    def __packing(self,):
+    def __packing(self, ptxts: List[ptxt]) -> None:
         # TODO refactor so that padding is added maybe before encoding
         for ptxt_data in list_ptxt_data:
-            # FIXME surely, not required for each item
+            # TODO surely, not required for each item
             padding_size_in_segment = (params.nslots // segment_divisor) - len(
                 ptxt_data
             )
@@ -209,28 +209,28 @@ class ClientEncoder(Encoder):
             ptxt_data.extend([] for _ in range(padding_size_in_segment))
 
         extend_with_repetitions(list_ptxt_data, repeat)
-        list_of_ptxts.extend(
-            Ptxt(params).insert_data(ptxt_data) for ptxt_data in list_ptxt_data
+        ptxts.extend(
+            Ptxt(self.params).insert_data(ptxt_data) for ptxt_data in list_ptxt_data
         )
 
 
 class ServerEncoder(Encoder):
     """Encoder for server"""
 
-    def __packing():
+    def __packing(self, ptxts: List[Ptxt]) -> None:
         # For the server, we must expand each datum into a ptxt.
-        list_of_ptxts.extend(
-            Ptxt(params).insert_repeated_across_slots(data)
+        ptxts.extend(
+            Ptxt(self.params).insert_repeated_across_slots(data)
             for ptxt_data in list_ptxt_data
             for data in grouper(ptxt_data, repeat, [])
         )
 
-    def __call__(self, entries):
-        list_of_ptxts = super.__call__(self, entries)
-        return transpose(list_of_ptxts, rows, cols)
+    def __call__(self, entries) -> List[Ptxt]:
+        ptxts: List[Ptxt] = super.__call__(self, entries)
+        return transpose(ptxts, rows, cols)
 
 
-def how_many_entries_in_file(filename):
+def how_many_entries_in_file(filename: str) -> int:
     """Return number of lines in a file."""
     with open(filename) as f:
         return sum(1 for _ in f)
@@ -257,27 +257,23 @@ def parse_args(argv: List[str] = None):
 def main(args) -> None:
     """Encoder Program"""
 
-    # TODO move to config obj
-    # sanity check
-    if args.config.params.nslots % args.config.segments != 0:
-        sys.stderr.write(
-            f"Segmentation divisor '{args.segment}' does not divide number of slots '{params.nslots}'"
-        )
-        exit(1)
-    encode = (
-        ServerEncoder(args.config)
-        if args.server is True
-        else ClientEncoder(args.config)
-    )
     try:
+        encode = (
+            ServerEncoder(args.config)
+            if args.server is True
+            else ClientEncoder(args.config)
+        )
         with open(args.datafile, newline="") as csvfile:
             csv_reader = DictReader(csvfile, delimiter=" ")
             for txt in read_txt_worth(csv_reader, params.nslots // args.segment):
                 ptxts = encode(txt)
                 for ptxt in ptxts:
                     print(ptxt.to_json(), file=fd)
-    except FileNotFoundError:
-        sys.stderr.write(f"Datafile '{args.datafile}' not found")
+    except FileNotFoundError as file_error:
+        sys.stderr.write(f"{file_error!r}")
+        sys.exit(1)
+    except ConfigError as config_error:
+        sys.stderr.write(f"{config_error}!r")
         sys.exit(1)
 
 
