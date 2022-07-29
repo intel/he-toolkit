@@ -10,7 +10,6 @@ from kit.commands.init import (
     append_to_rc,
     get_expanded_path,
     create_default_config,
-    create_default_workspace,
 )
 
 
@@ -97,12 +96,6 @@ def test_create_default_config_file_created(mocker):
     create_default_config(Path("/test"))
     mock_open.assert_called_once()
     mock_print.assert_any_call("/test/default.config created")
-
-
-def test_create_default_config_file_created(mocker):
-    mock_mkdir = mocker.patch.object(Path, "mkdir")
-    create_default_workspace()
-    mock_mkdir.assert_called_once()
 
 
 @pytest.fixture

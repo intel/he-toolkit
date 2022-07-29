@@ -7,7 +7,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
-
+from kit.utils.files import create_default_workspace
 from kit.utils.typing import PathType
 
 
@@ -114,14 +114,6 @@ def create_default_config(dir_path: Path) -> None:
         with default_config_path.open("w", encoding="utf-8") as f:
             f.write(line)
         print(f"{default_config_path} created")
-
-
-def create_default_workspace(dir_path: str = "~/") -> Path:
-    """Create the directory ~/.hekit,
-    when the user sets the default_config flag"""
-    workspace_path = Path(dir_path).expanduser() / ".hekit"
-    workspace_path.mkdir(exist_ok=True)
-    return workspace_path
 
 
 def init_hekit(args) -> None:

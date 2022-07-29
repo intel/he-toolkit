@@ -4,7 +4,7 @@
 import pytest
 
 from pathlib import Path
-from kit.utils.files import files_in_dir, list_dirs
+from kit.utils.files import files_in_dir, list_dirs, create_default_workspace
 
 
 def test_files_in_dir_commands_filter_py(get_toolkit_path):
@@ -59,6 +59,12 @@ def test_list_dirs(get_toolkit_path):
     assert exp_files[0] in set(directories)
     assert exp_files[1] in set(directories)
     assert exp_files[2] in set(directories)
+
+
+def test_create_default_config_file_created(mocker):
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
+    create_default_workspace()
+    mock_mkdir.assert_called_once()
 
 
 @pytest.fixture
