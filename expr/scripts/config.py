@@ -12,6 +12,10 @@ import toml
 from ptxt import Params
 
 
+class ConfigError(Exception):
+    """Errors related to configuration"""
+
+
 @dataclass(frozen=True)
 class Config:
     """The configuration of the encoded data"""
@@ -37,6 +41,12 @@ class Config:
         config_data = data["config"]
         columns = config_data["columns"]
         segments = config_data["segments"]
+
+        # sanity check
+        if params.nslots % segments != 0:
+            raise ConfigError(
+                f"Segmentation divisor '{segments}' does not divide number of slots '{params.nslots}'"
+            )
 
         if params_only is True:
             return cls(
