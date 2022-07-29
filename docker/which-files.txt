@@ -38,7 +38,6 @@ expr/scripts/natural.py
 expr/scripts/ptxt.py
 expr/scripts/tests/test_decode.py
 expr/scripts/tests/test_encode.py
-expr/scripts/util.py
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
 he-samples/cmake/gtest.cmake
