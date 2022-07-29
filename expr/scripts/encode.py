@@ -13,9 +13,9 @@ from pathlib import Path
 from functools import partial
 from itertools import zip_longest
 from dataclasses import dataclass
-from typing import List, Sequence, Iterable, Generator
+from typing import List, Sequence, Iterable, Generator, Callable
 
-from config import Config
+from config import Config, ConfigError
 from ptxt import Ptxt, Params
 
 
@@ -67,15 +67,8 @@ class BaseFromAlphabet:
         )
         return int_to_poly(num_base_10, p=to_base, d=size)
 
-    def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
-        """Change a number in string to different base within finite size"""
-        # Pivot to base 10 - python in does this for us upto base 36
-        num_base10 = int(numstr, base=from_base)
-        return int_to_poly(num_base10, p=to_base, d=size)
 
-
-# This is from a itertools recipe
-# https://docs.python.org/3.8/library/itertools.html
+# Itertools recipe https://docs.python.org/3.8/library/itertools.html
 def grouper(iterable, n: int, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
@@ -161,11 +154,11 @@ class Policy:
 class Encoder:
     """Encoder Base class"""
 
-    def __init__(config: Config) -> None:
+    def __init__(self, config: Config) -> None:
         # TODO policies need defining
         self.params: Params = config.params
-        self.composite_columns: List[int] = config.column.composites
-        self.column_policies: List[ColumnPolicies] = config.column.encodings
+        self.composite_columns: List[int] = config.composites
+        self.column_policies: List[ColumnPolicies] = config.encodings
         self.repeat: int = config.segments  # segment divisor
 
     def __packing(self, ptxts: List[Ptxt]) -> None:
@@ -190,11 +183,17 @@ class Encoder:
         rows = math.ceil(len(entries) / repeat)
         return ptxts
 
+    def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
+        """Change a number in string to different base within finite size"""
+        # Pivot to base 10 - python in does this for us upto base 36
+        num_base10 = int(numstr, base=from_base)
+        return int_to_poly(num_base10, p=to_base, d=size)
+
 
 class ClientEncoder(Encoder):
     """Encoder for client"""
 
-    def __packing(self, ptxts: List[ptxt]) -> None:
+    def __packing(self, ptxts: List[Ptxt]) -> None:
         # TODO refactor so that padding is added maybe before encoding
         for ptxt_data in list_ptxt_data:
             # TODO surely, not required for each item
@@ -263,9 +262,11 @@ def main(args) -> None:
             if args.server is True
             else ClientEncoder(args.config)
         )
+        nslots = args.config.params.nslots
+        segments = args.config.segments
         with open(args.datafile, newline="") as csvfile:
             csv_reader = DictReader(csvfile, delimiter=" ")
-            for txt in read_txt_worth(csv_reader, params.nslots // args.segment):
+            for txt in read_txt_worth(csv_reader, nslots // segments):
                 ptxts = encode(txt)
                 for ptxt in ptxts:
                     print(ptxt.to_json(), file=fd)
