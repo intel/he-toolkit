@@ -8,6 +8,7 @@
 import sys
 import argparse
 import math
+import string
 from csv import DictReader
 from pathlib import Path
 from functools import partial
@@ -45,7 +46,7 @@ def inner_prod(vector_a: Sequence[int], vector_b: Sequence[int]) -> int:
 
 class BaseFromAlphabet:
     def __init__(
-        to_base: int, size: int, alphabet: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        to_base: int, size: int, alphabet: str = string.ascii_uppercase
     ) -> None:
         """Closure to do a change str to poly p base."""
         self.to_base = to_base
@@ -66,6 +67,13 @@ class BaseFromAlphabet:
             converted, list(len_alphabet ** i for i in reversed(range(len(numstr))))
         )
         return int_to_poly(num_base_10, p=to_base, d=size)
+
+    @staticmethod
+    def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
+        """Change a number in string to different base within finite size"""
+        # Pivot to base 10 - python in does this for us upto base 36
+        num_base10 = int(numstr, base=from_base)
+        return int_to_poly(num_base10, p=to_base, d=size)
 
 
 # Itertools recipe https://docs.python.org/3.8/library/itertools.html
@@ -145,63 +153,37 @@ def extend_with_repetitions(ls_of_ls: list, repeat: int) -> None:
         ls *= repeat  # NOTE objects are repeats not new objects
 
 
-@dataclass(frozen=True)
-class Policy:
-    """"Policy for column"""
-
-    column_name: str
-    encoding: str
-    composite: int
-
-
-def make_policies(
-    encodings: Dict[str, str], composites: Dict[str, int]
-) -> List[Policy]:
-    """Create columns' policies from config info"""
-    return [
-        Policy(colname, encoding, composites.get(colname, 1))
-        for colname, encoding in encodings.items()
-    ]
+Entry = Dict[str, str]
 
 
 class Encoder:
     """Encoder Base class"""
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, encoding_functions: Dict[str, Callable]) -> None:
         self.params: Params = config.params
-        self.column_policies: List[Policy] = make_policies(
-            config.columns.encoding, config.columns.composite
-        )
+        self.column_encodings: Dict[str, str] = config.encodings
+        self.column_composites: Dict[str, int] = config.composites
         self.repeat: int = config.segments  # segment divisor
 
     def __packing(self, ptxts: List[Ptxt]) -> None:
         """To be implemented by derived class"""
         raise NotImplemented
 
-    def __call__(self, entries):
+    def __call__(self, entries: List[Entry]) -> List[Ptxt]:
         """Encodes the entries. An entry is a dict with columns as attribs."""
         ptxts: List[Ptxt] = []
-        for colname, policy in column_policies.items():
-            exec_policy = policies[policy.encode]
-            composite = policy.composite
+        for colname, encoding in self.column_encodings.items():
+            exec_policy = encoding_functions[encoding]
+            composite = self.column_composites.get(composite, 1)
             entries_by_column = (entry[colname] for entry in entries)
             column_data = composite_split(entries_by_column, composite)
             encode_datum_with_policy = partial(encode_datum, policy_to_exec=exec_policy)
-            list_ptxt_data = round_robin_encode(
-                encode_datum_with_policy, column_data, composite
-            )
+            ptxts = round_robin_encode(encode_datum_with_policy, column_data, composite)
         self.__packing(ptxts)  # Will be either Client or Server
         # Note the above for server has list in column order, we need row order
         cols = sum(v.composite for v in column_policies.values())
         rows = math.ceil(len(entries) / repeat)
         return ptxts
-
-    @staticmethod
-    def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
-        """Change a number in string to different base within finite size"""
-        # Pivot to base 10 - python in does this for us upto base 36
-        num_base10 = int(numstr, base=from_base)
-        return int_to_poly(num_base10, p=to_base, d=size)
 
 
 class ClientEncoder(Encoder):
@@ -238,7 +220,7 @@ class ServerEncoder(Encoder):
             for data in grouper(ptxt_data, self.repeat, [])
         )
 
-    def __call__(self, entries) -> List[Ptxt]:
+    def __call__(self, entries: List[Entry]) -> List[Ptxt]:
         ptxts: List[Ptxt] = super.__call__(self, entries)
         return transpose(ptxts, rows, cols)
 
@@ -270,11 +252,23 @@ def parse_args(argv: List[str] = None):
 def main(args) -> None:
     """Encoder Program"""
 
+    params = args.config.params
+    breakpoint()
+    policies = {
+        "alphanumeric": BaseFromAlphabet(
+            to_base=params.p,
+            size=params.d,
+            alphabet=string.digits + string.ascii_uppercase,
+        ),
+        "alphabetical": BaseFromAlphabet(to_base=params.p, size=params.d),
+        "numeric": int_to_poly,
+    }
+
     try:
         encode = (
-            ServerEncoder(args.config)
+            ServerEncoder(args.config, policies)
             if args.server is True
-            else ClientEncoder(args.config)
+            else ClientEncoder(args.config, policies)
         )
         nslots = args.config.params.nslots
         segments = args.config.segments
