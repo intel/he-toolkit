@@ -13,7 +13,7 @@ from pathlib import Path
 from functools import partial
 from itertools import zip_longest
 from dataclasses import dataclass
-from typing import List, Sequence, Iterable, Generator, Callable
+from typing import Dict, List, Sequence, Iterable, Generator, Callable
 
 from config import Config, ConfigError
 from ptxt import Ptxt, Params
@@ -147,18 +147,31 @@ def extend_with_repetitions(ls_of_ls: list, repeat: int) -> None:
 
 @dataclass(frozen=True)
 class Policy:
-    encode: str
+    """"Policy for column"""
+
+    column_name: str
+    encoding: str
     composite: int
+
+
+def make_policies(
+    encodings: Dict[str, str], composites: Dict[str, int]
+) -> List[Policy]:
+    """Create columns' policies from config info"""
+    return [
+        Policy(colname, encoding, composites.get(colname, 1))
+        for colname, encoding in encodings.items()
+    ]
 
 
 class Encoder:
     """Encoder Base class"""
 
     def __init__(self, config: Config) -> None:
-        # TODO policies need defining
         self.params: Params = config.params
-        self.composite_columns: List[int] = config.composites
-        self.column_policies: List[ColumnPolicies] = config.encodings
+        self.column_policies: List[Policy] = make_policies(
+            config.columns.encoding, config.columns.composite
+        )
         self.repeat: int = config.segments  # segment divisor
 
     def __packing(self, ptxts: List[Ptxt]) -> None:
@@ -183,6 +196,7 @@ class Encoder:
         rows = math.ceil(len(entries) / repeat)
         return ptxts
 
+    @staticmethod
     def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
         """Change a number in string to different base within finite size"""
         # Pivot to base 10 - python in does this for us upto base 36
@@ -207,7 +221,7 @@ class ClientEncoder(Encoder):
                 )
             ptxt_data.extend([] for _ in range(padding_size_in_segment))
 
-        extend_with_repetitions(list_ptxt_data, repeat)
+        extend_with_repetitions(list_ptxt_data, self.repeat)
         ptxts.extend(
             Ptxt(self.params).insert_data(ptxt_data) for ptxt_data in list_ptxt_data
         )
@@ -221,7 +235,7 @@ class ServerEncoder(Encoder):
         ptxts.extend(
             Ptxt(self.params).insert_repeated_across_slots(data)
             for ptxt_data in list_ptxt_data
-            for data in grouper(ptxt_data, repeat, [])
+            for data in grouper(ptxt_data, self.repeat, [])
         )
 
     def __call__(self, entries) -> List[Ptxt]:
@@ -231,8 +245,8 @@ class ServerEncoder(Encoder):
 
 def how_many_entries_in_file(filename: str) -> int:
     """Return number of lines in a file."""
-    with open(filename) as f:
-        return sum(1 for _ in f)
+    with open(filename) as fobj:
+        return sum(1 for _ in fobj)
 
 
 def parse_args(argv: List[str] = None):
