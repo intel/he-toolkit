@@ -169,7 +169,7 @@ class Encoder:
 
     def _packing(self, ptxts: List[Ptxt]) -> None:
         """To be implemented by derived class"""
-        raise NotImplemented
+        raise NotImplementedError
 
     def __call__(self, entries: List[Entry]) -> List[Ptxt]:
         """Encodes the entries. An entry is a dict with columns as attribs."""
@@ -183,7 +183,10 @@ class Encoder:
             ptxts = round_robin_encode(encode_datum_with_policy, column_data, composite)
         self._packing(ptxts)  # Will be either Client or Server
         # Note the above for server has list in column order, we need row order
-        cols = sum(v.composite for v in column_policies.values())
+        cols = sum(
+            self.column_composites.get(colname, 1)
+            for colname in self.column_encodings.keys()
+        )
         rows = math.ceil(len(entries) / self.repeat)
         return ptxts
 
@@ -193,7 +196,8 @@ class ClientEncoder(Encoder):
 
     def _packing(self, ptxts: List[Ptxt]) -> None:
         # TODO refactor so that padding is added maybe before encoding
-        for ptxt_data in list_ptxt_data:
+        params = self.params
+        for ptxt_data in ptxts:
             # TODO surely, not required for each item
             padding_size_in_segment = (params.nslots // self.repeat) - len(ptxt_data)
             if padding_size_in_segment < 0:
@@ -223,7 +227,7 @@ class ServerEncoder(Encoder):
         )
 
     def __call__(self, entries: List[Entry]) -> List[Ptxt]:
-        ptxts: List[Ptxt] = super.__call__(self, entries)
+        ptxts: List[Ptxt] = super().__call__(entries)
         return transpose(ptxts, rows, cols)
 
 
