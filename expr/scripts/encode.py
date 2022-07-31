@@ -13,23 +13,24 @@ from csv import DictReader
 from pathlib import Path
 from functools import partial
 from itertools import zip_longest
-from dataclasses import dataclass
 from typing import Dict, List, Sequence, Iterable, Generator, Callable
 
 from config import Config, ConfigError
 from ptxt import Ptxt, Params
 
+Entry = Dict[str, str]
+
 
 def int_to_poly(num: int, base: int, numof_coeffs: int) -> List[int]:
     """Return a list of coeffs of a polynomial encoded from an integer"""
 
-    def coeffs(pd, num):
-        for pth in pd:
+    def coeffs(pds, num):
+        for pth in pds:
             coeff, num = divmod(num, pth)
             yield coeff
 
-    pd = (base ** i for i in reversed(range(numof_coeffs)))
-    poly = list(coeffs(pd, num))
+    pds = (base ** i for i in reversed(range(numof_coeffs)))
+    poly = list(coeffs(pds, num))
     if poly[0] >= base:
         raise ValueError(f"Integer cannot fit in {numof_coeffs} slot coeffs: {poly}")
     return poly
@@ -45,8 +46,10 @@ def inner_prod(vector_a: Sequence[int], vector_b: Sequence[int]) -> int:
 
 
 class BaseFromAlphabet:
+    """Transform one alphabet to encoding alphabet"""
+
     def __init__(
-        to_base: int, size: int, alphabet: str = string.ascii_uppercase
+        self, to_base: int, size: int, alphabet: str = string.ascii_uppercase
     ) -> None:
         """Closure to do a change str to poly p base."""
         self.to_base = to_base
@@ -54,40 +57,41 @@ class BaseFromAlphabet:
         self.alphabet = alphabet
 
         self.len_alphabet = len(alphabet)
-        if len_alphabet < 1:
+        if self.len_alphabet < 1:
             raise ValueError(
-                f"Alphabet must have positive integer cardinality, not '{len_alphabet}'"
+                f"Alphabet must have positive integer cardinality, not '{self.len_alphabet}'"
             )
         self.translation_table = {symbol: code for code, symbol in enumerate(alphabet)}
 
-    def __call__(numstr: str) -> List[int]:
+    def __call__(self, numstr: str) -> List[int]:
         # use table to convert to pivot base 10
-        converted = [translation_table[c] for c in numstr]
+        converted = [self.translation_table[c] for c in numstr]
         num_base_10 = inner_prod(
-            converted, list(len_alphabet ** i for i in reversed(range(len(numstr))))
+            converted,
+            list(self.len_alphabet ** i for i in reversed(range(len(numstr)))),
         )
-        return int_to_poly(num_base_10, p=to_base, d=size)
+        return int_to_poly(num_base_10, base=self.to_base, numof_coeffs=self.size)
 
     @staticmethod
     def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
         """Change a number in string to different base within finite size"""
         # Pivot to base 10 - python in does this for us upto base 36
         num_base10 = int(numstr, base=from_base)
-        return int_to_poly(num_base10, p=to_base, d=size)
+        return int_to_poly(num_base10, base=to_base, numof_coeffs=size)
 
 
 # Itertools recipe https://docs.python.org/3.8/library/itertools.html
-def grouper(iterable, n: int, fillvalue=None):
+def grouper(iterable, group_size: int, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-    args = [iter(iterable)] * n
+    args = [iter(iterable)] * group_size
     return zip_longest(*args, fillvalue=fillvalue)
 
 
-def transpose(ls: List, rows: int, cols: int) -> List:
+def transpose(in_list: List, rows: int, cols: int) -> List:
     """Transpose list order. List ls is in column major.
        rows and cols are of the current layout in the list."""
-    return [ls[c * rows + r] for r in range(rows) for c in range(cols)]
+    return [in_list[c * rows + r] for r in range(rows) for c in range(cols)]
 
 
 def read_txt_worth(data_list, nslots: int) -> Generator:
@@ -149,11 +153,8 @@ def extend_with_repetitions(ls_of_ls: list, repeat: int) -> None:
     if repeat == 1:
         return
 
-    for ls in ls_of_ls:
-        ls *= repeat  # NOTE objects are repeats not new objects
-
-
-Entry = Dict[str, str]
+    for one_list in ls_of_ls:
+        one_list *= repeat  # NOTE objects are repeats not new objects
 
 
 class Encoder:
@@ -164,8 +165,9 @@ class Encoder:
         self.column_encodings: Dict[str, str] = config.encodings
         self.column_composites: Dict[str, int] = config.composites
         self.repeat: int = config.segments  # segment divisor
+        self.encoding_functions = encoding_functions
 
-    def __packing(self, ptxts: List[Ptxt]) -> None:
+    def _packing(self, ptxts: List[Ptxt]) -> None:
         """To be implemented by derived class"""
         raise NotImplemented
 
@@ -173,31 +175,31 @@ class Encoder:
         """Encodes the entries. An entry is a dict with columns as attribs."""
         ptxts: List[Ptxt] = []
         for colname, encoding in self.column_encodings.items():
-            exec_policy = encoding_functions[encoding]
-            composite = self.column_composites.get(composite, 1)
+            exec_policy = self.encoding_functions[encoding]
+            composite = self.column_composites.get(colname, 1)
             entries_by_column = (entry[colname] for entry in entries)
             column_data = composite_split(entries_by_column, composite)
             encode_datum_with_policy = partial(encode_datum, policy_to_exec=exec_policy)
             ptxts = round_robin_encode(encode_datum_with_policy, column_data, composite)
-        self.__packing(ptxts)  # Will be either Client or Server
+        self._packing(ptxts)  # Will be either Client or Server
         # Note the above for server has list in column order, we need row order
         cols = sum(v.composite for v in column_policies.values())
-        rows = math.ceil(len(entries) / repeat)
+        rows = math.ceil(len(entries) / self.repeat)
         return ptxts
 
 
 class ClientEncoder(Encoder):
     """Encoder for client"""
 
-    def __packing(self, ptxts: List[Ptxt]) -> None:
+    def _packing(self, ptxts: List[Ptxt]) -> None:
         # TODO refactor so that padding is added maybe before encoding
         for ptxt_data in list_ptxt_data:
             # TODO surely, not required for each item
-            padding_size_in_segment = (params.nslots // segment_divisor) - len(
-                ptxt_data
-            )
+            padding_size_in_segment = (params.nslots // self.repeat) - len(ptxt_data)
             if padding_size_in_segment < 0:
-                max_queries = params.nslots // segment_divisor
+                max_queries = (
+                    params.nslots // self.repeat
+                )  # repeat is the segment divisor
                 raise ValueError(
                     f"Cannot have '{len(ptxt_data)}' queries more than a segment allows '{max_queries}'"
                 )
@@ -212,7 +214,7 @@ class ClientEncoder(Encoder):
 class ServerEncoder(Encoder):
     """Encoder for server"""
 
-    def __packing(self, ptxts: List[Ptxt]) -> None:
+    def _packing(self, ptxts: List[Ptxt]) -> None:
         # For the server, we must expand each datum into a ptxt.
         ptxts.extend(
             Ptxt(self.params).insert_repeated_across_slots(data)
@@ -227,7 +229,7 @@ class ServerEncoder(Encoder):
 
 def how_many_entries_in_file(filename: str) -> int:
     """Return number of lines in a file."""
-    with open(filename) as fobj:
+    with open(filename, encoding="UTF-8") as fobj:
         return sum(1 for _ in fobj)
 
 
@@ -249,11 +251,10 @@ def parse_args(argv: List[str] = None):
     return parser.parse_args(argv) if argv else parser.parse_args()
 
 
-def main(args) -> None:
+def main(args, fobj=sys.stdout) -> None:
     """Encoder Program"""
 
     params = args.config.params
-    breakpoint()
     policies = {
         "alphanumeric": BaseFromAlphabet(
             to_base=params.p,
@@ -272,12 +273,12 @@ def main(args) -> None:
         )
         nslots = args.config.params.nslots
         segments = args.config.segments
-        with open(args.datafile, newline="") as csvfile:
+        with open(args.datafile, encoding="UTF-8", newline="") as csvfile:
             csv_reader = DictReader(csvfile, delimiter=" ")
             for txt in read_txt_worth(csv_reader, nslots // segments):
                 ptxts = encode(txt)
                 for ptxt in ptxts:
-                    print(ptxt.to_json(), file=fd)
+                    print(ptxt.to_json(), file=fobj)
     except FileNotFoundError as file_error:
         sys.stderr.write(f"{file_error!r}")
         sys.exit(1)
