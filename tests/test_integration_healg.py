@@ -75,6 +75,7 @@ def test_gen_primes_max_stop(hekit_path):
     assert 0 != act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_arg_header(hekit_path):
     """Verify that gen-primes cmd is excuted correctly
     when p and d are single numbers"""
@@ -92,6 +93,7 @@ def test_healg_arg_header(hekit_path):
     assert 0 == act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_arg_no_header(hekit_path):
     """Verify that algebras cmd is excuted correctly when
     --no-header flag is used"""
@@ -109,6 +111,7 @@ def test_healg_arg_no_header(hekit_path):
     assert 0 == act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_arg_p(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     p is a list of numbers"""
@@ -126,6 +129,7 @@ def test_healg_arg_p(hekit_path):
     assert 0 == act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_negative_arg_p(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     p is a negative number"""
@@ -138,6 +142,7 @@ def test_healg_negative_arg_p(hekit_path):
     assert 0 != act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_max_arg_p(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     p is equal to sys.maxsize"""
@@ -150,6 +155,7 @@ def test_healg_max_arg_p(hekit_path):
     assert 0 != act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_arg_d(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     d is a list of numbers"""
@@ -167,6 +173,7 @@ def test_healg_arg_d(hekit_path):
     assert 0 == act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_negative_arg_d(hekit_path):
     """Verify that gen-primes cmd triggers an error when
     d is a negative number"""
@@ -192,12 +199,11 @@ def test_healg_max_arg_d(hekit_path):
     assert 0 != act_result.returncode
 
 
+@pytest.mark.xdist_group(name="arg_group")
 def test_healg_arg_no_corrected(hekit_path):
     """Verify that algebras cmd is excuted correctly when
     --no-corrected flag is used"""
-    cmd = (
-        f"{hekit_path} algebras -p 11,13,17,19,23 -d 2,4,5 --no-header --no-corrected "
-    )
+    cmd = f"{hekit_path} algebras -p 11,19,23 -d 2,4,5 --no-header --no-corrected "
     act_result = execute_process(cmd)
     assert (
         "11                   2                    3                    2                    1"
