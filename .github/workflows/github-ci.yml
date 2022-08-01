@@ -47,7 +47,7 @@ jobs:
           pip3 install docker pytest pytest-mock toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
-        run: pytest tests/
+        run: pytest tests/ -n 8
 
   build-and-test-toolkit-palisade:
     name: Build, test and run PALISADE dependent HE Toolkit
@@ -187,7 +187,7 @@ jobs:
         # Add local bin for pytest
 
       - name: Run pytests
-        run: pytest tests/
+        run: pytest tests/ -n 8
 
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
