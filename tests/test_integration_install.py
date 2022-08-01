@@ -18,42 +18,54 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
 
     # Test fetch command
     cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test.toml"
-    out, err = execute_process(cmd)
-    assert f"fetch" in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert f"fetch" in act_result.stdout
+    assert not act_result.stderr
 
     # Test list command after fetch
     cmd = f"{hekit_path} --config {config_file} list"
-    out, err = execute_process(cmd)
-    assert f"{component}   {instance}   success                         " in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert (
+        f"{component}   {instance}   success                         "
+        in act_result.stdout
+    )
+    assert not act_result.stderr
 
     # Test build command
     cmd = f"{hekit_path} --config {config_file} build {input_files_path}/test.toml"
-    out, err = execute_process(cmd)
-    assert "build" in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert "build" in act_result.stdout
+    assert not act_result.stderr
 
     # Test list command after build
     cmd = f"{hekit_path} --config {config_file} list"
-    out, err = execute_process(cmd)
-    assert f"{component}   {instance}   success    success              " in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert (
+        f"{component}   {instance}   success    success              "
+        in act_result.stdout
+    )
+    assert not act_result.stderr
 
     # Test install command
     cmd = f"{hekit_path} --config {config_file} install {input_files_path}/test.toml"
-    out, err = execute_process(cmd)
-    assert "install" in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert "install" in act_result.stdout
+    assert not act_result.stderr
 
     # Test list command after isntall
     cmd = f"{hekit_path} --config {config_file} list"
-    out, err = execute_process(cmd)
-    assert f"{component}   {instance}   success    success    success   " in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert (
+        f"{component}   {instance}   success    success    success   "
+        in act_result.stdout
+    )
+    assert not act_result.stderr
 
     # Test remove command
     cmd = f"{hekit_path} --config {config_file} remove {component} {instance}"
-    out, err = execute_process(cmd)
-    assert f"{component}   {instance}   success    success    success   " not in out
-    assert not err
+    act_result = execute_process(cmd)
+    assert (
+        f"{component}   {instance}   success    success    success   "
+        not in act_result.stdout
+    )
+    assert not act_result.stderr

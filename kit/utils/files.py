@@ -35,7 +35,7 @@ def list_dirs(path: PathType) -> List[str]:
     return files_in_dir(path, ftype=FileType.DIRS)
 
 
-def create_default_workspace(dir_path: str = "~/") -> Path:
+def create_default_workspace(dir_path: str = "~") -> Path:
     """Create the directory ~/.hekit"""
     workspace_path = Path(dir_path).expanduser() / ".hekit"
     workspace_path.mkdir(exist_ok=True)
