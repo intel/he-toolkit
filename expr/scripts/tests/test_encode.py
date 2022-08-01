@@ -14,12 +14,12 @@ def test_inner_prod():
     assert inner_prod(v1, v2) == 24
 
 
-def test_int_to_pd_poly():
+def test_int_to_poly():
     num = 121
     p = 5
     d = 3
     powers_of_p = [p ** i for i in reversed(range(d))]
-    coeffs = int_to_pd_poly(num, p, d)
+    coeffs = int_to_poly(num, p, d)
     assert len(powers_of_p) == len(coeffs)
     assert coeffs == [4, 4, 1]  # 4 * 5^2 + 4 * 5 + 1 == 121
     assert inner_prod(coeffs, powers_of_p) == num
@@ -33,10 +33,15 @@ def test_base_from_alphabet():
 def test_base():
     # Similar to int_to_poly. Internally uses base 10 to pivot between bases.
     numstr = "AZ"  # 10 * 36 + 35 = 395
-    num_base10 = base(numstr, from_base=36, to_base=10, size=4)
+    num_base10 = BaseFromAlphabet.base(numstr, from_base=36, to_base=10, size=4)
     numstr_base10 = "".join(map(str, num_base10))
     assert numstr_base10 == "0395"
-    assert base(numstr_base10, from_base=10, to_base=5, size=4) == [3, 0, 4, 0]
+    assert BaseFromAlphabet.base(numstr_base10, from_base=10, to_base=5, size=4) == [
+        3,
+        0,
+        4,
+        0,
+    ]
 
 
 def test_transpose():
@@ -119,7 +124,6 @@ def test_how_many_entries_in_file(tmp_path):
     assert how_many_entries_in_file(filepath.resolve()) == num_of_lines
 
 
-# FIXME
 def test_parse_args():
     cmdline_args = "--config some_params.file some_data.file".split()
     args = parse_args(cmdline_args)
@@ -172,15 +176,18 @@ def test_encode_for_server(encode_obj_for_server, test_vector):
 
 def test_edge_case(edge_case_data):
     p, d, entry, expected_colA, expected_colB, expected_colC = edge_case_data
-    assert base(entry["colA"], from_base=36, to_base=p, size=d) == expected_colA
+    assert (
+        BaseFromAlphabet.base(entry["colA"], from_base=36, to_base=p, size=d)
+        == expected_colA
+    )
     assert BaseFromAlphabet(p, d)(entry["colB"]) == expected_colB
     # won't fit with d coeffs
     with pytest.raises(ValueError):
-        int_to_pd_poly(entry["colC"], p, d)
+        int_to_poly(entry["colC"], p, d)
     # will fit with 2d coeffs
-    assert int_to_pd_poly(entry["colC"], p, d * 2) == expected_colC
-    assert int_to_pd_poly(int(entry["colC"]) - 1, p, d * 2) != expected_colC
-    assert int_to_pd_poly(int(entry["colC"]) + 1, p, d * 2) != expected_colC
+    assert int_to_poly(entry["colC"], p, d * 2) == expected_colC
+    assert int_to_poly(int(entry["colC"]) - 1, p, d * 2) != expected_colC
+    assert int_to_poly(int(entry["colC"]) + 1, p, d * 2) != expected_colC
 
 
 def test_segmentation_edge_case(edge_case_data):
@@ -191,16 +198,16 @@ def test_segmentation_edge_case(edge_case_data):
     expected_ptxt = [219, 690, 342, 540]
     for s in split_entries:
         assert s == expected_split
-        assert int_to_pd_poly(s, p, d) == expected_ptxt
+        assert int_to_poly(s, p, d) == expected_ptxt
 
     colC = str(int(entry["colC"]) - 1)
     split_entries = list(composite_split([colC], 2))
     assert split_entries == [expected_split, "9" * 10 + "8"]
     assert split_entries[1] != expected_split  # Should be expected_split - 1
-    assert int_to_pd_poly(split_entries[0], p, d) == expected_ptxt
-    assert int_to_pd_poly(split_entries[1], p, d) != expected_ptxt
+    assert int_to_poly(split_entries[0], p, d) == expected_ptxt
+    assert int_to_poly(split_entries[1], p, d) != expected_ptxt
     expected_ptxt[-1] -= 1  # decr the last element
-    assert int_to_pd_poly(split_entries[1], p, d) == expected_ptxt
+    assert int_to_poly(split_entries[1], p, d) == expected_ptxt
 
 
 def test_client_segmentation(encode_obj_for_client, test_vector):
@@ -274,7 +281,7 @@ def params_and_policies():
     Params = namedtuple("Params", ["m", "p", "d", "nslots"])
     params = Params(m=24, p=37, d=2, nslots=8)
 
-    int_to_poly = partial(int_to_pd_poly, p=params.p, d=params.d)
+    int_to_poly = partial(int_to_poly, p=params.p, d=params.d)
     policies = {
         "alphanumeric": {
             symbol: code

@@ -13,16 +13,18 @@ from csv import DictReader
 from pathlib import Path
 from functools import partial
 from itertools import zip_longest
-from typing import Dict, List, Sequence, Iterable, Generator, Callable
+from typing import Dict, List, Sequence, Iterable, Generator, Callable, Union
 
 from config import Config, ConfigError
 from ptxt import Ptxt, Params
 
 Entry = Dict[str, str]
+NumRep = Union[int, str]
 
 
-def int_to_poly(num: int, base: int, numof_coeffs: int) -> List[int]:
+def int_to_poly(num: NumRep, base: NumRep, numof_coeffs: NumRep) -> List[int]:
     """Return a list of coeffs of a polynomial encoded from an integer"""
+    num, base, numof_coeffs = int(num), int(base), int(numof_coeffs)
 
     def coeffs(pds, num):
         for pth in pds:
