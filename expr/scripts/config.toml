@@ -1,6 +1,6 @@
 [params]
-p = 23
-m = 16 
+p = 257
+m = 80
 
 [config]
 columns = 3
@@ -12,4 +12,4 @@ column2 = "alphabetical"
 column3 = "numeric"
 
 [columns.composite]
-column2 = 4
+column2 = 2

@@ -266,7 +266,9 @@ def main(args, fobj=sys.stdout) -> None:
             alphabet=string.digits + string.ascii_uppercase,
         ),
         "alphabetical": BaseFromAlphabet(to_base=params.p, size=params.d),
-        "numeric": int_to_poly,
+        "numeric": BaseFromAlphabet(
+            to_base=params.p, size=params.d, alphabet=string.digits
+        ),
     }
 
     try:
