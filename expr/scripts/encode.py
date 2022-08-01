@@ -167,7 +167,7 @@ class Encoder:
         self.repeat: int = config.segments  # segment divisor
         self.encoding_functions = encoding_functions
 
-    def _packing(self, ptxts: List[Ptxt]) -> None:
+    def _packing(self, ptxts_data: List) -> List[Ptxt]:
         """To be implemented by derived class"""
         raise NotImplementedError
 
@@ -180,24 +180,20 @@ class Encoder:
             entries_by_column = (entry[colname] for entry in entries)
             column_data = composite_split(entries_by_column, composite)
             encode_datum_with_policy = partial(encode_datum, policy_to_exec=exec_policy)
-            ptxts = round_robin_encode(encode_datum_with_policy, column_data, composite)
-        self._packing(ptxts)  # Will be either Client or Server
-        # Note the above for server has list in column order, we need row order
-        cols = sum(
-            self.column_composites.get(colname, 1)
-            for colname in self.column_encodings.keys()
-        )
-        rows = math.ceil(len(entries) / self.repeat)
+            ptxts_data: List = round_robin_encode(
+                encode_datum_with_policy, column_data, composite
+            )
+            ptxts.extend(self._packing(ptxts_data))  # Will be either Client or Server
         return ptxts
 
 
 class ClientEncoder(Encoder):
     """Encoder for client"""
 
-    def _packing(self, ptxts: List[Ptxt]) -> None:
+    def _packing(self, ptxts_data: List) -> List[Ptxt]:
         # TODO refactor so that padding is added maybe before encoding
         params = self.params
-        for ptxt_data in ptxts:
+        for ptxt_data in ptxts_data:
             # TODO surely, not required for each item
             padding_size_in_segment = (params.nslots // self.repeat) - len(ptxt_data)
             if padding_size_in_segment < 0:
@@ -209,25 +205,29 @@ class ClientEncoder(Encoder):
                 )
             ptxt_data.extend([] for _ in range(padding_size_in_segment))
 
-        extend_with_repetitions(list_ptxt_data, self.repeat)
-        ptxts.extend(
-            Ptxt(self.params).insert_data(ptxt_data) for ptxt_data in list_ptxt_data
-        )
+        extend_with_repetitions(ptxts_data, self.repeat)
+        return [Ptxt(self.params).insert_data(data) for data in ptxts_data]
 
 
 class ServerEncoder(Encoder):
     """Encoder for server"""
 
-    def _packing(self, ptxts: List[Ptxt]) -> None:
+    def _packing(self, ptxts_data: List) -> List[Ptxt]:
         # For the server, we must expand each datum into a ptxt.
-        ptxts.extend(
+        return [
             Ptxt(self.params).insert_repeated_across_slots(data)
-            for ptxt_data in list_ptxt_data
+            for ptxt_data in ptxts_data
             for data in grouper(ptxt_data, self.repeat, [])
-        )
+        ]
 
     def __call__(self, entries: List[Entry]) -> List[Ptxt]:
         ptxts: List[Ptxt] = super().__call__(entries)
+        # Note the above for server has list in column order, we need row order
+        cols = sum(
+            self.column_composites.get(colname, 1)
+            for colname in self.column_encodings.keys()
+        )
+        rows = math.ceil(len(entries) / self.repeat)
         return transpose(ptxts, rows, cols)
 
 
