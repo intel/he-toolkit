@@ -21,6 +21,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     act_result = execute_process(cmd)
     assert f"fetch" in act_result.stdout
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
     # Test list command after fetch
     cmd = f"{hekit_path} --config {config_file} list"
@@ -30,12 +31,14 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
     # Test build command
     cmd = f"{hekit_path} --config {config_file} build {input_files_path}/test.toml"
     act_result = execute_process(cmd)
     assert "build" in act_result.stdout
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
     # Test list command after build
     cmd = f"{hekit_path} --config {config_file} list"
@@ -45,12 +48,14 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
     # Test install command
     cmd = f"{hekit_path} --config {config_file} install {input_files_path}/test.toml"
     act_result = execute_process(cmd)
     assert "install" in act_result.stdout
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
     # Test list command after isntall
     cmd = f"{hekit_path} --config {config_file} list"
@@ -60,6 +65,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
     # Test remove command
     cmd = f"{hekit_path} --config {config_file} remove {component} {instance}"
@@ -69,3 +75,4 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
         not in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode

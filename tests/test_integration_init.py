@@ -25,13 +25,14 @@ def test_init_hekit_create_config_file(mocker, tmp_path):
 
 def test_init_hekit_rcfile_FileNotFoundError(mocker, tmp_path):
     mockers = Mockers(mocker, tmp_path, False)
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as exc_info:
         main()
     mockers.mock_hekit_print.assert_called_with(
         "Error while running subcommand\n",
         f"FileNotFoundError(PosixPath('{tmp_path}/.mybashfile'))",
         file=stderr,
     )
+    assert 0 != exc_info.value.code
 
 
 """Utilities used by the tests"""

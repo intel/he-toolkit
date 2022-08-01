@@ -13,6 +13,7 @@ def test_gen_primes_start_less_than_stop(hekit_path):
     act_result = execute_process(cmd)
     assert "2\n3\n5\n7\n" in act_result.stdout
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
 def test_gen_primes_start_equal_to_stop(hekit_path):
@@ -22,6 +23,7 @@ def test_gen_primes_start_equal_to_stop(hekit_path):
     act_result = execute_process(cmd)
     assert "\n" in act_result.stdout
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
 def test_gen_primes_start_greater_than_stop(hekit_path):
@@ -31,6 +33,7 @@ def test_gen_primes_start_greater_than_stop(hekit_path):
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert "TypeError(\"'NoneType' object is not iterable\")" in act_result.stderr
+    assert 0 != act_result.returncode
 
 
 def test_gen_primes_negative_start(hekit_path):
@@ -43,6 +46,7 @@ def test_gen_primes_negative_start(hekit_path):
         "ValueError('A negative number was found in the input: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_gen_primes_negative_stop(hekit_path):
@@ -55,6 +59,7 @@ def test_gen_primes_negative_stop(hekit_path):
         "ValueError('A negative number was found in the input: [-5, -4, -3, -2, -1]')"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_gen_primes_max_stop(hekit_path):
@@ -67,6 +72,7 @@ def test_gen_primes_max_stop(hekit_path):
         "OverflowError('Python int too large to convert to C ssize_t')"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_healg_arg_header(hekit_path):
@@ -83,6 +89,7 @@ def test_healg_arg_header(hekit_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
 def test_healg_arg_no_header(hekit_path):
@@ -99,6 +106,7 @@ def test_healg_arg_no_header(hekit_path):
         not in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
 def test_healg_arg_p(hekit_path):
@@ -115,6 +123,7 @@ def test_healg_arg_p(hekit_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
 def test_healg_negative_arg_p(hekit_path):
@@ -126,6 +135,7 @@ def test_healg_negative_arg_p(hekit_path):
         "hekit algebras: error: argument -p: Wrong syntax for range given '-7'"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_healg_max_arg_p(hekit_path):
@@ -137,6 +147,7 @@ def test_healg_max_arg_p(hekit_path):
         "hekit algebras: error: argument -p: invalid parse_range_for_primes value"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_healg_arg_d(hekit_path):
@@ -153,6 +164,7 @@ def test_healg_arg_d(hekit_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
 def test_healg_negative_arg_d(hekit_path):
@@ -164,6 +176,7 @@ def test_healg_negative_arg_d(hekit_path):
         "hekit algebras: error: argument -d: Wrong syntax for range given '-1'"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 @pytest.mark.skip(reason="Not realistic test because SW cannot handle that amount in d")
@@ -176,6 +189,7 @@ def test_healg_max_arg_d(hekit_path):
         "hekit algebras: error: argument -d: invalid parse_range_for_primes value"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_healg_arg_no_corrected(hekit_path):
@@ -194,3 +208,4 @@ def test_healg_arg_no_corrected(hekit_path):
         in act_result.stdout
     )
     assert not act_result.stderr
+    assert 0 == act_result.returncode

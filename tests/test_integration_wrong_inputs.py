@@ -20,6 +20,7 @@ def test_main_config_is_symlink(hekit_path, input_files_path):
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert "The config file cannot be a symlink" in act_result.stderr
+    assert 0 != act_result.returncode
 
 
 def test_main_config_name_has_null(mocker, input_files_path):
@@ -31,13 +32,14 @@ def test_main_config_name_has_null(mocker, input_files_path):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as exc_info:
         main()
     mock_print.assert_called_with(
         "Error while running subcommand\n",
         "ConfigFileError('Error while parsing config file\\n', \"  ValueError('embedded null byte')\")",
         file=stderr,
     )
+    assert 0 != exc_info.value.code
 
 
 def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
@@ -48,6 +50,7 @@ def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert "The TOML file cannot be a symlink" in act_result.stderr
+    assert 0 != act_result.returncode
 
 
 def test_main_toml_name_has_null(mocker, input_files_path):
@@ -59,13 +62,14 @@ def test_main_toml_name_has_null(mocker, input_files_path):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as exc_info:
         main()
     mock_print.assert_called_with(
         "Error while running subcommand\n",
         "ValueError('embedded null byte')",
         file=stderr,
     )
+    assert 0 != exc_info.value.code
 
 
 def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
@@ -78,6 +82,7 @@ def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
     assert (
         "TypeError('replace() argument 2 must be str, not float')" in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_main_toml_missing_value(tmp_path, hekit_path, input_files_path):
@@ -91,6 +96,7 @@ def test_main_toml_missing_value(tmp_path, hekit_path, input_files_path):
         "TomlDecodeError('Empty value is invalid (line 7 column 1 char 122)')"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
@@ -104,6 +110,7 @@ def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
         "TomlDecodeError('Unbalanced quotes (line 9 column 24 char 234)')"
         in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
 """Utilities used by the tests"""
