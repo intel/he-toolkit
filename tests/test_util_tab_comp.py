@@ -4,66 +4,41 @@
 import pytest
 from os import getcwd, chdir
 from pathlib import Path
-from kit.hekit import main
 from kit.utils.tab_completion import components_completer, instances_completer
-from kit.commands.remove import remove_components
-from kit.commands.install import install_components
 
 
-# Due to install command changes current directory,
-# the other commands need to restore the current path
-cwd_test = getcwd()
-
-
-def execute_action(mocker, args_action):
-    global cwd_test
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_action, ""
-    main()
-    chdir(cwd_test)
-
-
-def test_get_instances_after_fetch(mocker, args_fetch, args_tab, comp_data):
-    """Arrange"""
-    execute_action(mocker, args_fetch)
+def test_get_instances_after_fetch(mocker, args_tab, comp_data):
     exp_comp = [comp_data["comp"]]
     exp_inst = [comp_data["inst_v1"], comp_data["inst_v2"]]
+    mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
+    mock_list_dirs.side_effect = [exp_comp, exp_inst]
 
-    """Act"""
     act_comp = components_completer("", args_tab)
     act_inst = instances_completer("", args_tab)
-
-    """Assert"""
     assert act_comp == exp_comp
     assert act_inst == exp_inst
 
 
-def test_get_instances_after_remove_v1(mocker, args_remove_v1, args_tab, comp_data):
-    """Arrange"""
-    execute_action(mocker, args_remove_v1)
+def test_get_instances_after_remove_v1(mocker, args_tab, comp_data):
     exp_comp = [comp_data["comp"]]
     exp_inst = [comp_data["inst_v2"]]
+    mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
+    mock_list_dirs.side_effect = [exp_comp, exp_inst]
 
-    """Act"""
     act_comp = components_completer("", args_tab)
     act_inst = instances_completer("", args_tab)
-
-    """Assert"""
     assert act_comp == exp_comp
     assert act_inst == exp_inst
 
 
-def test_get_instances_after_remove_v2(mocker, args_remove_v2, args_tab):
-    """Arrange"""
-    execute_action(mocker, args_remove_v2)
+def test_get_instances_after_remove_v2(mocker, args_tab):
     exp_comp = []
     exp_inst = []
+    mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
+    mock_list_dirs.side_effect = [exp_comp, exp_inst]
 
-    """Act"""
     act_comp = components_completer("", args_tab)
     act_inst = instances_completer("", args_tab)
-
-    """Assert"""
     assert act_comp == exp_comp
     assert act_inst == exp_inst
 
@@ -78,7 +53,7 @@ class MockArgs:
         self.component = component
         self.instance = instance
         self.config = f"{self.tests_path}/input_files/default.config"
-        self.recipe_file = f"{self.tests_path}/input_files/test_two_instances.toml"
+        self.recipe_file = f"{self.tests_path}/input_files/test.toml"
         self.fn = fn
         self.upto_stage = upto_stage
         self.force = False
@@ -95,22 +70,3 @@ def comp_data():
 @pytest.fixture
 def args_tab(comp_data):
     return MockArgs(None, comp_data["comp"], instance="", upto_stage="")
-
-
-@pytest.fixture
-def args_fetch(comp_data):
-    return MockArgs(install_components, component="", instance="", upto_stage="fetch")
-
-
-@pytest.fixture
-def args_remove_v1(comp_data):
-    return MockArgs(
-        remove_components, comp_data["comp"], comp_data["inst_v1"], upto_stage=""
-    )
-
-
-@pytest.fixture
-def args_remove_v2(comp_data):
-    return MockArgs(
-        remove_components, comp_data["comp"], comp_data["inst_v2"], upto_stage=""
-    )

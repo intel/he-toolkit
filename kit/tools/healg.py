@@ -12,6 +12,7 @@ from sys import stdout, stderr, exit as sys_exit
 from itertools import chain, combinations
 from collections import Counter
 from pathlib import Path
+from kit.utils.files import create_default_workspace
 
 
 def set_gen_primes_subparser(subparsers):
@@ -102,6 +103,7 @@ def parse_range_for_primes(string):
     try:
         primes_list = PrimesFromFile(default_primes_filepath)
     except FileNotFoundError:
+        create_default_workspace()
         with default_primes_filepath.open("w", encoding="utf-8") as f:
             write_primes(2, 140_000, outfile=f)
         primes_list = PrimesFromFile(default_primes_filepath)

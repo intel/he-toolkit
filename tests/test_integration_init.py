@@ -2,143 +2,66 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+from sys import stderr
 from pathlib import Path
 from kit.hekit import main
-from kit.commands.init import init_hekit
+from kit.commands.init import init_hekit, create_default_workspace
 
 
-def test_init_hekit_config_file_exists(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
-    mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = True
-    mockers.mock_exists.side_effect = [True, True]
-
-    """Act"""
+def test_init_hekit_create_config_file(mocker, tmp_path):
+    mockers = Mockers(mocker, tmp_path, True)
+    mockers.create_tmp_config_file()
+    # Create a new config file
     main()
-
-    """Assert"""
-    # create_default_config function
-    mockers.mock_mkdir.assert_called_once()
-    mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
-    # create_backup function
-    mockers.mock_copyfile.assert_called_once()
-    mockers.mock_same_files.assert_called_once()
-    # init_hekit function
-    mockers.mock_remove_from_rc.assert_called_once()
-    mockers.mock_append_to_rc.assert_called_once()
-    mockers.mock_print.assert_any_call(f"source {rc_file}")
-
-
-def test_init_hekit_config_file_is_created(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
-    mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = True
-    mockers.mock_exists.side_effect = [False, True]
-
-    """Act"""
+    mockers.mock_print.assert_any_call(f"{tmp_path}/.hekit/default.config created")
+    mockers.mock_print.assert_any_call(f"source {mockers.filepath}")
+    # Try to create a new config file, but it exists
     main()
-
-    """Assert"""
-    # create_default_config function
-    mockers.mock_mkdir.assert_called_once()
-    mockers.mock_open.assert_called_once()
-    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
-    # create_backup function
-    mockers.mock_copyfile.assert_called_once()
-    mockers.mock_same_files.assert_called_once()
-    # init_hekit function
-    mockers.mock_remove_from_rc.assert_called_once()
-    mockers.mock_append_to_rc.assert_called_once()
-    mockers.mock_print.assert_any_call(f"source {rc_file}")
+    mockers.mock_print.assert_any_call(
+        f"{tmp_path}/.hekit/default.config file already exists"
+    )
+    mockers.mock_print.assert_any_call(f"source {mockers.filepath}")
 
 
-def test_init_hekit_config_FileNotFoundError_from_get_expanded_path(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
-    mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = True
-    mockers.mock_exists.side_effect = [False, False]
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mockers.mock_exit.assert_called_once_with(1)
-    # create_default_config function
-    mockers.mock_mkdir.assert_called_once()
-    mockers.mock_open.assert_called_once()
-    mockers.mock_print.assert_any_call("~/.hekit/default.config created")
-    # create_backup function
-    mockers.mock_copyfile.assert_not_called()
-    mockers.mock_same_files.assert_not_called()
-    # init_hekit function
-    mockers.mock_remove_from_rc.assert_not_called()
-    mockers.mock_append_to_rc.assert_not_called()
-
-
-def test_init_hekit_ValueError_from_create_backup(mocker):
-    """Arrange"""
-    args = MockArgs()
-    rc_file = "~/.mybashfile"
-    mockers = Mockers(mocker)
-    mockers.mock_parse_cmdline.return_value = args, ""
-    mockers.mock_get_rc_file.return_value = rc_file
-    mockers.mock_same_files.return_value = False
-    mockers.mock_exists.side_effect = [True, True]
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mockers.mock_exit.assert_called_once_with(1)
-    # create_default_config function
-    mockers.mock_mkdir.assert_called_once()
-    mockers.mock_print.assert_any_call("~/.hekit/default.config file already exists")
-    # create_backup function
-    mockers.mock_copyfile.assert_called_once()
-    mockers.mock_same_files.assert_called_once()
-    # init_hekit function
-    mockers.mock_remove_from_rc.assert_not_called()
-    mockers.mock_append_to_rc.assert_not_called()
+def test_init_hekit_rcfile_FileNotFoundError(mocker, tmp_path):
+    mockers = Mockers(mocker, tmp_path, False)
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    mockers.mock_hekit_print.assert_called_with(
+        "Error while running subcommand\n",
+        f"FileNotFoundError(PosixPath('{tmp_path}/.mybashfile'))",
+        file=stderr,
+    )
+    assert 0 != exc_info.value.code
 
 
 """Utilities used by the tests"""
 
 
 class Mockers:
-    def __init__(self, mocker):
-        # mocking functions for Path Objects
-        self.mock_mkdir = mocker.patch.object(Path, "mkdir")
-        self.mock_open = mocker.patch.object(Path, "open")
-        # mocking included functions
-        self.mock_print = mocker.patch("kit.commands.init.print")
-        self.mock_copyfile = mocker.patch("kit.commands.init.copyfile")
-        self.mock_same_files = mocker.patch("kit.commands.init.same_files")
-        self.mock_exit = mocker.patch("kit.hekit.sys_exit")
-        # mocking internal functions
+    def __init__(self, mocker, tmp_path, default_config_flag):
+        self.filepath = tmp_path / ".mybashfile"
         self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+        self.mock_parse_cmdline.return_value = MockArgs(default_config_flag), ""
+        self.mock_create_default_workspace = mocker.patch(
+            "kit.commands.init.create_default_workspace",
+            return_value=create_default_workspace(tmp_path),
+        )
         self.mock_get_rc_file = mocker.patch("kit.commands.init.get_rc_file")
-        self.mock_exists = mocker.patch("kit.commands.init.file_exists")
-        self.mock_remove_from_rc = mocker.patch("kit.commands.init.remove_from_rc")
-        self.mock_append_to_rc = mocker.patch("kit.commands.init.append_to_rc")
+        self.mock_get_rc_file.return_value = self.filepath
+        self.mock_print = mocker.patch("kit.commands.init.print")
+        self.mock_hekit_print = mocker.patch("kit.hekit.print")
+
+    def create_tmp_config_file(self):
+        with self.filepath.open("w") as f:
+            f.write("test\n")
 
 
 class MockArgs:
-    def __init__(self):
+    def __init__(self, default_config_flag):
         self.tests_path = Path(__file__).resolve().parent
         self.config = f"{self.tests_path}/input_files/default.config"
-        self.default_config = True
+        self.default_config = default_config_flag
         self.fn = init_hekit
         self.hekit_root_dir = Path("/home")
         self.version = False

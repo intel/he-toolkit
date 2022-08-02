@@ -31,7 +31,9 @@ def test_transform_spec_to_toml_dict():
             }
         ]
     }
-    spec = Spec.from_instance_spec("hexl", input_dict["hexl"][0], rloc="")
+    spec = Spec.from_instance_spec(
+        "hexl", input_dict["hexl"][0], rloc="", recipe_arg_dict={}
+    )
     assert spec.to_toml_dict() == expected_dict
 
 
@@ -47,21 +49,27 @@ def test_when_name_not_given():
     """The name attribute for a component must always be provided."""
     expected = {"hexl": [{}]}
     with pytest.raises(InvalidSpecError) as execinfo:
-        Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+        Spec.from_instance_spec(
+            "hexl", expected["hexl"][0], rloc="", recipe_arg_dict={}
+        )
     assert "'name' was not provided for instance" == str(execinfo.value)
 
 
 def test_when_skip_not_boolean():
     expected = {"hexl": [{"name": "bob", "skip": "False"}]}
     with pytest.raises(InvalidSpecError) as execinfo:
-        Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+        Spec.from_instance_spec(
+            "hexl", expected["hexl"][0], rloc="", recipe_arg_dict={}
+        )
     assert "'skip' not of type bool" == str(execinfo.value)
 
 
 def test_when_attribute_not_string():
     expected = {"hexl": [{"name": "bob", "build": "build", "fetch": False}]}
     with pytest.raises(InvalidSpecError) as execinfo:
-        Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+        Spec.from_instance_spec(
+            "hexl", expected["hexl"][0], rloc="", recipe_arg_dict={}
+        )
     assert "'fetch' is not a string" == str(execinfo.value)
 
 
@@ -78,7 +86,9 @@ def test_basic_substitutions_are_expanded():
             }
         ]
     }
-    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+    spec = Spec.from_instance_spec(
+        "hexl", expected["hexl"][0], rloc="", recipe_arg_dict={}
+    )
     assert spec["name"] == "bob2"
     assert spec["something"] == "bla/bob2/bla"
     assert spec["another"] == "start-bla/bob2/bla-end"
@@ -87,7 +97,9 @@ def test_basic_substitutions_are_expanded():
 def test_write_spec_to_toml_file(create_basic_spec_file, tmp_path):
     """Compare with manually written TOML file"""
     path_to_expected_file, expected_dict = create_basic_spec_file
-    spec = Spec.from_instance_spec("hexl", expected_dict["hexl"][0], rloc="")
+    spec = Spec.from_instance_spec(
+        "hexl", expected_dict["hexl"][0], rloc="", recipe_arg_dict={}
+    )
     path_to_spec_file = (tmp_path / "spec.toml").resolve()
     spec.to_toml_file(path_to_spec_file)
     assert compare_files(path_to_spec_file, path_to_expected_file)
@@ -102,7 +114,7 @@ def test_dependency_substitutions_are_expanded(tmp_path):
     dep_loc = tmp_path / "hexl/bob"
     # Creates missing directories
     dep_loc.mkdir(parents=True)
-    dep_spec = Spec.from_instance_spec("hexl", dep["hexl"][0], rloc)
+    dep_spec = Spec.from_instance_spec("hexl", dep["hexl"][0], rloc, recipe_arg_dict={})
     # Write depedency spec to file
     dep_spec.to_toml_file((dep_loc / "hekit.spec").resolve())
 
@@ -117,7 +129,9 @@ def test_dependency_substitutions_are_expanded(tmp_path):
             }
         ]
     }
-    spec = Spec.from_instance_spec("somelib", expected["somelib"][0], rloc)
+    spec = Spec.from_instance_spec(
+        "somelib", expected["somelib"][0], rloc, recipe_arg_dict={}
+    )
     assert spec["something"] == f"bla/alice/bla --dep={dep_loc}/someinfo"
 
 
@@ -135,7 +149,9 @@ def test_add_component_repo_location_to_inits_and_exports():
         ]
     }
     rloc = "/home/some_user"
-    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc)
+    spec = Spec.from_instance_spec(
+        "hexl", expected["hexl"][0], rloc, recipe_arg_dict={}
+    )
     assert spec["something"] == "bla/bob/bla"
     # rloc/component/instance
     assert spec["init_something"] == f"{rloc}/hexl/bob/bla/bob/bla"
@@ -160,7 +176,9 @@ def test_basic_user_substitutions_are_expanded(mocker):
             }
         ]
     }
-    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc="")
+    spec = Spec.from_instance_spec(
+        "hexl", expected["hexl"][0], rloc="", recipe_arg_dict={}
+    )
     assert spec["name"] == f"bob{exp_name}"
     assert spec["init_something"] == f"bla/bob{exp_name}/bla"
     assert spec["another"] == f"start-{exp_version}-bla/bob{exp_name}/bla-end"
@@ -187,8 +205,8 @@ def test_user_substitutions_are_expanded_to_init(mocker):
         ]
     }
     rloc = "/home/some_user"
-    Spec.recipe_arg_dict = {"version": exp_version}
-    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc)
+    recipe_arg_dict = {"version": exp_version}
+    spec = Spec.from_instance_spec("hexl", expected["hexl"][0], rloc, recipe_arg_dict)
     mock_input.assert_called_once()
     assert spec["something"] == f"bla/{exp_name}/bla"
     # rloc/component/instance
@@ -216,7 +234,6 @@ def test_validate_unique_instance_same_values(mocker):
     act_rloc = "/home"
 
     Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
-
     mock_read_spec.assert_called_once()
 
 
@@ -231,7 +248,6 @@ def test_validate_unique_instance_different_values(mocker):
 
     with pytest.raises(InvalidSpecError) as execinfo:
         Spec._validate_unique_instance(act_comp, act_inst, act_rloc)
-
     mock_read_spec.assert_called_once()
     assert (
         "comp/test is already present but it was executed with different options"
@@ -249,7 +265,6 @@ def test_from_toml_file_tsort(mocker):
     filepath = f"{tests_path}/input_files/test_tsort.toml"
 
     specs = list(Spec.from_toml_file(filepath, rloc="", recipe_arg_dict={}))
-
     assert 6 == mock_read_spec.call_count
     assert 8 == mock_validate_unique.call_count
     assert len(specs) == len(exp_keys_list)

@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from re import findall
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List
 from toml import dump, load
 from kit.utils.tsort import tsort
@@ -176,8 +176,6 @@ class Spec:
         "init_install_dir": "build",
     }
 
-    recipe_arg_dict: RecipeArgDict = field(default_factory=dict)
-
     # Factory from TOML file
     @classmethod
     def from_toml_file(
@@ -185,10 +183,6 @@ class Spec:
     ):
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
-
-        # Dictionary filled with recipe_arg values
-        cls.recipe_arg_dict = recipe_arg_dict
-
         # load the recipe file
         toml_specs = load(filename)
 
@@ -209,14 +203,18 @@ class Spec:
             # TODO: Add else case to check that dependency is already installed
             if component in toml_specs:
                 for instance_spec in toml_specs[component]:
-                    yield cls.from_instance_spec(component, instance_spec, rloc)
+                    yield cls.from_instance_spec(
+                        component, instance_spec, rloc, recipe_arg_dict
+                    )
 
     @staticmethod
-    def _expand_instance(component: str, instance: dict, rloc: PathType):
+    def _expand_instance(
+        component: str, instance: dict, rloc: PathType, recipe_arg_dict: RecipeArgDict
+    ):
         """Expansion operations"""
         # substitution from user must come before rloc expansion
         # to avoid asking for the same data several times
-        instance = fill_user_string_dict(instance, Spec.recipe_arg_dict)
+        instance = fill_user_string_dict(instance, recipe_arg_dict)
         if rloc != "":
             instance_name = instance["name"]
             instance = fill_rloc_paths(instance, f"{rloc}/{component}/{instance_name}")
@@ -260,7 +258,11 @@ class Spec:
     # Factory given parsed TOML python dict
     @classmethod
     def from_instance_spec(
-        cls, component: str, instance_spec: dict, rloc: PathType
+        cls,
+        component: str,
+        instance_spec: dict,
+        rloc: PathType,
+        recipe_arg_dict: RecipeArgDict,
     ) -> Spec:
         """Expand paths.
         Populate the fixed attribs and place others in dictionary."""
@@ -268,7 +270,7 @@ class Spec:
         # Add some defaults and override with input instance spec
         instance_spec_with_defaults = {**cls._fixed_attribs, **instance_spec}
         expanded_instance_spec = cls._expand_instance(
-            component, instance_spec_with_defaults, rloc
+            component, instance_spec_with_defaults, rloc, recipe_arg_dict
         )
         cls._validate_unique_instance(component, expanded_instance_spec, rloc)
         return cls(component, expanded_instance_spec, rloc)

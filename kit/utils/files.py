@@ -6,6 +6,7 @@
 from os import walk
 from typing import Callable, List
 from enum import Enum
+from pathlib import Path
 from kit.utils.typing import PathType
 
 
@@ -32,3 +33,10 @@ def files_in_dir(
 def list_dirs(path: PathType) -> List[str]:
     """Return list of directories in path."""
     return files_in_dir(path, ftype=FileType.DIRS)
+
+
+def create_default_workspace(dir_path: str = "~") -> Path:
+    """Create the directory ~/.hekit"""
+    workspace_path = Path(dir_path).expanduser() / ".hekit"
+    workspace_path.mkdir(exist_ok=True)
+    return workspace_path

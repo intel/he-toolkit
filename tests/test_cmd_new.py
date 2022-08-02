@@ -14,78 +14,57 @@ from kit.commands.new import (
 
 
 def test_create_toml_template(mocker, create_basic_spec_file, tmp_path):
-    """Arrange"""
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     project_name, project_path, expected_file = create_basic_spec_file
     toml_path = (tmp_path / "spec.toml").resolve()
 
-    """Act"""
     create_toml_template(project_name, project_path, toml_path)
-
-    """Assert"""
     mock_mkdir.assert_called_once()
     assert compare_files(expected_file, toml_path)
 
 
 def test_create_cmake_template(create_basic_cmake_file, tmp_path):
-    """Arrange"""
     project_name, expected_file = create_basic_cmake_file
     cmake_path = (tmp_path / "CMakeLists.txt").resolve()
 
-    """Act"""
     create_cmake_template(project_name, cmake_path)
-
-    """Assert"""
     assert compare_files(expected_file, cmake_path)
 
 
 def test_modify_cmake_file(
     create_basic_cmake_file, create_modified_cmake_file, tmp_path
 ):
-    """Arrange"""
     _, expected_file = create_basic_cmake_file
     modified_name, modified_file = create_modified_cmake_file
 
-    """Act"""
     modify_cmake_file(modified_name, expected_file)
-
-    """Assert"""
     assert compare_files(expected_file, modified_file)
 
 
 def test_create_directory_structure(tmp_path):
-    """Arrange"""
     project_name = "test2"
     project_path = tmp_path.resolve() / "projects" / project_name
     readme_path = project_path / "README.md"
     cpp_path = project_path / "src" / f"{project_name}.cpp"
     header_path = project_path / "include" / f"{project_name}.h"
 
-    """Act"""
     create_directory_structure(project_name, project_path)
-
-    """Assert"""
     assert readme_path.exists()
     assert cpp_path.exists()
     assert header_path.exists()
 
 
 def test_create_new_project(tmp_path):
-    """Arrange"""
     project_name = "test2"
     directory = tmp_path.resolve()
     args = MockArgs(project_name, directory, based_on="")
-
     project_path = directory / "projects" / project_name
     readme_path = project_path / "README.md"
     cpp_path = project_path / "src" / f"{project_name}.cpp"
     header_path = project_path / "include" / f"{project_name}.h"
     toml_path = project_path / "recipes" / f"{project_name}.toml"
 
-    """Act"""
     create_new_project(args)
-
-    """Assert"""
     assert readme_path.exists()
     assert cpp_path.exists()
     assert header_path.exists()
@@ -93,20 +72,15 @@ def test_create_new_project(tmp_path):
 
 
 def test_create_new_project_FileExistsError(mocker, tmp_path):
-    """Arrange"""
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     mock_mkdir.side_effect = FileExistsError()
     mock_print = mocker.patch("kit.commands.new.print")
-
     project_name = "test2"
     directory = tmp_path.resolve()
     args = MockArgs(project_name, directory, based_on="")
     project_path = directory / "projects" / project_name
 
-    """Act"""
     create_new_project(args)
-
-    """Assert"""
     mock_print.assert_called_with(f"Project {project_path} already exists")
 
 

@@ -3,348 +3,215 @@
 
 import pytest
 import sys
-from sys import stderr
-from pathlib import Path
-from kit.hekit import main
-from kit.tools.healg import healg, gen_primes
+from tests.common_utils import execute_process, hekit_path
 
 
-def test_gen_primes_start_less_than_stop(mocker):
-    """Arrange"""
-    args = MockArgsGenPrimes()
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 1 == mock_print.call_count
+def test_gen_primes_start_less_than_stop(hekit_path):
+    """Verify that gen-primes cmd is executed correctly when
+    start is less than stop"""
+    cmd = f"{hekit_path} gen-primes 0 10"
+    act_result = execute_process(cmd)
+    assert "2\n3\n5\n7\n" in act_result.stdout
+    assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
-def test_gen_primes_start_equal_to_stop(mocker):
-    """Arrange"""
-    args = MockArgsGenPrimes()
-    args.stop = args.start
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 1 == mock_print.call_count
+def test_gen_primes_start_equal_to_stop(hekit_path):
+    """Verify that gen-primes cmd is executed correctly when
+    start is equal to stop"""
+    cmd = f"{hekit_path} gen-primes 10 10"
+    act_result = execute_process(cmd)
+    assert "\n" in act_result.stdout
+    assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
-def test_gen_primes_start_greater_than_stop(mocker):
-    """Arrange"""
-    args = MockArgsGenPrimes()
-    args.stop = 10
-    args.start = 100
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    mock_print_main = mocker.patch("kit.hekit.print")
+def test_gen_primes_start_greater_than_stop(hekit_path):
+    """Verify that gen-primes cmd triggers an error when
+    start is greater than stop"""
+    cmd = f"{hekit_path} gen-primes 100 10"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert "TypeError(\"'NoneType' object is not iterable\")" in act_result.stderr
+    assert 0 != act_result.returncode
 
-    """Act"""
-    main()
 
-    """Assert"""
-    mock_exit.assert_called_once_with(1)
-    mock_print.assert_not_called()
-    mock_exit.assert_called_once_with(1)
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n",
-        "TypeError(\"'NoneType' object is not iterable\")",
-        file=stderr,
+def test_gen_primes_negative_start(hekit_path):
+    """Verify that gen-primes cmd triggers an error when
+    start is negative"""
+    cmd = f"{hekit_path} gen-primes -1 10"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert (
+        "ValueError('A negative number was found in the input: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')"
+        in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
-def test_gen_primes_negative_start(mocker):
-    """Arrange"""
-    args = MockArgsGenPrimes()
-    args.start = -1
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    mock_print_main = mocker.patch("kit.hekit.print")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_not_called()
-    mock_exit.assert_called_once_with(1)
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n",
-        "ValueError('A negative number was found in the input: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')",
-        file=stderr,
+def test_gen_primes_negative_stop(hekit_path):
+    """Verify that gen-primes cmd triggers an error when
+    start and stop are negative"""
+    cmd = f"{hekit_path} gen-primes -5 -1"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert (
+        "ValueError('A negative number was found in the input: [-5, -4, -3, -2, -1]')"
+        in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
-def test_gen_primes_negative_stop(mocker):
-    """Arrange"""
-    args = MockArgsGenPrimes()
-    args.start = -5
-    args.stop = -1
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    mock_print_main = mocker.patch("kit.hekit.print")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_exit.assert_called_once_with(1)
-    mock_print.assert_not_called()
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n",
-        "ValueError('A negative number was found in the input: [-5, -4, -3, -2, -1]')",
-        file=stderr,
+def test_gen_primes_max_stop(hekit_path):
+    """Verify that gen-primes cmd triggers an error when
+    stop is equal to sys.maxsize"""
+    cmd = f"{hekit_path} gen-primes -5 {sys.maxsize}"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert (
+        "OverflowError('Python int too large to convert to C ssize_t')"
+        in act_result.stderr
     )
+    assert 0 != act_result.returncode
 
 
-def test_gen_primes_max_stop(mocker):
-    """Arrange"""
-    args = MockArgsGenPrimes()
-    args.stop = sys.maxsize
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    mock_print_main = mocker.patch("kit.hekit.print")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_not_called()
-    mock_exit.assert_called_once_with(1)
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n",
-        "OverflowError('Python int too large to convert to C ssize_t')",
-        file=stderr,
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_arg_header(hekit_path):
+    """Verify that gen-primes cmd is excuted correctly
+    when p and d are single numbers"""
+    cmd = f"{hekit_path} algebras -p 2 -d 3"
+    act_result = execute_process(cmd)
+    assert (
+        "2                    3                    7                    6                    2"
+        in act_result.stdout
     )
-
-
-def test_healg_arg_header(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    width = 20
-    exp_output = f"{'p' :^{width}} {'d' :^{width}} {'m' :^{width}} {'phim' :^{width}} {'nslots' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 2 == mock_print.call_count
-    mock_print.assert_called_with(exp_output)
-
-
-def test_healg_arg_no_header(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_print.assert_not_called()
-
-
-def test_healg_arg_p(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    args.p = [7]
-    width = 20
-    exp_output = f"{'7' :^{width}} {'1' :^{width}} {'6' :^{width}} {'2' :^{width}} {'2' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 3 == mock_print.call_count
-    mock_print.assert_called_with(exp_output)
-
-
-def test_healg_negative_arg_p(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    args.p = [-1]
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    mock_print_main = mocker.patch("kit.hekit.print")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_exit.assert_called_once_with(1)
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n",
-        "ValueError('A negative number was found in the input: [-2]')",
-        file=stderr,
+    assert (
+        "p                    d                    m                   phim                nslots"
+        in act_result.stdout
     )
+    assert not act_result.stderr
+    assert 0 == act_result.returncode
 
 
-def test_healg_max_arg_p(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    args.p = [sys.maxsize]
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-    mock_print = mocker.patch("kit.tools.healg.print")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 15 == mock_print.call_count
-
-
-def test_healg_arg_d(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    args.d = [4, 5]
-    args.p = [2]
-    width = 20
-    exp_output = f"{'2' :^{width}} {'5' :^{width}} {'31' :^{width}} {'30' :^{width}} {'6' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 4 == mock_print.call_count
-    mock_print.assert_called_with(exp_output)
-
-
-def test_healg_negative_arg_d(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    args.d = [-1]
-    args.p = [2]
-    width = 20
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print_main = mocker.patch("kit.hekit.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    mock_exit.assert_called_once_with(1)
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n",
-        "ValueError('A negative number was found in the input: [-0.5]')",
-        file=stderr,
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_arg_no_header(hekit_path):
+    """Verify that algebras cmd is excuted correctly when
+    --no-header flag is used"""
+    cmd = f"{hekit_path} algebras -p 2 -d 3 --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "2                    3                    7                    6                    2"
+        in act_result.stdout
     )
+    assert (
+        "p                    d                    m                   phim                nslots"
+        not in act_result.stdout
+    )
+    assert not act_result.stderr
+    assert 0 == act_result.returncode
+
+
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_arg_p(hekit_path):
+    """Verify that gen-primes cmd is excuted correctly when
+    p is a list of numbers"""
+    cmd = f"{hekit_path} algebras -p 7,13 -d 1 --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "7                    1                    2                    1                    1"
+        in act_result.stdout
+    )
+    assert (
+        "13                   1                    12                   4                    4"
+        in act_result.stdout
+    )
+    assert not act_result.stderr
+    assert 0 == act_result.returncode
+
+
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_negative_arg_p(hekit_path):
+    """Verify that gen-primes cmd triggers an error when
+    p is a negative number"""
+    cmd = f"{hekit_path} algebras -p -7 -d 1 --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "hekit algebras: error: argument -p: Wrong syntax for range given '-7'"
+        in act_result.stderr
+    )
+    assert 0 != act_result.returncode
+
+
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_max_arg_p(hekit_path):
+    """Verify that gen-primes cmd is excuted correctly when
+    p is equal to sys.maxsize"""
+    cmd = cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "hekit algebras: error: argument -p: invalid parse_range_for_primes value"
+        in act_result.stderr
+    )
+    assert 0 != act_result.returncode
+
+
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_arg_d(hekit_path):
+    """Verify that gen-primes cmd is excuted correctly when
+    d is a list of numbers"""
+    cmd = f"{hekit_path} algebras -p 2 -d 3,5 --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "2                    3                    7                    6                    2"
+        in act_result.stdout
+    )
+    assert (
+        "2                    5                    31                   30                   6"
+        in act_result.stdout
+    )
+    assert not act_result.stderr
+    assert 0 == act_result.returncode
+
+
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_negative_arg_d(hekit_path):
+    """Verify that gen-primes cmd triggers an error when
+    d is a negative number"""
+    cmd = f"{hekit_path} algebras -p 7 -d -1 --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "hekit algebras: error: argument -d: Wrong syntax for range given '-1'"
+        in act_result.stderr
+    )
+    assert 0 != act_result.returncode
 
 
 @pytest.mark.skip(reason="Not realistic test because SW cannot handle that amount in d")
-def test_healg_max_arg_d(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_header = False
-    args.d = [sys.maxsize]
-    args.p = [2]
-    width = 20
-    exp_output = f"{'2' :^{width}} {'5' :^{width}} {'31' :^{width}} {'30' :^{width}} {'6' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 4 == mock_print.call_count
-    mock_print.assert_called_with(exp_output)
+def test_healg_max_arg_d(hekit_path):
+    """Verify that gen-primes cmd is excuted correctly when
+    d is equal to sys.maxsize"""
+    cmd = cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
+    act_result = execute_process(cmd)
+    assert (
+        "hekit algebras: error: argument -d: invalid parse_range_for_primes value"
+        in act_result.stderr
+    )
+    assert 0 != act_result.returncode
 
 
-def test_healg_arg_no_corrected(mocker):
-    """Arrange"""
-    args = MockArgsHealg()
-    args.no_corrected = False
-    args.no_header = False
-    args.d = [2, 4, 5]
-    args.p = [11, 13, 17, 19, 23]
-    width = 20
-    exp_output = f"{'23' :^{width}} {'5' :^{width}} {'6436342' :^{width}} {'2925600' :^{width}} {'585120' :^{width}}"
-    mock_PrimesFromFile = mocker.patch("kit.tools.healg.PrimesFromFile")
-    mock_PrimesFromFile.is_prime.return_value = True
-    mock_print = mocker.patch("kit.tools.healg.print")
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args, ""
-
-    """Act"""
-    main()
-
-    """Assert"""
-    assert 376 == mock_print.call_count
-    mock_print.assert_called_with(exp_output)
-
-
-class MockArgsHealg:
-    def __init__(self):
-        self.tests_path = Path(__file__).resolve().parent
-        self.p = [2]
-        self.d = [1]
-        self.no_corrected = True
-        self.no_header = True
-        self.version = False
-        self.fn = healg
-        self.config = f"{self.tests_path}/input_files/default.config"
-        self.tests_path = Path(__file__).resolve().parent
-
-
-class MockArgsGenPrimes:
-    def __init__(self):
-        self.tests_path = Path(__file__).resolve().parent
-        self.version = False
-        self.stop = 10
-        self.start = 0
-        self.fn = gen_primes
-        self.config = f"{self.tests_path}/input_files/default.config"
-        self.tests_path = Path(__file__).resolve().parent
+@pytest.mark.xdist_group(name="arg_group")
+def test_healg_arg_no_corrected(hekit_path):
+    """Verify that algebras cmd is excuted correctly when
+    --no-corrected flag is used"""
+    cmd = f"{hekit_path} algebras -p 11,19,23 -d 2,4,5 --no-header --no-corrected "
+    act_result = execute_process(cmd)
+    assert (
+        "11                   2                    3                    2                    1"
+        in act_result.stdout
+    )
+    assert (
+        "23                   5                 6436342              2925600               585120"
+        in act_result.stdout
+    )
+    assert not act_result.stderr
+    assert 0 == act_result.returncode

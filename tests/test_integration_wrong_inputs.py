@@ -2,181 +2,128 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from os import getcwd, chdir
 from sys import stderr
-from pathlib import Path
 from kit.hekit import main
+from tests.common_utils import (
+    create_config_file,
+    execute_process,
+    hekit_path,
+    input_files_path,
+)
 from kit.commands.install import install_components
 
 
-def test_main_config_is_symlink(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.config = f"{args_fetch.tests_path}/input_files/default_symlink.config"
+def test_main_config_is_symlink(hekit_path, input_files_path):
+    """Verify that the SW triggers an exception when
+    the config file is a symlink"""
+    cmd = f"{hekit_path} --config {input_files_path}/default_symlink.config list"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert "The config file cannot be a symlink" in act_result.stderr
+    assert 0 != act_result.returncode
+
+
+def test_main_config_name_has_null(mocker, input_files_path):
+    """Verify that the SW triggers an exception when
+    the name of the config file has a null character"""
+    args = MockArgs()
+    args.config = f"{input_files_path}/web.xml\0default.config"
+    args.recipe_file = f"{input_files_path}/test.toml"
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
+    mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
-
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
-
-    """Act"""
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as exc_info:
         main()
-
-    """Assert"""
-    mock_print.assert_called_with(
-        "Error while running subcommand\n",
-        "TypeError('The config file cannot be a symlink')",
-        file=stderr,
-    )
-
-
-def test_main_config_name_has_null(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.config = f"{args_fetch.tests_path}/input_files/web.xml\0default.config"
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.hekit.print")
-
-    arg1 = f"{args_fetch.component}/{args_fetch.instance}"
-
-    """Act"""
-    with pytest.raises(SystemExit):
-        main()
-
-    """Assert"""
     mock_print.assert_called_with(
         "Error while running subcommand\n",
         "ConfigFileError('Error while parsing config file\\n', \"  ValueError('embedded null byte')\")",
         file=stderr,
     )
+    assert 0 != exc_info.value.code
 
 
-def test_main_toml_is_symlink(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.recipe_file = f"{args_fetch.tests_path}/input_files/test_symlink.toml"
+def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
+    """Verify that the SW triggers an exception when
+    the recipe file is a symlink"""
+    config_file = create_config_file(tmp_path)
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_symlink.toml"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert "The TOML file cannot be a symlink" in act_result.stderr
+    assert 0 != act_result.returncode
+
+
+def test_main_toml_name_has_null(mocker, input_files_path):
+    """Verify that the SW triggers an exception when
+    the name of the recipe file has a null character"""
+    args = MockArgs()
+    args.config = f"{input_files_path}/default.config"
+    args.recipe_file = f"{input_files_path}/web.xml\0test.toml"
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_print_main = mocker.patch("kit.hekit.print")
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-
-    main()
-
-    """Assert"""
-    message = "TypeError('The TOML file cannot be a symlink')"
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n", message, file=stderr
+    mock_parse_cmdline.return_value = args, ""
+    mock_print = mocker.patch("kit.hekit.print")
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    mock_print.assert_called_with(
+        "Error while running subcommand\n",
+        "ValueError('embedded null byte')",
+        file=stderr,
     )
-    mock_exit.assert_called_once_with(1)
+    assert 0 != exc_info.value.code
 
 
-def test_main_toml_name_has_null(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.recipe_file = f"{args_fetch.tests_path}/input_files/web.xml\0test.toml"
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_print_main = mocker.patch("kit.hekit.print")
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-
-    main()
-
-    """Assert"""
-    message = "ValueError('embedded null byte')"
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n", message, file=stderr
+def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
+    """Verify that the SW triggers an exception when
+    the recipe file contains a float value instead of a string"""
+    config_file = create_config_file(tmp_path)
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_wrong_format.toml"
+    act_result = execute_process(cmd)
+    assert "while running subcommand" in act_result.stderr
+    assert (
+        "TypeError('replace() argument 2 must be str, not float')" in act_result.stderr
     )
-    mock_exit.assert_called_once_with(1)
+    assert 0 != act_result.returncode
 
 
-def test_main_toml_wrong_format(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.recipe_file = (
-        f"{args_fetch.tests_path}/input_files/test_wrong_format.toml"
+def test_main_toml_missing_value(tmp_path, hekit_path, input_files_path):
+    """Verify that the SW triggers an exception when
+    the recipe file does not have a value in the key=value pair"""
+    config_file = create_config_file(tmp_path)
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_value.toml"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert (
+        "TomlDecodeError('Empty value is invalid (line 7 column 1 char 122)')"
+        in act_result.stderr
     )
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_print_main = mocker.patch("kit.hekit.print")
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
+    assert 0 != act_result.returncode
 
-    """Act"""
-    main()
 
-    """Assert"""
-    message = "TypeError('replace() argument 2 must be str, not float')"
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n", message, file=stderr
+def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
+    """Verify that the SW triggers an exception when
+    the recipe file has a missing quote in key="value" pair"""
+    config_file = create_config_file(tmp_path)
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_quotes.toml"
+    act_result = execute_process(cmd)
+    assert "Error while running subcommand" in act_result.stderr
+    assert (
+        "TomlDecodeError('Unbalanced quotes (line 9 column 24 char 234)')"
+        in act_result.stderr
     )
-    mock_exit.assert_called_once_with(1)
-
-
-def test_main_toml_missing_value(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.recipe_file = (
-        f"{args_fetch.tests_path}/input_files/test_missing_value.toml"
-    )
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_print_main = mocker.patch("kit.hekit.print")
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    message = "TomlDecodeError('Empty value is invalid (line 7 column 1 char 122)')"
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n", message, file=stderr
-    )
-    mock_exit.assert_called_once_with(1)
-
-
-def test_main_toml_missing_quotes(mocker, args_fetch):
-    """Arrange"""
-    args_fetch.recipe_file = (
-        f"{args_fetch.tests_path}/input_files/test_missing_quotes.toml"
-    )
-    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
-    mock_parse_cmdline.return_value = args_fetch, ""
-    mock_print = mocker.patch("kit.commands.install.print")
-    mock_print_main = mocker.patch("kit.hekit.print")
-    mock_exit = mocker.patch("kit.hekit.sys_exit")
-
-    """Act"""
-    main()
-
-    """Assert"""
-    message = "TomlDecodeError('Unbalanced quotes (line 9 column 24 char 234)')"
-    mock_print_main.assert_called_with(
-        "Error while running subcommand\n", message, file=stderr
-    )
-    mock_exit.assert_called_once_with(1)
+    assert 0 != act_result.returncode
 
 
 """Utilities used by the tests"""
 
 
 class MockArgs:
-    def __init__(self, fn, upto_stage):
-        self.tests_path = Path(__file__).resolve().parent
+    def __init__(self):
         self.version = False
         self.component = "hexl"
         self.instance = "1.2.3"
-        self.config = f"{self.tests_path}/input_files/default.config"
-        self.recipe_file = f"{self.tests_path}/input_files/test.toml"
-        self.fn = fn
-        self.upto_stage = upto_stage
+        self.fn = install_components
+        self.upto_stage = "fetch"
         self.force = False
         self.all = False
         self.y = True
-        # back substitution
-        self.recipe_arg = {"name": self.instance}
-        self.toml_arg_version = self.instance
-        self.toml_arg_build = "build"
-
-
-@pytest.fixture
-def args_fetch():
-    return MockArgs(install_components, "fetch")
+        self.recipe_arg = {}
