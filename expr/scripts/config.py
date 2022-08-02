@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 
 import toml
 from ptxt import Params
@@ -23,8 +23,8 @@ class Config:
     params: Params
     columns: int
     segments: int
-    encodings: Dict[str, str]
-    composites: Dict[str, int]
+    encodings: Optional[Dict[str, str]]
+    composites: Optional[Dict[str, int]]
 
     @classmethod
     def from_toml(cls, filename: str, params_only: bool = False) -> Config:

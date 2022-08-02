@@ -124,15 +124,42 @@ def test_how_many_entries_in_file(tmp_path):
     assert how_many_entries_in_file(filepath.resolve()) == num_of_lines
 
 
-def test_parse_args():
-    cmdline_args = "--config some_params.file some_data.file".split()
-    args = parse_args(cmdline_args)
+def test_parse_args_params_only(tmp_path):
+    config_file = tmp_path / "some_config.file"
+    config_file.open("w").write(
+        """
+        [params]
+        p = 257
+        m = 80
 
+        [config]
+        columns = 3
+        segments = 2
+
+        [columns.encoding]
+        column1 = "alphanumeric"
+        column2 = "alphabetical"
+        column3 = "numeric"
+
+        [columns.composite]
+        column2 = 2
+    """
+    )
+    cmdline_args = f"--config {config_file} some_data.file".split()
+    args = parse_args(cmdline_args)
     expected_obj = {
-        "params": "some_params.file",
+        "config": Config(
+            params=Params(m=80, p=257),
+            columns=3,
+            segments=2,
+            encodings={
+                "column1": "alphanumeric",
+                "column2": "alphabetical",
+                "column3": "numeric",
+            },
+            composites={"column2": 2},
+        ),
         "datafile": "some_data.file",
-        "composite": [1, 2, 3],
-        "segment": 2,
         "server": False,
     }
 
@@ -281,7 +308,6 @@ def params_and_policies():
     Params = namedtuple("Params", ["m", "p", "d", "nslots"])
     params = Params(m=24, p=37, d=2, nslots=8)
 
-    int_to_poly = partial(int_to_poly, p=params.p, d=params.d)
     policies = {
         "alphanumeric": {
             symbol: code
@@ -291,7 +317,7 @@ def params_and_policies():
             symbol: code for code, symbol in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1)
         },
         # func must return slot list
-        "numeric": int_to_poly,
+        "numeric": partial(int_to_poly, p=params.p, d=params.d),
     }
 
     return params, policies

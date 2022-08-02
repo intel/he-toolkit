@@ -10,7 +10,6 @@ import argparse
 import math
 import string
 from csv import DictReader
-from pathlib import Path
 from functools import partial
 from itertools import zip_longest
 from typing import Dict, List, Sequence, Iterable, Generator, Callable, Union
@@ -144,7 +143,7 @@ def round_robin_encode(encode: Callable, data, composite_columns: int) -> List:
     if composite_columns == 1:
         return [[encode(datum) for datum in data]]
 
-    ptxt_data_list = [[] for _ in range(composite_columns)]
+    ptxt_data_list: List[List] = [[] for _ in range(composite_columns)]
     for i, datum in enumerate(data):
         ptxt_data_list[i % composite_columns].append(encode(datum))
     return ptxt_data_list
@@ -242,7 +241,7 @@ def how_many_entries_in_file(filename: str) -> int:
 def parse_args(argv: List[str] = None):
     """Parse argv either passed in or from the command line"""
     parser = argparse.ArgumentParser(description="Encoder for client and server sides")
-    parser.add_argument("datafile", type=Path, help="Data file to encode")
+    parser.add_argument("datafile", type=str, help="Data file to encode")
     parser.add_argument(
         "--server",
         action="store_true",

@@ -154,6 +154,7 @@ kit/utils/subparsers.py
 kit/utils/tab_completion.py
 kit/utils/tsort.py
 kit/utils/typing.py
+mypy.ini
 recipes/default.toml
 recipes/examples.toml
 recipes/sample-kernels.toml
