@@ -17,7 +17,7 @@ def test_gen_primes_start_less_than_stop(hekit_path):
 
 
 def test_gen_primes_start_equal_to_stop(hekit_path):
-    """Verify that gen-primes cmd is excuted correctly when
+    """Verify that gen-primes cmd is executed correctly when
     start is equal to stop"""
     cmd = f"{hekit_path} gen-primes 10 10"
     act_result = execute_process(cmd)

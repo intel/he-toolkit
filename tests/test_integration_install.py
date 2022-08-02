@@ -57,7 +57,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     assert not act_result.stderr
     assert 0 == act_result.returncode
 
-    # Test list command after isntall
+    # Test list command after install
     cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (

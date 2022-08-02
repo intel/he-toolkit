@@ -44,7 +44,7 @@ def test_main_config_name_has_null(mocker, input_files_path):
 
 def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
-    the config file is a symlink"""
+    the recipe file is a symlink"""
     config_file = create_config_file(tmp_path)
     cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_symlink.toml"
     act_result = execute_process(cmd)
@@ -74,7 +74,7 @@ def test_main_toml_name_has_null(mocker, input_files_path):
 
 def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
-    the recipe file has an float value instead of a string"""
+    the recipe file contains a float value instead of a string"""
     config_file = create_config_file(tmp_path)
     cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_wrong_format.toml"
     act_result = execute_process(cmd)
