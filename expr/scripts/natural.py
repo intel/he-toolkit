@@ -20,8 +20,11 @@ class Natural:
     def __int__(self) -> int:
         return self.number
 
-    def __le__(self, other_number: Union[Natural, int]) -> bool:
-        return self.number <= int(other_number)
+    def __le__(self, other: Union[Natural, int]) -> bool:
+        return self.number <= int(other)
 
-    def __eq__(self, other_number: Union[Natural, int]) -> bool:
-        return self.number == int(other_number)
+    # mypy says arg for __eq__ should be type object
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, (Natural, int)):
+            raise NotImplementedError
+        return self.number == int(other)

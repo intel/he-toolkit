@@ -47,10 +47,10 @@ class Ptxt:
            Inputs are params and an encode function"""
         if not isinstance(params, Params):
             raise ValueError("params argument not type Params but type {type(params)}")
-        self._params = params
-        self._slots = None
+        self._params: Params = params
+        self._slots: List = []
 
-    def _check_valid(self, slots: List = None, check_length: bool = True) -> None:
+    def _check_valid(self, slots: List, check_length: bool = True) -> None:
         """Util function to check validity of data struct holding a ptxt."""
         slots = self._slots if slots is None else slots
         params = self._params
@@ -103,7 +103,7 @@ class Ptxt:
 
     def insert_repeated_across_slots(self, data) -> Ptxt:
         """Insert the data in all slots."""
-        slots = []
+        slots: List = []
         rep_slots = self._params.nslots // len(data)
         for datum in data:
             slots.extend(datum for _ in range(rep_slots))

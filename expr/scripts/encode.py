@@ -163,8 +163,12 @@ class Encoder:
 
     def __init__(self, config: Config, encoding_functions: Dict[str, Callable]) -> None:
         self.params: Params = config.params
-        self.column_encodings: Dict[str, str] = config.encodings
-        self.column_composites: Dict[str, int] = config.composites
+        self.column_encodings: Dict[
+            str, str
+        ] = config.encodings if config.encodings is not None else {}
+        self.column_composites: Dict[
+            str, int
+        ] = config.composites if config.composites is not None else {}
         self.repeat: int = config.segments  # segment divisor
         self.encoding_functions = encoding_functions
 
@@ -259,7 +263,7 @@ def main(args, fobj=sys.stdout) -> None:
     """Encoder Program"""
 
     params = args.config.params
-    policies = {
+    policies: Dict[str, Callable] = {
         "alphanumeric": BaseFromAlphabet(
             to_base=params.p,
             size=params.d,

@@ -9,7 +9,7 @@ import sys
 import argparse
 from itertools import islice
 from functools import partial
-from typing import List, Tuple, Iterable
+from typing import List, Tuple, Iterable, Union
 
 from ptxt import Ptxt
 from config import Config
@@ -43,7 +43,7 @@ def sum_segments(slots, segment_divisor: int):
 
 def parse_header(header_line: str) -> Tuple[int, int]:
     """Return the number of rows and columns from the header line"""
-    num_cols = 1
+    num_cols: Union[int, str] = 1
     dims = header_line.split()
     len_dims = len(dims)
     if len_dims == 1:
