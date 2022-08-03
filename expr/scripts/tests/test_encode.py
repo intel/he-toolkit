@@ -1,6 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import string
 from collections import namedtuple
 from functools import partial
 
@@ -170,7 +171,7 @@ def test_encode_datum():
     # Translation table encoding
     assert encode_datum("ABB", {"A": 1, "B": 2}) == [1, 2, 2]
 
-    # Func encoding
+    # Encoding function
     def fn(s):
         cnt = 0
         for c in s:
@@ -183,22 +184,22 @@ def test_encode_datum():
     assert encode_datum("ABB", fn) == [34]
 
 
-def test_encode_for_client(encode_obj_for_client, test_vector):
-    data_entries, expected_encoding, _ = test_vector
+def test_encode_for_client(encode_obj_for_client, test_vector_p41_m41):
+    data_entries, expected_encoding, _ = test_vector_p41_m41
     encode = encode_obj_for_client
     ptxts = encode(data_entries)
     assert len(ptxts) == len(expected_encoding)
-    for ptxt, enc in zip(ptxts, expected_encoding):
-        assert ptxt.slots() == enc
+    for ptxt, expected in zip(ptxts, expected_encoding):
+        assert ptxt.slots() == expected
 
 
-def test_encode_for_server(encode_obj_for_server, test_vector):
-    data_entries, _, expected_encoding = test_vector
+def test_encode_for_server(encode_obj_for_server, test_vector_p41_m41):
+    data_entries, _, expected_encoding = test_vector_p41_m41
     encode = encode_obj_for_server
     ptxts = encode(data_entries)
     assert len(ptxts) == len(expected_encoding)
-    for ptxt, enc in zip(ptxts, expected_encoding):
-        assert ptxt.slots() == enc
+    for ptxt, expected in zip(ptxts, expected_encoding):
+        assert ptxt.slots() == expected
 
 
 def test_edge_case(edge_case_data):
@@ -237,9 +238,9 @@ def test_segmentation_edge_case(edge_case_data):
     assert int_to_poly(split_entries[1], p, d) == expected_ptxt
 
 
-def test_client_segmentation(encode_obj_for_client, test_vector):
+def test_client_segmentation(encode_obj_for_client, test_vector_p41_m41):
     """Test when number of queries is smaller than the segmentation size."""
-    data_entries, expected_encoding, _ = test_vector
+    data_entries, expected_encoding, _ = test_vector_p41_m41
     encode = encode_obj_for_client
     data_entries.pop(-1)  # Remove last entry so now 3 entries
     # Alter expected_encoding accordingly (remove every 4th entry)
@@ -251,13 +252,13 @@ def test_client_segmentation(encode_obj_for_client, test_vector):
 
     ptxts = encode(data_entries)
     assert len(ptxts) == len(expected_encoding)
-    for ptxt, enc in zip(ptxts, expected_encoding):
-        assert ptxt.slots() == enc
+    for ptxt, expected in zip(ptxts, expected_encoding):
+        assert ptxt.slots() == expected
 
 
-def test_more_queries_than_capacity(encode_obj_for_client, test_vector):
+def test_more_queries_than_capacity(encode_obj_for_client, test_vector_p41_m41):
     """Test for when number of entries is larger than max capacity in ptxt"""
-    data_entries, expected_encoding, _ = test_vector
+    data_entries, expected_encoding, _ = test_vector_p41_m41
     encode = encode_obj_for_client
     # Append extra entry
     data_entries.append({"colA": "IJ", "colB": "FR", "colC": "89"})
@@ -277,7 +278,7 @@ def edge_case_data():
 
 
 @pytest.fixture
-def test_vector():
+def test_vector_p41_m41():
     data_entries = [
         {"colA": "AB", "colB": "NC", "colC": "56"},
         {"colA": "CD", "colB": "SU", "colC": "22"},
@@ -286,17 +287,17 @@ def test_vector():
     ]
     expected_client_encoding = [
         [[1, 2], [3, 4], [5, 6], [7, 8], [1, 2], [3, 4], [5, 6], [7, 8]],
-        [[21, 19], [3, 14], [21, 11], [4, 5], [21, 19], [3, 14], [21, 11], [4, 5]],
+        [[14, 3], [19, 21], [11, 21], [5, 4], [14, 3], [19, 21], [11, 21], [5, 4]],
         [[0, 5], [0, 2], [0, 3], [0, 6], [0, 5], [0, 2], [0, 3], [0, 6]],
         [[0, 6], [0, 2], [0, 2], [0, 7], [0, 6], [0, 2], [0, 2], [0, 7]],
     ]
     expected_server_encoding = [
         [[1, 2], [1, 2], [1, 2], [1, 2], [3, 4], [3, 4], [3, 4], [3, 4]],
-        [[21, 19], [21, 19], [21, 19], [21, 19], [3, 14], [3, 14], [3, 14], [3, 14]],
+        [[14, 3], [14, 3], [14, 3], [14, 3], [19, 21], [19, 21], [19, 21], [19, 21]],
         [[0, 5], [0, 5], [0, 5], [0, 5], [0, 2], [0, 2], [0, 2], [0, 2]],
         [[0, 6], [0, 6], [0, 6], [0, 6], [0, 2], [0, 2], [0, 2], [0, 2]],
         [[5, 6], [5, 6], [5, 6], [5, 6], [7, 8], [7, 8], [7, 8], [7, 8]],
-        [[21, 11], [21, 11], [21, 11], [21, 11], [4, 5], [4, 5], [4, 5], [4, 5]],
+        [[11, 21], [11, 21], [11, 21], [11, 21], [5, 4], [5, 4], [5, 4], [5, 4]],
         [[0, 3], [0, 3], [0, 3], [0, 3], [0, 6], [0, 6], [0, 6], [0, 6]],
         [[0, 2], [0, 2], [0, 2], [0, 2], [0, 7], [0, 7], [0, 7], [0, 7]],
     ]
@@ -304,58 +305,35 @@ def test_vector():
 
 
 @pytest.fixture
-def params_and_policies():
-    Params = namedtuple("Params", ["m", "p", "d", "nslots"])
-    params = Params(m=24, p=37, d=2, nslots=8)
+def config_and_policies():
+    config = Config(
+        params=Params(p=41, m=48),
+        columns=3,
+        segments=2,
+        encodings={"colA": "alphanumeric", "colB": "alphabetical", "colC": "numeric",},
+        composites={"colC": 2},
+    )
 
+    params = config.params
     policies = {
         "alphanumeric": {
             symbol: code
-            for code, symbol in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 1)
+            for code, symbol in enumerate(string.ascii_uppercase + string.digits, 1)
         },
         "alphabetical": {
-            symbol: code for code, symbol in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1)
+            symbol: code for code, symbol in enumerate(string.ascii_uppercase, 1)
         },
         # func must return slot list
-        "numeric": partial(int_to_poly, p=params.p, d=params.d),
+        "numeric": partial(int_to_poly, base=params.p, numof_coeffs=params.d),
     }
-
-    return params, policies
-
-
-@pytest.fixture
-def encode_obj_for_client(params_and_policies, column_policies):
-    params, policies = params_and_policies
-    composite_columns = [value.composite for value in column_policies.values()]
-    return Encode(
-        policies,
-        params,
-        for_server=False,
-        composite_columns=composite_columns,
-        column_policies=column_policies,
-        segment_divisor=2,
-    )
+    return config, policies
 
 
 @pytest.fixture
-def encode_obj_for_server(params_and_policies, column_policies):
-    params, policies = params_and_policies
-    composite_columns = [value.composite for value in column_policies.values()]
-    return Encode(
-        policies,
-        params,
-        for_server=True,
-        composite_columns=composite_columns,
-        column_policies=column_policies,
-        segment_divisor=2,
-    )
+def encode_obj_for_client(config_and_policies):
+    return ClientEncoder(*config_and_policies)
 
 
 @pytest.fixture
-def column_policies():
-    Policy = namedtuple("Policy", ["encode", "composite"])
-    return {
-        "colA": Policy("alphanumeric", 1),
-        "colB": Policy("alphabetical", 1),
-        "colC": Policy("numeric", 2),
-    }
+def encode_obj_for_server(config_and_policies):
+    return ServerEncoder(*config_and_policies)

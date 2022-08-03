@@ -10,6 +10,7 @@ if ! type -p mypy > /dev/null; then
   exit $FAILURE
 fi
 
+# shellcheck disable=SC2068
 if ! MYPYPATH=kit mypy $@ --ignore-missing-imports; then
   echo "FAILURE: mypy failed. You need to manually correct the errors."
   exit $FAILURE

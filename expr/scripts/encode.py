@@ -198,9 +198,8 @@ class ClientEncoder(Encoder):
             # TODO surely, not required for each item
             padding_size_in_segment = (params.nslots // self.repeat) - len(ptxt_data)
             if padding_size_in_segment < 0:
-                max_queries = (
-                    params.nslots // self.repeat
-                )  # repeat is the segment divisor
+                # repeat is the segment divisor
+                max_queries = params.nslots // self.repeat
                 raise ValueError(
                     f"Cannot have '{len(ptxt_data)}' queries more than a segment allows '{max_queries}'"
                 )

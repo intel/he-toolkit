@@ -5,6 +5,7 @@
 SUCCESS=0
 FAILURE=1
 
+# shellcheck disable=SC2068
 if ! pylint $@; then
   echo "FAILURE: pylint failed. You need to manually correct the errors."
   exit $FAILURE
