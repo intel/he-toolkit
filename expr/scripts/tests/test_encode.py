@@ -31,20 +31,6 @@ def test_base_from_alphabet():
     assert base_from_alphabet("ZYX") == [4, 1]
 
 
-def test_base():
-    # Similar to int_to_poly. Internally uses base 10 to pivot between bases.
-    numstr = "AZ"  # 10 * 36 + 35 = 395
-    num_base10 = BaseFromAlphabet.base(numstr, from_base=36, to_base=10, size=4)
-    numstr_base10 = "".join(map(str, num_base10))
-    assert numstr_base10 == "0395"
-    assert BaseFromAlphabet.base(numstr_base10, from_base=10, to_base=5, size=4) == [
-        3,
-        0,
-        4,
-        0,
-    ]
-
-
 def test_transpose():
     matrix = [1, 2, 3, 4, 5, 6]  # column major
     expected_transposed = [1, 3, 5, 2, 4, 6]
@@ -205,7 +191,9 @@ def test_encode_for_server(encode_obj_for_server, test_vector_p41_m41):
 def test_edge_case(edge_case_data):
     p, d, entry, expected_colA, expected_colB, expected_colC = edge_case_data
     assert (
-        BaseFromAlphabet.base(entry["colA"], from_base=36, to_base=p, size=d)
+        BaseFromAlphabet(p, d, alphabet=string.digits + string.ascii_uppercase)(
+            entry["colA"]
+        )
         == expected_colA
     )
     assert BaseFromAlphabet(p, d)(entry["colB"]) == expected_colB

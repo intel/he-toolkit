@@ -62,23 +62,19 @@ class BaseFromAlphabet:
             raise ValueError(
                 f"Alphabet must have positive integer cardinality, not '{self.len_alphabet}'"
             )
+        # This way we can have any single char alphabet, but char order matters
         self.translation_table = {symbol: code for code, symbol in enumerate(alphabet)}
 
     def __call__(self, numstr: str) -> List[int]:
         # use table to convert to pivot base 10
         converted = [self.translation_table[c] for c in numstr]
+        # recompose
         num_base_10 = inner_prod(
             converted,
             list(self.len_alphabet ** i for i in reversed(range(len(numstr)))),
         )
+        # decompose
         return int_to_poly(num_base_10, base=self.to_base, numof_coeffs=self.size)
-
-    @staticmethod
-    def base(numstr: str, from_base: int, to_base: int, size: int) -> List[int]:
-        """Change a number in string to different base within finite size"""
-        # Pivot to base 10 - python in does this for us upto base 36
-        num_base10 = int(numstr, base=from_base)
-        return int_to_poly(num_base10, base=to_base, numof_coeffs=size)
 
 
 # Itertools recipe https://docs.python.org/3.8/library/itertools.html
