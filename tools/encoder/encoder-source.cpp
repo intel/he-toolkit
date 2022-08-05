@@ -7,7 +7,7 @@
 #include <iterator>
 #include <map>
 
-#include "nibnaf1.h"
+#include "nibnaf.h"
 #include "iomanip"
 
 
