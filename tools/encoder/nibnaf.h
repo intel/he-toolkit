@@ -9,24 +9,60 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iterator>
-#include <map>
 #include <vector>
+#include <map>
+#include <iterator>
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-inline std::map<long, long> gap(double theta, double bw, double epsil) {
-  const double log_bw = std::log(bw);
-  std::map<long, long> a;
-  long r;
-  double t_minus_po;
-  for (double t = std::abs(theta), sigma = signum(theta); t > epsil;
-       t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-    r = std::ceil(std::log(t) / log_bw);
-    r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
+class Coder{
+        private: double bw=1.2;
+                 double epsil=0.00000001;
 
-    a[r] = sigma;
-    t_minus_po = t - std::pow(bw, r);
-  }
-  return a;
-}
+
+        public:
+                 std::map<long,long> encode(double num){
+
+                 const double log_bw = std::log(bw);
+                 std::map<long, long> a;
+                 long r;
+                 double t_minus_po; 
+                 for (double t = std::abs(num), sigma = signum(num); t >= epsil;
+                 t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
+                 r = std::ceil(std::log(t) / log_bw);
+                 r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
+
+                 a[r] = sigma;
+                 t_minus_po = t - std::pow(bw, r);
+                   }
+                 return a;
+                 }
+
+                 template <typename T>
+                 void print_out_results(const T& en) {
+                 for (const auto& [key, value] : en) {
+                 std::cout << "(" << key << " , " << value << ")" << std::endl;
+                 }
+                }
+
+                 template <typename T, typename U, typename W>
+                 void print_poly_rep(const T& en, U mi,  W de){
+                 for(const auto& [key, value] : en){
+                 std::cout<<value<<"x^" << key-mi;
+                 if(key-mi!=de)
+                 std::cout<<" + ";
+
+                }
+               }
+
+
+                template<typename T>
+                 double decoder(const T& en){
+                 double sum=0;
+                 for(const auto& [key, value] :en) {
+                sum+=value*pow(bw,key);
+                }
+                return sum;
+               }
+
+};
