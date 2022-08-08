@@ -18,12 +18,10 @@ from config import Config, ConfigError
 from ptxt import Ptxt, Params
 
 Entry = Dict[str, str]
-NumRep = Union[int, str]
 
 
-def int_to_poly(num: NumRep, base: NumRep, numof_coeffs: NumRep) -> List[int]:
+def int_to_poly(num: int, base: int, numof_coeffs: int) -> List[int]:
     """Return a list of coeffs of a polynomial encoded from an integer"""
-    num, base, numof_coeffs = int(num), int(base), int(numof_coeffs)
 
     def coeffs(pds, num):
         for pth in pds:
@@ -67,11 +65,10 @@ class BaseFromAlphabet:
 
     def __call__(self, numstr: str) -> List[int]:
         # use table to convert to pivot base 10
-        converted = [self.translation_table[c] for c in numstr]
+        converted: List[int] = [self.translation_table[c] for c in numstr]
         # recompose
-        num_base_10 = inner_prod(
-            converted,
-            list(self.len_alphabet ** i for i in reversed(range(len(numstr)))),
+        num_base_10: int = inner_prod(
+            converted, [self.len_alphabet ** i for i in reversed(range(len(numstr)))]
         )
         # decompose
         return int_to_poly(num_base_10, base=self.to_base, numof_coeffs=self.size)
@@ -97,7 +94,7 @@ def read_txt_worth(data_list, nslots: int) -> Generator:
         yield [item for item in txt_worth if item is not None]
 
 
-def composite_split(column: Iterable, subcols: int):
+def composite_split(column: Iterable, subcols: int) -> Generator:
     """Generator splits a column into composite columns"""
     # column has many entries
     if subcols < 1:
@@ -120,17 +117,15 @@ def composite_split(column: Iterable, subcols: int):
         yield from split_datum
 
 
-def encode_datum(datum: str, policy_to_exec):
+def encode_datum(datum: str, policy_to_exec: Union[Dict, Callable]) -> List[int]:
     """Encode a datum. The returned encoded datum is a list."""
     if isinstance(policy_to_exec, dict):
         # Translation table
-        encoded_datum = [policy_to_exec[char] for char in datum]
-    elif callable(policy_to_exec):
+        return [policy_to_exec[char] for char in datum]
+    if callable(policy_to_exec):
         # Assume function to be called to encode slot
-        encoded_datum = policy_to_exec(datum)
-    else:
-        raise TypeError(f"Policy is not a dict or function: '{type(policy_to_exec)}'")
-    return encoded_datum
+        return policy_to_exec(datum)
+    raise TypeError(f"Policy is not a dict or function: '{type(policy_to_exec)}'")
 
 
 def round_robin_encode(encode: Callable, data, composite_columns: int) -> List:
