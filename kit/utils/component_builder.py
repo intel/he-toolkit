@@ -22,7 +22,7 @@ class BuildError(Exception):
 
 def chain_run(funcs: Iterable[Callable]):
     """Run functions sequentially. Fail at first function with failed
-       return value."""
+    return value."""
     for fn in funcs:
         success, return_code = fn()
         if not success:
@@ -56,7 +56,7 @@ def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
 
 def try_run(spec: dict, attrib: str):
     """Try to run the attrib in the spec.
-       Do nothing (pass success) if no key in dict.
+    Do nothing (pass success) if no key in dict.
     """
     try:
         return run(spec[attrib])
@@ -118,7 +118,7 @@ class ComponentBuilder:
 
     def already_successful(self, stage):
         """Returns True if stage already recorded in info file
-           as successful"""
+        as successful"""
         return self._info_file["status"][stage] == "success"
 
     def update_info_file(self, stage, success):

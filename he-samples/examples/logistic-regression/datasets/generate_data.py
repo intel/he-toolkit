@@ -21,21 +21,21 @@ from sklearn.model_selection import train_test_split
 def doTrain(Xtrain, ytrain, Xtest, ytest, epochs=10, verbose=False):
     """Efficient logistic regression training
 
-  Efficient logistic regression training by Bergamaschi et. al (https://eprint.iacr.org/2019/425)
-  Provides a fast/efficient logistic regression training with cleartext data
+    Efficient logistic regression training by Bergamaschi et. al (https://eprint.iacr.org/2019/425)
+    Provides a fast/efficient logistic regression training with cleartext data
 
-  Args:
-    Xtrain (numpy.array): Training data samples in numpy 2d array
-    ytrain (numpy.array): Target of training set
-    Xtest (numpy.array): Test data samples for validation in numpy 2d array
-    ytest (numpy.array): Target of test set for validation
-    epochs (int): Number of training epochs. Default = 10
-    verbose (bool): Set to True for printing training progress. Default = False
+    Args:
+      Xtrain (numpy.array): Training data samples in numpy 2d array
+      ytrain (numpy.array): Target of training set
+      Xtest (numpy.array): Test data samples for validation in numpy 2d array
+      ytest (numpy.array): Target of test set for validation
+      epochs (int): Number of training epochs. Default = 10
+      verbose (bool): Set to True for printing training progress. Default = False
 
-  Returns:
-    bias (float): bias of logistic regression trained model
-    weights (numpy.array): weights of logistic regression trained model
-  """
+    Returns:
+      bias (float): bias of logistic regression trained model
+      weights (numpy.array): weights of logistic regression trained model
+    """
 
     v = lrb.get_initweight(Xtrain, ytrain)
     w = v
@@ -45,7 +45,7 @@ def doTrain(Xtrain, ytrain, Xtest, ytest, epochs=10, verbose=False):
         print("== Logistic Regression Training ==")
     for i in range(epochs):
         learning_rate = 10.0 / ((i + 1) + 1)
-        new_lmbda = (1.0 + np.sqrt(1 + 4 * lmbda ** 2)) / 2.0
+        new_lmbda = (1.0 + np.sqrt(1 + 4 * lmbda**2)) / 2.0
         smoothing = (1 - lmbda) / new_lmbda
         lmbda = new_lmbda
 
@@ -76,14 +76,14 @@ class DataMode(Enum):
 def saveData(dataName, X, y, datamode: DataMode = DataMode.eval):
     """Save data samples to csv file
 
-  Stores the data samples to be used for the LRHE example.
+    Stores the data samples to be used for the LRHE example.
 
-  Args:
-    dataName (str): data name prefix
-    X (numpy.array): data samples to be stored in 2d numpy array
-    y (numpy.array): targets to be stored in a 1d numpy array
-    datamode (DataMode): Determines the suffix [train, test, eval]. Default = DataMode.eval
-  """
+    Args:
+      dataName (str): data name prefix
+      X (numpy.array): data samples to be stored in 2d numpy array
+      y (numpy.array): targets to be stored in a 1d numpy array
+      datamode (DataMode): Determines the suffix [train, test, eval]. Default = DataMode.eval
+    """
     nFeatures = X.shape[1]
     suffix = datamode.name
     features = [f"feature_{i}" for i in range(nFeatures)]
@@ -101,13 +101,13 @@ def saveData(dataName, X, y, datamode: DataMode = DataMode.eval):
 def saveModel(dataName, b, w):
     """Save logistic regression model to csv file
 
-  Stores the model to be used for the LRHE example.
+    Stores the model to be used for the LRHE example.
 
-  Args:
-    dataName (str): data name prefix
-    b (float): bias of LR model
-    w (numpy.array): weights of LR model
-  """
+    Args:
+      dataName (str): data name prefix
+      b (float): bias of LR model
+      w (numpy.array): weights of LR model
+    """
     lr_model = np.concatenate(([b], w), axis=0).tolist()
     with open(f"{dataName}_lrmodel.csv", "w") as csvfile:
         writer = csv.writer(csvfile, delimiter=",")
@@ -117,23 +117,23 @@ def saveModel(dataName, b, w):
 def generateSynData(nSamples, nFeatures):
     """Generate synthetic dataset
 
-  Generates synthetic datasets with the use of sklearn.datasets.make_classification.
-  Splits the entire dataset into train, test and eval with the ratio of 2:1:1.
+    Generates synthetic datasets with the use of sklearn.datasets.make_classification.
+    Splits the entire dataset into train, test and eval with the ratio of 2:1:1.
 
-  Note that this will generate purposely well-fitted data samples for LR training
+    Note that this will generate purposely well-fitted data samples for LR training
 
-  Args:
-    nSamples (int): number of data samples
-    nFeatures (int): number of features
+    Args:
+      nSamples (int): number of data samples
+      nFeatures (int): number of features
 
-  Returns:
-    Xtrain (numpy.array): train dataset. 1/4 of nSamples
-    ytrain (numpy.array): train target
-    Xtest (numpy.array): test dataset. 1/4 of nSamples
-    ytest (numpy.array): test target
-    Xeval (numpy.array): eval dataset. 1/4 of nSamples
-    yeval (numpy.array): eval target
-  """
+    Returns:
+      Xtrain (numpy.array): train dataset. 1/4 of nSamples
+      ytrain (numpy.array): train target
+      Xtest (numpy.array): test dataset. 1/4 of nSamples
+      ytest (numpy.array): test target
+      Xeval (numpy.array): eval dataset. 1/4 of nSamples
+      yeval (numpy.array): eval target
+    """
 
     data = sklearn.datasets.make_classification(
         n_samples=nSamples,

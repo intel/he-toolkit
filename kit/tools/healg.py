@@ -43,15 +43,15 @@ def write_primes(start: int, stop: int, outfile=stdout):
 
 def powerset(iterable):
     """Returns a generator.
-       Note that we do not return the empty set.
-       https://docs.python.org/3/library/itertools.html"""
+    Note that we do not return the empty set.
+    https://docs.python.org/3/library/itertools.html"""
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
 
 def find_ms(ps, ds, factorize):
     """Generator returns the p, gen for max m's for p^d"""
-    prime_factors = factorize(p ** d - 1 for p in ps for d in ds)
+    prime_factors = factorize(p**d - 1 for p in ps for d in ds)
     if prime_factors:
         all_factors = tuple(powerset(primes) for primes in prime_factors)
         pd = ((p, d) for p in ps for d in ds)
@@ -62,7 +62,7 @@ def find_ms(ps, ds, factorize):
 
 def str_to_range(s):
     """Parse a string and return a Python range object.
-       This function expects a positive integer."""
+    This function expects a positive integer."""
     if s.isdigit():
         num = int(s)
         return range(num, num + 1)
@@ -128,7 +128,7 @@ class PrimesFromFile:
 
 
 def parse_factor_line(line):
-    """ 'num: f1 f2 f3' -> (num, (f1, f2, f3))"""
+    """'num: f1 f2 f3' -> (num, (f1, f2, f3))"""
     split_line = line.split()  # ['key:', 'v1', 'v2' , ...]
     key = split_line[0]
     if key[-1] != ":":
@@ -140,7 +140,7 @@ def parse_factor_line(line):
 
 def compute_prime_factors(numbers, factor_util="factor"):
     """Return generator. Keys m, Value prime factors.
-       Process out to factor"""
+    Process out to factor"""
 
     numbers = list(numbers)
     if len(numbers) == 0:
@@ -193,8 +193,8 @@ def set_gen_algebras_subparser(subparsers):
 
 
 def phi(prime_factors):
-    """"Euler's totient from prime factors.
-        This function assumes that only primes are passed in."""
+    """ "Euler's totient from prime factors.
+    This function assumes that only primes are passed in."""
     c = Counter(prime_factors)
     return math.prod((p - 1) * p ** (k - 1) for p, k in c.items())
 
@@ -206,7 +206,7 @@ def correct_for_d(p, d, m):
 
     This function expects that p is a prime number."""
     for e in range(1, d + 1):
-        if (p ** e) % m == 1:
+        if (p**e) % m == 1:
             break
 
     return e, e != d

@@ -17,8 +17,8 @@ _SEP_SPACES = 2
 
 
 class RepoProperties:
-    """ Contains a dictionary with the structure of the repo
-        and widths of the widest component and instance"""
+    """Contains a dictionary with the structure of the repo
+    and widths of the widest component and instance"""
 
     def __init__(self, repo_location: str, separation_spaces: int = _SEP_SPACES):
         # Get the components and instances
@@ -50,7 +50,7 @@ class RepoProperties:
     @staticmethod
     def _repo_struct(path: PathType) -> Dict[str, List[str]]:
         """Return a dictionary with sorted keys as components and values as
-           sorted list of instances"""
+        sorted list of instances"""
         path = Path(path)
         return {component: list_dirs(path / component) for component in list_dirs(path)}
 
