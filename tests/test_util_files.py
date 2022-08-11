@@ -16,6 +16,7 @@ def test_files_in_dir_commands_filter_py(get_toolkit_path):
         "remove.py",
         "new.py",
         "list_cmd.py",
+        "plugin.py",
     }
     module = get_toolkit_path / "kit" / "commands"
     filter = lambda f: f[0] != "_" and f.endswith(".py")
@@ -34,6 +35,7 @@ def test_files_in_dir_commands_filter_None(get_toolkit_path):
         "remove.py",
         "new.py",
         "list_cmd.py",
+        "plugin.py",
     }
     module = get_toolkit_path / "kit" / "commands"
     filter = None
