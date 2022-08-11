@@ -7,11 +7,11 @@
 def handle_plugins(args) -> None:
     """handle third party plugins"""
     if args.list:
-        print("List")
+        print("List ")
     elif args.install:
-        print("Install")
+        print("Install ")
     elif args.remove:
-        print("Remove")
+        print("Remove ")
     else:
         pass
 
