@@ -79,7 +79,7 @@ def create_directory_structure(project_name: str, project_path: Path) -> None:
 def create_new_project(args) -> None:
     """create a new project"""
     project_name = args.name
-    project_path = Path(args.directory).resolve().expanduser()
+    project_path = Path(args.directory).expanduser().resolve()
     project_path = project_path / "projects" / f"{project_name}"
     toml_path = project_path / "recipes" / f"{project_name}.toml"
     cmake_path = project_path / "CMakeLists.txt"

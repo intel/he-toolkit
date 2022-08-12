@@ -4,7 +4,7 @@
 import pytest
 
 from pathlib import Path
-from kit.utils.files import files_in_dir, list_dirs, create_default_workspace
+from kit.utils.files import files_in_dir, list_dirs, create_default_workspace, load_toml
 
 
 def test_files_in_dir_commands_filter_py(get_toolkit_path):
@@ -67,6 +67,20 @@ def test_create_default_config_file_created(mocker):
     mock_mkdir = mocker.patch.object(Path, "mkdir")
     create_default_workspace()
     mock_mkdir.assert_called_once()
+
+
+def test_load_toml(get_toolkit_path):
+    file = f"{get_toolkit_path}/tests/input_files/default.config"
+    act_dict = load_toml(file)
+    assert "~/.hekit_test/components" == act_dict["repo_location"]
+
+
+def test_load_toml_symlink(get_toolkit_path):
+    file = f"{get_toolkit_path}/tests/input_files/default_symlink.config"
+    with pytest.raises(Exception) as exc_info:
+        load_toml(file)
+
+    assert "default_symlink.config cannot be a symlink" in str(exc_info.value)
 
 
 @pytest.fixture

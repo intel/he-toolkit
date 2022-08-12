@@ -7,6 +7,7 @@ from os import walk
 from typing import Callable, List
 from enum import Enum
 from pathlib import Path
+from toml import load
 from kit.utils.typing import PathType
 
 
@@ -40,3 +41,14 @@ def create_default_workspace(dir_path: str = "~") -> Path:
     workspace_path = Path(dir_path).expanduser() / ".hekit"
     workspace_path.mkdir(exist_ok=True)
     return workspace_path
+
+
+def load_toml(file_name: str):
+    """Load a toml file and returns its content as a dict"""
+    file_path = Path(file_name).expanduser()
+
+    # Note: Path.resolve() cannot be used before checking Path.is_symlink()
+    if file_path.is_symlink():
+        raise TypeError(f"The  file {file_path.name} cannot be a symlink")
+
+    return load(file_path)

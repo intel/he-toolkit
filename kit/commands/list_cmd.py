@@ -7,8 +7,7 @@ from pathlib import Path
 from itertools import chain
 from typing import Dict, List
 
-from toml import load
-from kit.utils.files import list_dirs
+from kit.utils.files import list_dirs, load_toml
 from kit.utils.config import config_required
 from kit.utils.typing import PathType
 
@@ -75,7 +74,7 @@ def list_components(args):
         for comp_inst in inst_list:
             try:
                 info_filepath = repo_location / comp_name / comp_inst / "hekit.info"
-                info_file = load(info_filepath)
+                info_file = load_toml(info_filepath)
                 print(
                     f"{comp_name:{width_comp}} {comp_inst:{width_inst}}",
                     f"{info_file['status']['fetch']:{width_status}}",
