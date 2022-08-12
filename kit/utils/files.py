@@ -7,7 +7,7 @@ from os import walk
 from typing import Callable, List
 from enum import Enum
 from pathlib import Path
-from toml import load
+from toml import load, dump
 from kit.utils.typing import PathType
 
 
@@ -43,7 +43,7 @@ def create_default_workspace(dir_path: str = "~") -> Path:
     return workspace_path
 
 
-def load_toml(file_name: str):
+def load_toml(file_name: str) -> dict:
     """Load a toml file and returns its content as a dict"""
     file_path = Path(file_name).expanduser()
 
@@ -52,3 +52,11 @@ def load_toml(file_name: str):
         raise TypeError(f"The  file {file_path.name} cannot be a symlink")
 
     return load(file_path)
+
+
+def dump_toml(file_name: str, content: dict) -> None:
+    """Load a toml file and returns its content as a dict"""
+    file_path = Path(file_name).expanduser()
+
+    with file_path.open("w", encoding="utf-8") as f:
+        dump(content, f)
