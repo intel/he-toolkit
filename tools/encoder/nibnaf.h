@@ -55,6 +55,23 @@ class Coder{
                 }
                }
 
+                
+                //The polynomial representation for fractional decoding, where a power of 2 cyclcotomic is used
+                //x^-i is replaced by -x^(N-i), where N is the degree of the cyclotomic.
+                 template <typename T>
+                 void print_poly_rep_frac(const T& en, int N){
+                 for(const auto& [key, value] : en){
+                 if(key<0)
+                 std::cout<<(-1)*value<<"x^" <<N+key;
+                 else
+                 std::cout<<value<<"x^"<<key;
+
+                 if (key!=prev(en.end())->first)
+                 std::cout<<" + ";
+
+                }
+               } 
+
 
                 template<typename T>
                  double decoder(const T& en){
