@@ -3,8 +3,8 @@
 
 [[hexl]]
 skip = false
-version = "1.2.3"
-name = "1.2.3"
+version = "1.2.5"
+name = "1.2.5"
 fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
@@ -56,7 +56,7 @@ install = "cmake --install %init_install_dir%"
 export_cmake = "install/share/cmake/helib"
 # Dependencies
 ntl = "ntl/11.5.1"
-hexl = "hexl/1.2.3"
+hexl = "hexl/1.2.5"
 
 
 [[examples]]
