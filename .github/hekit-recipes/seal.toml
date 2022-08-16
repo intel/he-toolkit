@@ -3,7 +3,7 @@
 
 [[hexl]]
 skip = false
-version = "1.2.5"
+version = "v1.2.5"
 name = "v1.2.5"
 fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
 init_fetch_dir = "fetch"
@@ -102,7 +102,7 @@ init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
-hexl = "hexl/1.2.3"
+hexl = "hexl/v1.2.5"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
 
@@ -125,7 +125,7 @@ init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
-hexl = "hexl/1.2.3"
+hexl = "hexl/v1.2.5"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
 
@@ -149,6 +149,6 @@ init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
-hexl = "hexl/v1.2.3"
+hexl = "hexl/v1.2.5"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
