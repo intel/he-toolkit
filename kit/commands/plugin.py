@@ -48,10 +48,6 @@ def handle_plugins(args) -> None:
     toml_file_key = "plugins"
     source_file = "~/.hekit/plugins/plugins.toml"
     plugin_data = load_toml(source_file)
-
-    # case when the file is empty
-    if toml_file_key not in plugin_data.keys():
-        plugin_data[toml_file_key] = {}
     plugin_dict = plugin_data[toml_file_key]
 
     if args.list:

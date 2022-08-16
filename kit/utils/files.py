@@ -43,7 +43,7 @@ def create_default_workspace(dir_path: str = "~") -> Path:
     return workspace_path
 
 
-def load_toml(file_name: str) -> dict:
+def load_toml(file_name: PathType) -> dict:
     """Load a toml file and returns its content as a dict"""
     file_path = Path(file_name).expanduser()
 
@@ -54,7 +54,7 @@ def load_toml(file_name: str) -> dict:
     return load(file_path)
 
 
-def dump_toml(file_name: str, content: dict) -> None:
+def dump_toml(file_name: PathType, content: dict) -> None:
     """Write a TOML file"""
     file_path = Path(file_name).expanduser()
 

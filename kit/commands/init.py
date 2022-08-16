@@ -7,7 +7,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
-from kit.utils.files import create_default_workspace
+from kit.utils.files import create_default_workspace, dump_toml
 from kit.utils.typing import PathType
 
 
@@ -19,7 +19,7 @@ class Tags:
 
 
 def file_exists(file: Path) -> bool:
-    """ Wrapper to check if file exists because Path.exists() cannot be mocked
+    """Wrapper to check if file exists because Path.exists() cannot be mocked
     directly due to being used internally by pytest creating some clash"""
     return file.exists()
 
@@ -85,7 +85,7 @@ def append_to_rc(path: Path, content: str) -> None:
 
 
 def get_rc_file() -> Path:
-    """ Return the correct file to add shell commands"""
+    """Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
@@ -116,11 +116,27 @@ def create_default_config(dir_path: Path) -> None:
         print(f"{default_config_path} created")
 
 
+def create_plugin_data(dir_path: Path) -> None:
+    """Create the directory ~/.hekit/plugins"""
+    plugins_path = dir_path / "plugins"
+    plugins_path.mkdir(exist_ok=True)
+
+    # Setup plugin file
+    plugin_file_path = plugins_path / "plugins.toml"
+    if file_exists(plugin_file_path):
+        print(f"{plugin_file_path} file already exists")
+    else:
+        plugin_data: dict = {"plugins": {}}
+        dump_toml(plugin_file_path, plugin_data)
+        print(f"{plugin_file_path} created")
+
+
 def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
         dir_path = create_default_workspace()
         create_default_config(dir_path)
+        create_plugin_data(dir_path)
 
     # Backup the shell init file
     rc_file = get_rc_file()
@@ -137,7 +153,9 @@ def init_hekit(args) -> None:
     path_line = "PATH=$HEKITPATH:$PATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
-        "if [ -n $(type -p register-python-argcomplete) ]; then\n"
+        "if [ -n $(type -p register-python-argcomplete3) ]; then\n"
+        '  eval "$(register-python-argcomplete3 hekit)"\n'
+        "else"
         '  eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
