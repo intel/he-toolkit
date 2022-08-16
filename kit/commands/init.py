@@ -116,27 +116,11 @@ def create_default_config(dir_path: Path) -> None:
         print(f"{default_config_path} created")
 
 
-def create_plugin_data(dir_path: Path) -> None:
-    """Create the directory ~/.hekit/plugins"""
-    plugins_path = dir_path / "plugins"
-    plugins_path.mkdir(exist_ok=True)
-
-    # Setup config file
-    plugin_file_path = plugins_path / "plugins.toml"
-    if file_exists(plugin_file_path):
-        print(f"{plugin_file_path} file already exists")
-    else:
-        with plugin_file_path.open("w", encoding="utf-8") as f:
-            f.write("# Externals plugins\n")
-        print(f"{plugin_file_path} created")
-
-
 def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
         dir_path = create_default_workspace()
         create_default_config(dir_path)
-        create_plugin_data(dir_path)
 
     # Backup the shell init file
     rc_file = get_rc_file()
@@ -153,10 +137,8 @@ def init_hekit(args) -> None:
     path_line = "PATH=$HEKITPATH:$PATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
-        "if [ -n $(type -p register-python-argcomplete3) ]; then\n"
-        '  eval "$(register-python-argcomplete3 hekit)"\n'
-        "else"
-        '  eval "$(register-python-argcomplete hekit)"\n'
+        "if [ -n $(type -p register-python-argcomplete) ]; then\n"
+        ' eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
     content = "".join([export_line, path_line, eval_lines])
