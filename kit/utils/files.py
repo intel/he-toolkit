@@ -55,7 +55,7 @@ def load_toml(file_name: str) -> dict:
 
 
 def dump_toml(file_name: str, content: dict) -> None:
-    """Load a toml file and returns its content as a dict"""
+    """Write a TOML file"""
     file_path = Path(file_name).expanduser()
 
     with file_path.open("w", encoding="utf-8") as f:

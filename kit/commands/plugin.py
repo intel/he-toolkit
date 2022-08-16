@@ -10,49 +10,58 @@ from kit.utils.files import load_toml, dump_toml
 
 def list_plugins(plugin_dict) -> None:
     """Print the list of all plug-ins"""
-    width_plugin = max(map(len, plugin_dict.keys()), default=0) + 6
+    width_plugin = max(map(len, plugin_dict.keys()), default=0) + 3
     width_status = 10
 
     print(f"{'PLUG-IN':{width_plugin}} {'STATE':{width_status}}")
     for k, v in plugin_dict.items():
-        status = "Enabled" if v["enabled"] else "Disabled"
-        print(f"{k:{width_plugin}} {status:{width_status}}")
+        print(f"{k:{width_plugin}} {v:{width_status}}")
 
 
 def install_plugin(plugin_name: str, plugin_dict: dict) -> None:
     """Install third party plug-in"""
-    if plugin_name in plugin_dict.keys() and plugin_dict[plugin_name]["enabled"]:
+    plugin_enable = "enabled"
+    if plugin_name in plugin_dict.keys() and plugin_enable == plugin_dict[plugin_name]:
         print(f"Plug-in {plugin_name} is already installed in the system")
         return
 
-    plugin_dict[plugin_name] = {"enabled": True}
+    plugin_dict[plugin_name] = plugin_enable
     print(f"Plug-in {plugin_name} was installed successfully")
 
 
 def remove_plugin(plugin_name: str, plugin_dict: dict) -> None:
     """Remove third party plug-ins"""
-    if plugin_name not in plugin_dict.keys() or not plugin_dict[plugin_name]["enabled"]:
+    plugin_disable = "disabled"
+    if (
+        plugin_name not in plugin_dict.keys()
+        or plugin_disable == plugin_dict[plugin_name]
+    ):
         print(f"Plug-in {plugin_name} was not found in the system")
         return
 
-    plugin_dict[plugin_name]["enabled"] = False
+    plugin_dict[plugin_name] = plugin_disable
     print(f"Plug-in {plugin_name} was uninstalled successfully")
 
 
 def handle_plugins(args) -> None:
     """handle third party plug-ins"""
+    toml_file_key = "plugins"
     source_file = "~/.hekit/plugins/plugins.toml"
-    plugin_dict = load_toml(source_file)
+    plugin_data = load_toml(source_file)
+
+    # case when the file is empty
+    if toml_file_key not in plugin_data.keys():
+        plugin_data[toml_file_key] = {}
+    plugin_dict = plugin_data[toml_file_key]
 
     if args.list:
         list_plugins(plugin_dict)
-    else:
-        if args.install:
-            install_plugin(args.install[0], plugin_dict)
-        elif args.remove:
-            remove_plugin(args.remove[0], plugin_dict)
-
-        dump_toml(source_file, plugin_dict)
+    elif args.install:
+        install_plugin(args.install[0], plugin_dict)
+        dump_toml(source_file, plugin_data)
+    elif args.remove:
+        remove_plugin(args.remove[0], plugin_dict)
+        dump_toml(source_file, plugin_data)
 
 
 def set_plugin_subparser(subparsers) -> None:
