@@ -24,7 +24,6 @@ except ImportError:
         print("This command is disabled. To enable it install the docker-py dependency")
         print("  pip install docker")
 
-
 else:
 
     def try_setup_docker(args):
