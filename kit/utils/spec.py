@@ -107,8 +107,8 @@ def fill_self_ref_string_dict(d: dict, repo_path: PathType) -> dict:
 
 
 def get_dependencies(instances_list: List) -> List[str]:
-    """ Returns a list of dependencies defined
-    and used in the recipe file """
+    """Returns a list of dependencies defined
+    and used in the recipe file"""
     dependency_list: List[str] = []
 
     def fill_dependencies_list(s: str, d: dict) -> None:
@@ -135,7 +135,7 @@ def get_dependencies(instances_list: List) -> List[str]:
 
 def fill_rloc_paths(d: dict, repo_location: PathType) -> dict:
     """Create absolute path for the top-level attribs that begin
-       with 'init_' or '_export_' by prepending repo location"""
+    with 'init_' or '_export_' by prepending repo location"""
     for k, v in d.items():
         if k.startswith("init_") or k.startswith("export_"):
             d[k] = f"{repo_location}/{v}"

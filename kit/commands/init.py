@@ -19,7 +19,7 @@ class Tags:
 
 
 def file_exists(file: Path) -> bool:
-    """ Wrapper to check if file exists because Path.exists() cannot be mocked
+    """Wrapper to check if file exists because Path.exists() cannot be mocked
     directly due to being used internally by pytest creating some clash"""
     return file.exists()
 
@@ -85,7 +85,7 @@ def append_to_rc(path: Path, content: str) -> None:
 
 
 def get_rc_file() -> Path:
-    """ Return the correct file to add shell commands"""
+    """Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
@@ -138,7 +138,7 @@ def init_hekit(args) -> None:
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
         "if [ -n $(type -p register-python-argcomplete) ]; then\n"
-        '  eval "$(register-python-argcomplete hekit)"\n'
+        ' eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
     content = "".join([export_line, path_line, eval_lines])
