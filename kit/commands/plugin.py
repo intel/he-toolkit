@@ -13,26 +13,44 @@ from kit.utils.constants import Constants
 
 
 PluginDict = Dict[str, str]
+plugins_toml_file: Path = Constants.plugins_root_dir / "plugins.toml"
+key_toml_file: str = "plugins"
+plugin_enable: str = "enabled"
+plugin_disable: str = "disabled"
 
 
-def get_enabled_plugins():
+def completer_plugins_enable(
+    prefix, parsed_args, **kwargs
+):  # pylint: disable=unused-argument
     """Return a list of plugins that are enabled"""
-    plugin_toml_file = Constants.plugins_work_area / "plugins.toml"
-    plugin_data = load_toml(plugin_toml_file)
-    plugin_dict = plugin_data["plugins"]
-
-    enabled_plugins = [k for k, v in plugin_dict.items() if v == "enabled"]
-    return enabled_plugins
+    return get_plugins_by_state()
 
 
-def list_plugins(plugin_dict: PluginDict) -> None:
+def completer_plugins_disable(
+    prefix, parsed_args, **kwargs
+):  # pylint: disable=unused-argument
+    """Return a list of plugins that are disabled"""
+    return get_plugins_by_state(plugin_disable)
+
+
+def get_plugins_by_state(state: str = plugin_enable):
+    """Return a list of plugins with a specific state"""
+    if plugins_toml_file.exists():
+        plugin_dict = load_toml(plugins_toml_file)[key_toml_file]
+        return [k for k, v in plugin_dict.items() if v == state]
+
+    return []
+
+
+def list_plugins(plugin_dict: PluginDict, state: str) -> None:
     """Print the list of all plugins"""
     width_name = max(map(len, plugin_dict.keys()), default=0) + 3
     width_status = 10
 
     print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
     for k, v in plugin_dict.items():
-        print(f"{k:{width_name}} {v:{width_status}}")
+        if state in (v, "all"):
+            print(f"{k:{width_name}} {v:{width_status}}")
 
 
 def get_file_name_extension(file_full_name: str) -> Tuple[str, List[str]]:
@@ -48,103 +66,162 @@ def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
     plugin_name, plugin_ext = get_file_name_extension(plugin_file)
 
     # Check if the plugin is present
-    plugin_enable = "enabled"
     if plugin_name in plugin_dict.keys() and plugin_enable == plugin_dict[plugin_name]:
-        print(f"plugin {plugin_name} is already installed in the system")
+        print(f"Plugin {plugin_name} is already installed in the system")
         return
 
     # Create the directory where the plugin is installed
-    plugin_dir = Constants.plugins_work_area / plugin_name
+    plugin_dir = Constants.plugins_root_dir / plugin_name
     plugin_dir.mkdir(exist_ok=True)
 
     # Handle file's extensions
     if ".tar" in plugin_ext:
         with open_tar(plugin_file) as f:
             f.extractall(plugin_dir)
-        print(f"plugin {plugin_file} was extracted successfully")
+        print(f"Plugin {plugin_file} was extracted successfully")
 
     # Update plugin dictionary
     plugin_dict[plugin_name] = plugin_enable
-    print(f"plugin {plugin_name} was installed successfully")
+    print(f"Plugin {plugin_name} was installed successfully")
+
+
+def remove_all_plugins(plugin_dict: PluginDict) -> None:
+    """Remove all third party plugins"""
+    for plugin_name in plugin_dict.keys():
+        # Delete the directory where the plugin is installed
+        plugin_path = Constants.plugins_root_dir / plugin_name
+        if plugin_path.exists():
+            rmtree(plugin_path)
+
+    plugin_dict.clear()
+    print("All Plugins were uninstalled successfully")
 
 
 def remove_plugin(plugin_name: str, plugin_dict: PluginDict) -> None:
-    """Remove third party plugins"""
+    """Remove a specific third party plugins"""
     if plugin_name not in plugin_dict.keys():
-        print(f"plugin {plugin_name} was not found in the system")
+        print(f"Plugin {plugin_name} was not found in the system")
         return
 
     # Delete the directory where the plugin is installed
-    plugin_dir = Constants.plugins_work_area / plugin_name
-    rmtree(plugin_dir)
+    plugin_path = Constants.plugins_root_dir / plugin_name
+    if plugin_path.exists():
+        rmtree(plugin_path)
 
     del plugin_dict[plugin_name]
-    print(f"plugin {plugin_name} was uninstalled successfully")
+    print(f"Plugin {plugin_name} was uninstalled successfully")
 
 
 def enable_plugin(plugin_name: str, plugin_dict: PluginDict) -> None:
     """Enable third party plugins"""
-    plugin_enable = "enabled"
     if plugin_name in plugin_dict.keys() and plugin_enable == plugin_dict[plugin_name]:
-        print(f"plugin {plugin_name} is already enabled in the system")
+        print(f"Plugin {plugin_name} is already enabled in the system")
         return
 
     plugin_dict[plugin_name] = plugin_enable
-    print(f"plugin {plugin_name} was enabled successfully")
+    print(f"Plugin {plugin_name} was enabled successfully")
 
 
 def disable_plugin(plugin_name: str, plugin_dict: PluginDict) -> None:
     """Disable third party plugins"""
-    plugin_disable = "disabled"
     if plugin_name not in plugin_dict.keys():
-        print(f"plugin {plugin_name} was not found in the system")
+        print(f"Plugin {plugin_name} was not found in the system")
         return
     if plugin_disable == plugin_dict[plugin_name]:
-        print(f"plugin {plugin_name} is already disabled in the system")
+        print(f"Plugin {plugin_name} is already disabled in the system")
         return
 
     plugin_dict[plugin_name] = plugin_disable
-    print(f"plugin {plugin_name} was disabled successfully")
+    print(f"Plugin {plugin_name} was disabled successfully")
 
 
 def handle_plugins(args) -> None:
     """Handle third party plugins"""
-    plugin_toml_file = Constants.plugins_work_area / "plugins.toml"
-    plugin_data = load_toml(plugin_toml_file)
-    plugin_dict = plugin_data["plugins"]
-
-    if args.list:
-        get_enabled_plugins()
-        list_plugins(plugin_dict)
+    if not plugins_toml_file.exists():
+        print("Please execute: hekit init --default-config")
         return
 
-    if args.install:
-        install_plugin(args.install[0], plugin_dict)
-    elif args.remove:
-        remove_plugin(args.remove[0], plugin_dict)
-    elif args.enable:
-        enable_plugin(args.enable[0], plugin_dict)
-    elif args.disable:
-        disable_plugin(args.disable[0], plugin_dict)
+    # Get the plugins data
+    plugin_dict = load_toml(plugins_toml_file)[key_toml_file]
 
-    dump_toml(plugin_toml_file, plugin_data)
+    if hasattr(args, "state"):
+        list_plugins(plugin_dict, args.state)
+        return
+
+    if hasattr(args, "plugin_to_install"):
+        install_plugin(args.plugin_to_install, plugin_dict)
+    elif hasattr(args, "plugin_to_remove"):
+        if "ALL" == args.plugin_to_remove:
+            remove_all_plugins(plugin_dict)
+        else:
+            remove_plugin(args.plugin_to_remove, plugin_dict)
+    elif hasattr(args, "plugin_to_enable"):
+        enable_plugin(args.plugin_to_enable, plugin_dict)
+    elif hasattr(args, "plugin_to_disable"):
+        disable_plugin(args.plugin_to_disable, plugin_dict)
+
+    # Save changes in the plugins data
+    sorted_plugin_dict = {key_toml_file: dict(sorted(plugin_dict.items()))}
+    dump_toml(plugins_toml_file, sorted_plugin_dict)
 
 
 def set_plugin_subparser(subparsers) -> None:
     """create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
-        "plugin", description="handle third party plugins"
+        "plugins", description="handle third party plugins"
     )
-    group = parser_plugin.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--list", action="store_true", help="print the list of all plugins"
+    subparsers_plugin = parser_plugin.add_subparsers(help="sub-command help")
+
+    # list options
+    parser_install = subparsers_plugin.add_parser(
+        "list", description="print the list of all plugins"
     )
-    group.add_argument(
-        "--install", type=validate_input, help="install a new plugin", nargs=1
+    parser_install.add_argument(
+        "--state",
+        default="all",
+        choices=["all", plugin_enable, plugin_disable],
+        help="filter the plugins by their state",
     )
-    group.add_argument("--remove", type=validate_input, help="remove a plugin", nargs=1)
-    group.add_argument("--enable", type=validate_input, help="enable a plugin", nargs=1)
-    group.add_argument(
-        "--disable", type=validate_input, help="disable a plugin", nargs=1
+
+    # install options
+    parser_install = subparsers_plugin.add_parser(
+        "install", description="install a new plugin"
     )
+    parser_install.add_argument(
+        "plugin_to_install",
+        type=validate_input,
+        help="File with the plugin",
+        metavar="PLUGIN",
+    )
+    parser_install.add_argument(
+        "--force", action="store_true", help="forces the installation process"
+    )
+
+    # remove options
+    parser_remove = subparsers_plugin.add_parser(
+        "remove", description="remove a plugin"
+    )
+    parser_remove.add_argument(
+        "plugin_to_remove",
+        type=validate_input,
+        help="plugin name. Use 'ALL' option to remove all plugins",
+        metavar="PLUGIN",
+    ).completer = completer_plugins_enable
+
+    # enable options
+    parser_enable = subparsers_plugin.add_parser(
+        "enable", description="enable a plugin"
+    )
+    parser_enable.add_argument(
+        "plugin_to_enable", type=validate_input, help="plugin name", metavar="PLUGIN"
+    ).completer = completer_plugins_disable
+
+    # disable options
+    parser_disable = subparsers_plugin.add_parser(
+        "disable", description="disable a plugin"
+    )
+    parser_disable.add_argument(
+        "plugin_to_disable", type=validate_input, help="plugin name", metavar="PLUGIN"
+    ).completer = completer_plugins_enable
+
     parser_plugin.set_defaults(fn=handle_plugins)

@@ -11,25 +11,16 @@ from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Tuple, List
+from typing import Tuple
 
-from kit.utils.subparsers import discover_subparsers_from, validate_input
+from kit.utils.subparsers import register_subparser, validate_input
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
-from kit.commands.plugin import get_enabled_plugins
+from kit.commands.plugin import get_plugins_by_state
 
 if sys.version_info < (3, 8):
     print("Intel HE Toolkit requires Python version 3.8 or above", file=sys.stderr)
     sys_exit(1)
-
-
-def enable_subparser(subparsers, components: List[str], directory: Path):
-    """Register surparsers"""
-    for func in discover_subparsers_from(components, directory):
-        try:
-            func(subparsers)
-        except TypeError:
-            func(subparsers, directory)
 
 
 def parse_cmdline() -> Tuple:
@@ -53,8 +44,8 @@ def parse_cmdline() -> Tuple:
 
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
-    enable_subparser(subparsers, ["commands", "tools"], hekit_root_dir / "kit")
-    enable_subparser(subparsers, get_enabled_plugins(), Constants.plugins_work_area)
+    register_subparser(subparsers, ["commands", "tools"], hekit_root_dir / "kit")
+    register_subparser(subparsers, get_plugins_by_state(), Constants.plugins_root_dir)
 
     # try to enable tab completion
     enable_tab_completion(parser)

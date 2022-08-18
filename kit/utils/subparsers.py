@@ -10,6 +10,15 @@ from kit.utils.typing import PathType
 from kit.utils.files import files_in_dir
 
 
+def register_subparser(subparsers, components: List[str], directory: PathType):
+    """Register surparsers"""
+    for func in discover_subparsers_from(components, directory):
+        try:
+            func(subparsers)
+        except TypeError:
+            func(subparsers, directory)
+
+
 def import_from_source_file(module_name, file_path):
     """Importing a source file directly"""
     spec = spec_from_file_location(module_name, file_path)

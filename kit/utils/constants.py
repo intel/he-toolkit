@@ -24,4 +24,4 @@ class Constants:  # pylint: disable=too-many-instance-attributes
     cmake_cxx_standard: str = "17"
 
     # Plugins
-    plugins_work_area: Path = Path("~/.hekit/plugins/").expanduser()
+    plugins_root_dir: Path = Path("~/.hekit/plugins/").expanduser()
