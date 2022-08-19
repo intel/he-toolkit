@@ -24,12 +24,6 @@ def file_exists(file: Path) -> bool:
     return file.exists()
 
 
-def get_file_name(file_full_name: str) -> str:
-    "Return the name of a file without extensions"
-    file_extensions: List[str] = Path(file_full_name).suffixes
-    return file_full_name.replace("".join(file_extensions), "")
-
-
 def files_in_dir(
     path: PathType, cond: Callable = None, ftype: FileType = FileType.FILES
 ) -> List[str]:
