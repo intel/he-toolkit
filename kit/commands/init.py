@@ -7,7 +7,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
-from kit.utils.files import create_default_workspace, dump_toml
+from kit.utils.files import create_default_workspace, dump_toml, file_exists
 from kit.utils.typing import PathType
 
 
@@ -16,12 +16,6 @@ class Tags:
 
     start_tag: str = "# >>> hekit start >>>\n"
     end_tag: str = "# <<<  hekit end  <<<\n"
-
-
-def file_exists(file: Path) -> bool:
-    """Wrapper to check if file exists because Path.exists() cannot be mocked
-    directly due to being used internally by pytest creating some clash"""
-    return file.exists()
 
 
 def get_expanded_path(path: PathType) -> Path:
@@ -155,7 +149,7 @@ def init_hekit(args) -> None:
     eval_lines = (
         "if [ -n $(type -p register-python-argcomplete3) ]; then\n"
         '  eval "$(register-python-argcomplete3 hekit)"\n'
-        "else"
+        "else\n"
         '  eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
