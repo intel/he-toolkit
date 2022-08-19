@@ -20,16 +20,16 @@ PluginDict = Dict[str, str]
 class PluginState:
     """Define the possible state of a plugin"""
 
-    enable: str = "enabled"
-    disable: str = "disabled"
+    ENABLE: str = "enabled"
+    DISABLE: str = "disabled"
 
 
 @dataclass(frozen=True, init=False)
 class PluginsConfig:
     """Define the attributes of the config file for plugins"""
 
-    file: Path = Constants.plugins_root_dir / "plugins.toml"
-    key: str = "plugins"
+    FILE: Path = Constants.plugins_root_dir / "plugins.toml"
+    KEY: str = "plugins"
 
 
 def completer_plugins_enable(
@@ -43,13 +43,13 @@ def completer_plugins_disable(
     prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
 ) -> List[str]:
     """Return a list of plugins that are disabled"""
-    return get_plugins_by_state(PluginState.disable)
+    return get_plugins_by_state(PluginState.DISABLE)
 
 
-def get_plugins_by_state(state: str = PluginState.enable) -> List[str]:
+def get_plugins_by_state(state: str = PluginState.ENABLE) -> List[str]:
     """Return a list of plugins with a specific state"""
-    if file_exists(PluginsConfig.file):
-        plugin_dict = load_toml(PluginsConfig.file)[PluginsConfig.key]
+    if file_exists(PluginsConfig.FILE):
+        plugin_dict = load_toml(PluginsConfig.FILE)[PluginsConfig.KEY]
         return [k for k, v in plugin_dict.items() if v == state]
 
     return []
@@ -79,7 +79,7 @@ def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
     # Check if the plugin is present
     if (
         plugin_name in plugin_dict.keys()
-        and PluginState.enable == plugin_dict[plugin_name]
+        and PluginState.ENABLE == plugin_dict[plugin_name]
     ):
         print(f"Plugin {plugin_name} is already installed in the system")
         return
@@ -98,7 +98,7 @@ def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
         ) from e
 
     # Update plugin dictionary
-    plugin_dict[plugin_name] = PluginState.enable
+    plugin_dict[plugin_name] = PluginState.ENABLE
     print(f"Plugin {plugin_name} was installed successfully")
 
 
@@ -111,6 +111,10 @@ def remove_plugin_dir(plugin_name: str) -> None:
 
 def remove_all_plugins(plugin_dict: PluginDict) -> None:
     """Remove all third party plugins"""
+    user_answer = input("All plugins will be deleted. Do you want to continue? (y/n) ")
+    if user_answer not in ("y", "Y"):
+        return
+
     for plugin_name in plugin_dict.keys():
         remove_plugin_dir(plugin_name)
 
@@ -133,12 +137,12 @@ def enable_plugin(plugin_name: str, plugin_dict: PluginDict) -> None:
     """Enable third party plugins"""
     if (
         plugin_name in plugin_dict.keys()
-        and PluginState.enable == plugin_dict[plugin_name]
+        and PluginState.ENABLE == plugin_dict[plugin_name]
     ):
         print(f"Plugin {plugin_name} is already enabled in the system")
         return
 
-    plugin_dict[plugin_name] = PluginState.enable
+    plugin_dict[plugin_name] = PluginState.ENABLE
     print(f"Plugin {plugin_name} was enabled successfully")
 
 
@@ -147,22 +151,22 @@ def disable_plugin(plugin_name: str, plugin_dict: PluginDict) -> None:
     if plugin_name not in plugin_dict.keys():
         print(f"Plugin {plugin_name} was not found in the system")
         return
-    if PluginState.disable == plugin_dict[plugin_name]:
+    if PluginState.DISABLE == plugin_dict[plugin_name]:
         print(f"Plugin {plugin_name} is already disabled in the system")
         return
 
-    plugin_dict[plugin_name] = PluginState.disable
+    plugin_dict[plugin_name] = PluginState.DISABLE
     print(f"Plugin {plugin_name} was disabled successfully")
 
 
 def handle_plugins(args) -> None:
     """Handle third party plugins"""
-    if not file_exists(PluginsConfig.file):
+    if not file_exists(PluginsConfig.FILE):
         print("Please execute: hekit init --default-config")
         return
 
     # Get the plugins data
-    plugin_dict = load_toml(PluginsConfig.file)[PluginsConfig.key]
+    plugin_dict = load_toml(PluginsConfig.FILE)[PluginsConfig.KEY]
 
     if hasattr(args, "state"):
         list_plugins(plugin_dict, args.state)
@@ -181,8 +185,8 @@ def handle_plugins(args) -> None:
         disable_plugin(args.plugin_to_disable, plugin_dict)
 
     # Save changes in the plugins data
-    sorted_plugin_dict = {PluginsConfig.key: dict(sorted(plugin_dict.items()))}
-    dump_toml(PluginsConfig.file, sorted_plugin_dict)
+    sorted_plugin_dict = {PluginsConfig.KEY: dict(sorted(plugin_dict.items()))}
+    dump_toml(PluginsConfig.FILE, sorted_plugin_dict)
 
 
 def set_plugin_subparser(subparsers) -> None:
@@ -199,7 +203,7 @@ def set_plugin_subparser(subparsers) -> None:
     parser_install.add_argument(
         "--state",
         default="all",
-        choices=["all", PluginState.enable, PluginState.disable],
+        choices=["all", PluginState.ENABLE, PluginState.DISABLE],
         help="filter the plugins by their state",
     )
 
