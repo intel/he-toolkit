@@ -3,56 +3,15 @@
 
 """This module handles the usage of third party plugins"""
 
-from dataclasses import dataclass
-
-from pathlib import Path
 from shutil import rmtree, unpack_archive, get_archive_formats
-from typing import Dict, List
+from typing import Dict
+from kit.utils.constants import PluginsConfig, PluginState
+from kit.utils.files import load_toml, dump_toml, file_exists, get_file_name
 from kit.utils.subparsers import validate_input
-from kit.utils.files import load_toml, dump_toml, file_exists
-from kit.utils.constants import Constants
+from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 
 PluginDict = Dict[str, str]
-
-
-@dataclass(frozen=True, init=False)
-class PluginState:
-    """Define the possible state of a plugin"""
-
-    ENABLE: str = "enabled"
-    DISABLE: str = "disabled"
-
-
-@dataclass(frozen=True, init=False)
-class PluginsConfig:
-    """Define the attributes of the config file for plugins"""
-
-    FILE: Path = Constants.plugins_root_dir / "plugins.toml"
-    KEY: str = "plugins"
-
-
-def completer_plugins_enable(
-    prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
-) -> List[str]:
-    """Return a list of plugins that are enabled"""
-    return get_plugins_by_state()
-
-
-def completer_plugins_disable(
-    prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
-) -> List[str]:
-    """Return a list of plugins that are disabled"""
-    return get_plugins_by_state(PluginState.DISABLE)
-
-
-def get_plugins_by_state(state: str = PluginState.ENABLE) -> List[str]:
-    """Return a list of plugins with a specific state"""
-    if file_exists(PluginsConfig.FILE):
-        plugin_dict = load_toml(PluginsConfig.FILE)[PluginsConfig.KEY]
-        return [k for k, v in plugin_dict.items() if v == state]
-
-    return []
 
 
 def list_plugins(plugin_dict: PluginDict, state: str) -> None:
@@ -64,12 +23,6 @@ def list_plugins(plugin_dict: PluginDict, state: str) -> None:
     for k, v in plugin_dict.items():
         if state in (v, "all"):
             print(f"{k:{width_name}} {v:{width_status}}")
-
-
-def get_file_name(file_full_name: str) -> str:
-    "Return the name of a file without extensions"
-    file_extensions: List[str] = Path(file_full_name).suffixes
-    return file_full_name.replace("".join(file_extensions), "")
 
 
 def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
@@ -85,7 +38,7 @@ def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
         return
 
     # Create the directory where the plugin is installed
-    plugin_dir = Constants.plugins_root_dir / plugin_name
+    plugin_dir = PluginsConfig.ROOT_DIR / plugin_name
     plugin_dir.mkdir(exist_ok=True)
 
     try:
@@ -104,7 +57,7 @@ def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
 
 def remove_plugin_dir(plugin_name: str) -> None:
     """Delete the directory where the plugin is installed"""
-    plugin_path = Constants.plugins_root_dir / plugin_name
+    plugin_path = PluginsConfig.ROOT_DIR / plugin_name
     if file_exists(plugin_path):
         rmtree(plugin_path)
 
@@ -230,7 +183,7 @@ def set_plugin_subparser(subparsers) -> None:
         type=validate_input,
         help="plugin name. Use 'ALL' option to remove all plugins",
         metavar="PLUGIN",
-    ).completer = completer_plugins_enable
+    ).completer = plugins_enable_completer
 
     # enable options
     parser_enable = subparsers_plugin.add_parser(
@@ -238,7 +191,7 @@ def set_plugin_subparser(subparsers) -> None:
     )
     parser_enable.add_argument(
         "plugin_to_enable", type=validate_input, help="plugin name", metavar="PLUGIN"
-    ).completer = completer_plugins_disable
+    ).completer = plugins_disable_completer
 
     # disable options
     parser_disable = subparsers_plugin.add_parser(
@@ -246,6 +199,6 @@ def set_plugin_subparser(subparsers) -> None:
     )
     parser_disable.add_argument(
         "plugin_to_disable", type=validate_input, help="plugin name", metavar="PLUGIN"
-    ).completer = completer_plugins_enable
+    ).completer = plugins_enable_completer
 
     parser_plugin.set_defaults(fn=handle_plugins)

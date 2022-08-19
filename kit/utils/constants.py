@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 @dataclass(frozen=True, init=False)
-class Constants:  # pylint: disable=too-many-instance-attributes
+class Constants:
     """Defines constants for the he-toolkit"""
 
     # version and the docker's tags
@@ -23,5 +23,19 @@ class Constants:  # pylint: disable=too-many-instance-attributes
     cmake_min_version: str = "3.13"
     cmake_cxx_standard: str = "17"
 
-    # Plugins
-    plugins_root_dir: Path = Path("~/.hekit/plugins/").expanduser()
+
+@dataclass(frozen=True, init=False)
+class PluginState:
+    """Define the possible state of a plugin"""
+
+    ENABLE: str = "enabled"
+    DISABLE: str = "disabled"
+
+
+@dataclass(frozen=True, init=False)
+class PluginsConfig:
+    """Define the attributes of the config file for plugins"""
+
+    ROOT_DIR: Path = Path("~/.hekit/plugins/").expanduser()
+    FILE: Path = ROOT_DIR / "plugins.toml"
+    KEY: str = "plugins"
