@@ -18,6 +18,12 @@ class FileType(Enum):
     FILES = 2
 
 
+def file_exists(file: Path) -> bool:
+    """Wrapper to check if file exists because Path.exists() cannot be mocked
+    directly due to being used internally by pytest creating some clash"""
+    return file.exists()
+
+
 def files_in_dir(
     path: PathType, cond: Callable = None, ftype: FileType = FileType.FILES
 ) -> List[str]:
