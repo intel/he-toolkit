@@ -4,10 +4,10 @@
 """This module handles the usage of third party plugins"""
 
 from dataclasses import dataclass
-from tarfile import open as open_tar
+
 from pathlib import Path
-from shutil import rmtree
-from typing import Dict, List, Tuple
+from shutil import rmtree, unpack_archive, get_archive_formats
+from typing import Dict, List
 from kit.utils.subparsers import validate_input
 from kit.utils.files import load_toml, dump_toml, file_exists
 from kit.utils.constants import Constants
@@ -33,20 +33,20 @@ class PluginsConfig:
 
 
 def completer_plugins_enable(
-    prefix, parsed_args, **kwargs
-):  # pylint: disable=unused-argument
+    prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
+) -> List[str]:
     """Return a list of plugins that are enabled"""
     return get_plugins_by_state()
 
 
 def completer_plugins_disable(
-    prefix, parsed_args, **kwargs
-):  # pylint: disable=unused-argument
+    prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
+) -> List[str]:
     """Return a list of plugins that are disabled"""
     return get_plugins_by_state(PluginState.disable)
 
 
-def get_plugins_by_state(state: str = PluginState.enable):
+def get_plugins_by_state(state: str = PluginState.enable) -> List[str]:
     """Return a list of plugins with a specific state"""
     if file_exists(PluginsConfig.file):
         plugin_dict = load_toml(PluginsConfig.file)[PluginsConfig.key]
@@ -66,17 +66,15 @@ def list_plugins(plugin_dict: PluginDict, state: str) -> None:
             print(f"{k:{width_name}} {v:{width_status}}")
 
 
-def get_file_name_extension(file_full_name: str) -> Tuple[str, List[str]]:
-    "Return the name and the extensions of a file"
-    file = Path(file_full_name)
-    file_extensions: List[str] = file.suffixes
-    file_name = file_full_name.replace("".join(file_extensions), "")
-    return file_name, file_extensions
+def get_file_name(file_full_name: str) -> str:
+    "Return the name of a file without extensions"
+    file_extensions: List[str] = Path(file_full_name).suffixes
+    return file_full_name.replace("".join(file_extensions), "")
 
 
 def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
     """Install third party plugins"""
-    plugin_name, plugin_ext = get_file_name_extension(plugin_file)
+    plugin_name = get_file_name(plugin_file)
 
     # Check if the plugin is present
     if (
@@ -90,11 +88,14 @@ def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
     plugin_dir = Constants.plugins_root_dir / plugin_name
     plugin_dir.mkdir(exist_ok=True)
 
-    # Handle file's extensions
-    if ".tar" in plugin_ext:
-        with open_tar(plugin_file) as f:
-            f.extractall(plugin_dir)
+    try:
+        unpack_archive(plugin_file, plugin_dir)
         print(f"Plugin {plugin_file} was extracted successfully")
+    except Exception as e:
+        valid_formats = ", ".join([ext for ext, _ in get_archive_formats()])
+        raise TypeError(
+            f"{plugin_file} is not valid file. Supported formats are: {valid_formats}"
+        ) from e
 
     # Update plugin dictionary
     plugin_dict[plugin_name] = PluginState.enable
