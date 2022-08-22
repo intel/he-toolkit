@@ -3,8 +3,8 @@
 
 [[hexl]]
 skip = false
-version = "v1.2.5"
-name = "v1.2.5"
+version = "1.2.5"
+name = "1.2.5"
 fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
@@ -42,7 +42,7 @@ post-build = ""
 install = "cmake --install %init_install_dir%"
 export_cmake = "install/lib/Palisade"
 # Dependencies
-hexl = "hexl/v1.2.5"
+hexl = "hexl/1.2.5"
 
 
 [[sample-kernels]]
@@ -62,4 +62,4 @@ init_install_dir = ""
 install = ""
 # Dependencies
 palisade = "palisade/v1.11.6"
-hexl = "hexl/v1.2.5"
+hexl = "hexl/1.2.5"
