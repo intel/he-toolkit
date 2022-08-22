@@ -3,9 +3,10 @@
 
 """This module handles the usage of third party plugins"""
 
+from pathlib import Path
 from tarfile import is_tarfile, open as tar_open
 from zipfile import is_zipfile, ZipFile
-from shutil import rmtree
+from shutil import rmtree, copytree
 from typing import Dict
 from kit.utils.constants import PluginsConfig, PluginState
 from kit.utils.files import load_toml, dump_toml, file_exists
@@ -36,35 +37,61 @@ def is_plugin_present(plugin_name: str, plugin_dict: PluginDict) -> bool:
     return False
 
 
-def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
+def install_plugin(  # pylint: disable=too-many-branches
+    plugin_file: str, plugin_dict: PluginDict
+) -> None:
     """Install third party plugins"""
-    if is_tarfile(plugin_file):
-        with tar_open(plugin_file) as f:
-            tar_element_info = f.getmembers()[0]
-            plugin_name = tar_element_info.name
-            if tar_element_info.isdir() and f.getmember(f"{plugin_name}/plugin.py"):
-                # check plugin name
-                if is_plugin_present(plugin_name, plugin_dict):
-                    return
+    plugin_path = Path(plugin_file).resolve()
 
-                # extract the data
-                f.extractall(PluginsConfig.ROOT_DIR)
+    if not plugin_path.exists():
+        raise TypeError(f"Wrong input file. {plugin_file} does not exists")
+
+    if plugin_path.is_dir():
+        plugin_name = plugin_path.name
+        if (plugin_path / "plugin.py").exists():
+            # check if plugin name is unique
+            if is_plugin_present(plugin_name, plugin_dict):
+                return
+
+            # Copy the data
+            copytree(plugin_path, PluginsConfig.ROOT_DIR / plugin_name)
+        else:
+            raise TypeError(f"{plugin_path} does not meet the expected plugin format")
+
+    elif is_tarfile(plugin_file):
+        try:
+            with tar_open(plugin_file) as f:
+                plugin_name = f.getmembers()[0].name
+                if f.getmember(f"{plugin_name}/plugin.py"):
+                    # check if plugin name is unique
+                    if is_plugin_present(plugin_name, plugin_dict):
+                        return
+
+                    # extract the data
+                    f.extractall(PluginsConfig.ROOT_DIR)
+        except Exception as e:
+            raise TypeError(
+                f"{plugin_path.name} does not meet the expected plugin format"
+            ) from e
 
     elif is_zipfile(plugin_file):
-        with ZipFile(plugin_file) as f:
-            zip_element_info = f.infolist()[0]
-            plugin_name = zip_element_info.filename.replace("/", "")
-            if zip_element_info.is_dir() and f.getinfo(f"{plugin_name}/plugin.py"):
-                # check plugin name
-                if is_plugin_present(plugin_name, plugin_dict):
-                    return
+        try:
+            with ZipFile(plugin_file) as f:
+                plugin_name = f.infolist()[0].filename.replace("/", "")
+                if f.getinfo(f"{plugin_name}/plugin.py"):
+                    # check if plugin name is unique
+                    if is_plugin_present(plugin_name, plugin_dict):
+                        return
 
-                # extract the data
-                f.extractall(PluginsConfig.ROOT_DIR)
+                    # extract the data
+                    f.extractall(PluginsConfig.ROOT_DIR)
+        except Exception as e:
+            raise TypeError(
+                f"{plugin_path.name} does not meet the expected plugin format"
+            ) from e
 
     else:
-        print("No Supported")
-        return
+        raise TypeError("This program only supports tarball or zip files")
 
     # Update plugin dictionary
     plugin_dict[plugin_name] = PluginState.ENABLE
