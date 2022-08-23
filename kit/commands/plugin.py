@@ -81,7 +81,7 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluingType) -> str:
 
 
 def move_plugin_data(plugin_path: Path, plugin_type: PluingType) -> None:
-    """Move the pluing data to ~/.hekit/plugins"""
+    """Move the plugin data to ~/.hekit/plugins"""
     dst_path = PluginsConfig.ROOT_DIR
     if PluingType.DIR == plugin_type:
         copytree(plugin_path, dst_path / plugin_path.name)
