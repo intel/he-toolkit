@@ -3,11 +3,12 @@
 
 """This module handles the usage of third party plugins"""
 
+from enum import Enum
 from pathlib import Path
-from tarfile import is_tarfile, open as tar_open
-from zipfile import is_zipfile, ZipFile
 from shutil import rmtree, copytree
+from tarfile import is_tarfile, open as tar_open
 from typing import Dict
+from zipfile import is_zipfile, ZipFile
 from kit.utils.constants import PluginsConfig, PluginState
 from kit.utils.files import load_toml, dump_toml, file_exists
 from kit.utils.subparsers import validate_input
@@ -17,81 +18,87 @@ from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_c
 PluginDict = Dict[str, str]
 
 
-def list_plugins(plugin_dict: PluginDict, state: str) -> None:
-    """Print the list of all plugins"""
-    width_name = max(map(len, plugin_dict.keys()), default=0) + 3
-    width_status = 10
-
-    print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
-    for k, v in plugin_dict.items():
-        if state in (v, "all"):
-            print(f"{k:{width_name}} {v:{width_status}}")
+class InvalidPluingError(Exception):
+    """InvalidPluingError exception raised for an invalid plugin"""
 
 
-def is_plugin_present(plugin_name: str, plugin_dict: PluginDict) -> bool:
-    """Check if the plugin is present"""
-    if plugin_name in plugin_dict.keys():
-        print(f"Plugin {plugin_name} is already installed in the system")
-        return True
+class PluingType(Enum):
+    """Categories of files"""
 
-    return False
+    DIR = 1
+    TARBALL = 2
+    ZIP = 3
 
 
-def install_plugin(  # pylint: disable=too-many-branches
-    plugin_file: str, plugin_dict: PluginDict
-) -> None:
-    """Install third party plugins"""
-    plugin_path = Path(plugin_file).resolve()
-
+def get_plugin_type(plugin_path: Path) -> PluingType:
+    """return plugin type"""
     if not plugin_path.exists():
-        raise TypeError(f"Wrong input file. {plugin_file} does not exists")
+        raise FileNotFoundError(plugin_path)
 
     if plugin_path.is_dir():
-        plugin_name = plugin_path.name
-        if (plugin_path / "plugin.py").exists():
-            # check if plugin name is unique
-            if is_plugin_present(plugin_name, plugin_dict):
-                return
+        return PluingType.DIR
 
-            # Copy the data
-            copytree(plugin_path, PluginsConfig.ROOT_DIR / plugin_name)
-        else:
-            raise TypeError(f"{plugin_path} does not meet the expected plugin format")
+    if is_tarfile(plugin_path):
+        return PluingType.TARBALL
 
-    elif is_tarfile(plugin_file):
-        try:
-            with tar_open(plugin_file) as f:
+    if is_zipfile(plugin_path):
+        return PluingType.ZIP
+
+    raise TypeError("This program only supports tarball or zip files")
+
+
+def check_plugin_structure(plugin_path: Path, plugin_type: PluingType) -> str:
+    """check the mínimum plugin structure (a directory with a plugin.py file)
+    and return its name"""
+    plugin_name = ""
+    try:
+        if PluingType.DIR == plugin_type:
+            plugin_name = plugin_path.name
+            if not (plugin_path / "plugin.py").exists():
+                raise FileNotFoundError(plugin_path)
+        elif PluingType.TARBALL == plugin_type:
+            with tar_open(plugin_path) as f:
                 plugin_name = f.getmembers()[0].name
-                if f.getmember(f"{plugin_name}/plugin.py"):
-                    # check if plugin name is unique
-                    if is_plugin_present(plugin_name, plugin_dict):
-                        return
-
-                    # extract the data
-                    f.extractall(PluginsConfig.ROOT_DIR)
-        except Exception as e:
-            raise TypeError(
-                f"{plugin_path.name} does not meet the expected plugin format"
-            ) from e
-
-    elif is_zipfile(plugin_file):
-        try:
-            with ZipFile(plugin_file) as f:
+                # getmember raises a KeyError if the file can not be found
+                f.getmember(f"{plugin_name}/plugin.py")
+        elif PluingType.ZIP == plugin_type:
+            with ZipFile(plugin_path) as f:
                 plugin_name = f.infolist()[0].filename.replace("/", "")
-                if f.getinfo(f"{plugin_name}/plugin.py"):
-                    # check if plugin name is unique
-                    if is_plugin_present(plugin_name, plugin_dict):
-                        return
+                # getinfo raises a KeyError if the file can not be found
+                f.getinfo(f"{plugin_name}/plugin.py")
+    except Exception as e:
+        raise InvalidPluingError(
+            f"'{plugin_path.name}' does not meet the expected plugin format"
+        ) from e
 
-                    # extract the data
-                    f.extractall(PluginsConfig.ROOT_DIR)
-        except Exception as e:
-            raise TypeError(
-                f"{plugin_path.name} does not meet the expected plugin format"
-            ) from e
+    return plugin_name
 
-    else:
-        raise TypeError("This program only supports tarball or zip files")
+
+def move_plugin_data(plugin_path: Path, plugin_type: PluingType) -> None:
+    """Move the pluing data to ~/.hekit/plugins"""
+    dst_path = PluginsConfig.ROOT_DIR
+    if PluingType.DIR == plugin_type:
+        copytree(plugin_path, dst_path / plugin_path.name)
+    elif PluingType.TARBALL == plugin_type:
+        with tar_open(plugin_path) as f:
+            f.extractall(dst_path)
+    elif PluingType.ZIP == plugin_type:
+        with ZipFile(plugin_path) as f:
+            f.extractall(dst_path)
+
+
+def install_plugin(plugin_file: str, plugin_dict: PluginDict) -> None:
+    """Install third party plugins"""
+    plugin_path = Path(plugin_file).resolve()
+    plugin_type = get_plugin_type(plugin_path)
+    plugin_name = check_plugin_structure(plugin_path, plugin_type)
+
+    # check if plugin is unique
+    if plugin_name in plugin_dict.keys():
+        print(f"Plugin {plugin_name} is already installed in the system")
+        return
+
+    move_plugin_data(plugin_path, plugin_type)
 
     # Update plugin dictionary
     plugin_dict[plugin_name] = PluginState.ENABLE
@@ -153,6 +160,17 @@ def disable_plugin(plugin_name: str, plugin_dict: PluginDict) -> None:
 
     plugin_dict[plugin_name] = PluginState.DISABLE
     print(f"Plugin {plugin_name} was disabled successfully")
+
+
+def list_plugins(plugin_dict: PluginDict, state: str) -> None:
+    """Print the list of all plugins"""
+    width_name = max(map(len, plugin_dict.keys()), default=0) + 3
+    width_status = 10
+
+    print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
+    for k, v in plugin_dict.items():
+        if state in (v, "all"):
+            print(f"{k:{width_name}} {v:{width_status}}")
 
 
 def handle_plugins(args) -> None:
