@@ -3,9 +3,9 @@
 
 [[hexl]]
 skip = false
-version = "v1.2.3"
+version = "1.2.3"
 name = "v1.2.3"
-fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+fetch = "git clone https://github.com/intel/hexl.git --branch v%version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
