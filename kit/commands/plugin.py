@@ -33,7 +33,7 @@ class PluingType(Enum):
 def get_plugin_type(plugin_path: Path) -> PluingType:
     """return plugin type"""
     if not plugin_path.exists():
-        raise FileNotFoundError(plugin_path)
+        raise FileNotFoundError(f"File '{plugin_path}' not found")
 
     if plugin_path.is_dir():
         return PluingType.DIR
@@ -51,24 +51,30 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluingType) -> str:
     """check the mínimum plugin structure (a directory with a plugin.py file)
     and return its name"""
     plugin_name = ""
+    expected_file = "plugin.py"
+
+    if PluingType.DIR == plugin_type:
+        plugin_name = plugin_path.name
+        if not (plugin_path / expected_file).exists():
+            raise FileNotFoundError(
+                f"File '{expected_file}' not found in '{plugin_name}'"
+            )
+        return plugin_name
+
     try:
-        if PluingType.DIR == plugin_type:
-            plugin_name = plugin_path.name
-            if not (plugin_path / "plugin.py").exists():
-                raise FileNotFoundError(plugin_path)
-        elif PluingType.TARBALL == plugin_type:
+        if PluingType.TARBALL == plugin_type:
             with tar_open(plugin_path) as f:
                 plugin_name = f.getmembers()[0].name
                 # getmember raises a KeyError if the file can not be found
-                f.getmember(f"{plugin_name}/plugin.py")
+                f.getmember(f"{plugin_name}/{expected_file}")
         elif PluingType.ZIP == plugin_type:
             with ZipFile(plugin_path) as f:
                 plugin_name = f.infolist()[0].filename.replace("/", "")
                 # getinfo raises a KeyError if the file can not be found
-                f.getinfo(f"{plugin_name}/plugin.py")
+                f.getinfo(f"{plugin_name}/{expected_file}")
     except Exception as e:
         raise InvalidPluingError(
-            f"'{plugin_path.name}' does not meet the expected plugin format"
+            f"File 'DIRECTORY/{expected_file}' not found in '{plugin_path.name}'"
         ) from e
 
     return plugin_name
@@ -166,11 +172,15 @@ def list_plugins(plugin_dict: PluginDict, state: str) -> None:
     """Print the list of all plugins"""
     width_name = max(map(len, plugin_dict.keys()), default=0) + 3
     width_status = 10
+    filtered_plugin_dict = (
+        plugin_dict.items()
+        if state == "all"
+        else ((k, v) for k, v in plugin_dict.items() if state == v)
+    )
 
     print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
-    for k, v in plugin_dict.items():
-        if state in (v, "all"):
-            print(f"{k:{width_name}} {v:{width_status}}")
+    for k, v in filtered_plugin_dict:
+        print(f"{k:{width_name}} {v:{width_status}}")
 
 
 def handle_plugins(args) -> None:
