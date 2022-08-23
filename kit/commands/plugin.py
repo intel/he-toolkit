@@ -23,9 +23,9 @@ def list_plugins(plugin_dict: PluginDict, state: str) -> None:
     width_status = 10
 
     print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
-    for k, v in plugin_dict.items():
-        if state in (v, "all"):
-            print(f"{k:{width_name}} {v:{width_status}}")
+    filtered_plugin_dict = plugin_dict.itmes() if state == "all" else ((k, v) for k, v in plugin_dict.items() if state == v)
+    for k, v in filtered_plugin_dict:
+        print(f"{k:{width_name}} {v:{width_status}}")
 
 
 def is_plugin_present(plugin_name: str, plugin_dict: PluginDict) -> bool:
@@ -44,19 +44,19 @@ def install_plugin(  # pylint: disable=too-many-branches
     plugin_path = Path(plugin_file).resolve()
 
     if not plugin_path.exists():
-        raise TypeError(f"Wrong input file. {plugin_file} does not exists")
+        raise FileNotFoundError(f"File '{plugin_file}' not found")
 
     if plugin_path.is_dir():
         plugin_name = plugin_path.name
-        if (plugin_path / "plugin.py").exists():
-            # check if plugin name is unique
-            if is_plugin_present(plugin_name, plugin_dict):
-                return
+        if not (plugin_path / "plugin.py").exists():
+            raise FileNotFoundError(f"File '{plugin_path}' not found")
 
-            # Copy the data
-            copytree(plugin_path, PluginsConfig.ROOT_DIR / plugin_name)
-        else:
-            raise TypeError(f"{plugin_path} does not meet the expected plugin format")
+        # check if plugin name is unique
+        if is_plugin_present(plugin_name, plugin_dict):
+            return
+
+        # Copy the data
+        copytree(plugin_path, PluginsConfig.ROOT_DIR / plugin_name)
 
     elif is_tarfile(plugin_file):
         try:
@@ -70,8 +70,8 @@ def install_plugin(  # pylint: disable=too-many-branches
                     # extract the data
                     f.extractall(PluginsConfig.ROOT_DIR)
         except Exception as e:
-            raise TypeError(
-                f"{plugin_path.name} does not meet the expected plugin format"
+            raise FileNotFoundError(
+                f"File '{plugin_path.name}' not found"
             ) from e
 
     elif is_zipfile(plugin_file):
@@ -86,8 +86,8 @@ def install_plugin(  # pylint: disable=too-many-branches
                     # extract the data
                     f.extractall(PluginsConfig.ROOT_DIR)
         except Exception as e:
-            raise TypeError(
-                f"{plugin_path.name} does not meet the expected plugin format"
+            raise FileNotFoundError(
+                f"File '{plugin_path.name}' not found"
             ) from e
 
     else:
