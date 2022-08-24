@@ -18,11 +18,11 @@ from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_c
 PluginDict = Dict[str, str]
 
 
-class InvalidPluingError(Exception):
-    """InvalidPluingError exception raised for an invalid plugin"""
+class InvalidPluginError(Exception):
+    """InvalidPluginError exception raised for an invalid plugin"""
 
 
-class PluingType(Enum):
+class PluginType(Enum):
     """Categories of files"""
 
     DIR = 1
@@ -48,30 +48,30 @@ def update_plugin_file(plugin_dict: PluginDict) -> None:
     dump_toml(PluginsConfig.FILE, sorted_dict)
 
 
-def get_plugin_type(plugin_path: Path) -> PluingType:
+def get_plugin_type(plugin_path: Path) -> PluginType:
     """return plugin type"""
     if not plugin_path.exists():
         raise FileNotFoundError(f"File '{plugin_path}' not found")
 
     if plugin_path.is_dir():
-        return PluingType.DIR
+        return PluginType.DIR
 
     if is_tarfile(plugin_path):
-        return PluingType.TARBALL
+        return PluginType.TARBALL
 
     if is_zipfile(plugin_path):
-        return PluingType.ZIP
+        return PluginType.ZIP
 
     raise TypeError("This program only supports tarball or zip files")
 
 
-def check_plugin_structure(plugin_path: Path, plugin_type: PluingType) -> str:
+def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> str:
     """check the mínimum plugin structure (a directory with a plugin.py file)
     and return its name"""
     plugin_name = ""
     expected_file = "plugin.py"
 
-    if PluingType.DIR == plugin_type:
+    if PluginType.DIR == plugin_type:
         plugin_name = plugin_path.name
         if not (plugin_path / expected_file).exists():
             raise FileNotFoundError(
@@ -80,33 +80,33 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluingType) -> str:
         return plugin_name
 
     try:
-        if PluingType.TARBALL == plugin_type:
+        if PluginType.TARBALL == plugin_type:
             with tar_open(plugin_path) as f:
                 plugin_name = f.getmembers()[0].name
-                # getmember raises a KeyError if the file can not be found
+                # getmember raises a KeyError if the file cannot be found
                 f.getmember(f"{plugin_name}/{expected_file}")
-        elif PluingType.ZIP == plugin_type:
+        elif PluginType.ZIP == plugin_type:
             with ZipFile(plugin_path) as f:
                 plugin_name = f.infolist()[0].filename.replace("/", "")
-                # getinfo raises a KeyError if the file can not be found
+                # getinfo raises a KeyError if the file cannot be found
                 f.getinfo(f"{plugin_name}/{expected_file}")
     except Exception as e:
-        raise InvalidPluingError(
+        raise InvalidPluginError(
             f"File 'DIRECTORY/{expected_file}' not found in '{plugin_path.name}'"
         ) from e
 
     return plugin_name
 
 
-def move_plugin_data(plugin_path: Path, plugin_type: PluingType) -> None:
+def move_plugin_data(plugin_path: Path, plugin_type: PluginType) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
     dst_path = PluginsConfig.ROOT_DIR
-    if PluingType.DIR == plugin_type:
+    if PluginType.DIR == plugin_type:
         copytree(plugin_path, dst_path / plugin_path.name)
-    elif PluingType.TARBALL == plugin_type:
+    elif PluginType.TARBALL == plugin_type:
         with tar_open(plugin_path) as f:
             f.extractall(dst_path)
-    elif PluingType.ZIP == plugin_type:
+    elif PluginType.ZIP == plugin_type:
         with ZipFile(plugin_path) as f:
             f.extractall(dst_path)
 
@@ -118,8 +118,9 @@ def install_plugin(args) -> None:
     plugin_type = get_plugin_type(plugin_path)
     plugin_name = check_plugin_structure(plugin_path, plugin_type)
 
-    # check if plugin is unique
-    if plugin_name in plugin_dict.keys():
+    if args.force:
+        remove_plugin_dir(plugin_name)
+    elif plugin_name in plugin_dict.keys():
         print(f"Plugin {plugin_name} is already installed in the system")
         return
 
@@ -141,10 +142,8 @@ def remove_plugin_dir(plugin_name: str) -> None:
 def remove_plugin(args) -> None:
     """Remove third party plugins"""
     plugin_dict = get_plugin_dict()
-    plugin_name = args.plugin
 
-    # TODO: add a argument
-    if "ALL" == plugin_name:
+    if args.all:
         # Remove all third party plugins
         user_answer = input(
             "All plugins will be deleted. Do you want to continue? (y/n) "
@@ -158,6 +157,10 @@ def remove_plugin(args) -> None:
         plugin_dict.clear()
         print("All Plugins were uninstalled successfully")
     else:
+        plugin_name = args.plugin
+        if not plugin_name:
+            raise ValueError("A plugin name should be specified as argument")
+
         # Remove a specific third party plugins
         if plugin_name not in plugin_dict.keys():
             print(f"Plugin {plugin_name} was not found in the system")
@@ -246,8 +249,15 @@ def set_plugin_subparser(subparsers) -> None:
     parser_remove.add_argument(
         "plugin",
         type=validate_input,
-        help="plugin name. Use 'ALL' option to remove all plugins",
+        help="plugin name",
+        nargs="?",
+        default="",
     ).completer = plugins_enable_completer
+    parser_remove.add_argument(
+        "--all",
+        action="store_true",
+        help="Remove all plugins in the system",
+    )
     parser_remove.set_defaults(fn=remove_plugin)
 
     # enable options
