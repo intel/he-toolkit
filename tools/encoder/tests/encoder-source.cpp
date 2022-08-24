@@ -1,21 +1,23 @@
-// Copyright (C) 2020 Intel Corporation
+// Copyright (C) 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 // A program that calls the header and returns the coefficients and the
 // corresponding exponents.
+#include <gtest/gtest.h>
+
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <map>
 
-#include "iomanip"
-#include "nibnaf.h"
+#include "../nibnaf.h"
 
 // To print the zero polynomial and the zero results when en is empty, which
 // happens when theta=0 or |theta|<epsil
 inline void print_zero_pol() { std::cout << "0"; }
 inline void print_zero_res() { std::cout << "(0,0)"; }
 
-void test_integer() {
+TEST(NIBNAF, test_integer) {
   Coder co;
   double num = 546;
 
@@ -30,9 +32,10 @@ void test_integer() {
   std::cout << std::endl;
   std::cout << std::fixed << std::setprecision(10) << co.decoder(en)
             << std::endl;
+  ASSERT_TRUE(false);
 }
 
-void test_float() {
+TEST(NIBNAF, test_float) {
   Coder co;
   double num = 546.789;
 
@@ -47,9 +50,10 @@ void test_float() {
   std::cout << std::endl;
   std::cout << std::fixed << std::setprecision(10) << co.decoder(en)
             << std::endl;
+  ASSERT_TRUE(false);
 }
 
-void test_zero() {
+TEST(NIBNAF, test_zero) {
   Coder co;
   double num = 0;
 
@@ -66,16 +70,5 @@ void test_zero() {
   std::cout << std::endl;
   std::cout << std::fixed << std::setprecision(10) << co.decoder(en)
             << std::endl;
-}
-
-int main(void) {
-  Coder co;
-  std::cout << "test float\n";
-  test_float();
-  std::cout << "test integer\n";
-  test_integer();
-  std::cout << "test zero\n";
-  test_zero();
-
-  return 0;
+  ASSERT_TRUE(false);
 }

@@ -185,6 +185,7 @@ tests/test_util_subparsers.py
 tests/test_util_tab_comp.py
 tests/test_util_tsort.py
 tools/README.md
+tools/encoder/CMakeLists.txt
 tools/encoder/coder.h
-tools/encoder/encoder-source.cpp
 tools/encoder/nibnaf.h
+tools/encoder/tests/encoder-source.cpp
