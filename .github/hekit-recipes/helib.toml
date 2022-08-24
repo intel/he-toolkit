@@ -55,8 +55,8 @@ post-build = ""
 install = "cmake --install %init_install_dir%"
 export_cmake = "install/share/cmake/helib"
 # Dependencies
-ntl = "ntl/11.5.1"
-hexl = "hexl/1.2.3"
+ntl = "ntl/v11.5.1"
+hexl = "hexl/v1.2.3"
 
 
 [[examples]]
