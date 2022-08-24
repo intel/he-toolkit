@@ -15,20 +15,43 @@
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
+class SparsePoly {
+ public:
+  long coeff(long i) const { return coeffs_.count(i) ? coeffs_.at(i) : 0L; }
+  void coeff(long i, long value) { coeffs_[i] = value; }
+  long degree() const { return coeffs_.rbegin()->first; }
+  long operator[](long i) const { return coeff(i); }
+  long& operator[](long i) { return coeffs_[i]; }
+  SparsePoly operator+(const SparsePoly& other) const {
+    auto res = other;
+    for (const auto [index, value] : coeffs_) {
+      res.coeffs_[index] += value;
+    }
+    return res;
+  }
+
+ private:
+  std::map<long, long> coeffs_;
+};
+
 class Coder {
  public:
+  Coder() = default;
+
+  Coder(double bw, double epsil) : bw_(bw), epsil_(epsil) {}
+
   std::map<long, long> encode(double num) {
-    const double log_bw = std::log(bw);
+    const double log_bw_ = std::log(bw_);
     std::map<long, long> a;
     long r;
     double t_minus_po;
-    for (double t = std::abs(num), sigma = signum(num); t >= epsil;
+    for (double t = std::abs(num), sigma = signum(num); t >= epsil_;
          t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-      r = std::ceil(std::log(t) / log_bw);
-      r -= (std::pow(bw, r) - t > t - std::pow(bw, r - 1));
+      r = std::ceil(std::log(t) / log_bw_);
+      r -= (std::pow(bw_, r) - t > t - std::pow(bw_, r - 1));
 
       a[r] = sigma;
-      t_minus_po = t - std::pow(bw, r);
+      t_minus_po = t - std::pow(bw_, r);
     }
     return a;
   }
@@ -67,12 +90,12 @@ class Coder {
   double decoder(const T& en) {
     double sum = 0;
     for (const auto& [key, value] : en) {
-      sum += value * pow(bw, key);
+      sum += value * pow(bw_, key);
     }
     return sum;
   }
 
  private:
-  double bw = 1.2;
-  double epsil = 0.00000001;
+  double bw_ = 1.2;
+  double epsil_ = 0.00000001;
 };

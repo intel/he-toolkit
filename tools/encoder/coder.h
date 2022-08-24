@@ -3,10 +3,22 @@
 
 #pragma once
 
-class PolyRep;
+#include <vector>
 
+template <typename Poly>
+class EncPoly {
+ public:
+  EncPoly() = delete;
+  EncPoly(poly, is) : poly_(poly), is_(is) {}
+
+ private:
+  std::vector<long> is_;
+  Poly poly_;
+};
+
+template <typename Poly>
 struct Coder {
-  virtual PolyRep encode(double num) = 0;
-  virtual double decode(const PolyRep& poly_rep) = 0;
+  virtual EncPoly<Poly> encode(double num) = 0;
+  virtual double decode(const EncPoly<Poly>& enc_poly) = 0;
   virtual ~Coder = default;
 };
