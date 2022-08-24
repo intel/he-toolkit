@@ -26,7 +26,7 @@ class PluginType(Enum):
     """Categories of files"""
 
     DIR = 1
-    TARBALL = 2
+    TAR = 2
     ZIP = 3
 
 
@@ -57,7 +57,7 @@ def get_plugin_type(plugin_path: Path) -> PluginType:
         return PluginType.DIR
 
     if is_tarfile(plugin_path):
-        return PluginType.TARBALL
+        return PluginType.TAR
 
     if is_zipfile(plugin_path):
         return PluginType.ZIP
@@ -80,7 +80,7 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> str:
         return plugin_name
 
     try:
-        if PluginType.TARBALL == plugin_type:
+        if PluginType.TAR == plugin_type:
             with tar_open(plugin_path) as f:
                 plugin_name = f.getmembers()[0].name
                 # getmember raises a KeyError if the file cannot be found
@@ -103,7 +103,7 @@ def move_plugin_data(plugin_path: Path, plugin_type: PluginType) -> None:
     dst_path = PluginsConfig.ROOT_DIR
     if PluginType.DIR == plugin_type:
         copytree(plugin_path, dst_path / plugin_path.name)
-    elif PluginType.TARBALL == plugin_type:
+    elif PluginType.TAR == plugin_type:
         with tar_open(plugin_path) as f:
             f.extractall(dst_path)
     elif PluginType.ZIP == plugin_type:
