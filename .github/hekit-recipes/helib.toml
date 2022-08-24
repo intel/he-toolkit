@@ -4,8 +4,8 @@
 [[hexl]]
 skip = false
 version = "1.2.3"
-name = "1.2.3"
-fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+name = "v1.2.3"
+fetch = "git clone https://github.com/intel/hexl.git --branch v%version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
@@ -22,7 +22,7 @@ export_cmake = "install/lib/cmake/hexl-%version%"
 [[ntl]]
 skip = false
 version = "11.5.1"
-name = "11.5.1"
+name = "v11.5.1"
 init_fetch_dir = "fetch"
 init_pre_build_dir = "build"
 init_build_dir = "build/ntl-%version%/src"
@@ -36,14 +36,14 @@ export_install_dir = "install"
 
 [[helib]]
 skip = false
-version = "2.2.1"
+version = "v2.2.1"
 name = "v2.2.1"
 root = "%name%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
 export_install_dir = "install"
-fetch = "git clone https://github.com/homenc/HElib.git --branch %name%"
+fetch = "git clone https://github.com/homenc/HElib.git --branch %version%"
 pre-build = """cmake -S %init_fetch_dir%/HElib -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%
                -DNTL_DIR=$%ntl%/export_install_dir$
@@ -55,8 +55,8 @@ post-build = ""
 install = "cmake --install %init_install_dir%"
 export_cmake = "install/share/cmake/helib"
 # Dependencies
-ntl = "ntl/11.5.1"
-hexl = "hexl/1.2.3"
+ntl = "ntl/v11.5.1"
+hexl = "hexl/v1.2.3"
 
 
 [[examples]]
