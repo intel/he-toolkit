@@ -15,6 +15,7 @@ from kit.commands.plugin import (
 
 
 def test_get_plugin_type_all_valid(tmp_path):
+    """Verify the function returns the correct plugin type"""
     plugin_name = "MyPlugin"
     create_plugins_files(plugin_name, tmp_path)
 
@@ -26,6 +27,8 @@ def test_get_plugin_type_all_valid(tmp_path):
 
 
 def test_get_plugin_type_not_found():
+    """Verify the function raises an error
+    when the file is not found"""
     plugin_name = "MyPlugin"
     with pytest.raises(FileNotFoundError) as exc_info:
         get_plugin_type(Path(plugin_name))
@@ -33,6 +36,8 @@ def test_get_plugin_type_not_found():
 
 
 def test_get_plugin_type_not_supported():
+    """Verify the function raises an error
+    when the file does not exist"""
     tests_path = Path(__file__).resolve().parent
     file = tests_path / "input_files/default.config"
     with pytest.raises(TypeError) as exc_info:
@@ -41,7 +46,7 @@ def test_get_plugin_type_not_supported():
 
 
 def test_list_plugins_all(mocker):
-    """Verify the program prints all plugins"""
+    """Verify the function prints all plugins"""
     args = MockArgs()
     mockers = Mockers(mocker)
 
@@ -52,7 +57,7 @@ def test_list_plugins_all(mocker):
 
 
 def test_list_plugins_enable(mocker):
-    """Verify the program prints only enabled plugins"""
+    """Verify the function prints only enabled plugins"""
     args = MockArgs()
     args.state = PluginState.ENABLE
     mockers = Mockers(mocker)
@@ -63,7 +68,7 @@ def test_list_plugins_enable(mocker):
 
 
 def test_list_plugins_disable(mocker):
-    """Verify the program prints only disabled plugins"""
+    """Verify the function prints only disabled plugins"""
     args = MockArgs()
     args.state = PluginState.DISABLE
     mockers = Mockers(mocker)
@@ -74,7 +79,7 @@ def test_list_plugins_disable(mocker):
 
 
 def test_update_plugin_state_unknown_plugin(mocker):
-    """Verify the program reports a message
+    """Verify the function reports a message
     when the plugin is not in the system"""
     args = MockArgs()
     args.plugin = "test"
@@ -87,7 +92,7 @@ def test_update_plugin_state_unknown_plugin(mocker):
 
 
 def test_update_plugin_state_already_enabled(mocker):
-    """Verify the program reports a message
+    """Verify the function reports a message
     when the plugin is already enabled"""
     args = MockArgs()
     args.state = PluginState.ENABLE
@@ -101,7 +106,7 @@ def test_update_plugin_state_already_enabled(mocker):
 
 
 def test_update_plugin_state_already_disabled(mocker):
-    """Verify the program reports a message
+    """Verify the function reports a message
     when the plugin is already disabled"""
     args = MockArgs()
     args.state = PluginState.ENABLE
@@ -115,8 +120,7 @@ def test_update_plugin_state_already_disabled(mocker):
 
 
 def test_update_plugin_state_enable(mocker):
-    """Verify the program reports a message
-    when the plugin is already enabled"""
+    """Verify the function enables a plugin"""
     args = MockArgs()
     args.plugin = "plugin2"
     args.state = PluginState.ENABLE
@@ -128,8 +132,7 @@ def test_update_plugin_state_enable(mocker):
 
 
 def test_update_plugin_state_disable(mocker):
-    """Verify the program reports a message
-    when the plugin is already enabled"""
+    """Verify the function disables a plugin"""
     args = MockArgs()
     args.plugin = "plugin1"
     args.state = PluginState.DISABLE
