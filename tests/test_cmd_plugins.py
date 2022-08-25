@@ -7,18 +7,52 @@ from pathlib import Path
 from kit.utils.constants import PluginsConfig, PluginState
 from kit.commands.plugin import (
     PluginType,
-    list_plugins,
-    update_plugin_state,
+    get_plugin_dict,
+    update_plugin_file,
     get_plugin_type,
     check_plugin_structure,
+    update_plugin_state,
+    list_plugins,
 )
 
 
+def test_get_plugin_dict_not_found():
+    """Verify that the SW raises an error
+    when the file is not found"""
+    plugin_name = "test.toml"
+    with pytest.raises(FileNotFoundError) as exc_info:
+        get_plugin_dict(Path(plugin_name))
+    assert (
+        str(exc_info.value)
+        == f"File '{plugin_name}' not found. Please execute: hekit init --default-config"
+    )
+
+
+def test_get_plugin_dict_correct_file(tmp_path):
+    """Verify that the SW returns a dict
+    after reading a toml file"""
+    plugin_name = tmp_path / "test.toml"
+    create_config_file(plugin_name)
+
+    act_dict = get_plugin_dict(plugin_name)
+    assert act_dict == geet_fake_dict()
+
+
+def test_update_plugin_file(tmp_path):
+    """Verify that the SW saves an ordered
+    dictionary in a toml file"""
+    dict = {"w": "1", "t": "5", "a": "2", "j": "3"}
+    order_dict = {"a": "2", "j": "3", "t": "5", "w": "1"}
+    plugin_name = tmp_path / "test.toml"
+
+    update_plugin_file(dict, plugin_name)
+    assert order_dict == get_plugin_dict(plugin_name)
+
+
 def test_get_plugin_type_all_valid(tmp_path):
-    """Verify the function returns the correct plugin type"""
+    """Verify that the SW returns the correct plugin type"""
     plugin_name = "MyPlugin"
     create_plugins_files(plugin_name, tmp_path)
-
     assert PluginType.DIR == get_plugin_type(tmp_path / plugin_name)
     assert PluginType.TAR == get_plugin_type(tmp_path / f"{plugin_name}.tar.gz")
     assert PluginType.TAR == get_plugin_type(tmp_path / f"{plugin_name}.tar.xz")
@@ -27,7 +61,7 @@ def test_get_plugin_type_all_valid(tmp_path):
 
 
 def test_get_plugin_type_not_found():
-    """Verify the function raises an error
+    """Verify that the SW raises an error
     when the file is not found"""
     plugin_name = "MyPlugin"
     with pytest.raises(FileNotFoundError) as exc_info:
@@ -36,8 +70,8 @@ def test_get_plugin_type_not_found():
 
 
 def test_get_plugin_type_not_supported():
-    """Verify the function raises an error
-    when the file does not exist"""
+    """Verify that the SW return a dict
+    that was read from a toml file"""
     tests_path = Path(__file__).resolve().parent
     file = tests_path / "input_files/default.config"
     with pytest.raises(TypeError) as exc_info:
@@ -46,7 +80,7 @@ def test_get_plugin_type_not_supported():
 
 
 def test_list_plugins_all(mocker):
-    """Verify the function prints all plugins"""
+    """Verify that the SW prints all plugins"""
     args = MockArgs()
     mockers = Mockers(mocker)
 
@@ -57,7 +91,7 @@ def test_list_plugins_all(mocker):
 
 
 def test_list_plugins_enable(mocker):
-    """Verify the function prints only enabled plugins"""
+    """Verify that the SW prints only enabled plugins"""
     args = MockArgs()
     args.state = PluginState.ENABLE
     mockers = Mockers(mocker)
@@ -68,7 +102,7 @@ def test_list_plugins_enable(mocker):
 
 
 def test_list_plugins_disable(mocker):
-    """Verify the function prints only disabled plugins"""
+    """Verify that the SW prints only disabled plugins"""
     args = MockArgs()
     args.state = PluginState.DISABLE
     mockers = Mockers(mocker)
@@ -79,7 +113,7 @@ def test_list_plugins_disable(mocker):
 
 
 def test_update_plugin_state_unknown_plugin(mocker):
-    """Verify the function reports a message
+    """Verify that the SW reports a message
     when the plugin is not in the system"""
     args = MockArgs()
     args.plugin = "test"
@@ -92,7 +126,7 @@ def test_update_plugin_state_unknown_plugin(mocker):
 
 
 def test_update_plugin_state_already_enabled(mocker):
-    """Verify the function reports a message
+    """Verify that the SW reports a message
     when the plugin is already enabled"""
     args = MockArgs()
     args.state = PluginState.ENABLE
@@ -106,7 +140,7 @@ def test_update_plugin_state_already_enabled(mocker):
 
 
 def test_update_plugin_state_already_disabled(mocker):
-    """Verify the function reports a message
+    """Verify that the SW reports a message
     when the plugin is already disabled"""
     args = MockArgs()
     args.state = PluginState.ENABLE
@@ -120,7 +154,7 @@ def test_update_plugin_state_already_disabled(mocker):
 
 
 def test_update_plugin_state_enable(mocker):
-    """Verify the function enables a plugin"""
+    """Verify that the SW enables a plugin"""
     args = MockArgs()
     args.plugin = "plugin2"
     args.state = PluginState.ENABLE
@@ -132,7 +166,7 @@ def test_update_plugin_state_enable(mocker):
 
 
 def test_update_plugin_state_disable(mocker):
-    """Verify the function disables a plugin"""
+    """Verify that the SW disables a plugin"""
     args = MockArgs()
     args.plugin = "plugin1"
     args.state = PluginState.DISABLE
@@ -161,6 +195,13 @@ def create_plugins_files(plugin_name, tmp_path, type="all"):
 
     if type in ["all", "zip"]:
         make_archive(plugin, "zip", tmp_path)
+
+
+def create_config_file(filepath):
+    with filepath.open("w") as f:
+        f.write(f"[{PluginsConfig.KEY}]\n")
+        for k, v in geet_fake_dict().items():
+            f.write(f'{k} = "{v}"\n')
 
 
 class MockArgs:

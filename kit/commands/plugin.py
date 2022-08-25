@@ -30,22 +30,23 @@ class PluginType(Enum):
     ZIP = 3
 
 
-def get_plugin_dict() -> PluginDict:
+def get_plugin_dict(source_file: Path = PluginsConfig.FILE) -> PluginDict:
     """Return plugins dictionary"""
-    source_file = PluginsConfig.FILE
     if not file_exists(source_file):
         raise FileNotFoundError(
-            f"File '{source_file}' not found. Please execute: hekit init --default-confi"
+            f"File '{source_file}' not found. Please execute: hekit init --default-config"
         )
 
     # Get the plugins data
     return load_toml(source_file)[PluginsConfig.KEY]
 
 
-def update_plugin_file(plugin_dict: PluginDict) -> None:
+def update_plugin_file(
+    plugin_dict: PluginDict, dest_file: Path = PluginsConfig.FILE
+) -> None:
     """Save changes in the plugins data"""
     sorted_dict = {PluginsConfig.KEY: dict(sorted(plugin_dict.items()))}
-    dump_toml(PluginsConfig.FILE, sorted_dict)
+    dump_toml(dest_file, sorted_dict)
 
 
 def get_plugin_type(plugin_path: Path) -> PluginType:
