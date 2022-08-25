@@ -50,7 +50,7 @@ def update_plugin_file(
 
 
 def get_plugin_type(plugin_path: Path) -> PluginType:
-    """return plugin type"""
+    """Return plugin type"""
     if not plugin_path.exists():
         raise FileNotFoundError(f"File '{plugin_path}' not found")
 
@@ -67,7 +67,7 @@ def get_plugin_type(plugin_path: Path) -> PluginType:
 
 
 def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> str:
-    """check the mínimum plugin structure (a directory with a plugin.py file)
+    """Check the minimum plugin structure (a directory with a plugin.py file)
     and return its name"""
     plugin_name = ""
     expected_file = "plugin.py"
@@ -211,7 +211,7 @@ def list_plugins(args) -> None:
 
 
 def set_plugin_subparser(subparsers) -> None:
-    """create the parser for the 'plugin' command"""
+    """Create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
         "plugins", description="handle third party plugins"
     )
