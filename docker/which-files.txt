@@ -188,4 +188,5 @@ tools/README.md
 tools/encoder/CMakeLists.txt
 tools/encoder/coder.h
 tools/encoder/nibnaf.h
+tools/encoder/sparse_poly.h
 tools/encoder/tests/encoder-source.cpp

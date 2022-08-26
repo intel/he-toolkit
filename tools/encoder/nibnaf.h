@@ -9,40 +9,26 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iterator>
-#include <map>
 #include <vector>
+
+#include "coder.h"
+#include "sparse_poly.h"
+
+namespace hekit::coder {
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-class SparsePoly {
+class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
  public:
-  long coeff(long i) const { return coeffs_.count(i) ? coeffs_.at(i) : 0L; }
-  void coeff(long i, long value) { coeffs_[i] = value; }
-  long degree() const { return coeffs_.rbegin()->first; }
-  long operator[](long i) const { return coeff(i); }
-  long& operator[](long i) { return coeffs_[i]; }
-  SparsePoly operator+(const SparsePoly& other) const {
-    auto res = other;
-    for (const auto [index, value] : coeffs_) {
-      res.coeffs_[index] += value;
-    }
-    return res;
-  }
+  NIBNAFCoder() = default;
 
- private:
-  std::map<long, long> coeffs_;
-};
+  NIBNAFCoder(double bw, double epsil) : bw_(bw), epsil_(epsil) {}
 
-class Coder {
- public:
-  Coder() = default;
+  ~NIBNAFCoder() = default;
 
-  Coder(double bw, double epsil) : bw_(bw), epsil_(epsil) {}
-
-  std::map<long, long> encode(double num) {
+  EncPoly<poly::SparsePoly> encode(const double& num) const override {
     const double log_bw_ = std::log(bw_);
-    std::map<long, long> a;
+    poly::SparsePoly a;
     long r;
     double t_minus_po;
     for (double t = std::abs(num), sigma = signum(num); t >= epsil_;
@@ -53,19 +39,31 @@ class Coder {
       a[r] = sigma;
       t_minus_po = t - std::pow(bw_, r);
     }
-    return a;
+
+    long first_index = a.begin()->first;
+    long frac_exp =
+        (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
+    return EncPoly{a, {frac_exp}};
+  }
+
+  double decode(const EncPoly<poly::SparsePoly>& en) const override {
+    double sum = 0;
+    for (const auto& [key, value] : en.poly()) {
+      sum += value * std::pow(bw_, key);
+    }
+    return sum;
   }
 
   template <typename T>
   void print_out_results(const T& en) {
-    for (const auto& [key, value] : en) {
+    for (const auto& [key, value] : en.poly()) {
       std::cout << "(" << key << " , " << value << ")" << std::endl;
     }
   }
 
   template <typename T, typename U, typename W>
   void print_poly_rep(const T& en, U mi, W de) {
-    for (const auto& [key, value] : en) {
+    for (const auto& [key, value] : en.poly()) {
       std::cout << value << "x^" << key - mi;
       if (key - mi != de) std::cout << " + ";
     }
@@ -86,16 +84,9 @@ class Coder {
     }
   }
 
-  template <typename T>
-  double decoder(const T& en) {
-    double sum = 0;
-    for (const auto& [key, value] : en) {
-      sum += value * pow(bw_, key);
-    }
-    return sum;
-  }
-
  private:
   double bw_ = 1.2;
   double epsil_ = 0.00000001;
 };
+
+}  // namespace hekit::coder
