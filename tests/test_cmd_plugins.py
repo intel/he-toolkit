@@ -20,7 +20,7 @@ from kit.commands.plugin import (
 )
 
 
-def test_get_plugin_dict_not_found():
+def test_get_plugin_dict_file_not_found():
     """Verify that the SW raises an error
     when the toml file is not found"""
     plugin_name = "test.toml"
@@ -53,16 +53,7 @@ def test_update_plugin_file(tmp_path):
     assert order_dict == get_plugin_dict(plugin_name)
 
 
-def test_get_plugin_type_all_valid(tmp_path):
-    """Verify that the SW returns the correct plugin type"""
-    plugin_name = "MyPlugin"
-    create_plugins_files(plugin_name, tmp_path)
-    assert PluginType.DIR == get_plugin_type(tmp_path / plugin_name)
-    assert PluginType.TAR == get_plugin_type(tmp_path / f"{plugin_name}.tar.gz")
-    assert PluginType.ZIP == get_plugin_type(tmp_path / f"{plugin_name}.zip")
-
-
-def test_get_plugin_type_not_found():
+def test_get_plugin_type_file_not_found():
     """Verify that the SW raises an error
     when the plugin file is not found"""
     plugin_name = "MyPlugin"
@@ -71,7 +62,7 @@ def test_get_plugin_type_not_found():
     assert str(exc_info.value) == f"File '{plugin_name}' not found"
 
 
-def test_get_plugin_type_not_supported():
+def test_get_plugin_type_file_not_supported():
     """Verify that the SW return a dict
     that was read from a toml file"""
     tests_path = Path(__file__).resolve().parent
@@ -81,17 +72,33 @@ def test_get_plugin_type_not_supported():
     assert str(exc_info.value) == "This program only supports tarball or zip files"
 
 
+def test_get_plugin_type_dir(tmp_path):
+    """Verify that the SW returns the correct plugin type"""
+    plugin_path = create_plugins_files("test", tmp_path, PluginType.DIR)
+    assert PluginType.DIR == get_plugin_type(plugin_path)
+
+
+def test_get_plugin_type_tar(tmp_path):
+    """Verify that the SW returns the correct plugin type"""
+    plugin_path = create_plugins_files("test", tmp_path, PluginType.TAR)
+    assert PluginType.TAR == get_plugin_type(plugin_path)
+
+
+def test_get_plugin_type_zip(tmp_path):
+    """Verify that the SW returns the correct plugin type"""
+    plugin_path = create_plugins_files("test", tmp_path, PluginType.ZIP)
+    assert PluginType.ZIP == get_plugin_type(plugin_path)
+
+
 def test_check_plugin_structure_dir_plugin_not_found(tmp_path):
     """Verify that the SW raises an error when
     the plugin.py is not present in the directory"""
     plugin_name = "test"
-    create_plugins_files(plugin_name, tmp_path, type="dir")
-    plugin_path = tmp_path / plugin_name
+    plugin_type = PluginType.DIR
+    plugin_path = create_plugins_files(plugin_name, tmp_path, plugin_type)
 
-    plugin_type = get_plugin_type(plugin_path)
     with pytest.raises(FileNotFoundError) as exc_info:
         check_plugin_structure(plugin_path, plugin_type)
-    assert PluginType.DIR == plugin_type
     assert str(exc_info.value) == f"File 'plugin.py' not found in '{plugin_name}'"
 
 
@@ -99,29 +106,26 @@ def test_check_plugin_structure_dir_correct_plugin(tmp_path):
     """Verify that the SW returns the plugin name
     after checking a directory with plugin.py"""
     plugin_name = "test"
-    create_plugins_files(plugin_name, tmp_path, type="dir", with_file=True)
-    plugin_path = tmp_path / plugin_name
+    plugin_type = PluginType.DIR
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, plugin_type, with_file=True
+    )
 
-    plugin_type = get_plugin_type(plugin_path)
     act_name = check_plugin_structure(plugin_path, plugin_type)
-    assert PluginType.DIR == plugin_type
     assert act_name == plugin_name
 
 
 def test_check_plugin_structure_zip_plugin_not_found(tmp_path):
     """Verify that the SW raises an error when
     the plugin.py is not present in the zip file"""
-    plugin_name = "test"
-    create_plugins_files(plugin_name, tmp_path, type="zip")
-    plugin_path = tmp_path / f"{plugin_name}.zip"
+    plugin_type = PluginType.ZIP
+    plugin_path = create_plugins_files("test", tmp_path, plugin_type)
 
-    plugin_type = get_plugin_type(plugin_path)
     with pytest.raises(InvalidPluginError) as exc_info:
         check_plugin_structure(plugin_path, plugin_type)
-    assert PluginType.ZIP == plugin_type
     assert (
         str(exc_info.value)
-        == f"File 'DIRECTORY/plugin.py' not found in '{plugin_name}.zip'"
+        == f"File 'DIRECTORY/plugin.py' not found in '{plugin_path.name}'"
     )
 
 
@@ -129,29 +133,26 @@ def test_check_plugin_structure_zip_correct_plugin(tmp_path):
     """Verify that the SW returns the plugin name
     after checking a zip file with plugin.py"""
     plugin_name = "test"
-    create_plugins_files(plugin_name, tmp_path, type="zip", with_file=True)
-    plugin_path = tmp_path / f"{plugin_name}.zip"
+    plugin_type = PluginType.ZIP
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, plugin_type, with_file=True
+    )
 
-    plugin_type = get_plugin_type(plugin_path)
     act_name = check_plugin_structure(plugin_path, plugin_type)
-    assert PluginType.ZIP == plugin_type
     assert act_name == plugin_name
 
 
 def test_check_plugin_structure_tar_plugin_not_found(tmp_path):
     """Verify that the SW raises an error when
     the plugin.py is not present in the tarball file"""
-    plugin_name = "test"
-    create_plugins_files(plugin_name, tmp_path, type="tar")
-    plugin_path = tmp_path / f"{plugin_name}.tar.gz"
+    plugin_type = PluginType.TAR
+    plugin_path = create_plugins_files("test", tmp_path, plugin_type)
 
-    plugin_type = get_plugin_type(plugin_path)
     with pytest.raises(InvalidPluginError) as exc_info:
         check_plugin_structure(plugin_path, plugin_type)
-    assert PluginType.TAR == plugin_type
     assert (
         str(exc_info.value)
-        == f"File 'DIRECTORY/plugin.py' not found in '{plugin_name}.tar.gz'"
+        == f"File 'DIRECTORY/plugin.py' not found in '{plugin_path.name}'"
     )
 
 
@@ -159,13 +160,138 @@ def test_check_plugin_structure_tar_correct_plugin(tmp_path):
     """Verify that the SW returns the plugin name
     after checking a tarball file with plugin.py"""
     plugin_name = "test"
-    create_plugins_files(plugin_name, tmp_path, type="tar", with_file=True)
-    plugin_path = tmp_path / f"{plugin_name}.tar.gz"
+    plugin_type = PluginType.TAR
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, plugin_type, with_file=True
+    )
 
-    plugin_type = get_plugin_type(plugin_path)
     act_name = check_plugin_structure(plugin_path, plugin_type)
-    assert PluginType.TAR == plugin_type
     assert act_name == plugin_name
+
+
+def test_move_plugin_data_dir(tmp_path):
+    """Verify that the SW copies correctly the plugin in a directory"""
+    plugin_name = "test"
+    plugin_type = PluginType.DIR
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, plugin_type, with_file=True
+    )
+    dest_path = create_tmp_directory(tmp_path)
+
+    move_plugin_data(plugin_path, plugin_type, dest_path)
+    assert (dest_path / plugin_name).exists()
+
+
+def test_move_plugin_data_tar(tmp_path):
+    """Verify that the SW extracts correctly the plugin in a tarball file"""
+    plugin_name = "test"
+    plugin_type = PluginType.TAR
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, plugin_type, with_file=True
+    )
+    dest_path = create_tmp_directory(tmp_path)
+
+    move_plugin_data(plugin_path, plugin_type, dest_path)
+    assert (dest_path / plugin_name).exists()
+
+
+def test_move_plugin_data_zip(tmp_path):
+    """Verify that the SW extracts correctly the plugin in a zip file"""
+    plugin_name = "test"
+    plugin_type = PluginType.ZIP
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, plugin_type, with_file=True
+    )
+    dest_path = create_tmp_directory(tmp_path)
+
+    move_plugin_data(plugin_path, plugin_type, dest_path)
+    assert (dest_path / plugin_name).exists()
+
+
+def test_install_plugin_present_file(mocker, tmp_path):
+    plugin_name = "plugin1"
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, PluginType.DIR, with_file=True
+    )
+
+    args = MockArgs()
+    args.plugin = plugin_path
+    mockers = Mockers(mocker)
+
+    install_plugin(args)
+    mockers.mock_dump_toml.assert_not_called()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {plugin_name} is already installed in the system"
+    )
+
+
+def test_install_plugin_present_file_force_flag(mocker, tmp_path):
+    plugin_name = "plugin1"
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, PluginType.DIR, with_file=True
+    )
+
+    args = MockArgs()
+    args.plugin = plugin_path
+    args.force = True
+    mockers = Mockers(mocker)
+
+    install_plugin(args)
+    mockers.mock_dump_toml.assert_called_once()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {plugin_name} was installed successfully"
+    )
+
+
+def test_install_plugin_dir(mocker, tmp_path):
+    plugin_name = "test1"
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, PluginType.DIR, with_file=True
+    )
+
+    args = MockArgs()
+    args.plugin = plugin_path
+    mockers = Mockers(mocker)
+
+    install_plugin(args)
+    mockers.mock_dump_toml.assert_called_once()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {plugin_name} was installed successfully"
+    )
+
+
+def test_install_plugin_tar(mocker, tmp_path):
+    plugin_name = "test2"
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, PluginType.TAR, with_file=True
+    )
+
+    args = MockArgs()
+    args.plugin = plugin_path
+    mockers = Mockers(mocker)
+
+    install_plugin(args)
+    mockers.mock_dump_toml.assert_called_once()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {plugin_name} was installed successfully"
+    )
+
+
+def test_install_plugin_zip(mocker, tmp_path):
+    plugin_name = "test3"
+    plugin_path = create_plugins_files(
+        plugin_name, tmp_path, PluginType.ZIP, with_file=True
+    )
+
+    args = MockArgs()
+    args.plugin = plugin_path
+    mockers = Mockers(mocker)
+
+    install_plugin(args)
+    mockers.mock_dump_toml.assert_called_once()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {plugin_name} was installed successfully"
+    )
 
 
 def test_update_plugin_state_unknown_plugin(mocker):
@@ -178,7 +304,9 @@ def test_update_plugin_state_unknown_plugin(mocker):
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
-    mockers.mock_print.assert_called_with("Plugin test was not found in the system")
+    mockers.mock_print.assert_called_with(
+        f"Plugin {args.plugin} was not found in the system"
+    )
 
 
 def test_update_plugin_state_already_enabled(mocker):
@@ -191,7 +319,7 @@ def test_update_plugin_state_already_enabled(mocker):
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
     mockers.mock_print.assert_called_with(
-        "Plugin plugin1 is already enabled in the system"
+        f"Plugin {args.plugin} is already enabled in the system"
     )
 
 
@@ -205,7 +333,7 @@ def test_update_plugin_state_already_disabled(mocker):
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
     mockers.mock_print.assert_called_with(
-        "Plugin plugin1 is already enabled in the system"
+        f"Plugin {args.plugin} is already enabled in the system"
     )
 
 
@@ -218,7 +346,9 @@ def test_update_plugin_state_enable(mocker):
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_called_once()
-    mockers.mock_print.assert_called_with("Plugin plugin2 was enabled successfully")
+    mockers.mock_print.assert_called_with(
+        f"Plugin {args.plugin} was enabled successfully"
+    )
 
 
 def test_update_plugin_state_disable(mocker):
@@ -230,7 +360,9 @@ def test_update_plugin_state_disable(mocker):
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_called_once()
-    mockers.mock_print.assert_called_with("Plugin plugin1 was disabled successfully")
+    mockers.mock_print.assert_called_with(
+        f"Plugin {args.plugin} was disabled successfully"
+    )
 
 
 def test_list_plugins_all(mocker):
@@ -252,7 +384,7 @@ def test_list_plugins_enable(mocker):
 
     list_plugins(args)
     assert 2 == mockers.mock_print.call_count
-    mockers.mock_print.assert_called_with("plugin1    enabled   ")
+    mockers.mock_print.assert_called_with(f"plugin1    enabled   ")
 
 
 def test_list_plugins_disable(mocker):
@@ -273,7 +405,13 @@ def geet_fake_dict():
     return {"plugin1": PluginState.ENABLE, "plugin2": PluginState.DISABLE}
 
 
-def create_plugins_files(plugin_name, tmp_path, type="all", with_file=False):
+def create_tmp_directory(tmp_path):
+    dest_path = tmp_path / "tmp"
+    dest_path.mkdir(exist_ok=True)
+    return dest_path
+
+
+def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
     plugin_path = tmp_path / plugin_name
     plugin_path.mkdir(exist_ok=True)
 
@@ -282,11 +420,16 @@ def create_plugins_files(plugin_name, tmp_path, type="all", with_file=False):
         with plugin_file.open("w") as f:
             f.write("test")
 
-    if type in ["all", "tar"]:
-        make_archive(plugin_path, "gztar", root_dir=tmp_path, base_dir=plugin_name)
+    if plugin_type == PluginType.DIR:
+        return tmp_path / plugin_name
 
-    if type in ["all", "zip"]:
+    if plugin_type == PluginType.TAR:
+        make_archive(plugin_path, "gztar", root_dir=tmp_path, base_dir=plugin_name)
+        return tmp_path / f"{plugin_name}.tar.gz"
+
+    if plugin_type == PluginType.ZIP:
         make_archive(plugin_path, "zip", root_dir=tmp_path)
+        return tmp_path / f"{plugin_name}.zip"
 
 
 def create_config_file(filepath):
@@ -310,3 +453,4 @@ class Mockers:
         self.mock_plugin_dict = mocker.patch("kit.commands.plugin.get_plugin_dict")
         self.mock_plugin_dict.return_value = geet_fake_dict()
         self.mock_dump_toml = mocker.patch("kit.commands.plugin.dump_toml")
+        self.mock_plugin_data = mocker.patch("kit.commands.plugin.move_plugin_data")

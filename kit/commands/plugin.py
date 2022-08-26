@@ -99,17 +99,18 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> str:
     return plugin_name
 
 
-def move_plugin_data(plugin_path: Path, plugin_type: PluginType) -> None:
+def move_plugin_data(
+    plugin_path: Path, plugin_type: PluginType, dest_path: Path = PluginsConfig.ROOT_DIR
+) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
-    dst_path = PluginsConfig.ROOT_DIR
     if PluginType.DIR == plugin_type:
-        copytree(plugin_path, dst_path / plugin_path.name)
+        copytree(plugin_path, dest_path / plugin_path.name)
     elif PluginType.TAR == plugin_type:
         with tar_open(plugin_path) as f:
-            f.extractall(dst_path)
+            f.extractall(dest_path)
     elif PluginType.ZIP == plugin_type:
         with ZipFile(plugin_path) as f:
-            f.extractall(dst_path)
+            f.extractall(dest_path)
 
 
 def install_plugin(args) -> None:
@@ -118,7 +119,6 @@ def install_plugin(args) -> None:
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
     plugin_name = check_plugin_structure(plugin_path, plugin_type)
-
     if args.force:
         remove_plugin_dir(plugin_name)
     elif plugin_name in plugin_dict.keys():
