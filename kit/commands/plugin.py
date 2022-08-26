@@ -133,9 +133,11 @@ def install_plugin(args) -> None:
     print(f"Plugin {plugin_name} was installed successfully")
 
 
-def remove_plugin_dir(plugin_name: str) -> None:
+def remove_plugin_dir(
+    plugin_name: str, root_dir: Path = PluginsConfig.ROOT_DIR
+) -> None:
     """Delete the directory where the plugin is installed"""
-    plugin_path = PluginsConfig.ROOT_DIR / plugin_name
+    plugin_path = root_dir / plugin_name
     if file_exists(plugin_path):
         rmtree(plugin_path)
 

@@ -14,6 +14,7 @@ from kit.commands.plugin import (
     check_plugin_structure,
     move_plugin_data,
     install_plugin,
+    remove_plugin_dir,
     remove_plugin,
     update_plugin_state,
     list_plugins,
@@ -39,7 +40,7 @@ def test_get_plugin_dict_correct_file(tmp_path):
     create_config_file(plugin_name)
 
     act_dict = get_plugin_dict(plugin_name)
-    assert act_dict == geet_fake_dict()
+    assert act_dict == get_fake_dict()
 
 
 def test_update_plugin_file(tmp_path):
@@ -209,6 +210,8 @@ def test_move_plugin_data_zip(tmp_path):
 
 
 def test_install_plugin_present_file(mocker, tmp_path):
+    """Verify that the SW prints a message when
+    trying to install a plugin already installed"""
     plugin_name = "plugin1"
     plugin_path = create_plugins_files(
         plugin_name, tmp_path, PluginType.DIR, with_file=True
@@ -226,6 +229,8 @@ def test_install_plugin_present_file(mocker, tmp_path):
 
 
 def test_install_plugin_present_file_force_flag(mocker, tmp_path):
+    """Verify that the SW forces the installation process
+    when using --force flag"""
     plugin_name = "plugin1"
     plugin_path = create_plugins_files(
         plugin_name, tmp_path, PluginType.DIR, with_file=True
@@ -244,6 +249,7 @@ def test_install_plugin_present_file_force_flag(mocker, tmp_path):
 
 
 def test_install_plugin_dir(mocker, tmp_path):
+    """Verify that the SW installs a plugin in a directory"""
     plugin_name = "test1"
     plugin_path = create_plugins_files(
         plugin_name, tmp_path, PluginType.DIR, with_file=True
@@ -261,6 +267,7 @@ def test_install_plugin_dir(mocker, tmp_path):
 
 
 def test_install_plugin_tar(mocker, tmp_path):
+    """Verify that the SW installs a plugin in a tarball file"""
     plugin_name = "test2"
     plugin_path = create_plugins_files(
         plugin_name, tmp_path, PluginType.TAR, with_file=True
@@ -278,6 +285,7 @@ def test_install_plugin_tar(mocker, tmp_path):
 
 
 def test_install_plugin_zip(mocker, tmp_path):
+    """Verify that the SW installs a plugin in a zip file"""
     plugin_name = "test3"
     plugin_path = create_plugins_files(
         plugin_name, tmp_path, PluginType.ZIP, with_file=True
@@ -292,6 +300,57 @@ def test_install_plugin_zip(mocker, tmp_path):
     mockers.mock_print.assert_called_with(
         f"Plugin {plugin_name} was installed successfully"
     )
+
+
+def test_remove_plugin_dir(tmp_path):
+    """Verify that the SW removes the directory of a plugin"""
+    dest_path = create_tmp_directory(tmp_path)
+    assert dest_path.exists()
+    remove_plugin_dir("tmp", tmp_path)
+    assert not dest_path.exists()
+
+
+def test_remove_plugin_name_not_found(mocker):
+    """Verify that the SW prints a message when
+    trying to remove a plugin that is not in the system"""
+    args = MockArgs()
+    args.plugin = "test"
+    mockers = Mockers(mocker)
+
+    remove_plugin(args)
+    mockers.mock_dump_toml.assert_not_called()
+    mockers.mock_remove_dir.assert_not_called()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {args.plugin} was not found in the system"
+    )
+
+
+def test_remove_plugin_name_correct(mocker):
+    """Verify that the SW removes a specific plugin"""
+    args = MockArgs()
+    args.plugin = "plugin1"
+    mockers = Mockers(mocker)
+
+    remove_plugin(args)
+    mockers.mock_dump_toml.assert_called_once()
+    mockers.mock_remove_dir.assert_called_once()
+    mockers.mock_print.assert_called_with(
+        f"Plugin {args.plugin} was uninstalled successfully"
+    )
+
+
+def test_remove_plugin_all(mocker):
+    """Verify that the SW removes all plugins in the system"""
+    args = MockArgs()
+    args.all = True
+    mockers = Mockers(mocker)
+    mock_input = mocker.patch("kit.commands.plugin.input", return_value="y")
+
+    remove_plugin(args)
+    mock_input.assert_called_once()
+    assert 2 == mockers.mock_remove_dir.call_count
+    mockers.mock_dump_toml.assert_called_once()
+    mockers.mock_print.assert_called_with("All Plugins were uninstalled successfully")
 
 
 def test_update_plugin_state_unknown_plugin(mocker):
@@ -401,7 +460,7 @@ def test_list_plugins_disable(mocker):
 """Utilities used by the tests"""
 
 
-def geet_fake_dict():
+def get_fake_dict():
     return {"plugin1": PluginState.ENABLE, "plugin2": PluginState.DISABLE}
 
 
@@ -435,7 +494,7 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
 def create_config_file(filepath):
     with filepath.open("w") as f:
         f.write(f"[{PluginsConfig.KEY}]\n")
-        for k, v in geet_fake_dict().items():
+        for k, v in get_fake_dict().items():
             f.write(f'{k} = "{v}"\n')
 
 
@@ -450,7 +509,8 @@ class MockArgs:
 class Mockers:
     def __init__(self, mocker):
         self.mock_print = mocker.patch("kit.commands.plugin.print")
-        self.mock_plugin_dict = mocker.patch("kit.commands.plugin.get_plugin_dict")
-        self.mock_plugin_dict.return_value = geet_fake_dict()
+        self.mock_get_dict = mocker.patch("kit.commands.plugin.get_plugin_dict")
+        self.mock_get_dict.return_value = get_fake_dict()
         self.mock_dump_toml = mocker.patch("kit.commands.plugin.dump_toml")
-        self.mock_plugin_data = mocker.patch("kit.commands.plugin.move_plugin_data")
+        self.mock_move_data = mocker.patch("kit.commands.plugin.move_plugin_data")
+        self.mock_remove_dir = mocker.patch("kit.commands.plugin.remove_plugin_dir")
