@@ -6,17 +6,22 @@
 from sys import modules
 from importlib.util import spec_from_file_location, module_from_spec
 from typing import List
+from kit.utils.constants import Constants, PluginsConfig, PluginState
+from kit.utils.tab_completion import get_plugins_by_state
 from kit.utils.typing import PathType
 from kit.utils.files import files_in_dir
 
 
-def register_subparser(subparsers, components: List[str], directory: PathType):
+def register_subparser(subparsers) -> None:
     """Register surparsers"""
-    for func in discover_subparsers_from(components, directory):
-        try:
+    dir_comp_dict = {
+        Constants.HEKIT_ROOT_DIR / "kit": ["commands", "tools"],
+        PluginsConfig.ROOT_DIR: get_plugins_by_state(PluginState.ENABLE),
+    }
+
+    for directory, components in dir_comp_dict.items():
+        for func in discover_subparsers_from(components, directory):
             func(subparsers)
-        except TypeError:
-            func(subparsers, directory)
 
 
 def import_from_source_file(module_name, file_path):

@@ -7,6 +7,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
+from kit.utils.constants import Constants
 from kit.utils.files import create_default_workspace, dump_toml, file_exists
 from kit.utils.typing import PathType
 
@@ -143,7 +144,7 @@ def init_hekit(args) -> None:
 
     # Add new lines in the rc_file:
     # 1-Add hekit directory as part of environmental variable PATH
-    export_line = f"export HEKITPATH={args.hekit_root_dir}\n"
+    export_line = f"export HEKITPATH={Constants.HEKIT_ROOT_DIR}\n"
     path_line = "PATH=$HEKITPATH:$PATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
@@ -161,10 +162,10 @@ def init_hekit(args) -> None:
     print(f"source {rc_file}")
 
 
-def set_init_subparser(subparsers, hekit_root_dir) -> None:
+def set_init_subparser(subparsers) -> None:
     """create the parser for the 'init' command"""
     parser_init = subparsers.add_parser("init", description="initialize hekit")
     parser_init.add_argument(
         "--default-config", action="store_true", help="setup default config file"
     )
-    parser_init.set_defaults(fn=init_hekit, hekit_root_dir=hekit_root_dir)
+    parser_init.set_defaults(fn=init_hekit)

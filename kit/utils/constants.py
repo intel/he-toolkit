@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 @dataclass(frozen=True, init=False)
-class Constants:
+class Constants:  # pylint: disable=too-many-instance-attributes
     """Defines constants for the he-toolkit"""
 
     # version and the docker's tags
@@ -22,6 +22,9 @@ class Constants:
     # cmake properties
     cmake_min_version: str = "3.13"
     cmake_cxx_standard: str = "17"
+
+    # Root directory
+    HEKIT_ROOT_DIR: Path = Path(__file__).resolve().parent.parent.parent
 
 
 @dataclass(frozen=True, init=False)
