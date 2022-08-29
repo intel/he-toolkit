@@ -3,6 +3,7 @@
 
 """This module provides tab completion if the dependencies are installed"""
 
+from pathlib import Path
 from typing import List
 from kit.utils.constants import PluginsConfig, PluginState
 from kit.utils.files import file_exists
@@ -45,12 +46,14 @@ def instances_completer(
     return list_dirs(comp_name_path)
 
 
-def get_plugins_by_state(state: str = PluginState.ENABLE) -> List[str]:
+def get_plugins_by_state(
+    state: str, source_file: Path = PluginsConfig.FILE
+) -> List[str]:
     """Return a list of plugins with a specific state"""
-    if not file_exists(PluginsConfig.FILE):
+    if not file_exists(source_file):
         return []
 
-    plugin_dict = load_toml(PluginsConfig.FILE)[PluginsConfig.KEY]
+    plugin_dict = load_toml(source_file)[PluginsConfig.KEY]
     return [k for k, v in plugin_dict.items() if v == state]
 
 
@@ -58,7 +61,7 @@ def plugins_enable_completer(
     prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
 ) -> List[str]:
     """Return a list of plugins that are enabled"""
-    return get_plugins_by_state()
+    return get_plugins_by_state(PluginState.ENABLE)
 
 
 def plugins_disable_completer(
