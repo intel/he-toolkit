@@ -80,14 +80,14 @@ def create_new_project(args) -> None:
     """create a new project"""
     project_name = args.name
     project_path = Path(args.directory).expanduser().resolve()
-    project_path = project_path / "projects" / f"{project_name}"
+    project_path = project_path / "projects" / project_name
     toml_path = project_path / "recipes" / f"{project_name}.toml"
     cmake_path = project_path / "CMakeLists.txt"
 
     try:
         if args.based_on:
             example_path = (
-                Constants.HEKIT_ROOT_DIR / "he-samples" / "examples" / args.based_on
+                Constants.HEKIT_ROOT_DIR / "he-samples/examples" / args.based_on
             )
             copytree(example_path, project_path, dirs_exist_ok=False)
             modify_cmake_file(project_name, cmake_path)

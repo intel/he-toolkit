@@ -48,17 +48,15 @@ def test_get_instances_after_remove_v2(mocker, args_tab):
     assert act_inst == exp_inst
 
 
-def test_get_plugins_by_state_enable(tmp_path):
-    file_name = create_tmp_file(tmp_path)
-    act_data = get_plugins_by_state(PluginState.ENABLE, file_name)
+def test_get_plugins_by_state_enable(create_tmp_file):
+    act_data = get_plugins_by_state(PluginState.ENABLE, create_tmp_file)
     assert "plugin_a" in act_data
     assert "plugin_c" not in act_data
     assert "plugin_e" not in act_data
 
 
-def test_get_plugins_by_state_disable(tmp_path):
-    file_name = create_tmp_file(tmp_path)
-    act_data = get_plugins_by_state(PluginState.DISABLE, file_name)
+def test_get_plugins_by_state_disable(create_tmp_file):
+    act_data = get_plugins_by_state(PluginState.DISABLE, create_tmp_file)
     assert "plugin_c" in act_data
     assert "plugin_a" not in act_data
     assert "plugin_e" not in act_data
@@ -93,6 +91,7 @@ def args_tab(comp_data):
     return MockArgs(None, comp_data["comp"], instance="", upto_stage="")
 
 
+@pytest.fixture
 def create_tmp_file(tmp_path):
     file_name = tmp_path / "test.toml"
     file_data = {

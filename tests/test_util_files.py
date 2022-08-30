@@ -75,13 +75,13 @@ def test_create_default_config_dir_created(tmp_path):
 
 
 def test_load_toml(get_toolkit_path):
-    file = f"{get_toolkit_path}/tests/input_files/default.config"
+    file = get_toolkit_path / "tests/input_files/default.config"
     act_dict = load_toml(file)
     assert "~/.hekit_test/components" == act_dict["repo_location"]
 
 
 def test_load_toml_symlink(get_toolkit_path):
-    file = f"{get_toolkit_path}/tests/input_files/default_symlink.config"
+    file = get_toolkit_path / "tests/input_files/default_symlink.config"
     with pytest.raises(Exception) as exc_info:
         load_toml(file)
 
