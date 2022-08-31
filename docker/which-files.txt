@@ -123,6 +123,7 @@ kit/commands/init.py
 kit/commands/install.py
 kit/commands/list_cmd.py
 kit/commands/new.py
+kit/commands/plugin.py
 kit/commands/remove.py
 kit/hekit.py
 kit/tools/README.md
@@ -165,6 +166,7 @@ tests/test_cmd_init.py
 tests/test_cmd_install.py
 tests/test_cmd_list.py
 tests/test_cmd_new.py
+tests/test_cmd_plugins.py
 tests/test_cmd_remove.py
 tests/test_integration_check_deps.py
 tests/test_integration_docker.py

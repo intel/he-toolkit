@@ -16,6 +16,7 @@ def test_discover_subparsers_from_commands_all(get_toolkit_path):
         "set_remove_subparser",
         "set_new_subparser",
         "set_list_subparser",
+        "set_plugin_subparser",
     }
 
     act_funcs = discover_subparsers_from(["commands"], get_toolkit_path / "kit")

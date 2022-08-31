@@ -10,10 +10,9 @@ import sys
 from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser
-from pathlib import Path
 from typing import Tuple
 
-from kit.utils.subparsers import discover_subparsers_from, validate_input
+from kit.utils.subparsers import register_subparser, validate_input
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
@@ -24,9 +23,6 @@ if sys.version_info < (3, 8):
 
 def parse_cmdline() -> Tuple:
     """Parse commandline commands"""
-
-    # resolve first to follow the symlink, if any
-    hekit_root_dir = Path(__file__).resolve().parent.parent
 
     # create the top-level parser
     parser = ArgumentParser(prog="hekit")
@@ -43,12 +39,7 @@ def parse_cmdline() -> Tuple:
 
     # create subparsers for each command
     subparsers = parser.add_subparsers(help="sub-command help")
-
-    for func in discover_subparsers_from(["commands", "tools"], hekit_root_dir / "kit"):
-        try:
-            func(subparsers)
-        except TypeError:
-            func(subparsers, hekit_root_dir)
+    register_subparser(subparsers)
 
     # try to enable tab completion
     enable_tab_completion(parser)

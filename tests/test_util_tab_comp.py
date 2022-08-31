@@ -2,12 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from os import getcwd, chdir
+from toml import dump
 from pathlib import Path
-from kit.utils.tab_completion import components_completer, instances_completer
+from kit.utils.constants import PluginState, PluginsConfig
+from kit.utils.tab_completion import (
+    get_plugins_by_state,
+    components_completer,
+    instances_completer,
+)
 
 
-def test_get_instances_after_fetch(mocker, args_tab, comp_data):
+def test_get_instances_two_instances(mocker, args_tab, comp_data):
     exp_comp = [comp_data["comp"]]
     exp_inst = [comp_data["inst_v1"], comp_data["inst_v2"]]
     mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
@@ -43,6 +48,20 @@ def test_get_instances_after_remove_v2(mocker, args_tab):
     assert act_inst == exp_inst
 
 
+def test_get_plugins_by_state_enable(create_tmp_file):
+    act_data = get_plugins_by_state(PluginState.ENABLE, create_tmp_file)
+    assert "plugin_a" in act_data
+    assert "plugin_c" not in act_data
+    assert "plugin_e" not in act_data
+
+
+def test_get_plugins_by_state_disable(create_tmp_file):
+    act_data = get_plugins_by_state(PluginState.DISABLE, create_tmp_file)
+    assert "plugin_c" in act_data
+    assert "plugin_a" not in act_data
+    assert "plugin_e" not in act_data
+
+
 """Utilities used by the tests"""
 
 
@@ -70,3 +89,20 @@ def comp_data():
 @pytest.fixture
 def args_tab(comp_data):
     return MockArgs(None, comp_data["comp"], instance="", upto_stage="")
+
+
+@pytest.fixture
+def create_tmp_file(tmp_path):
+    file_name = tmp_path / "test.toml"
+    file_data = {
+        PluginsConfig.KEY: {
+            "plugin_a": PluginState.ENABLE,
+            "plugin_c": PluginState.DISABLE,
+            "plugin_e": "g",
+        }
+    }
+
+    with file_name.open("w", encoding="utf-8") as f:
+        dump(file_data, f)
+
+    return file_name

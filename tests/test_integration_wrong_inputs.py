@@ -19,7 +19,7 @@ def test_main_config_is_symlink(hekit_path, input_files_path):
     cmd = f"{hekit_path} --config {input_files_path}/default_symlink.config list"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
-    assert "The config file cannot be a symlink" in act_result.stderr
+    assert "default_symlink.config cannot be a symlink" in act_result.stderr
     assert 0 != act_result.returncode
 
 

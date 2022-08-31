@@ -79,15 +79,15 @@ def create_directory_structure(project_name: str, project_path: Path) -> None:
 def create_new_project(args) -> None:
     """create a new project"""
     project_name = args.name
-    project_path = Path(args.directory).resolve().expanduser()
-    project_path = project_path / "projects" / f"{project_name}"
+    project_path = Path(args.directory).expanduser().resolve()
+    project_path = project_path / "projects" / project_name
     toml_path = project_path / "recipes" / f"{project_name}.toml"
     cmake_path = project_path / "CMakeLists.txt"
 
     try:
         if args.based_on:
             example_path = (
-                args.hekit_root_dir / "he-samples" / "examples" / args.based_on
+                Constants.HEKIT_ROOT_DIR / "he-samples/examples" / args.based_on
             )
             copytree(example_path, project_path, dirs_exist_ok=False)
             modify_cmake_file(project_name, cmake_path)
@@ -102,7 +102,7 @@ def create_new_project(args) -> None:
         print(f"Project {project_path} already exists")
 
 
-def set_new_subparser(subparsers, hekit_root_dir):
+def set_new_subparser(subparsers):
     """create the parser for the 'new' command"""
     parser_new = subparsers.add_parser("new", description="create a new project")
     parser_new.add_argument("name", type=validate_input, help="project name")
@@ -118,4 +118,4 @@ def set_new_subparser(subparsers, hekit_root_dir):
         help="base project",
         choices=["logistic-regression", "psi", "secure-query"],
     )
-    parser_new.set_defaults(fn=create_new_project, hekit_root_dir=hekit_root_dir)
+    parser_new.set_defaults(fn=create_new_project)

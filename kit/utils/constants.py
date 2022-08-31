@@ -5,10 +5,11 @@
 
 from dataclasses import dataclass
 from getpass import getuser
+from pathlib import Path
 
 
 @dataclass(frozen=True, init=False)
-class Constants:
+class Constants:  # pylint: disable=too-many-instance-attributes
     """Defines constants for the he-toolkit"""
 
     # version and the docker's tags
@@ -21,3 +22,23 @@ class Constants:
     # cmake properties
     cmake_min_version: str = "3.13"
     cmake_cxx_standard: str = "17"
+
+    # Root directory
+    HEKIT_ROOT_DIR: Path = Path(__file__).resolve().parent.parent.parent
+
+
+@dataclass(frozen=True, init=False)
+class PluginState:
+    """Define the possible state of a plugin"""
+
+    ENABLE: str = "enabled"
+    DISABLE: str = "disabled"
+
+
+@dataclass(frozen=True, init=False)
+class PluginsConfig:
+    """Define the attributes of the config file for plugins"""
+
+    ROOT_DIR: Path = Path("~/.hekit/plugins/").expanduser()
+    FILE: Path = ROOT_DIR / "plugins.toml"
+    KEY: str = "plugins"

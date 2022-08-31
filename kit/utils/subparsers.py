@@ -3,22 +3,50 @@
 
 """ This module provides utility functions for importing and registering subparsers.
 """
-
-from importlib import import_module
+from sys import modules
+from importlib.util import spec_from_file_location, module_from_spec
 from typing import List
+from kit.utils.constants import Constants, PluginsConfig, PluginState
+from kit.utils.tab_completion import get_plugins_by_state
 from kit.utils.typing import PathType
 from kit.utils.files import files_in_dir
+
+
+def register_subparser(subparsers) -> None:
+    """Register surparsers"""
+    dir_comp_dict = {
+        Constants.HEKIT_ROOT_DIR / "kit": ["commands", "tools"],
+        PluginsConfig.ROOT_DIR: get_plugins_by_state(PluginState.ENABLE),
+    }
+
+    for directory, components in dir_comp_dict.items():
+        for func in discover_subparsers_from(components, directory):
+            func(subparsers)
+
+
+def import_from_source_file(module_name, file_path):
+    """Importing a source file directly"""
+    spec = spec_from_file_location(module_name, file_path)
+    module = module_from_spec(spec)
+    modules[module_name] = module
+    spec.loader.exec_module(module)
+
+    return module
 
 
 def discover_subparsers_from(module_dirs: List[str], kit_root: PathType):
     """Import modules in module_dirs, and discover and return a generator of set_.*_subparser functions"""
     for module_dir in module_dirs:
+        module_path = f"{kit_root}/{module_dir}"
         filenames = files_in_dir(
-            f"{kit_root}/{module_dir}", lambda f: f[0] != "_" and f.endswith(".py")
+            module_path, lambda f: f[0] != "_" and f.endswith(".py")
         )
+
         imported_modules = (
-            import_module(f"kit.{module_dir}.{fname[:-3]}") for fname in filenames
+            import_from_source_file(f"{fname[:-3]}", f"{module_path}/{fname}")
+            for fname in filenames
         )
+
         funcs = (
             getattr(imported_module, funcname)
             for imported_module in imported_modules

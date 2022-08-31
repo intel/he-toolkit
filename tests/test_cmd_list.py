@@ -65,7 +65,7 @@ def test_list_components_several_correct_items(
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=tree_directory)
     """load function returns success as status of the all the actions"""
     mock_load = mocker.patch(
-        "kit.commands.list_cmd.load", return_value=all_actions_success
+        "kit.commands.list_cmd.load_toml", return_value=all_actions_success
     )
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
@@ -82,7 +82,9 @@ def test_list_components_incorrect_fetch(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of fetch"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=fetch_failure)
+    mock_load = mocker.patch(
+        "kit.commands.list_cmd.load_toml", return_value=fetch_failure
+    )
     """print functions reports the failure for fetch"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -102,7 +104,9 @@ def test_list_components_incorrect_build(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of build"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=build_failure)
+    mock_load = mocker.patch(
+        "kit.commands.list_cmd.load_toml", return_value=build_failure
+    )
     """print functions reports the failure for build"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -122,7 +126,9 @@ def test_list_components_incorrect_install(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of install"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=install_failure)
+    mock_load = mocker.patch(
+        "kit.commands.list_cmd.load_toml", return_value=install_failure
+    )
     """print functions reports the failure for install"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -141,7 +147,7 @@ def test_list_components_without_version(mocker, without_version_directory, args
     mock_walk = mocker.patch(
         "kit.utils.files.walk", side_effect=without_version_directory
     )
-    mock_load = mocker.patch("kit.commands.list_cmd.load")
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     list_components(args)
@@ -154,7 +160,7 @@ def test_list_components_without_libraries(mocker, args, without_lib_directory):
     """list_dirs function is called once but
     there are not libraries"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=without_lib_directory)
-    mock_load = mocker.patch("kit.commands.list_cmd.load")
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     list_components(args)
@@ -167,7 +173,7 @@ def test_list_components_StopIteration_exception(mocker, args):
     """list_dirs function triggers a StopIteration exception
     and returns an empty list"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=StopIteration)
-    mock_load = mocker.patch("kit.commands.list_cmd.load")
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     list_components(args)
@@ -185,7 +191,7 @@ def test_list_components_FileNotFoundError_exception(
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """ load triggers an FileNotFoundError exception"""
     mock_load = mocker.patch(
-        "kit.commands.list_cmd.load", side_effect=FileNotFoundError
+        "kit.commands.list_cmd.load_toml", side_effect=FileNotFoundError
     )
     """print functions reports the exception"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
@@ -208,7 +214,7 @@ def test_list_components_KeyError_exception(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function triggers a KeyError exception"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", side_effect=KeyError)
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml", side_effect=KeyError)
     """print functions reports the exception"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
