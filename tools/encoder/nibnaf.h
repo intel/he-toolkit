@@ -56,36 +56,6 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
     return sum;
   }
 
-  template <typename T>
-  void print_out_results(const T& en) {
-    for (const auto& [key, value] : en.poly()) {
-      std::cout << "(" << key << " , " << value << ")" << std::endl;
-    }
-  }
-
-  template <typename T, typename U, typename W>
-  void print_poly_rep(const T& en, U mi, W de) {
-    for (const auto& [key, value] : en.poly()) {
-      std::cout << value << "x^" << key - mi;
-      if (key - mi != de) std::cout << " + ";
-    }
-  }
-
-  // The polynomial representation for fractional decoding, where a power of 2
-  // cyclotomic is used x^-i is replaced by -x^(N-i), where N is the degree of
-  // the cyclotomic.
-  template <typename T>
-  void print_poly_rep_frac(const T& en, int N) {
-    for (const auto& [key, value] : en) {
-      if (key < 0)
-        std::cout << (-1 * value) << "x^" << N + key;
-      else
-        std::cout << value << "x^" << key;
-
-      if (key != en.rbegin()->first) std::cout << " + ";
-    }
-  }
-
  private:
   double bw_ = 1.2;
   double epsil_ = 0.00000001;
