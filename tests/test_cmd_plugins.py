@@ -64,8 +64,8 @@ def test_get_plugin_type_file_not_found():
 
 
 def test_get_plugin_type_file_not_supported():
-    """Verify that the SW return a dict
-    that was read from a toml file"""
+    """Verify that the SW raises an error
+    when the plugin extension is wrong"""
     tests_path = Path(__file__).resolve().parent
     file = tests_path / "input_files/default.config"
     with pytest.raises(TypeError) as exc_info:
@@ -74,19 +74,19 @@ def test_get_plugin_type_file_not_supported():
 
 
 def test_get_plugin_type_dir(tmp_path):
-    """Verify that the SW returns the correct plugin type"""
+    """Verify that the SW returns the correct plugin type (directory)"""
     plugin_path = create_plugins_files("test", tmp_path, PluginType.DIR)
     assert PluginType.DIR == get_plugin_type(plugin_path)
 
 
 def test_get_plugin_type_tar(tmp_path):
-    """Verify that the SW returns the correct plugin type"""
+    """Verify that the SW returns the correct plugin type (tarball)"""
     plugin_path = create_plugins_files("test", tmp_path, PluginType.TAR)
     assert PluginType.TAR == get_plugin_type(plugin_path)
 
 
 def test_get_plugin_type_zip(tmp_path):
-    """Verify that the SW returns the correct plugin type"""
+    """Verify that the SW returns the correct plugin type (zip)"""
     plugin_path = create_plugins_files("test", tmp_path, PluginType.ZIP)
     assert PluginType.ZIP == get_plugin_type(plugin_path)
 
@@ -350,7 +350,7 @@ def test_remove_plugin_all(mocker):
     mock_input.assert_called_once()
     assert 2 == mockers.mock_remove_dir.call_count
     mockers.mock_dump_toml.assert_called_once()
-    mockers.mock_print.assert_called_with("All Plugins were uninstalled successfully")
+    mockers.mock_print.assert_called_with("All plugins were uninstalled successfully")
 
 
 def test_update_plugin_state_unknown_plugin(mocker):
@@ -386,13 +386,14 @@ def test_update_plugin_state_already_disabled(mocker):
     """Verify that the SW reports a message
     when the plugin is already disabled"""
     args = MockArgs()
-    args.state = PluginState.ENABLE
+    args.plugin = "plugin2"
+    args.state = PluginState.DISABLE
     mockers = Mockers(mocker)
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
     mockers.mock_print.assert_called_with(
-        f"Plugin {args.plugin} is already enabled in the system"
+        f"Plugin {args.plugin} is already disabled in the system"
     )
 
 

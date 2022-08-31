@@ -158,7 +158,7 @@ def remove_plugin(args) -> None:
             remove_plugin_dir(plugin_name)
 
         plugin_dict.clear()
-        print("All Plugins were uninstalled successfully")
+        print("All plugins were uninstalled successfully")
     else:
         plugin_name = args.plugin
         if not plugin_name:

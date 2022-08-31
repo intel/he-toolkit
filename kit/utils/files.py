@@ -50,7 +50,7 @@ def create_default_workspace(dir_path: str = "~") -> Path:
 
 
 def load_toml(file_name: PathType) -> dict:
-    """Load a toml file and returns its content as a dict"""
+    """Load a toml file and return its content as a dict"""
     file_path = Path(file_name).expanduser()
 
     # Note: Path.resolve() cannot be used before checking Path.is_symlink()
