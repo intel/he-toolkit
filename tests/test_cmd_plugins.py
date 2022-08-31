@@ -8,8 +8,8 @@ from kit.utils.constants import PluginsConfig, PluginState
 from kit.commands.plugin import (
     InvalidPluginError,
     PluginType,
-    get_plugin_dict,
-    update_plugin_file,
+    load_plugins_config_file,
+    update_plugins_config_file,
     get_plugin_type,
     check_plugin_structure,
     move_plugin_data,
@@ -21,37 +21,37 @@ from kit.commands.plugin import (
 )
 
 
-def test_get_plugin_dict_file_not_found():
+def test_load_plugins_config_file_file_not_found():
     """Verify that the SW raises an error
     when the toml file is not found"""
     plugin_name = "test.toml"
     with pytest.raises(FileNotFoundError) as exc_info:
-        get_plugin_dict(Path(plugin_name))
+        load_plugins_config_file(Path(plugin_name))
     assert (
         str(exc_info.value)
         == f"File '{plugin_name}' not found. Please execute: hekit init --default-config"
     )
 
 
-def test_get_plugin_dict_correct_file(tmp_path):
+def test_load_plugins_config_file_correct_file(tmp_path):
     """Verify that the SW returns a dict
     after reading a toml file"""
     plugin_name = tmp_path / "test.toml"
     create_config_file(plugin_name)
 
-    act_dict = get_plugin_dict(plugin_name)
+    act_dict = load_plugins_config_file(plugin_name)
     assert act_dict == get_fake_dict()
 
 
-def test_update_plugin_file(tmp_path):
+def test_update_plugins_config_file(tmp_path):
     """Verify that the SW saves an ordered
     dictionary in a toml file"""
     dict = {"w": "1", "t": "5", "a": "2", "j": "3"}
     order_dict = {"a": "2", "j": "3", "t": "5", "w": "1"}
     plugin_name = tmp_path / "test.toml"
 
-    update_plugin_file(dict, plugin_name)
-    assert order_dict == get_plugin_dict(plugin_name)
+    update_plugins_config_file(dict, plugin_name)
+    assert order_dict == load_plugins_config_file(plugin_name)
 
 
 def test_get_plugin_type_file_not_found():
@@ -510,7 +510,9 @@ class MockArgs:
 class Mockers:
     def __init__(self, mocker):
         self.mock_print = mocker.patch("kit.commands.plugin.print")
-        self.mock_get_dict = mocker.patch("kit.commands.plugin.get_plugin_dict")
+        self.mock_get_dict = mocker.patch(
+            "kit.commands.plugin.load_plugins_config_file"
+        )
         self.mock_get_dict.return_value = get_fake_dict()
         self.mock_dump_toml = mocker.patch("kit.commands.plugin.dump_toml")
         self.mock_move_data = mocker.patch("kit.commands.plugin.move_plugin_data")

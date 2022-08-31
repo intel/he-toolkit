@@ -15,6 +15,7 @@ from kit.utils.subparsers import validate_input
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 
+ConfigDict = Dict[str, str]
 PluginDict = Dict[str, str]
 
 
@@ -30,7 +31,7 @@ class PluginType(Enum):
     ZIP = 3
 
 
-def get_plugin_dict(source_file: Path = PluginsConfig.FILE) -> PluginDict:
+def load_plugins_config_file(source_file: Path = PluginsConfig.FILE) -> ConfigDict:
     """Return plugins dictionary"""
     try:
         # Get the plugins data
@@ -41,11 +42,11 @@ def get_plugin_dict(source_file: Path = PluginsConfig.FILE) -> PluginDict:
         ) from e
 
 
-def update_plugin_file(
-    plugin_dict: PluginDict, dest_file: Path = PluginsConfig.FILE
+def update_plugins_config_file(
+    config_dict: ConfigDict, dest_file: Path = PluginsConfig.FILE
 ) -> None:
     """Save changes in the plugins data"""
-    sorted_dict = {PluginsConfig.KEY: dict(sorted(plugin_dict.items()))}
+    sorted_dict = {PluginsConfig.KEY: dict(sorted(config_dict.items()))}
     dump_toml(dest_file, sorted_dict)
 
 
@@ -115,21 +116,21 @@ def move_plugin_data(
 
 def install_plugin(args) -> None:
     """Install third party plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
     plugin_name = check_plugin_structure(plugin_path, plugin_type)
     if args.force:
         remove_plugin_dir(plugin_name)
-    elif plugin_name in plugin_dict.keys():
+    elif plugin_name in config_dict.keys():
         print(f"Plugin {plugin_name} is already installed in the system")
         return
 
     move_plugin_data(plugin_path, plugin_type)
 
     # Update plugin dictionary
-    plugin_dict[plugin_name] = PluginState.ENABLE
-    update_plugin_file(plugin_dict)
+    config_dict[plugin_name] = PluginState.ENABLE
+    update_plugins_config_file(config_dict)
     print(f"Plugin {plugin_name} was installed successfully")
 
 
@@ -144,7 +145,7 @@ def remove_plugin_dir(
 
 def remove_plugin(args) -> None:
     """Remove third party plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
 
     if args.all:
         # Remove all third party plugins
@@ -154,10 +155,10 @@ def remove_plugin(args) -> None:
         if user_answer not in ("y", "Y"):
             return
 
-        for plugin_name in plugin_dict.keys():
+        for plugin_name in config_dict.keys():
             remove_plugin_dir(plugin_name)
 
-        plugin_dict.clear()
+        config_dict.clear()
         print("All plugins were uninstalled successfully")
     else:
         plugin_name = args.plugin
@@ -165,50 +166,50 @@ def remove_plugin(args) -> None:
             raise ValueError("A plugin name should be specified as argument")
 
         # Remove a specific third party plugins
-        if plugin_name not in plugin_dict.keys():
+        if plugin_name not in config_dict.keys():
             print(f"Plugin {plugin_name} was not found in the system")
             return
 
         remove_plugin_dir(plugin_name)
-        del plugin_dict[plugin_name]
+        del config_dict[plugin_name]
         print(f"Plugin {plugin_name} was uninstalled successfully")
 
-    update_plugin_file(plugin_dict)
+    update_plugins_config_file(config_dict)
 
 
 def update_plugin_state(args) -> None:
     """Enable third party plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
     plugin_name = args.plugin
     plugin_state = args.state
 
-    if plugin_name not in plugin_dict.keys():
+    if plugin_name not in config_dict.keys():
         print(f"Plugin {plugin_name} was not found in the system")
         return
-    if plugin_state == plugin_dict[plugin_name]:
+    if plugin_state == config_dict[plugin_name]:
         print(f"Plugin {plugin_name} is already {plugin_state} in the system")
         return
 
-    plugin_dict[plugin_name] = plugin_state
-    update_plugin_file(plugin_dict)
+    config_dict[plugin_name] = plugin_state
+    update_plugins_config_file(config_dict)
     print(f"Plugin {plugin_name} was {plugin_state} successfully")
 
 
 def list_plugins(args) -> None:
     """Print the list of all plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
     state = args.state
 
-    width_name = max(map(len, plugin_dict.keys()), default=0) + 3
+    width_name = max(map(len, config_dict.keys()), default=0) + 3
     width_status = 10
-    filtered_plugin_dict = (
-        plugin_dict.items()
+    filtered_dict = (
+        config_dict.items()
         if state == "all"
-        else ((k, v) for k, v in plugin_dict.items() if state == v)
+        else ((k, v) for k, v in config_dict.items() if state == v)
     )
 
     print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
-    for k, v in filtered_plugin_dict:
+    for k, v in filtered_dict:
         print(f"{k:{width_name}} {v:{width_status}}")
 
 
