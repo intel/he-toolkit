@@ -11,7 +11,7 @@ class SparsePoly {
  public:
   long coeff(long i) const { return coeffs_.count(i) ? coeffs_.at(i) : 0L; }
   void coeff(long i, long value) { coeffs_[i] = value; }
-  long degree() const { return coeffs_.rbegin()->first; }
+  long degree() const { return coeffs_.empty() ? 0L : coeffs_.rbegin()->first; }
   long operator[](long i) const { return coeff(i); }
   long& operator[](long i) { return coeffs_[i]; }
   SparsePoly operator+(const SparsePoly& other) const {

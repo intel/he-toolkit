@@ -26,6 +26,8 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
 
   ~NIBNAFCoder() = default;
 
+  double epsilon() { return epsil_; }
+
   EncPoly<poly::SparsePoly> encode(const double& num) const override {
     const double log_bw_ = std::log(bw_);
     poly::SparsePoly a;
@@ -70,17 +72,17 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
   }
 
   // The polynomial representation for fractional decoding, where a power of 2
-  // cyclcotomic is used x^-i is replaced by -x^(N-i), where N is the degree of
+  // cyclotomic is used x^-i is replaced by -x^(N-i), where N is the degree of
   // the cyclotomic.
   template <typename T>
   void print_poly_rep_frac(const T& en, int N) {
     for (const auto& [key, value] : en) {
       if (key < 0)
-        std::cout << (-1) * value << "x^" << N + key;
+        std::cout << (-1 * value) << "x^" << N + key;
       else
         std::cout << value << "x^" << key;
 
-      if (key != prev(en.end())->first) std::cout << " + ";
+      if (key != en.rbegin()->first) std::cout << " + ";
     }
   }
 
