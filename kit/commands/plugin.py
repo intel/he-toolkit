@@ -32,13 +32,13 @@ class PluginType(Enum):
 
 def get_plugin_dict(source_file: Path = PluginsConfig.FILE) -> PluginDict:
     """Return plugins dictionary"""
-    if not file_exists(source_file):
+    try:
+        # Get the plugins data
+        return load_toml(source_file)[PluginsConfig.KEY]
+    except FileNotFoundError as e:
         raise FileNotFoundError(
-            f"File '{source_file}' not found. Please execute: hekit init --default-config"
-        )
-
-    # Get the plugins data
-    return load_toml(source_file)[PluginsConfig.KEY]
+            f"{str(e)}. Please execute: hekit init --default-config"
+        ) from e
 
 
 def update_plugin_file(

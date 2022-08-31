@@ -8,7 +8,7 @@ from __future__ import annotations
 from re import findall
 from dataclasses import dataclass
 from typing import Dict, List
-from toml import dump, load
+from kit.utils.files import dump_toml, load_toml
 from kit.utils.tsort import tsort
 from kit.utils.typing import PathType
 
@@ -19,7 +19,7 @@ RecipeArgDict = Dict[str, str]
 def read_spec(component: str, instance: str, repo_location: PathType):
     """Return hekit.spec file as a dict"""
     path = f"{repo_location}/{component}/{instance}/hekit.spec"
-    spec = load(path)
+    spec = load_toml(path)
     # There should only be one instance
     return spec[component][0]
 
@@ -184,7 +184,7 @@ class Spec:
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
         # load the recipe file
-        toml_specs = load(filename)
+        toml_specs = load_toml(filename)
 
         # create dependency graph
         dependency_dict = {
@@ -284,8 +284,7 @@ class Spec:
     def to_toml_file(self, filename: PathType) -> None:
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
-        with open(filename, "w", encoding="utf-8") as f:
-            dump(obj_as_dict, f)
+        dump_toml(filename, obj_as_dict)
 
     def __getitem__(self, key: str):
         """Return value from key.
