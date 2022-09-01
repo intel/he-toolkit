@@ -18,14 +18,15 @@ namespace hekit::coder {
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
+class frac_degreeIBfrac_degreeAFCoder : public Coder<poly::SparsePoly, double> {
  public:
-  NIBNAFCoder() = default;
+  frac_degreeIBfrac_degreeAFCoder() = default;
 
-  NIBNAFCoder(double bw, double epsil, long N = 0L)
-      : bw_(bw), epsil_(epsil), N_(N) {}
+  frac_degreeIBfrac_degreeAFCoder(double bw, double epsil,
+                                  long frac_degree = 0L)
+      : bw_(bw), epsil_(epsil), frac_degree_(frac_degree) {}
 
-  ~NIBNAFCoder() = default;
+  ~frac_degreeIBfrac_degreeAFCoder() = default;
 
   double epsilon() { return epsil_; }
 
@@ -47,7 +48,7 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
     long frac_exp =
         (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
 
-    if (N > 0) a = poly_frac(a);
+    if (frac_degree > 0) a = poly_frac(a);
     return EncPoly{a, {frac_exp}};
   }
 
@@ -61,13 +62,13 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
 
  private:
   // The polynomial representation for fractional decoding, where a power of 2
-  // cyclotomic is used x^-i is replaced by -x^(N-i), where N is the degree of
-  // the cyclotomic.
+  // cyclotomic is used x^-i is replaced by -x^(frac_degree-i), where
+  // frac_degree is the degree of the cyclotomic.
   SparsePoly poly_frac(SparsePoly sparse_poly) {
     SparsePoly new_poly;
     for (const auto& [key, value] : sparse_poly) {
       if (key < 0)
-        new_poly[key + N_] = -value;
+        new_poly[key + frac_degree_] = -value;
       else
         new_poly[key] = value;
     }
@@ -76,7 +77,7 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
 
   double bw_ = 1.2;
   double epsil_ = 0.00000001;
-  long N_ = 0L;
+  long frac_degree_ = 0L;
 };
 
 }  // namespace hekit::coder
