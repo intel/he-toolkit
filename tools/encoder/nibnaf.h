@@ -22,7 +22,8 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
  public:
   NIBNAFCoder() = default;
 
-  NIBNAFCoder(double bw, double epsil) : bw_(bw), epsil_(epsil) {}
+  NIBNAFCoder(double bw, double epsil, long N = 0L)
+      : bw_(bw), epsil_(epsil), N_(N) {}
 
   ~NIBNAFCoder() = default;
 
@@ -45,6 +46,8 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
     long first_index = a.begin()->first;
     long frac_exp =
         (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
+
+    if (N > 0) a = poly_frac(a);
     return EncPoly{a, {frac_exp}};
   }
 
@@ -57,8 +60,23 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
   }
 
  private:
+  // The polynomial representation for fractional decoding, where a power of 2
+  // cyclotomic is used x^-i is replaced by -x^(N-i), where N is the degree of
+  // the cyclotomic.
+  SparsePoly poly_frac(SparsePoly sparse_poly) {
+    SparsePoly new_poly;
+    for (const auto& [key, value] : sparse_poly) {
+      if (key < 0)
+        new_poly[key + N_] = -value;
+      else
+        new_poly[key] = value;
+    }
+    return poly_map;
+  }
+
   double bw_ = 1.2;
   double epsil_ = 0.00000001;
+  long N_ = 0L;
 };
 
 }  // namespace hekit::coder

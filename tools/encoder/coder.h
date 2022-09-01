@@ -7,6 +7,12 @@
 
 namespace hekit::coder {
 
+EncPoly<SparsePoly> != EncPoly<ZZX>
+
+                           EncPoly<Ctxt> encrypt(EncPoly<ZZX>) {}
+
+EncPoly<ZZX> convert(EncPoly<SparsePoly>) {}
+
 template <typename Poly>
 class EncPoly {
  public:
@@ -30,15 +36,30 @@ struct Coder {
   virtual ~Coder() = default;
 };
 
+template <typename OutPoly, typename Nums>
+OutPoly encode(const Nums& nums, const Coder<OutPoly, Nums>& coder) {
+  return coder.encode(nums);
+}
+
+template <typename OutPoly, typename MidPoly, typename Nums>
+OutPoly encode(const Nums& nums, const Coder<MidPoly, Nums>& coder) {
+  return convert<OutPoly>(coder.encode(nums));
+}
+
+template <typename Nums, typename InPoly>
+Nums decode(const InPoly& in_poly, const Coder<InPoly, Nums>& coder) {
+  return coder.decode(in_poly);
+}
+
+template <typename Nums, typename MidPoly, typename InPoly>
+Nums decode(const InPoly& in_poly, const Coder<MidPoly, Nums>& coder) {
+  return coder.decode(convert<MidPoly>(in_poly));
+}
+
 // across single poly
 // num -> poly  == (poly, 0)
 // num -> (poly, i)
 // nums -> (poly, is)
-
-// template<typename OutPoly, typename Nums>
-// OutPoly encode(Nums nums, const Coder& coder){
-//   return convert<OutPoly>(coder.encode(nums));
-// }
 
 // const Coder& coder = NIBNAFCoder(1.2, 0.00001);
 // auto enc_poly = encode<ZZX>(input_num | in_vector, coder);
