@@ -48,9 +48,9 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
         (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
 
     if (frac_degree_ > 0)
-      return EncPoly{laurentFracEncode(a), {}};
+      return EncPoly{laurentFracEncode(a), {0}};
     else
-      return EncPoly{laurentFracEncode(a, frac_exp), {frac_exp}};
+      return EncPoly{laurentEncode(a, frac_exp), {frac_exp}};
   }
 
   double decode(const EncPoly<poly::SparsePoly>& en) const override {
@@ -65,8 +65,9 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
   // The polynomial representation for fractional decoding, where a power of 2
   // cyclotomic is used x^-i is replaced by -x^(frac_degree-i), where
   // frac_degree is the degree of the cyclotomic.
-  SparsePoly laurentFracEncode(const SparsePoly& sparse_poly) {
-    SparsePoly poly_map;
+  poly::SparsePoly laurentFracEncode(
+      const poly::SparsePoly& sparse_poly) const {
+    poly::SparsePoly poly_map;
     for (const auto& [key, value] : sparse_poly) {
       if (key < 0)
         poly_map[key + frac_degree_] = -value;
@@ -76,8 +77,9 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
     return poly_map;
   }
 
-  SparsePoly laurentEncode(const SparsePoly& sparse_poly, long i) {
-    SparsePoly poly_map;
+  poly::SparsePoly laurentEncode(const poly::SparsePoly& sparse_poly,
+                                 long i) const {
+    poly::SparsePoly poly_map;
     for (const auto& [key, value] : sparse_poly) {
       poly_map[key - i] = value;
     }
