@@ -32,7 +32,7 @@ class SparsePoly {
   std::string poly_rep() {
     std::ostringstream oss;
     for (const auto& [key, value] : coeffs_) {
-      oss << value << "x^" << key - mi << ((key - mi != de) ? " + " : "");
+      oss << value << "x^" << key << ((key - degree()) ? " + " : "");
     }
     return oss.str();
   }

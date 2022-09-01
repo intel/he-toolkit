@@ -18,15 +18,14 @@ namespace hekit::coder {
 
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
-class frac_degreeIBfrac_degreeAFCoder : public Coder<poly::SparsePoly, double> {
+class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
  public:
-  frac_degreeIBfrac_degreeAFCoder() = default;
+  NIBNAFCoder() = default;
 
-  frac_degreeIBfrac_degreeAFCoder(double bw, double epsil,
-                                  long frac_degree = 0L)
+  NIBNAFCoder(double bw, double epsil, long frac_degree = 0L)
       : bw_(bw), epsil_(epsil), frac_degree_(frac_degree) {}
 
-  ~frac_degreeIBfrac_degreeAFCoder() = default;
+  ~NIBNAFCoder() = default;
 
   double epsilon() { return epsil_; }
 
@@ -48,8 +47,10 @@ class frac_degreeIBfrac_degreeAFCoder : public Coder<poly::SparsePoly, double> {
     long frac_exp =
         (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
 
-    if (frac_degree > 0) a = poly_frac(a);
-    return EncPoly{a, {frac_exp}};
+    if (frac_degree_ > 0)
+      return EncPoly{laurentFracEncode(a), {}};
+    else
+      return EncPoly{laurentFracEncode(a, frac_exp), {frac_exp}};
   }
 
   double decode(const EncPoly<poly::SparsePoly>& en) const override {
@@ -64,13 +65,21 @@ class frac_degreeIBfrac_degreeAFCoder : public Coder<poly::SparsePoly, double> {
   // The polynomial representation for fractional decoding, where a power of 2
   // cyclotomic is used x^-i is replaced by -x^(frac_degree-i), where
   // frac_degree is the degree of the cyclotomic.
-  SparsePoly poly_frac(SparsePoly sparse_poly) {
-    SparsePoly new_poly;
+  SparsePoly laurentFracEncode(const SparsePoly& sparse_poly) {
+    SparsePoly poly_map;
     for (const auto& [key, value] : sparse_poly) {
       if (key < 0)
-        new_poly[key + frac_degree_] = -value;
+        poly_map[key + frac_degree_] = -value;
       else
-        new_poly[key] = value;
+        poly_map[key] = value;
+    }
+    return poly_map;
+  }
+
+  SparsePoly laurentEncode(const SparsePoly& sparse_poly, long i) {
+    SparsePoly poly_map;
+    for (const auto& [key, value] : sparse_poly) {
+      poly_map[key - i] = value;
     }
     return poly_map;
   }
