@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numeric>
 #include <vector>
 
 #include "coder.h"
@@ -47,18 +48,24 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
     long frac_exp =
         (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
 
-    if (frac_degree_ > 0)
-      return EncPoly{laurentFracEncode(a), {0}};
-    else
-      return EncPoly{laurentEncode(a, frac_exp), {frac_exp}};
+    if (frac_degree_ > 0) return EncPoly{laurentFracEncode(a), {0}};
+    return EncPoly{laurentEncode(a, frac_exp), {frac_exp}};
   }
 
   double decode(const EncPoly<poly::SparsePoly>& en) const override {
-    double sum = 0;
-    for (const auto& [key, value] : en.poly()) {
-      sum += value * std::pow(bw_, key);
+    const auto& poly = en.poly();
+    if (frac_degree_ > 0) {
+      // FIXME need implementing
+      auto laurentFracEncode = [](double init, const auto& pair) {
+        return 0.0;
+      };
+      return std::accumulate(poly.begin(), poly.end(), 0.0, laurentFracEncode);
     }
-    return sum;
+
+    auto laurentDecode = [this, i = en.i()[0]](double init, const auto& pair) {
+      return init + pair.second * std::pow(this->bw_, pair.first + i);
+    };
+    return std::accumulate(poly.begin(), poly.end(), 0.0, laurentDecode);
   }
 
  private:
