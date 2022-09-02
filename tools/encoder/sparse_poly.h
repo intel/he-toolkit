@@ -10,6 +10,8 @@ namespace hekit::poly {
 
 class SparsePoly {
  public:
+  SparsePoly() = default;
+  explicit SparsePoly(const std::map<long, long>& terms) : coeffs_(terms) {}
   long coeff(long i) const { return coeffs_.count(i) ? coeffs_.at(i) : 0L; }
   void coeff(long i, long value) { coeffs_[i] = value; }
   long degree() const { return coeffs_.empty() ? 0L : coeffs_.rbegin()->first; }
@@ -29,7 +31,7 @@ class SparsePoly {
   auto cbegin() const noexcept { return coeffs_.cbegin(); }
   auto cend() const noexcept { return coeffs_.cend(); }
 
-  std::string poly_rep() {
+  std::string toString() const {
     std::ostringstream oss;
     for (const auto& [key, value] : coeffs_) {
       oss << value << "x^" << key << ((key - degree()) ? " + " : "");

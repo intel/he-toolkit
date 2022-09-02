@@ -24,10 +24,9 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(
-  tests
-  tests/encoder-source.cpp
-)
+set(TEST_FILES tests/test_nibnaf.cpp tests/test_sparse_poly.cpp)
+
+add_executable(tests ${TEST_FILES})
 
 target_link_libraries(
   tests
