@@ -162,17 +162,19 @@ def install_plugin(args) -> None:
 
     for plugin_dict in plugins_data_list:
         plugin_name = plugin_dict["name"]
-        plugin_version = plugin_dict["version"]
         if args.force:
+            # remove the present version
             rmtree(PluginsConfig.ROOT_DIR / plugin_name)
         elif plugin_name in config_dict.keys():
+            # check the versions because the plugin is in the system
+            plugin_version = plugin_dict["version"]
             config_version = config_dict[plugin_name]["version"]
             if config_version == plugin_version:
                 print(
                     f"{plugin_name} version {plugin_version} is already installed in the system"
                 )
                 continue
-
+            # Installing a different version
             user_answer = input(
                 f"You are trying to install {plugin_name} version {plugin_version}.\n"
                 f"However the version {config_version} was found in the system.\n"
@@ -180,12 +182,10 @@ def install_plugin(args) -> None:
             )
             if user_answer in ("y", "Y"):
                 continue
-
+            # remove the present version
             rmtree(PluginsConfig.ROOT_DIR / plugin_name)
 
         move_plugin_data(plugin_name, plugin_path, plugin_type)
-
-        # Update plugin config dictionary
         config_dict[plugin_name] = {
             "version": plugin_dict["version"],
             "state": PluginState.ENABLE,
@@ -212,11 +212,11 @@ def remove_plugin(args) -> None:
         config_dict.clear()
         print("All plugins were uninstalled successfully")
     else:
+        # Remove a specific third party plugins
         plugin_name = args.plugin
         if not plugin_name:
             raise ValueError("A plugin name should be specified as argument")
 
-        # Remove a specific third party plugins
         if plugin_name not in config_dict.keys():
             print(f"Plugin {plugin_name} was not found in the system")
             return
