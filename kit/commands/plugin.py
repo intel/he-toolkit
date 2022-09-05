@@ -16,8 +16,8 @@ from kit.utils.subparsers import validate_input
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 
-ConfigDict = Dict[str, List[Dict[str, str]]]
-PluginsList = List[Dict[str, str]]
+ConfigDict = Dict[str, Dict[str, str]]
+PluginsDataList = List[Dict[str, str]]
 
 
 class InvalidPluginError(Exception):
@@ -36,7 +36,7 @@ def load_plugins_config_file(source_file: Path = PluginsConfig.FILE) -> ConfigDi
     """Return plugins dictionary"""
     try:
         # Get the plugins data
-        return load_toml(source_file)
+        return load_toml(source_file)[PluginsConfig.KEY]
     except FileNotFoundError as e:
         raise FileNotFoundError(
             f"{str(e)}. Please execute: hekit init --default-config"
@@ -47,8 +47,8 @@ def update_plugins_config_file(
     config_dict: ConfigDict, dest_file: Path = PluginsConfig.FILE
 ) -> None:
     """Save changes in the plugins data"""
-    # sorted_dict = {PluginsConfig.KEY: dict(sorted(config_dict.items()))}
-    dump_toml(dest_file, config_dict)
+    sorted_dict = {PluginsConfig.KEY: dict(sorted(config_dict.items()))}
+    dump_toml(dest_file, sorted_dict)
 
 
 def get_plugin_type(plugin_path: Path) -> PluginType:
@@ -68,7 +68,9 @@ def get_plugin_type(plugin_path: Path) -> PluginType:
     raise TypeError("This program only supports tarball or zip files")
 
 
-def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> PluginsList:
+def check_plugin_structure(
+    plugin_path: Path, plugin_type: PluginType
+) -> PluginsDataList:
     """Check the minimum plugin structure (a directory with a plugin.py file)
     and return its name"""
     plugins_data_list = []
@@ -77,11 +79,11 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> Plugin
 
     try:
         if PluginType.DIR == plugin_type:
-            plugin_dict = load_toml(plugin_path / exp_toml)
-            exp_file = plugin_path / plugin_dict["plugin"]["start"]
+            plugin_dict = load_toml(plugin_path / exp_toml)["plugin"]
+            exp_file = plugin_path / plugin_dict["start"]
             if not Path(exp_file).exists():
                 raise FileNotFoundError()
-            plugins_data_list.append(plugin_dict["plugin"])
+            plugins_data_list.append(plugin_dict)
 
         elif PluginType.TAR == plugin_type:
             with tar_open(plugin_path) as f:
@@ -99,10 +101,10 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> Plugin
                     # Read the toml file and check that the file
                     # defined in "start" is present
                     with f.extractfile(toml_file) as file:  # type: ignore[union-attr]
-                        plugin_dict = toml_loads(file.read().decode("utf-8"))
-                        exp_file = f'{dir_name}/{plugin_dict["plugin"]["start"]}'
+                        plugin_dict = toml_loads(file.read().decode("utf-8"))["plugin"]
+                        exp_file = f'{dir_name}/{plugin_dict["start"]}'
                         f.getmember(exp_file)
-                        plugins_data_list.append(plugin_dict["plugin"])
+                        plugins_data_list.append(plugin_dict)
 
         elif PluginType.ZIP == plugin_type:
             with ZipFile(plugin_path) as f:
@@ -120,10 +122,10 @@ def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> Plugin
                     # Read the toml file and check that the file
                     # defined in "start" is present
                     with f.open(toml_file) as file:
-                        plugin_dict = toml_loads(file.read().decode("utf-8"))
-                        exp_file = f'{dir_name}/{plugin_dict["plugin"]["start"]}'
+                        plugin_dict = toml_loads(file.read().decode("utf-8"))["plugin"]
+                        exp_file = f'{dir_name}/{plugin_dict["start"]}'
                         f.getinfo(exp_file)
-                        plugins_data_list.append(plugin_dict["plugin"])
+                        plugins_data_list.append(plugin_dict)
 
     except (FileNotFoundError, KeyError) as e:
         raise InvalidPluginError(
@@ -151,44 +153,43 @@ def move_plugin_data(
             f.extractall(dest_path, zip_items)
 
 
-def is_version_present(plugins_list, version):
-    """Verify if the version is already installed"""
-    for plugin_config in plugins_list:
-        if plugin_config["version"] == version:
-            return True
-
-    return False
-
-
 def install_plugin(args) -> None:
     """Install third party plugins"""
     config_dict = load_plugins_config_file()
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
-    plugins_list = check_plugin_structure(plugin_path, plugin_type)
+    plugins_data_list = check_plugin_structure(plugin_path, plugin_type)
 
-    for plugin_dict in plugins_list:
+    for plugin_dict in plugins_data_list:
         plugin_name = plugin_dict["name"]
+        plugin_version = plugin_dict["version"]
         if args.force:
             rmtree(PluginsConfig.ROOT_DIR / plugin_name)
         elif plugin_name in config_dict.keys():
-            if is_version_present(config_dict[plugin_name], plugin_dict["version"]):
+            config_version = config_dict[plugin_name]["version"]
+            if config_version == plugin_version:
                 print(
-                    f"Plugin {plugin_name} {plugin_dict['version']} is already installed in the system"
+                    f"{plugin_name} version {plugin_version} is already installed in the system"
                 )
                 continue
 
-            config_dict[plugin_name].append(
-                {"version": plugin_dict["version"], "status": PluginState.ENABLE}
+            user_answer = input(
+                f"You are trying to install {plugin_name} version {plugin_version}.\n"
+                f"However the version {config_version} was found in the system.\n"
+                "Do you want to remove the present version and continue? (y/n) "
             )
-        else:
-            config_dict[plugin_name] = [
-                {"version": plugin_dict["version"], "status": PluginState.ENABLE}
-            ]
+            if user_answer in ("y", "Y"):
+                continue
+
+            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
 
         move_plugin_data(plugin_name, plugin_path, plugin_type)
 
-        # Update plugin dictionary
+        # Update plugin config dictionary
+        config_dict[plugin_name] = {
+            "version": plugin_dict["version"],
+            "state": PluginState.ENABLE,
+        }
         update_plugins_config_file(config_dict)
         print(f"Plugin {plugin_name} was installed successfully")
 
@@ -217,7 +218,6 @@ def remove_plugin(args) -> None:
 
         # Remove a specific third party plugins
         if plugin_name not in config_dict.keys():
-            # TODO check version
             print(f"Plugin {plugin_name} was not found in the system")
             return
 
@@ -235,16 +235,14 @@ def update_plugin_state(args) -> None:
     plugin_state = args.state
 
     if plugin_name not in config_dict.keys():
-        # TODO check version
         print(f"Plugin {plugin_name} was not found in the system")
         return
 
-    for plugin_config in config_dict[plugin_name]:
-        if plugin_config["state"] == plugin_state:
-            print(f"Plugin {plugin_name} is already {plugin_state} in the system")
-            return
+    if config_dict[plugin_name]["state"] == plugin_state:
+        print(f"Plugin {plugin_name} is already {plugin_state} in the system")
+        return
 
-    # config_dict[plugin_name] = (config_dict[plugin_name][0], plugin_state)
+    config_dict[plugin_name]["state"] = plugin_state
     update_plugins_config_file(config_dict)
     print(f"Plugin {plugin_name} was {plugin_state} successfully")
 
@@ -257,15 +255,19 @@ def list_plugins(args) -> None:
     width_name = max(map(len, config_dict.keys()), default=0) + 3
     width_status = 10
 
-    print(
-        f"{'PLUGIN':{width_name}} {'Version':{width_status}} {'STATE':{width_status}}"
+    filtered_plugin_dict = (
+        config_dict.items()
+        if state == "all"
+        else ((k, v) for k, v in config_dict.items() if state == v["state"])
     )
-    for plugin_name, plugin_list in config_dict.items():
-        for plugin_dict in plugin_list:
-            if state in (plugin_dict["status"], "all"):
-                print(
-                    f"{plugin_name:{width_name}} {plugin_dict['version']:{width_status}} {plugin_dict['status']:{width_status}}"
-                )
+
+    print(
+        f"{'PLUGIN':{width_name}} {'VERSION':{width_status}} {'STATE':{width_status}}"
+    )
+    for k, v in filtered_plugin_dict:
+        print(
+            f"{k:{width_name}} {v['version']:{width_status}} {v['state']:{width_status}}"
+        )
 
 
 def set_plugin_subparser(subparsers) -> None:

@@ -51,10 +51,8 @@ def get_plugins_by_state(
     """Return a list of plugins with a specific state"""
     try:
 
-        plugin_dict = load_toml(source_file)
-        return [
-            k for k, v in plugin_dict.items() for dict in v if dict["status"] == state
-        ]
+        plugin_dict = load_toml(source_file)[PluginsConfig.KEY]
+        return [k for k, v in plugin_dict.items() if v["state"] == state]
 
     except (FileNotFoundError, KeyError):
         return []
