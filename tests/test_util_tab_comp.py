@@ -96,9 +96,9 @@ def create_tmp_file(tmp_path):
     file_name = tmp_path / "test.toml"
     file_data = {
         PluginsConfig.KEY: {
-            "plugin_a": PluginState.ENABLE,
-            "plugin_c": PluginState.DISABLE,
-            "plugin_e": "g",
+            "plugin_a": {"version": "1.0.0", "state": PluginState.ENABLE},
+            "plugin_c": {"version": "1.0.0", "state": PluginState.DISABLE},
+            "plugin_e": {"version": "1.0.0", "state": "g"},
         }
     }
 

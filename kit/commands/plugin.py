@@ -79,7 +79,8 @@ def check_plugin_structure(
 
     try:
         if PluginType.DIR == plugin_type:
-            plugin_dict = load_toml(plugin_path / exp_toml)["plugin"]
+            exp_file = exp_toml
+            plugin_dict = load_toml(plugin_path / exp_file)["plugin"]
             exp_file = plugin_path / plugin_dict["start"]
             if not Path(exp_file).exists():
                 raise FileNotFoundError()
@@ -88,13 +89,17 @@ def check_plugin_structure(
         elif PluginType.TAR == plugin_type:
             with tar_open(plugin_path) as f:
                 # get the list of plugin.toml files
+                exp_file = exp_toml
                 tar_toml_list = [
-                    item.name for item in f.getmembers() if exp_toml in item.name
+                    item.name for item in f.getmembers() if exp_file in item.name
                 ]
+                if not tar_toml_list:
+                    raise FileNotFoundError()
 
                 # getmember and extractfile raise a KeyError if the file cannot be found
                 for toml_file in tar_toml_list:
                     # Verify the toml file is in a directory
+                    exp_file = f"DIRECTORY/{exp_toml}"
                     dir_name = toml_file.split("/")[0]
                     f.getmember(dir_name)
 
@@ -109,13 +114,17 @@ def check_plugin_structure(
         elif PluginType.ZIP == plugin_type:
             with ZipFile(plugin_path) as f:
                 # get the list of plugin.toml files
+                exp_file = exp_toml
                 zip_toml_list = [
-                    item.filename for item in f.infolist() if exp_toml in item.filename
+                    item.filename for item in f.infolist() if exp_file in item.filename
                 ]
+                if not zip_toml_list:
+                    raise FileNotFoundError()
 
                 # getinfo and open raise a KeyError if the file cannot be found
                 for toml_file in zip_toml_list:
                     # Verify the toml file is in a directory
+                    exp_file = f"DIRECTORY/{exp_toml}"
                     dir_name = toml_file.split("/")[0]
                     f.getinfo(f"{dir_name}/")
 
@@ -136,11 +145,12 @@ def check_plugin_structure(
 
 
 def move_plugin_data(
-    plugin_name: str, plugin_path: Path, plugin_type: PluginType
+    plugin_name: str,
+    plugin_path: Path,
+    plugin_type: PluginType,
+    dest_path: Path = PluginsConfig.ROOT_DIR,
 ) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
-    dest_path = PluginsConfig.ROOT_DIR
-
     if PluginType.DIR == plugin_type:
         copytree(plugin_path, dest_path / plugin_name)
     elif PluginType.TAR == plugin_type:
