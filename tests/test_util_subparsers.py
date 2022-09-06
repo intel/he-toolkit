@@ -4,10 +4,10 @@
 import pytest
 
 from pathlib import Path
-from kit.utils.subparsers import discover_subparsers_from, validate_input
+from kit.utils.subparsers import discover_subparsers_kit, validate_input
 
 
-def test_discover_subparsers_from_commands_all(get_toolkit_path):
+def test_discover_subparsers_kit_commands_all(get_toolkit_path):
     exp_func = {
         "set_docker_subparser",
         "set_check_dep_subparser",
@@ -19,7 +19,7 @@ def test_discover_subparsers_from_commands_all(get_toolkit_path):
         "set_plugin_subparser",
     }
 
-    act_funcs = discover_subparsers_from(["commands"], get_toolkit_path / "kit")
+    act_funcs = discover_subparsers_kit(["commands"], get_toolkit_path / "kit")
     for func in act_funcs:
         func_name = func.__name__
         assert func_name in exp_func
@@ -27,12 +27,12 @@ def test_discover_subparsers_from_commands_all(get_toolkit_path):
     assert 0 == len(exp_func)
 
 
-def test_discover_subparsers_from_commands_some(mocker, get_toolkit_path):
+def test_discover_subparsers_kit_commands_some(mocker, get_toolkit_path):
     exp_func = {"set_check_dep_subparser", "set_remove_subparser", "set_list_subparser"}
     mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
     mocker_files_in_dir.return_value = ["check_deps.py", "remove.py", "list_cmd.py"]
 
-    act_funcs = discover_subparsers_from(["commands"], get_toolkit_path / "kit")
+    act_funcs = discover_subparsers_kit(["commands"], get_toolkit_path / "kit")
     for func in act_funcs:
         func_name = func.__name__
         assert func_name in exp_func
@@ -40,12 +40,12 @@ def test_discover_subparsers_from_commands_some(mocker, get_toolkit_path):
     assert 0 == len(exp_func)
 
 
-def test_discover_subparsers_from_tools_some(mocker, get_toolkit_path):
+def test_discover_subparsers_kit_tools_some(mocker, get_toolkit_path):
     exp_func = {"set_gen_algebras_subparser", "set_gen_primes_subparser"}
     mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
     mocker_files_in_dir.return_value = ["healg.py"]
 
-    act_funcs = discover_subparsers_from(["tools"], get_toolkit_path / "kit")
+    act_funcs = discover_subparsers_kit(["tools"], get_toolkit_path / "kit")
     for func in act_funcs:
         func_name = func.__name__
         assert func_name in exp_func

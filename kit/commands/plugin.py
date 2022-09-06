@@ -190,7 +190,7 @@ def install_plugin(args) -> None:
                 f"However the version {config_version} was found in the system.\n"
                 "Do you want to remove the present version and continue? (y/n) "
             )
-            if user_answer in ("y", "Y"):
+            if user_answer not in ("y", "Y"):
                 continue
             # remove the present version
             rmtree(PluginsConfig.ROOT_DIR / plugin_name)
@@ -199,6 +199,7 @@ def install_plugin(args) -> None:
         config_dict[plugin_name] = {
             "version": plugin_dict["version"],
             "state": PluginState.ENABLE,
+            "start": plugin_dict["start"],
         }
         update_plugins_config_file(config_dict)
         print(f"Plugin {plugin_name} was installed successfully")
@@ -261,7 +262,6 @@ def list_plugins(args) -> None:
     """Print the list of all plugins"""
     config_dict = load_plugins_config_file()
     state = args.state
-
     width_name = max(map(len, config_dict.keys()), default=0) + 3
     width_status = 10
 
