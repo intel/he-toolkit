@@ -11,6 +11,7 @@
 
 namespace {
 
+using hekit::coder::encode;
 using hekit::coder::NIBNAFCoder;
 using hekit::poly::SparsePoly;
 
@@ -43,8 +44,8 @@ TEST_P(NIBNAFSingleNum, testCompareOriginalToDecodedEncoded) {
 }
 
 TEST_P(NIBNAFParamsSingleNum, testRw) {
-  auto& [num, bw, terms_map] = GetParam();
-  const auto encoded = encode<SparsePoly>(num, hekit::coder::NIBNAFCoder{bw});
+  auto& [num, rw, terms_map] = GetParam();
+  const auto encoded = encode<SparsePoly>(num, hekit::coder::NIBNAFCoder{rw});
   comparePolyAndMap(encoded.poly(), terms_map);
 }
 

@@ -31,7 +31,8 @@ struct Coder {
 };
 
 template <typename OutPoly, typename Nums>
-EncPoly<OutPoly> encode(const Nums& nums, const Coder<OutPoly, Nums>& coder) {
+inline EncPoly<OutPoly> encode(const Nums& nums,
+                               const Coder<OutPoly, Nums>& coder) {
   return coder.encode(nums);
 }
 
