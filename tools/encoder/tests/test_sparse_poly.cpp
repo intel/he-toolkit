@@ -9,6 +9,8 @@
 
 #include "../sparse_poly.h"
 
+namespace {
+
 using hekit::poly::SparsePoly;
 
 TEST(spare_poly, test_zero_poly) {
@@ -30,3 +32,5 @@ TEST(spare_poly, test_to_string) {
   const auto& poly = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
   ASSERT_STREQ(poly.toString().c_str(), "2x^2 + 1x^3 + 3x^5");
 }
+
+}  // namespace

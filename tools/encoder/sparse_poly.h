@@ -30,6 +30,7 @@ class SparsePoly {
   const auto end() const noexcept { return coeffs_.end(); }
   auto cbegin() const noexcept { return coeffs_.cbegin(); }
   auto cend() const noexcept { return coeffs_.cend(); }
+  size_t size() const { return coeffs_.size(); }
 
   std::string toString() const {
     std::ostringstream oss;

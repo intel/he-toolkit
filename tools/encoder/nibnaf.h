@@ -21,49 +21,53 @@ inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
 class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
  public:
-  NIBNAFCoder() = default;
-
-  NIBNAFCoder(double bw, double epsil, long frac_degree = 0L)
-      : bw_(bw), epsil_(epsil), frac_degree_(frac_degree) {}
+  // This ctor also cover the default ctor
+  NIBNAFCoder(double rw = 1.2, double epsil = 1e-8, long frac_degree = 0L)
+      : rw_(rw), epsil_(epsil), frac_degree_(frac_degree) {}
 
   ~NIBNAFCoder() = default;
 
   double epsilon() { return epsil_; }
 
   EncPoly<poly::SparsePoly> encode(const double& num) const override {
-    const double log_bw_ = std::log(bw_);
+    const double log_rw_ = std::log(rw_);
     poly::SparsePoly a;
     long r;
     double t_minus_po;
     for (double t = std::abs(num), sigma = signum(num); t >= epsil_;
          t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-      r = std::ceil(std::log(t) / log_bw_);
-      r -= (std::pow(bw_, r) - t > t - std::pow(bw_, r - 1));
+      r = std::ceil(std::log(t) / log_rw_);
+      r -= (std::pow(rw_, r) - t > t - std::pow(rw_, r - 1));
 
       a[r] = sigma;
-      t_minus_po = t - std::pow(bw_, r);
+      t_minus_po = t - std::pow(rw_, r);
     }
 
     long first_index = a.begin()->first;
     long frac_exp =
         (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
 
-    if (frac_degree_ > 0) return EncPoly{laurentFracEncode(a), {0}};
+    if (frac_degree_ > 0) return EncPoly{laurentFracEncode(a), {}};
     return EncPoly{laurentEncode(a, frac_exp), {frac_exp}};
   }
 
   double decode(const EncPoly<poly::SparsePoly>& en) const override {
     const auto& poly = en.poly();
     if (frac_degree_ > 0) {
-      // FIXME need implementing
-      auto laurentFracEncode = [](double init, const auto& pair) {
-        return 0.0;
+      // frac_degree_ power of 2
+      auto laurentFracEncode = [this, midpoint = frac_degree_ / 2](
+                                   double init, const auto& pair) {
+        if (pair.first > midpoint)
+          return init - pair.second * std::pow(this->rw_,
+                                               pair.first - this->frac_degree_);
+        return init + pair.second * std::pow(this->rw_, pair.first);
       };
       return std::accumulate(poly.begin(), poly.end(), 0.0, laurentFracEncode);
     }
 
-    auto laurentDecode = [this, i = en.i()[0]](double init, const auto& pair) {
-      return init + pair.second * std::pow(this->bw_, pair.first + i);
+    auto laurentDecode = [this, i = en.i().front()](double init,
+                                                    const auto& pair) {
+      return init + pair.second * std::pow(this->rw_, pair.first + i);
     };
     return std::accumulate(poly.begin(), poly.end(), 0.0, laurentDecode);
   }
@@ -93,9 +97,9 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double> {
     return poly_map;
   }
 
-  double bw_ = 1.2;
-  double epsil_ = 0.00000001;
-  long frac_degree_ = 0L;
+  double rw_;
+  double epsil_;
+  long frac_degree_;
 };
 
 }  // namespace hekit::coder
