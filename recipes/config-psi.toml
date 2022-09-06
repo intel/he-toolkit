@@ -1,0 +1,27 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[gtest]]
+name = "v1.12.1"
+version = "1.12.1"
+export_install_dir = "install"
+fetch = "git clone https://github.com/google/googletest.git --branch release-%version%"
+pre-build = """cmake -S %init_fetch_dir%/googletest -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DBUILD_MOCK=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_build_dir%"
+export_cmake = "install/lib/cmake/GTest"
+
+
+[[psi]]
+name = "configurable-psi"
+src_dir = "~/git/he-toolkit/expr/psi"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -Dhelib_DIR=$%helib%/export_cmake$
+               -DENABLE_TESTS=ON
+               -DGTest_DIR=$%gtest%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+# Dependencies
+helib = "helib/psi-io"
+gtest = "gtest/v1.12.1"
