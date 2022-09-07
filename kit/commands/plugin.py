@@ -15,9 +15,9 @@ from kit.utils.files import load_toml, dump_toml
 from kit.utils.subparsers import validate_input
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
-
-ConfigDict = Dict[str, Dict[str, str]]
-PluginsDataList = List[Dict[str, str]]
+PluginSettings = Dict[str, str]
+PluginSettingsList = List[PluginSettings]
+ConfigDict = Dict[str, PluginSettings]
 
 
 class InvalidPluginError(Exception):
@@ -70,23 +70,22 @@ def get_plugin_type(plugin_path: Path) -> PluginType:
 
 def check_plugin_structure(
     plugin_path: Path, plugin_type: PluginType
-) -> PluginsDataList:
+) -> PluginSettingsList:
     """Check the minimum plugin structure (a directory with a plugin.py file)
     and return its name"""
-    plugins_data_list = []
+    plugin_settings_list = []
     exp_toml = "plugin.toml"
-    exp_file = ""
 
     try:
         if PluginType.DIR == plugin_type:
             exp_file = exp_toml
-            plugin_dict = load_toml(plugin_path / exp_file)["plugin"]
-            exp_file = plugin_path / plugin_dict["start"]
+            plugin_settings_dict = load_toml(plugin_path / exp_file)["plugin"]
+            exp_file = plugin_path / plugin_settings_dict["start"]
             if not Path(exp_file).exists():
                 raise FileNotFoundError()
-            plugins_data_list.append(plugin_dict)
+            return [plugin_settings_dict]
 
-        elif PluginType.TAR == plugin_type:
+        if PluginType.TAR == plugin_type:
             with tar_open(plugin_path) as f:
                 # get the list of plugin.toml files
                 exp_file = exp_toml
@@ -106,10 +105,11 @@ def check_plugin_structure(
                     # Read the toml file and check that the file
                     # defined in "start" is present
                     with f.extractfile(toml_file) as file:  # type: ignore[union-attr]
-                        plugin_dict = toml_loads(file.read().decode("utf-8"))["plugin"]
-                        exp_file = f'{dir_name}/{plugin_dict["start"]}'
+                        file_content = file.read().decode("utf-8")
+                        plugin_settings_dict = toml_loads(file_content)["plugin"]
+                        exp_file = f'{dir_name}/{plugin_settings_dict["start"]}'
                         f.getmember(exp_file)
-                        plugins_data_list.append(plugin_dict)
+                        plugin_settings_list.append(plugin_settings_dict)
 
         elif PluginType.ZIP == plugin_type:
             with ZipFile(plugin_path) as f:
@@ -131,17 +131,18 @@ def check_plugin_structure(
                     # Read the toml file and check that the file
                     # defined in "start" is present
                     with f.open(toml_file) as file:
-                        plugin_dict = toml_loads(file.read().decode("utf-8"))["plugin"]
-                        exp_file = f'{dir_name}/{plugin_dict["start"]}'
+                        file_content = file.read().decode("utf-8")
+                        plugin_settings_dict = toml_loads(file_content)["plugin"]
+                        exp_file = f'{dir_name}/{plugin_settings_dict["start"]}'
                         f.getinfo(exp_file)
-                        plugins_data_list.append(plugin_dict)
+                        plugin_settings_list.append(plugin_settings_dict)
 
     except (FileNotFoundError, KeyError) as e:
         raise InvalidPluginError(
             f"File '{exp_file}' not found in '{plugin_path.name}'"
         ) from e
 
-    return plugins_data_list
+    return plugin_settings_list
 
 
 def move_plugin_data(
@@ -168,16 +169,16 @@ def install_plugin(args) -> None:
     config_dict = load_plugins_config_file()
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
-    plugins_data_list = check_plugin_structure(plugin_path, plugin_type)
+    plugin_settings_list = check_plugin_structure(plugin_path, plugin_type)
 
-    for plugin_dict in plugins_data_list:
-        plugin_name = plugin_dict["name"]
+    for plugin_settings_dict in plugin_settings_list:
+        plugin_name = plugin_settings_dict["name"]
+        plugin_version = plugin_settings_dict["version"]
         if args.force:
             # remove the present version
             rmtree(PluginsConfig.ROOT_DIR / plugin_name)
         elif plugin_name in config_dict.keys():
             # check the versions because the plugin is in the system
-            plugin_version = plugin_dict["version"]
             config_version = config_dict[plugin_name]["version"]
             if config_version == plugin_version:
                 print(
@@ -197,9 +198,9 @@ def install_plugin(args) -> None:
 
         move_plugin_data(plugin_name, plugin_path, plugin_type)
         config_dict[plugin_name] = {
-            "version": plugin_dict["version"],
+            "version": plugin_version,
             "state": PluginState.ENABLE,
-            "start": plugin_dict["start"],
+            "start": plugin_settings_dict["start"],
         }
         update_plugins_config_file(config_dict)
         print(f"Plugin {plugin_name} was installed successfully")
@@ -265,7 +266,7 @@ def list_plugins(args) -> None:
     width_name = max(map(len, config_dict.keys()), default=0) + 3
     width_status = 10
 
-    filtered_plugin_dict = (
+    filtered_config_dict = (
         config_dict.items()
         if state == "all"
         else ((k, v) for k, v in config_dict.items() if state == v["state"])
@@ -274,7 +275,7 @@ def list_plugins(args) -> None:
     print(
         f"{'PLUGIN':{width_name}} {'VERSION':{width_status}} {'STATE':{width_status}}"
     )
-    for k, v in filtered_plugin_dict:
+    for k, v in filtered_config_dict:
         print(
             f"{k:{width_name}} {v['version']:{width_status}} {v['state']:{width_status}}"
         )

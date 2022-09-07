@@ -479,10 +479,12 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
 
         toml_file = plugin_path / "plugin.toml"
         with toml_file.open("w") as f:
-            f.write("[plugin]\n")
-            f.write(f'name = "{plugin_name}"\n')
-            f.write('version = "1.0.0"\n')
-            f.write('start = "plugin.py"\n')
+            f.write(
+                "[plugin]\n"
+                f'name = "{plugin_name}"\n'
+                'version = "1.0.0"\n'
+                'start = "plugin.py"\n'
+            )
 
     if plugin_type == PluginType.DIR:
         return tmp_path / plugin_name
@@ -500,9 +502,11 @@ def create_config_file(filepath):
     with filepath.open("w") as f:
         for k, v in get_fake_dict().items():
             version, state = v["version"], v["state"]
-            f.write(f"[{PluginsConfig.KEY}.{k}]\n")
-            f.write(f'version = "{version}"\n')
-            f.write(f'state = "{state}"\n')
+            f.write(
+                f"[{PluginsConfig.KEY}.{k}]\n"
+                f'version = "{version}"\n'
+                f'state = "{state}"\n'
+            )
 
 
 class MockArgs:
