@@ -15,7 +15,7 @@ from kit.utils.subparsers import (
 def test_discover_subparsers_plugins_tmp_file(mocker, tmp_path):
     """Verify that the SW reads the files defined in start
     and returns the function that defines the arguments"""
-    start_files, modules = create_plugin_file(tmp_path)
+    start_files, modules = create_comp_inst_dir(tmp_path)
     exp_func = {f"set_{modules[0]}_subparser", f"set_{modules[1]}_subparser"}
     mocker_files_in_dir = mocker.patch("kit.utils.subparsers.load_toml")
     mocker_files_in_dir.return_value = {
@@ -102,7 +102,7 @@ def get_toolkit_path():
     return Path(__file__).resolve().parent.parent
 
 
-def create_plugin_file(tmp_path):
+def create_comp_inst_dir(tmp_path):
     modules = ["plugin_a", "plugin_b"]
     start_files = ["test_a.py", "test_b.py"]
     for module, start_file in zip(modules, start_files):
