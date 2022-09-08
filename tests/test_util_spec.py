@@ -294,8 +294,8 @@ def create_basic_spec_file(tmp_path):
             'init_fetch_dir = "fetch"\n'
             'init_build_dir = "build"\n'
             'init_install_dir = "build"\n'
-            "\n"
-        )  # Parser inserts this new line
+            "\n"  # Parser inserts this new line
+        )
 
     expected_dict = {
         "hexl": [

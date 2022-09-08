@@ -83,9 +83,9 @@ def check_plugin_structure(
             exp_file = plugin_path / plugin_settings_dict["start"]
             if not Path(exp_file).exists():
                 raise FileNotFoundError()
-            return [plugin_settings_dict]
+            plugin_settings_list = [plugin_settings_dict]
 
-        if PluginType.TAR == plugin_type:
+        elif PluginType.TAR == plugin_type:
             with tar_open(plugin_path) as f:
                 # get the list of plugin.toml files
                 exp_file = exp_toml
@@ -104,7 +104,10 @@ def check_plugin_structure(
 
                     # Read the toml file and check that the file
                     # defined in "start" is present
-                    with f.extractfile(toml_file) as file:  # type: ignore[union-attr]
+                    file = f.extractfile(toml_file)
+                    if file is None:
+                        raise TypeError(f"{toml_file} is not valid file")
+                    with file:
                         file_content = file.read().decode("utf-8")
                         plugin_settings_dict = toml_loads(file_content)["plugin"]
                         exp_file = f'{dir_name}/{plugin_settings_dict["start"]}'

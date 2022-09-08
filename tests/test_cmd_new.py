@@ -107,8 +107,8 @@ def create_basic_spec_file(tmp_path):
             f'src_dir = "{project_path}"\n'
             'pre-build = "cmake -S %src_dir% -B %init_build_dir% -DFLAG=TBD"\n'
             'build = "cmake --build %init_build_dir% -j"\n'
-            "\n"
-        )  # Parser inserts this new line
+            "\n"  # Parser inserts this new line
+        )
 
     return project_name, project_path, filepath
 
