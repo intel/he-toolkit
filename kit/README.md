@@ -1,29 +1,45 @@
-## Introduction to `hekit`
+# Introduction to `hekit`
 The `hekit` tool can be used by the user to easily set up the required
 environment to evaluate homomorphic encryption technology.
 
-### Global Options
+## Contents
+
+- [Introduction to hekit](#introduction-to-hekit)
+  - [Global Options](#global-options)
+  - [Commands](#commands)
+    - [Configuration file](#configuration-file)
+    - [Recipe file](#recipe-file)
+      - [Simple example](#simple-example)
+      - [Back substitution in recipe files](#back-substitution-in-recipe-files)
+  - [Examples](#examples)
+     - [init](#init)
+     - [list](#list)
+     - [fetch, build and install](#fetch-build-and-install)
+     - [remove](#remove)
+     - [check-dependencies](#check-dependencies)
+     - [new](#new)
+  - [Tab completion](#tab-completion) 
+
+## Global Options
 
 `-h, --help`: Shows the help message.
 
 `--version`: Displays Intel HE toolkit version.
 
-`--config CONFIG_FILE`: Use non-default [configuration
-file](#configuration-file).  Default is `~/.hekit/default.config`.
-
-### Commands
-The option -h can be used to get details about the arguments and usage of each command.
+## Commands
+The option `-h` can be used to get details about the arguments and usage of each command.
 
 | Command | Description | Usage
 |-----------|-----------|-----------|
 | init | Initializes hekit. | hekit init [--default-config]
-| list | Lists installed components. |  hekit list
-| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] [-f] recipe-file
-| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] [-f] recipe-file
-| fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--recipe_arg RECIPE_ARG] recipe-file
-| remove | Uninstalls instances or components. | hekit remove [--all] [component] [instance]
-| new | Create a new project. | hekit new [--directory DIRECTORY] [--based-on {logistic-regression,psi,secure-query}] name|
+| list | Lists installed components. |  hekit [--config CONFIG_FILE] list 
+| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] recipe-file
+| remove | Uninstalls instances or components. | hekit remove [--config CONFIG_FILE] [--all] [component] [instance]
 | check-dependencies | Checks system dependencies. | hekit check-dependencies dependencies-file
+| new | Create a new project. | hekit new [--directory DIRECTORY] [--based-on {logistic-regression,psi,secure-query}] name|
+| plugins | Handle third party plugins. | hekit plugins {list,install,remove,enable,disable}
 | docker-build | Builds the HE Toolkit Docker container. See [Docker Build](../docker/README.md). | hekit docker-build [--id ID] [--clean] [--check-only] [--enable {vscode}]
 | gen-primes | Generates primes in range [n, m] where n, m are positive integers. See [Tools](./tools/README.md). | hekit gen-primes start stop
 | algebras  | Generates ZZ_p[x]/phi(X) algebras. . See [Tools](./tools/README.md). | hekit algebras [-p P] [-d D] [--no-corrected] [--no-header]
@@ -35,8 +51,12 @@ be available, for instance:
 ```
 repo_location = "~/.hekit/components"
 ```
+The comamnds `list`, `fetch`, `build`, `install` and `remove` uses a 
+default configuration file located in `~/.hekit/default.config`. However, the argument 
+`--config CONFIG_FILE` can be used to define the location of non-default configuration file
+
 The toolkit provides [default.config](../default.config) file that can be used
-as a valid option for --config argument.
+as template and it is a valid option for `--config` argument.
 
 ### Recipe file
 The `hekit` tool relies on recipe files written in TOML to perform its `fetch`,
@@ -48,7 +68,7 @@ actions to install them, as shown in the following example:
 ```
 [[library]]
 skip = false
-version = "!version!"
+version = "5.2.1"
 name = "instance"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
@@ -92,6 +112,7 @@ substitution
 
 ## Examples
 
+### init
 Although optional, the `init` command can be used to add hekit to the `PATH`
 variable and enable the [tab completion](#tab-completion) feature.
 To initialize `hekit` for the first time run
@@ -111,21 +132,23 @@ cd <he-toolkit-root-directory>
 ./hekit init --default-config
 ```
 
-In order to check the installed components, execute the list command
+### list
+In order to check the installed components, execute the following command
 ```bash
 hekit list
 ```
 
-The install command can be used to fetch, build, and install the required
+### fetch, build and install
+The `install` command can be used to fetch, build, and install the required
 libraries.
 ```bash
 hekit install ./recipes/default.toml
 ```
 
-Using fetch and build commands, the user has access to perform specific
+Using `fetch` and `build` commands, the user has access to perform specific
 actions. For example, for fetching libraries
 ```bash
-hekit fetch ./recipes/examples.toml --recipe_arg "version=v1.2.3"
+hekit fetch ./recipes/examples.toml --recipe_arg "toolkit-path=~/he-toolkit"
 ```
 
 By default, if actions as build or install were executed successfully,
@@ -136,26 +159,29 @@ set.
 hekit build ./recipes/examples.toml --force
 ```
 
-In order to uninstall a specific instance, execute the remove command
+### remove
+In order to uninstall a specific instance, execute the `remove` command with the component and instance name
 ```bash
 hekit remove hexl 1.2.3
 ```
 
-For uninstalling all the instances of a component, execute
+For uninstalling all the instances of a component, execute the `remove` command with only the component name
 ```bash
 hekit remove hexl
 ```
 
-Also, to uninstall all component, use
+Also, to uninstall all components, use the following command
 ```bash
 hekit remove --all
 ```
 
+### check-dependencies
 To check system dependencies, execute
 ```bash
 hekit check-dependencies dependencies.txt
 ```
 
+### new
 The command `new` can be used to create a new project. When it is executed
 with the option `-–based-on`, it will create a copy of the base project,
 keeping its directory structure.
