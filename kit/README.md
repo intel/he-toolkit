@@ -18,7 +18,7 @@ environment to evaluate homomorphic encryption technology.
      - [remove](#remove)
      - [check-dependencies](#check-dependencies)
      - [new](#new)
-  - [Tab completion](#tab-completion) 
+  - [Tab completion](#tab-completion)
 
 ## Global Options
 
@@ -32,7 +32,7 @@ The option `-h` can be used to get details about the arguments and usage of each
 | Command | Description | Usage
 |-----------|-----------|-----------|
 | init | Initializes hekit. | hekit init [--default-config]
-| list | Lists installed components. |  hekit [--config CONFIG_FILE] list 
+| list | Lists installed components. |  hekit [--config CONFIG_FILE] list
 | install | Installs components defined in [recipe file](#recipe-file). | hekit install [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] [-f] recipe-file
 | build | Builds components defined in [recipe file](#recipe-file). | hekit build [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] [-f] recipe-file
 | fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] recipe-file
@@ -51,8 +51,8 @@ be available, for instance:
 ```
 repo_location = "~/.hekit/components"
 ```
-The comamnds `list`, `fetch`, `build`, `install` and `remove` uses a 
-default configuration file located in `~/.hekit/default.config`. However, the argument 
+The commands `list`, `fetch`, `build`, `install` and `remove` uses a
+default configuration file located in `~/.hekit/default.config`. However, the argument
 `--config CONFIG_FILE` can be used to define the location of non-default configuration file
 
 The toolkit provides [default.config](../default.config) file that can be used
