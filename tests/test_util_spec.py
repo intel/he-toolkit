@@ -278,22 +278,24 @@ def create_basic_spec_file(tmp_path):
     """Create TOML file of one instance"""
     filepath = tmp_path / "basic.toml"
     with filepath.open("w") as f:
-        f.write("[[hexl]]\n")
-        f.write('name = "x.y.z"\n')
-        f.write("skip = true\n")
-        f.write('pre_fetch = ""\n')
-        f.write('fetch = "some-url"\n')
-        f.write('post_fetch = ""\n')
-        f.write('pre_build = ""\n')
-        f.write('build = "some-cmd"\n')
-        f.write('post_build = ""\n')
-        f.write('pre_install = ""\n')
-        f.write('install = ""\n')
-        f.write('post_install = ""\n')
-        f.write('init_fetch_dir = "fetch"\n')
-        f.write('init_build_dir = "build"\n')
-        f.write('init_install_dir = "build"\n')
-        f.write("\n")  # Parser inserts this new line
+        f.write(
+            "[[hexl]]\n"
+            'name = "x.y.z"\n'
+            "skip = true\n"
+            'pre_fetch = ""\n'
+            'fetch = "some-url"\n'
+            'post_fetch = ""\n'
+            'pre_build = ""\n'
+            'build = "some-cmd"\n'
+            'post_build = ""\n'
+            'pre_install = ""\n'
+            'install = ""\n'
+            'post_install = ""\n'
+            'init_fetch_dir = "fetch"\n'
+            'init_build_dir = "build"\n'
+            'init_install_dir = "build"\n'
+            "\n"  # Parser inserts this new line
+        )
 
     expected_dict = {
         "hexl": [

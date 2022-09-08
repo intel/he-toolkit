@@ -7,15 +7,17 @@ from enum import Enum
 from pathlib import Path
 from shutil import rmtree, copytree
 from tarfile import is_tarfile, open as tar_open
-from typing import Dict
+from typing import Dict, List
 from zipfile import is_zipfile, ZipFile
+from toml import loads as toml_loads
 from kit.utils.constants import PluginsConfig, PluginState
-from kit.utils.files import load_toml, dump_toml, file_exists
+from kit.utils.files import load_toml, dump_toml
 from kit.utils.subparsers import validate_input
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
-
-PluginDict = Dict[str, str]
+PluginSettings = Dict[str, str]
+PluginSettingsList = List[PluginSettings]
+ConfigDict = Dict[str, PluginSettings]
 
 
 class InvalidPluginError(Exception):
@@ -30,22 +32,22 @@ class PluginType(Enum):
     ZIP = 3
 
 
-def get_plugin_dict(source_file: Path = PluginsConfig.FILE) -> PluginDict:
+def load_plugins_config_file(source_file: Path = PluginsConfig.FILE) -> ConfigDict:
     """Return plugins dictionary"""
-    if not file_exists(source_file):
+    try:
+        # Get the plugins data
+        return load_toml(source_file)[PluginsConfig.KEY]
+    except FileNotFoundError as e:
         raise FileNotFoundError(
-            f"File '{source_file}' not found. Please execute: hekit init --default-config"
-        )
-
-    # Get the plugins data
-    return load_toml(source_file)[PluginsConfig.KEY]
+            f"{str(e)}. Please execute: hekit init --default-config"
+        ) from e
 
 
-def update_plugin_file(
-    plugin_dict: PluginDict, dest_file: Path = PluginsConfig.FILE
+def update_plugins_config_file(
+    config_dict: ConfigDict, dest_file: Path = PluginsConfig.FILE
 ) -> None:
     """Save changes in the plugins data"""
-    sorted_dict = {PluginsConfig.KEY: dict(sorted(plugin_dict.items()))}
+    sorted_dict = {PluginsConfig.KEY: dict(sorted(config_dict.items()))}
     dump_toml(dest_file, sorted_dict)
 
 
@@ -66,85 +68,150 @@ def get_plugin_type(plugin_path: Path) -> PluginType:
     raise TypeError("This program only supports tarball or zip files")
 
 
-def check_plugin_structure(plugin_path: Path, plugin_type: PluginType) -> str:
+def check_plugin_structure(
+    plugin_path: Path, plugin_type: PluginType
+) -> PluginSettingsList:
     """Check the minimum plugin structure (a directory with a plugin.py file)
     and return its name"""
-    plugin_name = ""
-    expected_file = "plugin.py"
-
-    if PluginType.DIR == plugin_type:
-        plugin_name = plugin_path.name
-        if not (plugin_path / expected_file).exists():
-            raise FileNotFoundError(
-                f"File '{expected_file}' not found in '{plugin_name}'"
-            )
-        return plugin_name
+    plugin_settings_list = []
+    exp_toml = "plugin.toml"
 
     try:
-        if PluginType.TAR == plugin_type:
+        if PluginType.DIR == plugin_type:
+            exp_file = exp_toml
+            plugin_settings_dict = load_toml(plugin_path / exp_file)["plugin"]
+            exp_file = plugin_path / plugin_settings_dict["start"]
+            if not Path(exp_file).exists():
+                raise FileNotFoundError()
+            plugin_settings_list = [plugin_settings_dict]
+
+        elif PluginType.TAR == plugin_type:
             with tar_open(plugin_path) as f:
-                plugin_name = f.getmembers()[0].name
-                # getmember raises a KeyError if the file cannot be found
-                f.getmember(f"{plugin_name}/{expected_file}")
+                # get the list of plugin.toml files
+                exp_file = exp_toml
+                tar_toml_list = [
+                    item.name for item in f.getmembers() if exp_file in item.name
+                ]
+                if not tar_toml_list:
+                    raise FileNotFoundError()
+
+                # getmember and extractfile raise a KeyError if the file cannot be found
+                for toml_file in tar_toml_list:
+                    # Verify the toml file is in a directory
+                    exp_file = f"DIRECTORY/{exp_toml}"
+                    dir_name = toml_file.split("/")[0]
+                    f.getmember(dir_name)
+
+                    # Read the toml file and check that the file
+                    # defined in "start" is present
+                    file = f.extractfile(toml_file)
+                    if file is None:
+                        raise TypeError(f"{toml_file} is not valid file")
+                    with file:
+                        file_content = file.read().decode("utf-8")
+                        plugin_settings_dict = toml_loads(file_content)["plugin"]
+                        exp_file = f'{dir_name}/{plugin_settings_dict["start"]}'
+                        f.getmember(exp_file)
+                        plugin_settings_list.append(plugin_settings_dict)
+
         elif PluginType.ZIP == plugin_type:
             with ZipFile(plugin_path) as f:
-                plugin_name = f.infolist()[0].filename.replace("/", "")
-                # getinfo raises a KeyError if the file cannot be found
-                f.getinfo(f"{plugin_name}/{expected_file}")
-    except Exception as e:
+                # get the list of plugin.toml files
+                exp_file = exp_toml
+                zip_toml_list = [
+                    item.filename for item in f.infolist() if exp_file in item.filename
+                ]
+                if not zip_toml_list:
+                    raise FileNotFoundError()
+
+                # getinfo and open raise a KeyError if the file cannot be found
+                for toml_file in zip_toml_list:
+                    # Verify the toml file is in a directory
+                    exp_file = f"DIRECTORY/{exp_toml}"
+                    dir_name = toml_file.split("/")[0]
+                    f.getinfo(f"{dir_name}/")
+
+                    # Read the toml file and check that the file
+                    # defined in "start" is present
+                    with f.open(toml_file) as file:
+                        file_content = file.read().decode("utf-8")
+                        plugin_settings_dict = toml_loads(file_content)["plugin"]
+                        exp_file = f'{dir_name}/{plugin_settings_dict["start"]}'
+                        f.getinfo(exp_file)
+                        plugin_settings_list.append(plugin_settings_dict)
+
+    except (FileNotFoundError, KeyError) as e:
         raise InvalidPluginError(
-            f"File 'DIRECTORY/{expected_file}' not found in '{plugin_path.name}'"
+            f"File '{exp_file}' not found in '{plugin_path.name}'"
         ) from e
 
-    return plugin_name
+    return plugin_settings_list
 
 
 def move_plugin_data(
-    plugin_path: Path, plugin_type: PluginType, dest_path: Path = PluginsConfig.ROOT_DIR
+    plugin_name: str,
+    plugin_path: Path,
+    plugin_type: PluginType,
+    dest_path: Path = PluginsConfig.ROOT_DIR,
 ) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
     if PluginType.DIR == plugin_type:
-        copytree(plugin_path, dest_path / plugin_path.name)
+        copytree(plugin_path, dest_path / plugin_name)
     elif PluginType.TAR == plugin_type:
         with tar_open(plugin_path) as f:
-            f.extractall(dest_path)
+            tar_items = [item for item in f.getmembers() if plugin_name in item.name]
+            f.extractall(dest_path, tar_items)
     elif PluginType.ZIP == plugin_type:
         with ZipFile(plugin_path) as f:
-            f.extractall(dest_path)
+            zip_items = [item for item in f.infolist() if plugin_name in item.filename]
+            f.extractall(dest_path, zip_items)
 
 
 def install_plugin(args) -> None:
     """Install third party plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
-    plugin_name = check_plugin_structure(plugin_path, plugin_type)
-    if args.force:
-        remove_plugin_dir(plugin_name)
-    elif plugin_name in plugin_dict.keys():
-        print(f"Plugin {plugin_name} is already installed in the system")
-        return
+    plugin_settings_list = check_plugin_structure(plugin_path, plugin_type)
 
-    move_plugin_data(plugin_path, plugin_type)
+    for plugin_settings_dict in plugin_settings_list:
+        plugin_name = plugin_settings_dict["name"]
+        plugin_version = plugin_settings_dict["version"]
+        if args.force:
+            # remove the present version
+            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+        elif plugin_name in config_dict.keys():
+            # check the versions because the plugin is in the system
+            config_version = config_dict[plugin_name]["version"]
+            if config_version == plugin_version:
+                print(
+                    f"{plugin_name} version {plugin_version} is already installed in the system"
+                )
+                continue
+            # Installing a different version
+            user_answer = input(
+                f"You are trying to install {plugin_name} version {plugin_version}.\n"
+                f"However the version {config_version} was found in the system.\n"
+                "Do you want to remove the present version and continue? (y/n) "
+            )
+            if user_answer not in ("y", "Y"):
+                continue
+            # remove the present version
+            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
 
-    # Update plugin dictionary
-    plugin_dict[plugin_name] = PluginState.ENABLE
-    update_plugin_file(plugin_dict)
-    print(f"Plugin {plugin_name} was installed successfully")
-
-
-def remove_plugin_dir(
-    plugin_name: str, root_dir: Path = PluginsConfig.ROOT_DIR
-) -> None:
-    """Delete the directory where the plugin is installed"""
-    plugin_path = root_dir / plugin_name
-    if file_exists(plugin_path):
-        rmtree(plugin_path)
+        move_plugin_data(plugin_name, plugin_path, plugin_type)
+        config_dict[plugin_name] = {
+            "version": plugin_version,
+            "state": PluginState.ENABLE,
+            "start": plugin_settings_dict["start"],
+        }
+        update_plugins_config_file(config_dict)
+        print(f"Plugin {plugin_name} was installed successfully")
 
 
 def remove_plugin(args) -> None:
     """Remove third party plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
 
     if args.all:
         # Remove all third party plugins
@@ -154,62 +221,67 @@ def remove_plugin(args) -> None:
         if user_answer not in ("y", "Y"):
             return
 
-        for plugin_name in plugin_dict.keys():
-            remove_plugin_dir(plugin_name)
+        for plugin_name in config_dict.keys():
+            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
 
-        plugin_dict.clear()
+        config_dict.clear()
         print("All plugins were uninstalled successfully")
     else:
+        # Remove a specific third party plugins
         plugin_name = args.plugin
         if not plugin_name:
             raise ValueError("A plugin name should be specified as argument")
 
-        # Remove a specific third party plugins
-        if plugin_name not in plugin_dict.keys():
+        if plugin_name not in config_dict.keys():
             print(f"Plugin {plugin_name} was not found in the system")
             return
 
-        remove_plugin_dir(plugin_name)
-        del plugin_dict[plugin_name]
+        rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+        del config_dict[plugin_name]
         print(f"Plugin {plugin_name} was uninstalled successfully")
 
-    update_plugin_file(plugin_dict)
+    update_plugins_config_file(config_dict)
 
 
 def update_plugin_state(args) -> None:
     """Enable third party plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
     plugin_name = args.plugin
     plugin_state = args.state
 
-    if plugin_name not in plugin_dict.keys():
+    if plugin_name not in config_dict.keys():
         print(f"Plugin {plugin_name} was not found in the system")
         return
-    if plugin_state == plugin_dict[plugin_name]:
+
+    if config_dict[plugin_name]["state"] == plugin_state:
         print(f"Plugin {plugin_name} is already {plugin_state} in the system")
         return
 
-    plugin_dict[plugin_name] = plugin_state
-    update_plugin_file(plugin_dict)
+    config_dict[plugin_name]["state"] = plugin_state
+    update_plugins_config_file(config_dict)
     print(f"Plugin {plugin_name} was {plugin_state} successfully")
 
 
 def list_plugins(args) -> None:
     """Print the list of all plugins"""
-    plugin_dict = get_plugin_dict()
+    config_dict = load_plugins_config_file()
     state = args.state
-
-    width_name = max(map(len, plugin_dict.keys()), default=0) + 3
+    width_name = max(map(len, config_dict.keys()), default=0) + 3
     width_status = 10
-    filtered_plugin_dict = (
-        plugin_dict.items()
+
+    filtered_config_dict = (
+        config_dict.items()
         if state == "all"
-        else ((k, v) for k, v in plugin_dict.items() if state == v)
+        else ((k, v) for k, v in config_dict.items() if state == v["state"])
     )
 
-    print(f"{'PLUGIN':{width_name}} {'STATE':{width_status}}")
-    for k, v in filtered_plugin_dict:
-        print(f"{k:{width_name}} {v:{width_status}}")
+    print(
+        f"{'PLUGIN':{width_name}} {'VERSION':{width_status}} {'STATE':{width_status}}"
+    )
+    for k, v in filtered_config_dict:
+        print(
+            f"{k:{width_name}} {v['version']:{width_status}} {v['state']:{width_status}}"
+        )
 
 
 def set_plugin_subparser(subparsers) -> None:

@@ -6,7 +6,6 @@
 from pathlib import Path
 from typing import List
 from kit.utils.constants import PluginsConfig, PluginState
-from kit.utils.files import file_exists
 from kit.utils.config import load_config, load_toml
 from kit.utils.files import list_dirs
 
@@ -50,11 +49,13 @@ def get_plugins_by_state(
     state: str, source_file: Path = PluginsConfig.FILE
 ) -> List[str]:
     """Return a list of plugins with a specific state"""
-    if not file_exists(source_file):
-        return []
+    try:
 
-    plugin_dict = load_toml(source_file)[PluginsConfig.KEY]
-    return [k for k, v in plugin_dict.items() if v == state]
+        plugin_dict = load_toml(source_file)[PluginsConfig.KEY]
+        return [k for k, v in plugin_dict.items() if v["state"] == state]
+
+    except (FileNotFoundError, KeyError):
+        return []
 
 
 def plugins_enable_completer(

@@ -8,50 +8,49 @@ from kit.utils.constants import PluginsConfig, PluginState
 from kit.commands.plugin import (
     InvalidPluginError,
     PluginType,
-    get_plugin_dict,
-    update_plugin_file,
+    load_plugins_config_file,
+    update_plugins_config_file,
     get_plugin_type,
     check_plugin_structure,
     move_plugin_data,
     install_plugin,
-    remove_plugin_dir,
     remove_plugin,
     update_plugin_state,
     list_plugins,
 )
 
 
-def test_get_plugin_dict_file_not_found():
+def test_load_plugins_config_file_file_not_found():
     """Verify that the SW raises an error
     when the toml file is not found"""
     plugin_name = "test.toml"
     with pytest.raises(FileNotFoundError) as exc_info:
-        get_plugin_dict(Path(plugin_name))
+        load_plugins_config_file(Path(plugin_name))
     assert (
         str(exc_info.value)
         == f"File '{plugin_name}' not found. Please execute: hekit init --default-config"
     )
 
 
-def test_get_plugin_dict_correct_file(tmp_path):
+def test_load_plugins_config_file_correct_file(tmp_path):
     """Verify that the SW returns a dict
     after reading a toml file"""
     plugin_name = tmp_path / "test.toml"
     create_config_file(plugin_name)
 
-    act_dict = get_plugin_dict(plugin_name)
+    act_dict = load_plugins_config_file(plugin_name)
     assert act_dict == get_fake_dict()
 
 
-def test_update_plugin_file(tmp_path):
+def test_update_plugins_config_file(tmp_path):
     """Verify that the SW saves an ordered
     dictionary in a toml file"""
     dict = {"w": "1", "t": "5", "a": "2", "j": "3"}
     order_dict = {"a": "2", "j": "3", "t": "5", "w": "1"}
     plugin_name = tmp_path / "test.toml"
 
-    update_plugin_file(dict, plugin_name)
-    assert order_dict == get_plugin_dict(plugin_name)
+    update_plugins_config_file(dict, plugin_name)
+    assert order_dict == load_plugins_config_file(plugin_name)
 
 
 def test_get_plugin_type_file_not_found():
@@ -91,16 +90,16 @@ def test_get_plugin_type_zip(tmp_path):
     assert PluginType.ZIP == get_plugin_type(plugin_path)
 
 
-def test_check_plugin_structure_dir_plugin_not_found(tmp_path):
+def test_check_plugin_structure_dir_toml_not_found(tmp_path):
     """Verify that the SW raises an error when
     the plugin.py is not present in the directory"""
     plugin_name = "test"
     plugin_type = PluginType.DIR
     plugin_path = create_plugins_files(plugin_name, tmp_path, plugin_type)
 
-    with pytest.raises(FileNotFoundError) as exc_info:
+    with pytest.raises(InvalidPluginError) as exc_info:
         check_plugin_structure(plugin_path, plugin_type)
-    assert str(exc_info.value) == f"File 'plugin.py' not found in '{plugin_name}'"
+    assert str(exc_info.value) == f"File 'plugin.toml' not found in '{plugin_name}'"
 
 
 def test_check_plugin_structure_dir_correct_plugin(tmp_path):
@@ -111,9 +110,10 @@ def test_check_plugin_structure_dir_correct_plugin(tmp_path):
     plugin_path = create_plugins_files(
         plugin_name, tmp_path, plugin_type, with_file=True
     )
-
-    act_name = check_plugin_structure(plugin_path, plugin_type)
-    assert act_name == plugin_name
+    act_name = check_plugin_structure(plugin_path, plugin_type)[0]
+    assert act_name["name"] == plugin_name
+    assert act_name["version"] == "1.0.0"
+    assert act_name["start"] == "plugin.py"
 
 
 def test_check_plugin_structure_zip_plugin_not_found(tmp_path):
@@ -125,8 +125,7 @@ def test_check_plugin_structure_zip_plugin_not_found(tmp_path):
     with pytest.raises(InvalidPluginError) as exc_info:
         check_plugin_structure(plugin_path, plugin_type)
     assert (
-        str(exc_info.value)
-        == f"File 'DIRECTORY/plugin.py' not found in '{plugin_path.name}'"
+        str(exc_info.value) == f"File 'plugin.toml' not found in '{plugin_path.name}'"
     )
 
 
@@ -139,8 +138,10 @@ def test_check_plugin_structure_zip_correct_plugin(tmp_path):
         plugin_name, tmp_path, plugin_type, with_file=True
     )
 
-    act_name = check_plugin_structure(plugin_path, plugin_type)
-    assert act_name == plugin_name
+    act_name = check_plugin_structure(plugin_path, plugin_type)[0]
+    assert act_name["name"] == plugin_name
+    assert act_name["version"] == "1.0.0"
+    assert act_name["start"] == "plugin.py"
 
 
 def test_check_plugin_structure_tar_plugin_not_found(tmp_path):
@@ -152,8 +153,7 @@ def test_check_plugin_structure_tar_plugin_not_found(tmp_path):
     with pytest.raises(InvalidPluginError) as exc_info:
         check_plugin_structure(plugin_path, plugin_type)
     assert (
-        str(exc_info.value)
-        == f"File 'DIRECTORY/plugin.py' not found in '{plugin_path.name}'"
+        str(exc_info.value) == f"File 'plugin.toml' not found in '{plugin_path.name}'"
     )
 
 
@@ -166,8 +166,10 @@ def test_check_plugin_structure_tar_correct_plugin(tmp_path):
         plugin_name, tmp_path, plugin_type, with_file=True
     )
 
-    act_name = check_plugin_structure(plugin_path, plugin_type)
-    assert act_name == plugin_name
+    act_name = check_plugin_structure(plugin_path, plugin_type)[0]
+    assert act_name["name"] == plugin_name
+    assert act_name["version"] == "1.0.0"
+    assert act_name["start"] == "plugin.py"
 
 
 def test_move_plugin_data_dir(tmp_path):
@@ -179,7 +181,7 @@ def test_move_plugin_data_dir(tmp_path):
     )
     dest_path = create_tmp_directory(tmp_path)
 
-    move_plugin_data(plugin_path, plugin_type, dest_path)
+    move_plugin_data(plugin_name, plugin_path, plugin_type, dest_path)
     assert (dest_path / plugin_name).exists()
 
 
@@ -192,7 +194,7 @@ def test_move_plugin_data_tar(tmp_path):
     )
     dest_path = create_tmp_directory(tmp_path)
 
-    move_plugin_data(plugin_path, plugin_type, dest_path)
+    move_plugin_data(plugin_name, plugin_path, plugin_type, dest_path)
     assert (dest_path / plugin_name).exists()
 
 
@@ -205,7 +207,7 @@ def test_move_plugin_data_zip(tmp_path):
     )
     dest_path = create_tmp_directory(tmp_path)
 
-    move_plugin_data(plugin_path, plugin_type, dest_path)
+    move_plugin_data(plugin_name, plugin_path, plugin_type, dest_path)
     assert (dest_path / plugin_name).exists()
 
 
@@ -224,7 +226,7 @@ def test_install_plugin_present_file(mocker, tmp_path):
     install_plugin(args)
     mockers.mock_dump_toml.assert_not_called()
     mockers.mock_print.assert_called_with(
-        f"Plugin {plugin_name} is already installed in the system"
+        f"{plugin_name} version 1.0.0 is already installed in the system"
     )
 
 
@@ -300,14 +302,6 @@ def test_install_plugin_zip(mocker, tmp_path):
     mockers.mock_print.assert_called_with(
         f"Plugin {plugin_name} was installed successfully"
     )
-
-
-def test_remove_plugin_dir(tmp_path):
-    """Verify that the SW removes the directory of a plugin"""
-    dest_path = create_tmp_directory(tmp_path)
-    assert dest_path.exists()
-    remove_plugin_dir("tmp", tmp_path)
-    assert not dest_path.exists()
 
 
 def test_remove_plugin_name_not_found(mocker):
@@ -432,8 +426,8 @@ def test_list_plugins_all(mocker):
 
     list_plugins(args)
     assert 3 == mockers.mock_print.call_count
-    mockers.mock_print.assert_any_call("plugin2    disabled  ")
-    mockers.mock_print.assert_any_call("plugin1    enabled   ")
+    mockers.mock_print.assert_any_call("plugin2    1.0.0      disabled  ")
+    mockers.mock_print.assert_any_call("plugin1    1.0.0      enabled   ")
 
 
 def test_list_plugins_enable(mocker):
@@ -444,7 +438,7 @@ def test_list_plugins_enable(mocker):
 
     list_plugins(args)
     assert 2 == mockers.mock_print.call_count
-    mockers.mock_print.assert_called_with(f"plugin1    enabled   ")
+    mockers.mock_print.assert_called_with(f"plugin1    1.0.0      enabled   ")
 
 
 def test_list_plugins_disable(mocker):
@@ -455,14 +449,17 @@ def test_list_plugins_disable(mocker):
 
     list_plugins(args)
     assert 2 == mockers.mock_print.call_count
-    mockers.mock_print.assert_called_with("plugin2    disabled  ")
+    mockers.mock_print.assert_called_with("plugin2    1.0.0      disabled  ")
 
 
 """Utilities used by the tests"""
 
 
 def get_fake_dict():
-    return {"plugin1": PluginState.ENABLE, "plugin2": PluginState.DISABLE}
+    return {
+        "plugin1": {"version": "1.0.0", "state": PluginState.ENABLE},
+        "plugin2": {"version": "1.0.0", "state": PluginState.DISABLE},
+    }
 
 
 def create_tmp_directory(tmp_path):
@@ -480,6 +477,15 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
         with plugin_file.open("w") as f:
             f.write("test")
 
+        toml_file = plugin_path / "plugin.toml"
+        with toml_file.open("w") as f:
+            f.write(
+                "[plugin]\n"
+                f'name = "{plugin_name}"\n'
+                'version = "1.0.0"\n'
+                'start = "plugin.py"\n'
+            )
+
     if plugin_type == PluginType.DIR:
         return tmp_path / plugin_name
 
@@ -494,9 +500,13 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
 
 def create_config_file(filepath):
     with filepath.open("w") as f:
-        f.write(f"[{PluginsConfig.KEY}]\n")
         for k, v in get_fake_dict().items():
-            f.write(f'{k} = "{v}"\n')
+            version, state = v["version"], v["state"]
+            f.write(
+                f"[{PluginsConfig.KEY}.{k}]\n"
+                f'version = "{version}"\n'
+                f'state = "{state}"\n'
+            )
 
 
 class MockArgs:
@@ -510,8 +520,10 @@ class MockArgs:
 class Mockers:
     def __init__(self, mocker):
         self.mock_print = mocker.patch("kit.commands.plugin.print")
-        self.mock_get_dict = mocker.patch("kit.commands.plugin.get_plugin_dict")
+        self.mock_get_dict = mocker.patch(
+            "kit.commands.plugin.load_plugins_config_file"
+        )
         self.mock_get_dict.return_value = get_fake_dict()
         self.mock_dump_toml = mocker.patch("kit.commands.plugin.dump_toml")
         self.mock_move_data = mocker.patch("kit.commands.plugin.move_plugin_data")
-        self.mock_remove_dir = mocker.patch("kit.commands.plugin.remove_plugin_dir")
+        self.mock_remove_dir = mocker.patch("kit.commands.plugin.rmtree")

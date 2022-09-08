@@ -53,6 +53,9 @@ def load_toml(file_name: PathType) -> dict:
     """Load a toml file and return its content as a dict"""
     file_path = Path(file_name).expanduser()
 
+    if not file_exists(file_path):
+        raise FileNotFoundError(f"File '{file_name}' not found")
+
     # Note: Path.resolve() cannot be used before checking Path.is_symlink()
     if file_path.is_symlink():
         raise TypeError(f"The  file {file_path.name} cannot be a symlink")

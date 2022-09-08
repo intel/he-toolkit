@@ -4,24 +4,26 @@
 """ This module provides utility functions for importing and registering subparsers.
 """
 from sys import modules
-from importlib.util import spec_from_file_location, module_from_spec
 from typing import List
+from importlib import import_module
+from importlib.util import spec_from_file_location, module_from_spec
 from kit.utils.constants import Constants, PluginsConfig, PluginState
 from kit.utils.tab_completion import get_plugins_by_state
 from kit.utils.typing import PathType
-from kit.utils.files import files_in_dir
+from kit.utils.files import files_in_dir, load_toml
 
 
 def register_subparser(subparsers) -> None:
     """Register surparsers"""
-    dir_comp_dict = {
-        Constants.HEKIT_ROOT_DIR / "kit": ["commands", "tools"],
-        PluginsConfig.ROOT_DIR: get_plugins_by_state(PluginState.ENABLE),
-    }
+    for func in discover_subparsers_kit(
+        ["commands", "tools"], Constants.HEKIT_ROOT_DIR / "kit"
+    ):
+        func(subparsers)
 
-    for directory, components in dir_comp_dict.items():
-        for func in discover_subparsers_from(components, directory):
-            func(subparsers)
+    for func in discover_subparsers_plugins(
+        get_plugins_by_state(PluginState.ENABLE), PluginsConfig.ROOT_DIR
+    ):
+        func(subparsers)
 
 
 def import_from_source_file(module_name, file_path):
@@ -34,19 +36,35 @@ def import_from_source_file(module_name, file_path):
     return module
 
 
-def discover_subparsers_from(module_dirs: List[str], kit_root: PathType):
+def discover_subparsers_plugins(module_dirs: List[str], kit_root: PathType):
+    """Import modules in module_dirs, and discover and return a generator of set_.*_subparser functions"""
+    try:
+        plugin_config = load_toml(PluginsConfig.FILE)[PluginsConfig.KEY]
+    except (FileNotFoundError, KeyError):
+        return
+
+    for module_dir in module_dirs:
+        fname = plugin_config[module_dir]["start"]
+        imported_module = import_from_source_file(
+            f"{fname[:-3]}", f"{kit_root}/{module_dir}/{fname}"
+        )
+        funcs = (
+            getattr(imported_module, funcname)
+            for funcname in dir(imported_module)
+            if funcname.startswith("set_") and funcname.endswith("_subparser")
+        )
+        yield from funcs
+
+
+def discover_subparsers_kit(module_dirs: List[str], kit_root: PathType):
     """Import modules in module_dirs, and discover and return a generator of set_.*_subparser functions"""
     for module_dir in module_dirs:
-        module_path = f"{kit_root}/{module_dir}"
         filenames = files_in_dir(
-            module_path, lambda f: f[0] != "_" and f.endswith(".py")
+            f"{kit_root}/{module_dir}", lambda f: f[0] != "_" and f.endswith(".py")
         )
-
         imported_modules = (
-            import_from_source_file(f"{fname[:-3]}", f"{module_path}/{fname}")
-            for fname in filenames
+            import_module(f"kit.{module_dir}.{fname[:-3]}") for fname in filenames
         )
-
         funcs = (
             getattr(imported_module, funcname)
             for imported_module in imported_modules
