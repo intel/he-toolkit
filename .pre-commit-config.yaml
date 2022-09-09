@@ -72,13 +72,13 @@ repos:
           pass_filenames: false
           files: docker/which-files.txt
           args: [docker/which-files.txt]
-        - id: mypy-expr
-          name: mypy-expr
+        - id: mypy-deployments
+          name: mypy-deployments
           entry: .github/scripts/run-mypy.sh
           language: script
           pass_filenames: false
           args:
-            - expr
+            - deployments
         - id: mypy-kit
           name: mypy-kit
           entry: .github/scripts/run-mypy.sh
@@ -94,7 +94,7 @@ repos:
           pass_filenames: false
           args:
             - kit
-            - expr
+            - deployments
         - id: bandit
           name: bandit
           entry: .github/scripts/run-bandit.sh

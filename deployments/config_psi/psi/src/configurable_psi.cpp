@@ -7,11 +7,10 @@
 #include <helib/helib.h>
 #include <helib/partialMatch.h>
 #include <helib/set.h>
+#include <io.h>
 
 #include <iostream>
 #include <type_traits>  // std::decay
-
-#include <io.h>
 
 using sharedContext = std::shared_ptr<helib::Context>;
 
@@ -196,7 +195,7 @@ int main(int argc, char* argv[]) {
       .positional()
       .arg("<pkFile>", cmdLineOpts.pkFilePath, "Public Key file.", nullptr)
       .arg("<tableFile>", cmdLineOpts.tableFilePath,
-          "File containing table description and query string.", nullptr)
+           "File containing table description and query string.", nullptr)
       .arg("<databaseFile>", cmdLineOpts.databaseFilePath, "Database file.",
            nullptr)
       .arg("<queryFile>", cmdLineOpts.queryFilePath, "Query file.", nullptr)

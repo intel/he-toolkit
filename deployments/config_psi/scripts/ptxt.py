@@ -20,7 +20,7 @@ def phi(m: int) -> int:
 def order_of_p(p: int, m: int) -> int:
     """The order of p in Z^*_m"""
     d = 1
-    while (p ** d) % m != 1:
+    while (p**d) % m != 1:
         d += 1
     return d
 
@@ -44,7 +44,7 @@ class Ptxt:
 
     def __init__(self, params: Params) -> None:
         """A list is used to store the ptxt.
-           Inputs are params and an encode function"""
+        Inputs are params and an encode function"""
         if not isinstance(params, Params):
             raise ValueError("params argument not type Params but type {type(params)}")
         self._params: Params = params

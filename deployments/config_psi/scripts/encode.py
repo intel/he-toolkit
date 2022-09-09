@@ -28,7 +28,7 @@ def int_to_poly(num: int, base: int, numof_coeffs: int) -> List[int]:
             coeff, num = divmod(num, pth)
             yield coeff
 
-    pds = (base ** i for i in reversed(range(numof_coeffs)))
+    pds = (base**i for i in reversed(range(numof_coeffs)))
     poly = list(coeffs(pds, num))
     if poly[0] >= base:
         raise ValueError(f"Integer cannot fit in {numof_coeffs} slot coeffs: {poly}")
@@ -68,7 +68,7 @@ class BaseFromAlphabet:
         converted: List[int] = [self.translation_table[c] for c in numstr]
         # recompose
         num_base_10: int = inner_prod(
-            converted, [self.len_alphabet ** i for i in reversed(range(len(numstr)))]
+            converted, [self.len_alphabet**i for i in reversed(range(len(numstr)))]
         )
         # decompose
         return int_to_poly(num_base_10, base=self.to_base, numof_coeffs=self.size)
@@ -84,12 +84,12 @@ def grouper(iterable, group_size: int, fillvalue=None):
 
 def transpose(in_list: List, rows: int, cols: int) -> List:
     """Transpose list order. List ls is in column major.
-       rows and cols are of the current layout in the list."""
+    rows and cols are of the current layout in the list."""
     return [in_list[c * rows + r] for r in range(rows) for c in range(cols)]
 
 
 def read_txt_worth(data_list, nslots: int) -> Generator:
-    """Reads up to a txt worth of entries (== number of slots) of """
+    """Reads up to a txt worth of entries (== number of slots) of"""
     for txt_worth in grouper(data_list, nslots):
         yield [item for item in txt_worth if item is not None]
 
@@ -154,12 +154,12 @@ class Encoder:
 
     def __init__(self, config: Config, encoding_functions: Dict[str, Callable]) -> None:
         self.params: Params = config.params
-        self.column_encodings: Dict[
-            str, str
-        ] = config.encodings if config.encodings is not None else {}
-        self.column_composites: Dict[
-            str, int
-        ] = config.composites if config.composites is not None else {}
+        self.column_encodings: Dict[str, str] = (
+            config.encodings if config.encodings is not None else {}
+        )
+        self.column_composites: Dict[str, int] = (
+            config.composites if config.composites is not None else {}
+        )
         self.repeat: int = config.segments  # segment divisor
         self.encoding_functions = encoding_functions
 
@@ -244,7 +244,7 @@ def parse_args(argv: List[str] = None):
     parser.add_argument(
         "--config",
         type=Config.from_toml,
-        default=None,
+        default="config.toml",
         help="set ptxt params and composite columns",
     )
     return parser.parse_args(argv) if argv else parser.parse_args()

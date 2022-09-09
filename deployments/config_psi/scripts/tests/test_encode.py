@@ -18,7 +18,7 @@ def test_int_to_poly():
     num = 121
     p = 5
     d = 3
-    powers_of_p = [p ** i for i in reversed(range(d))]
+    powers_of_p = [p**i for i in reversed(range(d))]
     coeffs = int_to_poly(num, p, d)
     assert len(powers_of_p) == len(coeffs)
     assert coeffs == [4, 4, 1]  # 4 * 5^2 + 4 * 5 + 1 == 121
@@ -302,7 +302,7 @@ def test_vector_p41_m41(test_vector_p41_m41_translation_table):
     def change_base(coeffs, len_alphabet):
         print(coeffs, file=sys.stderr, end=" ")
         number = inner_prod(
-            coeffs, [len_alphabet ** i for i in reversed(range(len(coeffs)))]
+            coeffs, [len_alphabet**i for i in reversed(range(len(coeffs)))]
         )
         print(number, file=sys.stderr, end=" ")
         poly = int_to_poly(number, base=41, numof_coeffs=2)

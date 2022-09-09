@@ -63,7 +63,7 @@ def parse_args(argv: List[str] = None):
     parser.add_argument(
         "--config",
         type=partial(Config.from_toml, params_only=True),
-        default=None,
+        default="config.toml",
         help="set ptxt params and composite columns",
     )
     parser.add_argument(
