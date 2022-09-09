@@ -1,8 +1,8 @@
 # Introduction to third party plugins
-The `plugins` command can be used to integrate third party
-plugins in the Intel HE Toolkit. However to be installed in
-the system, the plugins must fulfill the expected format as
-it is explained in section [Creating a new plugin](#creating-a-new-plugin).
+The `plugins` command can be used to integrate third party plugins 
+that expand the functionalities of the Intel HE Toolkit. However, 
+to be installed in the system, the plugins must fulfill the expected 
+format as it is explained in section [Creating a new plugin](#creating-a-new-plugin).
 
 ## Plugins sub-commands
 The option `-h` can be used to get details about the arguments
