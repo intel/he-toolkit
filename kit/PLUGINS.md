@@ -4,6 +4,20 @@ that expand the functionalities of the Intel HE Toolkit. However,
 to be installed in the system, the plugins must fulfill the expected
 format as explained in section [Creating a new plugin](#creating-a-new-plugin).
 
+
+## Contents
+- [Introduction to third party plugins](#introduction-to-third-party-plugins)
+  - [Plugins sub-commands](#plugins-sub-commands)
+  - [Usage](#usage)
+     - [list](#list)
+     - [install](#install)
+     - [remove](#remove)
+     - [enable and disable](#enable-and-disable)
+  - [Creating a new plugin](#creating-a-new-plugin)
+     - [TOML file](#toml-file)
+     - [Main python file](#main-python-file)
+     - [Main directory](#main-directory)
+
 ## Plugins sub-commands
 The option `-h` can be used to get details about the arguments
 and usage of each sub-command.
