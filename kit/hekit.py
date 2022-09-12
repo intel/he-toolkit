@@ -9,7 +9,7 @@ import sys
 
 from os import geteuid
 from sys import stderr, exit as sys_exit
-from argparse import ArgumentParser
+from argparse import ArgumentParser,HelpFormatter
 from pathlib import Path
 from typing import Tuple
 
@@ -28,8 +28,9 @@ def parse_cmdline() -> Tuple:
     # resolve first to follow the symlink, if any
     hekit_root_dir = Path(__file__).resolve().parent.parent
 
+    formatter = lambda prog: HelpFormatter(prog,max_help_position=25)
     # create the top-level parser
-    parser = ArgumentParser(prog="hekit")
+    parser = ArgumentParser(prog="hekit",formatter_class=formatter)
     parser.set_defaults(fn=None)
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolkit version"
@@ -42,7 +43,9 @@ def parse_cmdline() -> Tuple:
     )
 
     # create subparsers for each command
-    subparsers = parser.add_subparsers(help="sub-command help")
+    subparsers = parser.add_subparsers(
+    title="Sub Commands", description="Sub Commands List")
+
 
     for func in discover_subparsers_from(["commands", "tools"], hekit_root_dir / "kit"):
         try:

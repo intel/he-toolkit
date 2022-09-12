@@ -104,7 +104,7 @@ def create_new_project(args) -> None:
 
 def set_new_subparser(subparsers, hekit_root_dir):
     """create the parser for the 'new' command"""
-    parser_new = subparsers.add_parser("new", description="create a new project")
+    parser_new = subparsers.add_parser("new", help = "Create a new project", description="create a new project")
     parser_new.add_argument("name", type=validate_input, help="project name")
     parser_new.add_argument(
         "--directory",
