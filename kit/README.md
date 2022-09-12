@@ -124,9 +124,9 @@ Afterwards source your shell initialization file e.g. `~/.bashrc`. Now you can
 run the `hekit` commands from anywhere.
 
 Also, the `init` command can be executed with `--default-config` flag. This
-will create a directory `~/.hekit` in the user's home directory and create the
-`default.config`.  This directory will be where all components built and
-installed by `hekit` will be kept.
+will create a directory `~/.hekit` in the user's home directory with `default.config`
+and `plugins/plugins.toml` files.  This directory will be used to store all components
+and third party plugins installed by `hekit`.
 ```bash
 cd <he-toolkit-root-directory>
 ./hekit init --default-config
