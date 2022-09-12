@@ -1,7 +1,8 @@
 # Introduction to third party plugins
-The `plugins` command can be used to integrate third party plugins 
-that expand the functionalities of the Intel HE Toolkit. However, 
-to be installed in the system, the plugins must fulfill the expected 
+The `plugins` command can be used to integrate third party plugins
+that expand the functionalities of the Intel HE Toolkit. Currently,
+the program can install plugins stored in a directory or in a archive
+file as zip or tarball file. A valid plugin must fulfill the expected
 format as it is explained in section [Creating a new plugin](#creating-a-new-plugin).
 
 ## Plugins sub-commands
@@ -57,7 +58,7 @@ hekit plugins remove --all
 
 #### enable and disable
 After installing a plugin, its default state is enabled. To keep
-the plugin in the system and disable its functionality, execute
+the plugin in the system but disabling its functionality, execute
 the following command
 ```bash
 hekit plugins disable plugin-name
@@ -79,9 +80,12 @@ MyPlugin
     |- plugin.toml
 ```
 
+For delivering a plugin in zip or tarball format, a common file
+packaging utility must be applied to the previous structure.
+
 ### TMOL file
-This file must be named as `plugin.toml`. It defines the settings 
-of the plugin as name, version and entry point, as shown in the 
+This file must be named as `plugin.toml`. It defines the settings
+of the plugin as name, version and entry point, as shown in the
 following example:
 ```bash
 [plugin]
@@ -92,13 +96,13 @@ start = "new-plugin.py"
 
 ### Main python file
 This file has the logic to start the execution of the functionality
-provided by the plugin, therefore its name must be equal to the value 
+provided by the plugin, therefore its name must be equal to the value
 of `start` defined in the TOML file.
 
-In order to be integrated as an valid element of the intel HE Toolkit, 
-the file must have a function that its name must begin and end with `set_` 
-and `\_subparser`, respectively. About its content, it must define the 
-arguments of the command, using [API argparse](https://docs.python.org/3/library/argparse.html#) 
+In order to be integrated as an valid element of the intel HE Toolkit,
+this file must have a function that its name must begin and end with
+`set_` and `\_subparser`, respectively. About its content, it must define
+the arguments of the command, using [API argparse](https://docs.python.org/3/library/argparse.html#),
 as shown in the next example
 ```python
 def set_TBD_subparser(subparsers):
@@ -114,8 +118,8 @@ def set_TBD_subparser(subparsers):
 ```
 
 The parameter `fn` of the function `set_defaults` must be set to the
-function that implements the entry point of the functionality of the
-plugin and uses the arguments defined in the previous step.
+function that implements the entry point of the plugin, therefore, it
+uses the arguments defined in the previous step.
 ```python
 def NEW_FUNCTIONALITY(args) -> None:
     """Executes new functionality"""
