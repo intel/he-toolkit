@@ -310,10 +310,10 @@ described the functionality of the new command.
 
 * Generic utilities or helper functions that can be used for several commands
   should be in [utils](kit/utils).
-  
+
 ## Third Party Plugins
-Intel HE Toolkit provides the utilities to handle third party plugins that can 
-be installed in the system to add new HE funtionalities. See [PLUGINS](./kit/PLUGINS.md)
+Intel HE Toolkit provides the utilities to handle third party plugins that can
+be installed in the system to add new HE functionalities. See [PLUGINS](./kit/PLUGINS.md)
 for details about how to interact with them or create new plugins,
 
 
