@@ -1,8 +1,8 @@
 # Introduction to third party plugins
-The `plugins` command can be used to integrate third party plugins 
-that expand the functionalities of the Intel HE Toolkit. However, 
-to be installed in the system, the plugins must fulfill the expected 
-format as it is explained in section [Creating a new plugin](#creating-a-new-plugin).
+The `plugins` command can be used to integrate third party plugins
+that expand the functionalities of the Intel HE Toolkit. However,
+to be installed in the system, the plugins must fulfill the expected
+format as explained in section [Creating a new plugin](#creating-a-new-plugin).
 
 ## Plugins sub-commands
 The option `-h` can be used to get details about the arguments
@@ -24,7 +24,7 @@ In order to check all plugins in the system, execute the following command
 hekit plugins list
 ```
 
-Also, the argument `--state` can be used to filter the plugins
+Moreover, the argument `--state` can be used to filter the plugins
 by state, for instance
 ```bash
 hekit plugins list --state disabled
@@ -70,35 +70,35 @@ hekit plugins enable plugin-name
 
 ## Creating a new plugin
 The simplest version of a plugin must include a main directory
-that contains a TMOL file and at least one python file, as shown
+that contains a TOML file and at least one python file, as shown
 in the following example
 
 ```
-MyPlugin
+my-plugin
     |- new-plugin.py
     |- plugin.toml
 ```
 
-### TMOL file
-This file must be named as `plugin.toml`. It defines the settings 
-of the plugin as name, version and entry point, as shown in the 
+### TOML file
+This file must be named as `plugin.toml`. It defines the settings
+of the plugin as name, version and entry point, as shown in the
 following example:
 ```bash
 [plugin]
-name = "MyPlugin"
+name = "my-plugin"
 version = "1.1.0"
 start = "new-plugin.py"
 ```
 
 ### Main python file
 This file has the logic to start the execution of the functionality
-provided by the plugin, therefore its name must be equal to the value 
+provided by the plugin, therefore its name must be equal to the value
 of `start` defined in the TOML file.
 
-In order to be integrated as an valid element of the intel HE Toolkit, 
-the file must have a function that its name must begin and end with `set_` 
-and `\_subparser`, respectively. About its content, it must define the 
-arguments of the command, using [API argparse](https://docs.python.org/3/library/argparse.html#) 
+In order to be integrated as an valid element of the intel HE Toolkit,
+the file must have a function that its name must begin and end with `set_`
+and `\_subparser`, respectively. The python file must define the
+arguments of the command using [API argparse](https://docs.python.org/3/library/argparse.html#)
 as shown in the next example
 ```python
 def set_TBD_subparser(subparsers):
@@ -126,6 +126,6 @@ def NEW_FUNCTIONALITY(args) -> None:
 ```
 
 ### Main directory
-It must be named with the value of `name` defined in the TOML file.
-This name must be an unique label that will be used to identify
-the plugin in the system.
+The plugin root directory must be named with the value of `name` defined in the
+TOML file.  This name must be an unique label that will be used to identify the
+plugin in the system.
