@@ -36,6 +36,9 @@ the system executing the following command
 ```bash
 hekit plugins install plugin-file
 ```
+The `plugin-file` can be a directory, a zip file, or a tarball file.
+Python understands most compression schemes used for tarballs. Both tarballs and
+zip files can optionally contain more than one plugin directories.
 
 Additionally, the argument `--force` can be used to update the
 version without further interaction.
@@ -80,7 +83,7 @@ my-plugin
 ```
 
 ### TOML file
-This file must be named as `plugin.toml`. It defines the settings
+The TOML file must be named as `plugin.toml`. It defines the settings
 of the plugin as name, version and entry point, as shown in the
 following example:
 ```bash
@@ -91,7 +94,7 @@ start = "new-plugin.py"
 ```
 
 ### Main python file
-This file has the logic to start the execution of the functionality
+The main python file has the logic to start the execution of the functionality
 provided by the plugin, therefore its name must be equal to the value
 of `start` defined in the TOML file.
 
@@ -126,6 +129,6 @@ def NEW_FUNCTIONALITY(args) -> None:
 ```
 
 ### Main directory
-The plugin root directory must be named with the value of `name` defined in the
-TOML file.  This name must be an unique label that will be used to identify the
-plugin in the system.
+The plugin root directory must have the same name as the plugin, thus it must
+be the same as the `name` value defined in the TOML file.  This name must be an
+unique label that will be used to identify the plugin in the system.
