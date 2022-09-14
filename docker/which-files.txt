@@ -114,6 +114,7 @@ he-samples/sample-kernels/test/test_seal_bfv_kernel_executor.cpp
 he-samples/sample-kernels/test/test_seal_ckks_kernel_executor.cpp
 he-samples/sample-kernels/test/test_util.h
 hekit
+kit/PLUGINS.md
 kit/README.md
 kit/__init__.py
 kit/commands/__init__.py
