@@ -8,7 +8,11 @@ pytest-mock
 # Linting
 pylint
 bandit
+cpplint
 
 # Type analysis
 types-toml
 mypy
+
+# Formatting
+black
