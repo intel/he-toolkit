@@ -124,26 +124,28 @@ the following example template
 ```python
 def set_TBD_subparser(subparsers):
     """create the parser for the TDB plugin"""
-    parser_TBD = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
+    parser_TBD = subparsers.add_parser("TBD", description="ADD-SUBPARSER-DESCRIPTION")
     parser_TBD.add_argument(
         "ARG1", description="ADD-ARG-DESCRIPTION"
     )
     parser_TBD.add_argument(
         "ARG2", description="ADD-ARG-DESCRIPTION"
     )
-    parser_TBD.set_defaults(fn=NEW_FUNCTIONALITY)
+    parser_TBD.set_defaults(fn=TBD_NEW_FUNCTIONALITY)
 ```
 
-The parameter `fn` of the function `set_defaults` must be set to the
-function that implements the entry point of the plugin, therefore, it
-uses the arguments defined in the previous step.
+In the previous code, `TBD_NEW_FUNCTIONALITY` (parameter `fn` of `set_defaults`)
+is the function that implements the entry point of the plugin. Therefore, this
+function must use the plugin's arguments, for instance:
 ```python
-def NEW_FUNCTIONALITY(args) -> None:
+def TBD_NEW_FUNCTIONALITY(args) -> None:
     """Executes new functionality"""
     if(args.ARG1)
-        pass
-    elif(args.ARG2)
-        pass
+        # logic for ARG1
+        ...
+    if(args.ARG2)
+        # logic for ARG2
+        ...
 ```
 
 ### Main directory
