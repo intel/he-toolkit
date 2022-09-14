@@ -11,7 +11,7 @@ from typing import Dict, List
 from zipfile import is_zipfile, ZipFile
 from toml import loads as toml_loads
 from kit.utils.constants import PluginsConfig, PluginState
-from kit.utils.files import load_toml, dump_toml
+from kit.utils.files import list_dirs, load_toml, dump_toml
 from kit.utils.subparsers import validate_input
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
@@ -284,6 +284,36 @@ def list_plugins(args) -> None:
         )
 
 
+def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
+    """Synchronize the information regading the plugins in the system"""
+    root_dir = PluginsConfig.ROOT_DIR
+    config_dict = {}
+
+    for plugin_dir in list_dirs(root_dir):
+        plugin_path = root_dir / plugin_dir
+        # Verify TOML file exists
+        toml_file = plugin_path / "plugin.toml"
+        if not Path(toml_file).exists():
+            raise FileNotFoundError(f"plugin.toml not found in {plugin_path}")
+
+        plugin_settings_dict = load_toml(toml_file)["plugin"]
+
+        # Verify main python file exists
+        python_file = plugin_path / plugin_settings_dict["start"]
+        if not Path(python_file).exists():
+            raise FileNotFoundError(
+                f"{plugin_settings_dict['start']} not found in {plugin_path}"
+            )
+
+        config_dict[plugin_settings_dict["name"]] = {
+            "version": plugin_settings_dict["version"],
+            "state": PluginState.ENABLE,
+            "start": plugin_settings_dict["start"],
+        }
+
+    update_plugins_config_file(config_dict)
+
+
 def set_plugin_subparser(subparsers) -> None:
     """Create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
@@ -352,3 +382,10 @@ def set_plugin_subparser(subparsers) -> None:
         "plugin", type=validate_input, help="plugin name"
     ).completer = plugins_enable_completer
     parser_disable.set_defaults(fn=update_plugin_state, state=PluginState.DISABLE)
+
+    # refresh options
+    parser_list = subparsers_plugin.add_parser(
+        "refresh",
+        description="synchronize the information regading the plugins in the system",
+    )
+    parser_list.set_defaults(fn=refresh_plugins)

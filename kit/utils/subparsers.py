@@ -3,6 +3,7 @@
 
 """ This module provides utility functions for importing and registering subparsers.
 """
+from pathlib import Path
 from sys import modules
 from typing import List
 from importlib import import_module
@@ -45,9 +46,10 @@ def discover_subparsers_plugins(module_dirs: List[str], kit_root: PathType):
 
     for module_dir in module_dirs:
         fname = plugin_config[module_dir]["start"]
-        imported_module = import_from_source_file(
-            f"{fname[:-3]}", f"{kit_root}/{module_dir}/{fname}"
-        )
+        expected_file = f"{kit_root}/{module_dir}/{fname}"
+        if not Path(expected_file).exists():
+            continue
+        imported_module = import_from_source_file(f"{fname[:-3]}", expected_file)
         funcs = (
             getattr(imported_module, funcname)
             for funcname in dir(imported_module)
