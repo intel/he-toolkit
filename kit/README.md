@@ -27,7 +27,8 @@ environment to evaluate homomorphic encryption technology.
 `--version`: Displays Intel HE toolkit version.
 
 ## Commands
-The option `-h` can be used to get details about the arguments and usage of each command.
+The option `-h` can be used to get details about the arguments and usage of
+each command.
 
 | Command | Description | Usage
 |-----------|-----------|-----------|
@@ -51,12 +52,13 @@ be available, for instance:
 ```
 repo_location = "~/.hekit/components"
 ```
-The commands `list`, `fetch`, `build`, `install` and `remove` uses a
-default configuration file located in `~/.hekit/default.config`. However, the argument
-`--config CONFIG_FILE` can be used to define the location of non-default configuration file
+The commands `list`, `fetch`, `build`, `install` and `remove` use a
+default configuration file located in `~/.hekit/default.config`. However, the
+argument `--config CONFIG_FILE` can be used to define the location of a
+non-default configuration file.
 
-The toolkit provides [default.config](../default.config) file that can be used
-as template and it is a valid option for `--config` argument.
+The toolkit provides a [default.config](../default.config) file that can be
+used as a template and it is a valid option for the `--config` argument.
 
 ### Recipe file
 The `hekit` tool relies on recipe files written in TOML to perform its `fetch`,
@@ -123,10 +125,11 @@ cd <he-toolkit-root-directory>
 Afterwards source your shell initialization file e.g. `~/.bashrc`. Now you can
 run the `hekit` commands from anywhere.
 
-Also, the `init` command can be executed with `--default-config` flag. This
-will create a directory `~/.hekit` in the user's home directory with `default.config`
-and `plugins/plugins.toml` files.  This directory will be used to store all components
-and third party plugins installed by `hekit`.
+Additionally, the `init` command can be executed with the `--default-config`
+flag. This will create the directory `~/.hekit` in the user's home directory
+with the `default.config` and `plugins/plugins.toml` files.  This directory
+will be used to store all components and third party plugins installed by
+`hekit`.
 ```bash
 cd <he-toolkit-root-directory>
 ./hekit init --default-config
@@ -145,32 +148,34 @@ libraries.
 hekit install ./recipes/default.toml
 ```
 
-Using `fetch` and `build` commands, the user has access to perform specific
-actions. For example, for fetching libraries
+Using the `fetch` and `build` commands, the user can direct `hekit` to perform
+specific actions up to the one specified. For example, for fetching libraries
 ```bash
 hekit fetch ./recipes/examples.toml --recipe_arg "toolkit-path=~/he-toolkit"
 ```
 
-By default, if actions as build or install were executed successfully,
+By default, if actions such as build or install were executed successfully,
 the next time that the command is executed, they are going to be skipped.
 For re-executing actions such as build or install, the flag `--force` must be
-set.
+set
 ```bash
 hekit build ./recipes/examples.toml --force
 ```
 
 ### remove
-In order to uninstall a specific instance, execute the `remove` command with the component and instance name
+In order to uninstall a specific instance, execute the `remove` command with
+the component and instance name
 ```bash
 hekit remove hexl 1.2.3
 ```
 
-For uninstalling all the instances of a component, execute the `remove` command with only the component name
+For uninstalling all instances of a component, execute the `remove` command
+with only the component name
 ```bash
 hekit remove hexl
 ```
 
-Also, to uninstall all components, use the following command
+Lastly, it is possible to uninstall all components using the following command
 ```bash
 hekit remove --all
 ```
@@ -222,7 +227,7 @@ The following actions should be completed to build the new project:
   created by the command.
 
 ## Tab completion
-As an optional feature, the user is able to enable tab completion feature using
+As an optional feature, the user is able to enable tab completion using the
 [argcomplete](https://kislyuk.github.io/argcomplete/) library.
 
 As described in its documentation, the following actions are required to
@@ -232,9 +237,9 @@ enable this functionality
   pip install argcomplete
   ```
 
-- If you have used `hekit init` command than you are set to go. Otherwise, if
-  you would like to set it manually adding the following line in your shell
-  initialization script e.g. `.bashrc` file.
+- If you have used the `hekit init` command then you are ready to start using
+  the feature. Otherwise, if you would like to set it manually add the
+  following line to your shell initialization script e.g. `.bashrc` file
   ```
   eval "$(register-python-argcomplete hekit.py)"
   ```
