@@ -339,29 +339,34 @@ def list_plugins(args) -> None:
 def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
     """Synchronize the information regading the plugins on the system"""
     root_dir = PluginsConfig.ROOT_DIR
-    config_dict = {}
 
-    for plugin_dir in list_dirs(root_dir):
-        plugin_path = root_dir / plugin_dir
-        # Verify TOML file exists
-        toml_file = plugin_path / "plugin.toml"
-        if not Path(toml_file).exists():
-            raise FileNotFoundError(f"plugin.toml not found in {plugin_path}")
+    def objs():
+        for plugin_dir in list_dirs(root_dir):
+            plugin_path = root_dir / plugin_dir
+            # Verify TOML file exists
+            toml_file = plugin_path / "plugin.toml"
+            if not Path(toml_file).exists():
+                raise FileNotFoundError(f"plugin.toml not found in {plugin_path}")
 
-        plugin_settings_dict = load_toml(toml_file)["plugin"]
+            plugin_settings_dict = load_toml(toml_file)["plugin"]
 
-        # Verify main python file exists
-        python_file = plugin_path / plugin_settings_dict["start"]
-        if not Path(python_file).exists():
-            raise FileNotFoundError(
-                f"{plugin_settings_dict['start']} not found in {plugin_path}"
+            # Verify main python file exists
+            python_file = plugin_path / plugin_settings_dict["start"]
+            if not Path(python_file).exists():
+                raise FileNotFoundError(
+                    f"{plugin_settings_dict['start']} not found in {plugin_path}"
+                )
+            name, version, start = (
+                plugin_settings_dict["name"],
+                plugin_settings_dict["version"],
+                plugin_settings_dict["start"],
             )
+            yield name, version, start
 
-        config_dict[plugin_settings_dict["name"]] = {
-            "version": plugin_settings_dict["version"],
-            "state": PluginState.ENABLE,
-            "start": plugin_settings_dict["start"],
-        }
+    config_dict = {
+        name: {"version": version, "state": PluginState.ENABLE, "start": start}
+        for name, version, start in objs()
+    }
 
     update_plugins_config_file(config_dict)
 
