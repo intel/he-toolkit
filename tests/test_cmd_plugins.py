@@ -224,7 +224,7 @@ def test_install_plugin_present_file(mocker, tmp_path):
     mockers = Mockers(mocker)
 
     install_plugin(args)
-    # mockers.mock_dump_toml.assert_not_called()
+    mockers.mock_dump_toml.assert_not_called()
     mockers.mock_print.assert_called_with(
         f"{plugin_name} version 1.0.0 is already installed on the system"
     )
@@ -515,7 +515,7 @@ class MockArgs:
         self.plugin = "plugin1"
         self.force = False
         self.all = False
-        self.he_sub_commands = {}
+        self.hekit_parsers_list = {}
 
 
 class Mockers:

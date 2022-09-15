@@ -10,10 +10,10 @@ from typing import Dict, List
 from zipfile import is_zipfile, ZipFile
 from pathlib import Path
 from toml import loads as toml_loads
-from kit.utils.constants import PluginsConfig, PluginState
+from kit.utils.constants import Constants, PluginsConfig, PluginState
 from kit.utils.files import list_dirs, load_toml, dump_toml
 from kit.utils.subparsers import (
-    get_plugin_main_argument,
+    get_plugin_arg_choices,
     validate_input,
 )
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
@@ -179,31 +179,37 @@ def remove_plugin_data(
         rmtree(plugin_path)
 
 
-def is_plugin_unique(
-    plugin_name: str, is_plugin_present: bool, he_sub_commands: List[str]
+def are_plugin_args_correct(
+    plugin_name: str, is_plugin_present: bool, hekit_parsers_list: List[str]
 ) -> bool:
-    """Verify that the plugin argument is unique"""
-    plugin_argument = get_plugin_main_argument(plugin_name)
+    """Verify that trser_choices_he plugin argument is unique"""
+    arg_choices_list = get_plugin_arg_choices(plugin_name)
 
-    # Verify if argument is reserve word
-    if plugin_argument in {
-        "check-dependencies",
-        "docker-build",
-        "init",
-        "install",
-        "build",
-        "fetch",
-        "list",
-        "new",
-        "plugins",
-        "remove",
-        "algebras",
-        "gen-primes",
-    }:
+    # verify it contains only one choice
+    if len(arg_choices_list) != 1:
+        print(f"{plugin_name} cannot be installed because its arguments are wrong")
         return False
 
-    # Verify if argument is unique
-    if not is_plugin_present and plugin_argument in he_sub_commands:
+    # verify the prog name of the parser is equal to plugin name
+    plugin_arg_choice = arg_choices_list[0]
+    if plugin_arg_choice != plugin_name:
+        print(
+            f"Wrong argument definition, found '{plugin_arg_choice}' instead '{plugin_name}'"
+        )
+        return False
+
+    # Verify argument is a reserve word
+    if plugin_arg_choice in Constants.HEKIT_COMMANDS:
+        print(
+            f"Wrong argument definition, '{plugin_arg_choice}' is a reserved HE Toolkit command"
+        )
+        return False
+
+    # Verify it is not a new version and the argument is unique
+    if not is_plugin_present and plugin_arg_choice in hekit_parsers_list:
+        print(
+            f"Wrong argument definition, '{plugin_arg_choice}' is already used by another plugin"
+        )
         return False
 
     return True
@@ -245,9 +251,11 @@ def install_plugin(args) -> None:
 
         move_plugin_data(plugin_name, plugin_path, plugin_type)
 
-        # verify that the plugin argument is unique
-        if not is_plugin_unique(plugin_name, is_plugin_present, args.he_sub_commands):
-            print(f"{plugin_name} cannot be installed because it is not unique")
+        # verify the plugin arguments
+        if not are_plugin_args_correct(
+            plugin_name, is_plugin_present, args.hekit_parsers_list
+        ):
+            remove_plugin_data(plugin_name)
             continue
 
         config_dict[plugin_name] = {
@@ -338,9 +346,9 @@ def list_plugins(args) -> None:
 
 def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
     """Synchronize the information regading the plugins on the system"""
-    root_dir = PluginsConfig.ROOT_DIR
 
-    def objs():
+    def get_plugin_settings():
+        root_dir = PluginsConfig.ROOT_DIR
         for plugin_dir in list_dirs(root_dir):
             plugin_path = root_dir / plugin_dir
             # Verify TOML file exists
@@ -349,23 +357,21 @@ def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
                 raise FileNotFoundError(f"plugin.toml not found in {plugin_path}")
 
             plugin_settings_dict = load_toml(toml_file)["plugin"]
-
-            # Verify main python file exists
-            python_file = plugin_path / plugin_settings_dict["start"]
-            if not Path(python_file).exists():
-                raise FileNotFoundError(
-                    f"{plugin_settings_dict['start']} not found in {plugin_path}"
-                )
             name, version, start = (
                 plugin_settings_dict["name"],
                 plugin_settings_dict["version"],
                 plugin_settings_dict["start"],
             )
+
+            # Verify main python file exists
+            python_file = plugin_path / start
+            if not Path(python_file).exists():
+                raise FileNotFoundError(f"{start} not found in {plugin_path}")
             yield name, version, start
 
     config_dict = {
         name: {"version": version, "state": PluginState.ENABLE, "start": start}
-        for name, version, start in objs()
+        for name, version, start in get_plugin_settings()
     }
 
     update_plugins_config_file(config_dict)
@@ -403,7 +409,7 @@ def set_plugin_subparser(subparsers) -> None:
         "--force", action="store_true", help="forces the installation process"
     )
     parser_install.set_defaults(
-        fn=install_plugin, he_sub_commands=subparsers.choices.keys()
+        fn=install_plugin, hekit_parsers_list=subparsers.choices.keys()
     )
 
     # remove options
