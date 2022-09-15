@@ -4,15 +4,18 @@
 """This module handles the usage of third party plugins"""
 
 from enum import Enum
-from pathlib import Path
 from shutil import rmtree, copytree
 from tarfile import is_tarfile, open as tar_open
 from typing import Dict, List
 from zipfile import is_zipfile, ZipFile
+from pathlib import Path
 from toml import loads as toml_loads
 from kit.utils.constants import PluginsConfig, PluginState
 from kit.utils.files import list_dirs, load_toml, dump_toml
-from kit.utils.subparsers import validate_input
+from kit.utils.subparsers import (
+    get_plugin_main_argument,
+    validate_input,
+)
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 PluginSettings = Dict[str, str]
@@ -167,6 +170,45 @@ def move_plugin_data(
             f.extractall(dest_path, zip_items)
 
 
+def remove_plugin_data(
+    plugin_name: str, dest_path: Path = PluginsConfig.ROOT_DIR
+) -> None:
+    """Remove a plugin folder if exists"""
+    plugin_path = dest_path / plugin_name
+    if Path(plugin_path).exists():
+        rmtree(plugin_path)
+
+
+def is_plugin_unique(
+    plugin_name: str, is_plugin_present: bool, he_sub_commands: List[str]
+) -> bool:
+    """Verify that the plugin argument is unique"""
+    plugin_argument = get_plugin_main_argument(plugin_name)
+
+    # Verify if argument is reserve word
+    if plugin_argument in {
+        "check-dependencies",
+        "docker-build",
+        "init",
+        "install",
+        "build",
+        "fetch",
+        "list",
+        "new",
+        "plugins",
+        "remove",
+        "algebras",
+        "gen-primes",
+    }:
+        return False
+
+    # Verify if argument is unique
+    if not is_plugin_present and plugin_argument in he_sub_commands:
+        return False
+
+    return True
+
+
 def install_plugin(args) -> None:
     """Install third party plugins"""
     config_dict = load_plugins_config_file()
@@ -177,36 +219,46 @@ def install_plugin(args) -> None:
     for plugin_settings_dict in plugin_settings_list:
         plugin_name = plugin_settings_dict["name"]
         plugin_version = plugin_settings_dict["version"]
+        is_plugin_present = plugin_name in config_dict.keys()
+
         if args.force:
             # remove the present version
-            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
-        elif plugin_name in config_dict.keys():
-            # check the versions because the plugin is in the system
+            remove_plugin_data(plugin_name)
+        elif is_plugin_present:
+            # check the versions because the plugin is on the system
             config_version = config_dict[plugin_name]["version"]
             if config_version == plugin_version:
                 print(
-                    f"{plugin_name} version {plugin_version} is already installed in the system"
+                    f"{plugin_name} version {plugin_version} is already installed on the system"
                 )
                 continue
             # Installing a different version
             user_answer = input(
                 f"You are trying to install {plugin_name} version {plugin_version}.\n"
-                f"However the version {config_version} was found in the system.\n"
+                f"However the version {config_version} was found on the system.\n"
                 "Do you want to remove the present version and continue? (y/n) "
             )
             if user_answer not in ("y", "Y"):
                 continue
             # remove the present version
-            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+            remove_plugin_data(plugin_name)
 
         move_plugin_data(plugin_name, plugin_path, plugin_type)
+
+        # verify that the plugin argument is unique
+        if not is_plugin_unique(plugin_name, is_plugin_present, args.he_sub_commands):
+            print(f"{plugin_name} cannot be installed because it is not unique")
+            continue
+
         config_dict[plugin_name] = {
             "version": plugin_version,
             "state": PluginState.ENABLE,
             "start": plugin_settings_dict["start"],
         }
-        update_plugins_config_file(config_dict)
+
         print(f"Plugin {plugin_name} was installed successfully")
+
+    update_plugins_config_file(config_dict)
 
 
 def remove_plugin(args) -> None:
@@ -222,7 +274,7 @@ def remove_plugin(args) -> None:
             return
 
         for plugin_name in config_dict.keys():
-            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+            remove_plugin_data(plugin_name)
 
         config_dict.clear()
         print("All plugins were uninstalled successfully")
@@ -233,10 +285,10 @@ def remove_plugin(args) -> None:
             raise ValueError("A plugin name should be specified as argument")
 
         if plugin_name not in config_dict.keys():
-            print(f"Plugin {plugin_name} was not found in the system")
+            print(f"Plugin {plugin_name} was not found on the system")
             return
 
-        rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+        remove_plugin_data(plugin_name)
         del config_dict[plugin_name]
         print(f"Plugin {plugin_name} was uninstalled successfully")
 
@@ -250,11 +302,11 @@ def update_plugin_state(args) -> None:
     plugin_state = args.state
 
     if plugin_name not in config_dict.keys():
-        print(f"Plugin {plugin_name} was not found in the system")
+        print(f"Plugin {plugin_name} was not found on the system")
         return
 
     if config_dict[plugin_name]["state"] == plugin_state:
-        print(f"Plugin {plugin_name} is already {plugin_state} in the system")
+        print(f"Plugin {plugin_name} is already {plugin_state} on the system")
         return
 
     config_dict[plugin_name]["state"] = plugin_state
@@ -285,7 +337,7 @@ def list_plugins(args) -> None:
 
 
 def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
-    """Synchronize the information regading the plugins in the system"""
+    """Synchronize the information regading the plugins on the system"""
     root_dir = PluginsConfig.ROOT_DIR
     config_dict = {}
 
@@ -345,7 +397,9 @@ def set_plugin_subparser(subparsers) -> None:
     parser_install.add_argument(
         "--force", action="store_true", help="forces the installation process"
     )
-    parser_install.set_defaults(fn=install_plugin)
+    parser_install.set_defaults(
+        fn=install_plugin, he_sub_commands=subparsers.choices.keys()
+    )
 
     # remove options
     parser_remove = subparsers_plugin.add_parser(
@@ -361,7 +415,7 @@ def set_plugin_subparser(subparsers) -> None:
     parser_remove.add_argument(
         "--all",
         action="store_true",
-        help="Remove all plugins in the system",
+        help="Remove all plugins on the system",
     )
     parser_remove.set_defaults(fn=remove_plugin)
 
@@ -386,6 +440,6 @@ def set_plugin_subparser(subparsers) -> None:
     # refresh options
     parser_list = subparsers_plugin.add_parser(
         "refresh",
-        description="synchronize the information regading the plugins in the system",
+        description="synchronize the information regading the plugins on the system",
     )
     parser_list.set_defaults(fn=refresh_plugins)
