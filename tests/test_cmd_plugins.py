@@ -39,7 +39,7 @@ def test_load_plugins_config_file_correct_file(tmp_path):
     create_config_file(plugin_name)
 
     act_dict = load_plugins_config_file(plugin_name)
-    assert act_dict == get_fake_dict()
+    assert act_dict == get_plugin_config_dict()
 
 
 def test_update_plugins_config_file(tmp_path):
@@ -113,7 +113,7 @@ def test_check_plugin_structure_dir_correct_plugin(tmp_path):
     act_name = check_plugin_structure(plugin_path, plugin_type)[0]
     assert act_name["name"] == plugin_name
     assert act_name["version"] == "1.0.0"
-    assert act_name["start"] == "plugin.py"
+    assert act_name["start"] == f"start_{plugin_name}.py"
 
 
 def test_check_plugin_structure_zip_plugin_not_found(tmp_path):
@@ -141,7 +141,7 @@ def test_check_plugin_structure_zip_correct_plugin(tmp_path):
     act_name = check_plugin_structure(plugin_path, plugin_type)[0]
     assert act_name["name"] == plugin_name
     assert act_name["version"] == "1.0.0"
-    assert act_name["start"] == "plugin.py"
+    assert act_name["start"] == f"start_{plugin_name}.py"
 
 
 def test_check_plugin_structure_tar_plugin_not_found(tmp_path):
@@ -169,7 +169,7 @@ def test_check_plugin_structure_tar_correct_plugin(tmp_path):
     act_name = check_plugin_structure(plugin_path, plugin_type)[0]
     assert act_name["name"] == plugin_name
     assert act_name["version"] == "1.0.0"
-    assert act_name["start"] == "plugin.py"
+    assert act_name["start"] == f"start_{plugin_name}.py"
 
 
 def test_move_plugin_data_dir(tmp_path):
@@ -211,6 +211,10 @@ def test_move_plugin_data_zip(tmp_path):
     assert (dest_path / plugin_name).exists()
 
 
+def test_are_plugin_args_correct():
+    pass
+
+
 def test_install_plugin_present_file(mocker, tmp_path):
     """Verify that the SW prints a message when
     trying to install a plugin already installed"""
@@ -219,9 +223,8 @@ def test_install_plugin_present_file(mocker, tmp_path):
         plugin_name, tmp_path, PluginType.DIR, with_file=True
     )
 
-    args = MockArgs()
-    args.plugin = plugin_path
-    mockers = Mockers(mocker)
+    args = MockArgs(plugin_path)
+    mockers = Mockers(mocker, plugin_name)
 
     install_plugin(args)
     mockers.mock_dump_toml.assert_not_called()
@@ -238,10 +241,9 @@ def test_install_plugin_present_file_force_flag(mocker, tmp_path):
         plugin_name, tmp_path, PluginType.DIR, with_file=True
     )
 
-    args = MockArgs()
-    args.plugin = plugin_path
+    args = MockArgs(plugin_path)
     args.force = True
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     install_plugin(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -257,9 +259,8 @@ def test_install_plugin_dir(mocker, tmp_path):
         plugin_name, tmp_path, PluginType.DIR, with_file=True
     )
 
-    args = MockArgs()
-    args.plugin = plugin_path
-    mockers = Mockers(mocker)
+    args = MockArgs(plugin_path)
+    mockers = Mockers(mocker, plugin_name)
 
     install_plugin(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -275,9 +276,8 @@ def test_install_plugin_tar(mocker, tmp_path):
         plugin_name, tmp_path, PluginType.TAR, with_file=True
     )
 
-    args = MockArgs()
-    args.plugin = plugin_path
-    mockers = Mockers(mocker)
+    args = MockArgs(plugin_path)
+    mockers = Mockers(mocker, plugin_name)
 
     install_plugin(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -293,9 +293,8 @@ def test_install_plugin_zip(mocker, tmp_path):
         plugin_name, tmp_path, PluginType.ZIP, with_file=True
     )
 
-    args = MockArgs()
-    args.plugin = plugin_path
-    mockers = Mockers(mocker)
+    args = MockArgs(plugin_path)
+    mockers = Mockers(mocker, plugin_name)
 
     install_plugin(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -307,9 +306,9 @@ def test_install_plugin_zip(mocker, tmp_path):
 def test_remove_plugin_name_not_found(mocker):
     """Verify that the SW prints a message when
     trying to remove a plugin that is not on the system"""
-    args = MockArgs()
-    args.plugin = "test"
-    mockers = Mockers(mocker)
+    plugin_name = "test"
+    args = MockArgs(plugin_name)
+    mockers = Mockers(mocker, plugin_name)
 
     remove_plugin(args)
     mockers.mock_dump_toml.assert_not_called()
@@ -321,9 +320,9 @@ def test_remove_plugin_name_not_found(mocker):
 
 def test_remove_plugin_name_correct(mocker):
     """Verify that the SW removes a specific plugin"""
-    args = MockArgs()
-    args.plugin = "plugin1"
-    mockers = Mockers(mocker)
+    plugin_name = "plugin1"
+    args = MockArgs(plugin_name)
+    mockers = Mockers(mocker, plugin_name)
 
     remove_plugin(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -335,9 +334,10 @@ def test_remove_plugin_name_correct(mocker):
 
 def test_remove_plugin_all(mocker):
     """Verify that the SW removes all plugins on the system"""
-    args = MockArgs()
+    plugin_name = "test"
+    args = MockArgs(plugin_name)
     args.all = True
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
     mock_input = mocker.patch("kit.commands.plugin.input", return_value="y")
 
     remove_plugin(args)
@@ -350,10 +350,10 @@ def test_remove_plugin_all(mocker):
 def test_update_plugin_state_unknown_plugin(mocker):
     """Verify that the SW reports a message
     when the plugin is not on the system"""
-    args = MockArgs()
-    args.plugin = "test"
+    plugin_name = "test"
+    args = MockArgs(plugin_name)
     args.state = PluginState.ENABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
@@ -365,9 +365,10 @@ def test_update_plugin_state_unknown_plugin(mocker):
 def test_update_plugin_state_already_enabled(mocker):
     """Verify that the SW reports a message
     when the plugin is already enabled"""
-    args = MockArgs()
+    plugin_name = "plugin1"
+    args = MockArgs(plugin_name)
     args.state = PluginState.ENABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
@@ -379,10 +380,10 @@ def test_update_plugin_state_already_enabled(mocker):
 def test_update_plugin_state_already_disabled(mocker):
     """Verify that the SW reports a message
     when the plugin is already disabled"""
-    args = MockArgs()
-    args.plugin = "plugin2"
+    plugin_name = "plugin2"
+    args = MockArgs(plugin_name)
     args.state = PluginState.DISABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_not_called()
@@ -393,10 +394,10 @@ def test_update_plugin_state_already_disabled(mocker):
 
 def test_update_plugin_state_enable(mocker):
     """Verify that the SW enables a plugin"""
-    args = MockArgs()
-    args.plugin = "plugin2"
+    plugin_name = "plugin2"
+    args = MockArgs(plugin_name)
     args.state = PluginState.ENABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -407,10 +408,10 @@ def test_update_plugin_state_enable(mocker):
 
 def test_update_plugin_state_disable(mocker):
     """Verify that the SW disables a plugin"""
-    args = MockArgs()
-    args.plugin = "plugin1"
+    plugin_name = "plugin1"
+    args = MockArgs(plugin_name)
     args.state = PluginState.DISABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     update_plugin_state(args)
     mockers.mock_dump_toml.assert_called_once()
@@ -421,20 +422,22 @@ def test_update_plugin_state_disable(mocker):
 
 def test_list_plugins_all(mocker):
     """Verify that the SW prints all plugins"""
-    args = MockArgs()
-    mockers = Mockers(mocker)
+    plugin_name = "test"
+    args = MockArgs(plugin_name)
+    mockers = Mockers(mocker, plugin_name)
 
     list_plugins(args)
     assert 3 == mockers.mock_print.call_count
-    mockers.mock_print.assert_any_call("plugin2    1.0.0      disabled  ")
+    mockers.mock_print.assert_any_call("plugin2    2.3.0      disabled  ")
     mockers.mock_print.assert_any_call("plugin1    1.0.0      enabled   ")
 
 
 def test_list_plugins_enable(mocker):
     """Verify that the SW prints only enabled plugins"""
-    args = MockArgs()
+    plugin_name = "test"
+    args = MockArgs(plugin_name)
     args.state = PluginState.ENABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     list_plugins(args)
     assert 2 == mockers.mock_print.call_count
@@ -443,22 +446,35 @@ def test_list_plugins_enable(mocker):
 
 def test_list_plugins_disable(mocker):
     """Verify that the SW prints only disabled plugins"""
-    args = MockArgs()
+    plugin_name = "test"
+    args = MockArgs(plugin_name)
     args.state = PluginState.DISABLE
-    mockers = Mockers(mocker)
+    mockers = Mockers(mocker, plugin_name)
 
     list_plugins(args)
     assert 2 == mockers.mock_print.call_count
-    mockers.mock_print.assert_called_with("plugin2    1.0.0      disabled  ")
+    mockers.mock_print.assert_called_with("plugin2    2.3.0      disabled  ")
+
+
+def test_refresh_plugins():
+    pass
 
 
 """Utilities used by the tests"""
 
 
-def get_fake_dict():
+def get_plugin_config_dict():
     return {
-        "plugin1": {"version": "1.0.0", "state": PluginState.ENABLE},
-        "plugin2": {"version": "1.0.0", "state": PluginState.DISABLE},
+        "plugin1": {
+            "version": "1.0.0",
+            "state": PluginState.ENABLE,
+            "start": "start_plugin1.py",
+        },
+        "plugin2": {
+            "version": "2.3.0",
+            "state": PluginState.DISABLE,
+            "start": "start_plugin2.py",
+        },
     }
 
 
@@ -473,9 +489,15 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
     plugin_path.mkdir(exist_ok=True)
 
     if with_file:
-        plugin_file = plugin_path / "plugin.py"
-        with plugin_file.open("w") as f:
-            f.write("test")
+        start_file = plugin_path / f"start_{plugin_name}.py"
+        with start_file.open("w") as f:
+            f.write(
+                "def test_func(args):\n"
+                "   pass\n\n"
+                f"def set_{plugin_name}_subparser(subparsers):\n"
+                f"   parser_{plugin_name} = subparsers.add_parser('prog_{plugin_name}')\n"
+                f"   parser_{plugin_name}.set_defaults(fn=test_func)\n"
+            )
 
         toml_file = plugin_path / "plugin.toml"
         with toml_file.open("w") as f:
@@ -483,7 +505,7 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
                 "[plugin]\n"
                 f'name = "{plugin_name}"\n'
                 'version = "1.0.0"\n'
-                'start = "plugin.py"\n'
+                f'start = "start_{plugin_name}.py"\n'
             )
 
     if plugin_type == PluginType.DIR:
@@ -500,31 +522,36 @@ def create_plugins_files(plugin_name, tmp_path, plugin_type, with_file=False):
 
 def create_config_file(filepath):
     with filepath.open("w") as f:
-        for k, v in get_fake_dict().items():
-            version, state = v["version"], v["state"]
+        for k, v in get_plugin_config_dict().items():
             f.write(
                 f"[{PluginsConfig.KEY}.{k}]\n"
-                f'version = "{version}"\n'
-                f'state = "{state}"\n'
+                f'version = "{v["version"]}"\n'
+                f'state = "{v["state"]}"\n'
+                f'start = "{v["start"]}"\n'
             )
 
 
 class MockArgs:
-    def __init__(self):
+    def __init__(self, plugin_name):
         self.state = "all"
-        self.plugin = "plugin1"
+        self.plugin = plugin_name
         self.force = False
         self.all = False
         self.hekit_parsers_list = {}
 
 
 class Mockers:
-    def __init__(self, mocker):
+    def __init__(self, mocker, plugin_name):
         self.mock_print = mocker.patch("kit.commands.plugin.print")
-        self.mock_get_dict = mocker.patch(
-            "kit.commands.plugin.load_plugins_config_file"
-        )
-        self.mock_get_dict.return_value = get_fake_dict()
         self.mock_dump_toml = mocker.patch("kit.commands.plugin.dump_toml")
         self.mock_move_data = mocker.patch("kit.commands.plugin.move_plugin_data")
         self.mock_remove_dir = mocker.patch("kit.commands.plugin.remove_plugin_data")
+        self.mock_arg_choices = mocker.patch(
+            "kit.commands.plugin.get_plugin_arg_choices"
+        )
+        self.mock_arg_choices.return_value = [plugin_name]
+        # Fake config file content
+        self.mock_get_dict = mocker.patch(
+            "kit.commands.plugin.load_plugins_config_file",
+            return_value=get_plugin_config_dict(),
+        )

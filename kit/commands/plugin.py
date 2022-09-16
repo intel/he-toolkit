@@ -12,10 +12,7 @@ from pathlib import Path
 from toml import loads as toml_loads
 from kit.utils.constants import Constants, PluginsConfig, PluginState
 from kit.utils.files import list_dirs, load_toml, dump_toml
-from kit.utils.subparsers import (
-    get_plugin_arg_choices,
-    validate_input,
-)
+from kit.utils.subparsers import get_plugin_arg_choices, validate_input
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 PluginSettings = Dict[str, str]
@@ -221,6 +218,7 @@ def install_plugin(args) -> None:
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
     plugin_settings_list = check_plugin_structure(plugin_path, plugin_type)
+    update_config = False
 
     for plugin_settings_dict in plugin_settings_list:
         plugin_name = plugin_settings_dict["name"]
@@ -264,9 +262,11 @@ def install_plugin(args) -> None:
             "start": plugin_settings_dict["start"],
         }
 
+        update_config = True
         print(f"Plugin {plugin_name} was installed successfully")
 
-    update_plugins_config_file(config_dict)
+    if update_config:
+        update_plugins_config_file(config_dict)
 
 
 def remove_plugin(args) -> None:
