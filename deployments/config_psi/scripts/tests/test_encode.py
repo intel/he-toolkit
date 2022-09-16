@@ -106,7 +106,8 @@ def test_how_many_entries_in_file(tmp_path):
     filepath = tmp_path / "several_lines.txt"
     num_of_lines = 100
     filepath.write_text("\n".join([str(n) for n in range(num_of_lines)]))
-    assert how_many_entries_in_file(filepath.resolve()) == num_of_lines
+    # Remember that header line not counted
+    assert how_many_entries_in_file(filepath.resolve()) == num_of_lines - 1
 
 
 def test_parse_args_params_only(tmp_path):
