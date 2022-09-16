@@ -182,6 +182,15 @@ class Encoder:
             ptxts.extend(self._packing(ptxts_data))  # Will be either Client or Server
         return ptxts
 
+    def total_columns(self) -> int:
+        """Returns total number of composite columns of ptxts."""
+        colnames = (colname for colname in self.column_encodings.keys())
+        return sum(self.column_composites.get(colname, 1) for colname in colnames)
+
+    def total_rows(self, num_records: int) -> int:
+        """To be implemented by derived class"""
+        raise NotImplementedError
+
 
 class ClientEncoder(Encoder):
     """Encoder for client"""
@@ -202,6 +211,10 @@ class ClientEncoder(Encoder):
 
         extend_with_repetitions(ptxts_data, self.repeat)
         return [Ptxt(self.params).insert_data(data) for data in ptxts_data]
+
+    def total_rows(self, num_records: int) -> int:
+        """Return number of rows"""
+        return math.ceil(num_records / self.repeat)  # repeats == segments
 
 
 class ServerEncoder(Encoder):
@@ -225,11 +238,18 @@ class ServerEncoder(Encoder):
         rows = math.ceil(len(entries) / self.repeat)
         return transpose(ptxts, rows, cols)
 
+    def total_rows(self, num_records: int) -> int:
+        """Return number of rows"""
+        return math.ceil(num_records / self.params.nslots)
+
 
 def how_many_entries_in_file(filename: str) -> int:
-    """Return number of lines in a file."""
+    """Return number of lines in a file, not including the header line."""
     with open(filename, encoding="UTF-8") as fobj:
-        return sum(1 for _ in fobj)
+        no_lines = sum(1 for _ in fobj)
+    if no_lines > 0:
+        return no_lines - 1  # don't include header
+    return 0
 
 
 def parse_args(argv: List[str] = None):
@@ -274,6 +294,13 @@ def main(args, fobj=sys.stdout) -> None:
         )
         nslots = args.config.params.nslots
         segments = args.config.segments
+
+        # First pass - compute dimensions header
+        lines_in_file = how_many_entries_in_file(args.datafile)
+
+        # Print header with dimensions
+        print(encode.total_rows(lines_in_file), encode.total_columns(), file=fobj)
+
         with open(args.datafile, encoding="UTF-8", newline="") as csvfile:
             csv_reader = DictReader(csvfile, delimiter=" ")
             for txt in read_txt_worth(csv_reader, nslots // segments):
