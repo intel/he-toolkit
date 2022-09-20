@@ -198,7 +198,7 @@ def are_plugin_args_correct(
             )
             return False
 
-        # Verify argument is not a reserve word
+        # Verify argument is not a reserved word
         if plugin_arg_choice in Constants.HEKIT_COMMANDS:
             print(
                 f"Invalid argument definition, '{plugin_arg_choice}' is a reserved HE Toolkit command"
