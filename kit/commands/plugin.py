@@ -170,7 +170,7 @@ def move_plugin_data(
 def remove_plugin_data(
     plugin_name: str, dest_path: Path = PluginsConfig.ROOT_DIR
 ) -> None:
-    """Remove a plugin folder if exists"""
+    """Remove a plugin folder if it exists"""
     plugin_path = dest_path / plugin_name
     if Path(plugin_path).exists():
         rmtree(plugin_path)
@@ -179,35 +179,38 @@ def remove_plugin_data(
 def are_plugin_args_correct(
     plugin_name: str, is_plugin_present: bool, hekit_parsers_list: List[str]
 ) -> bool:
-    """Verify that trser_choices_he plugin argument is unique"""
+    """Verify that all plugin names are valid and unique"""
+    # Get plugin names
     arg_choices_list = get_plugin_arg_choices(plugin_name)
 
-    # verify it contains only one choice
-    if len(arg_choices_list) != 1:
-        print(f"{plugin_name} cannot be installed because its arguments are wrong")
-        return False
-
-    # verify the prog name of the parser is equal to plugin name
-    plugin_arg_choice = arg_choices_list[0]
-    if plugin_arg_choice != plugin_name:
+    # verify the argument parser was defined for the plugin
+    if len(arg_choices_list) == 0:
         print(
-            f"Wrong argument definition, found '{plugin_arg_choice}' instead '{plugin_name}'"
+            f"{plugin_name} cannot be installed because its argument parser was not defined"
         )
         return False
 
-    # Verify argument is a reserve word
-    if plugin_arg_choice in Constants.HEKIT_COMMANDS:
-        print(
-            f"Wrong argument definition, '{plugin_arg_choice}' is a reserved HE Toolkit command"
-        )
-        return False
+    for plugin_arg_choice in arg_choices_list:
+        # verify the prog name of the parser is equal to plugin name
+        if plugin_arg_choice != plugin_name:
+            print(
+                f"Invalid argument definition, found '{plugin_arg_choice}', expected '{plugin_name}'"
+            )
+            return False
 
-    # Verify it is not a new version and the argument is unique
-    if not is_plugin_present and plugin_arg_choice in hekit_parsers_list:
-        print(
-            f"Wrong argument definition, '{plugin_arg_choice}' is already used by another plugin"
-        )
-        return False
+        # Verify argument is not a reserve word
+        if plugin_arg_choice in Constants.HEKIT_COMMANDS:
+            print(
+                f"Invalid argument definition, '{plugin_arg_choice}' is a reserved HE Toolkit command"
+            )
+            return False
+
+        # Verify it is not a new version and the argument is unique
+        if not is_plugin_present and plugin_arg_choice in hekit_parsers_list:
+            print(
+                f"Invalid argument definition, '{plugin_arg_choice}' is already used by another plugin"
+            )
+            return False
 
     return True
 
@@ -345,10 +348,10 @@ def list_plugins(args) -> None:
 
 
 def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
-    """Synchronize the information regading the plugins on the system"""
+    """Synchronize the information regarding the plugins on the system"""
 
     def get_plugin_settings():
-        root_dir = PluginsConfig.ROOT_DIR
+        root_dir = args.root_dir
         for plugin_dir in list_dirs(root_dir):
             plugin_path = root_dir / plugin_dir
             # Verify TOML file exists
@@ -451,6 +454,6 @@ def set_plugin_subparser(subparsers) -> None:
     # refresh options
     parser_list = subparsers_plugin.add_parser(
         "refresh",
-        description="synchronize the information regading the plugins on the system",
+        description="synchronize the information regarding the plugins on the system",
     )
-    parser_list.set_defaults(fn=refresh_plugins)
+    parser_list.set_defaults(fn=refresh_plugins, root_dir=PluginsConfig.ROOT_DIR)

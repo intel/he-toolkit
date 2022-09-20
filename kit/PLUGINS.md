@@ -89,8 +89,8 @@ hekit plugins enable plugin-name
 ```
 
 #### refresh
-Execute the following command to synchronize the information in plugin
-config file with the plugins located on `~/.hekit/plugins`
+Execute the following command to synchronize the information in the
+plugin config file with the plugins located in `~/.hekit/plugins`
 ```bash
 hekit plugins refresh
 ```
@@ -141,7 +141,7 @@ def set_TBD_subparser(subparsers):
 
 In the previous code, the following conditions must be met:
 
-* The value of the first paramenter of `subparsers.add_parse` must be the
+* The value of the first paramenter of `subparsers.add_parser` must be the
 same as the value of `start` defined in the TOML file.
 
 * `ADD_NEW_FUNCTIONALITY` (parameter `fn` of `set_defaults`) is the function

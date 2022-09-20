@@ -60,14 +60,14 @@ def get_plugin_arg_choices(
     plugin_name: str,
     plugin_root: PathType = PluginsConfig.ROOT_DIR,
 ) -> List[str]:
-    """Return the choices of the argument parser"""
+    """Return the choices (list of plugin names) of the argument parser"""
     try:
         # Read the TOML file to identify plugin's name and start
         toml_file = f"{plugin_root}/{plugin_name}/plugin.toml"
         plugin_config = load_toml(toml_file)["plugin"]
         plugin_start = {plugin_config["name"]: plugin_config["start"]}
 
-        # Get the function that define the plugin arguments
+        # Get the function that defines the plugin arguments
         func = next(get_subparsers_plugins(plugin_start, plugin_root))
 
         # Create a parser to get the argument name
