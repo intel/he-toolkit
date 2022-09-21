@@ -215,7 +215,7 @@ def test_move_plugin_data_zip(tmp_path):
 
 def test_are_plugin_args_correct_elements(mocker):
     """Verify that the SW reports an error when
-    there is not argument name in the list"""
+    there is no argument name in the list"""
     plugin_name = "plugin1"
     mockers = Mockers(mocker)
     mockers.mock_arg_choices.return_value = []
@@ -274,7 +274,7 @@ def test_are_plugin_args_correct_not_unique(mocker):
 
 def test_are_plugin_args_correct_unique(mocker):
     """Verify that the SW does not report an error when
-    the argument name is fine"""
+    the argument name is valid"""
     plugin_name = "test"
     argument_name = plugin_name
     mockers = Mockers(mocker)

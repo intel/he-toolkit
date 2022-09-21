@@ -26,8 +26,8 @@ class Constants:  # pylint: disable=too-many-instance-attributes
     # Root directory
     HEKIT_ROOT_DIR: Path = Path(__file__).resolve().parent.parent.parent
 
-    # HE comands
-    HEKIT_COMMANDS = [
+    # Hekit core commands
+    HEKIT_COMMANDS = {
         "check-dependencies",
         "docker-build",
         "init",
@@ -40,7 +40,7 @@ class Constants:  # pylint: disable=too-many-instance-attributes
         "remove",
         "algebras",
         "gen-primes",
-    ]
+    }
 
 
 @dataclass(frozen=True, init=False)
