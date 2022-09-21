@@ -142,7 +142,7 @@ def set_TBD_subparser(subparsers):
 In the previous code, the following conditions must be met:
 
 * The value of the first paramenter of `subparsers.add_parser` must be the
-same as the value of `start` defined in the TOML file.
+same as the value of `name` defined in the TOML file.
 
 * `ADD_NEW_FUNCTIONALITY` (parameter `fn` of `set_defaults`) is the function
 that implements the entry point of the plugin. Therefore, this function
