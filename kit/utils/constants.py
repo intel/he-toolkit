@@ -26,7 +26,7 @@ class Constants:  # pylint: disable=too-many-instance-attributes
     # Root directory
     HEKIT_ROOT_DIR: Path = Path(__file__).resolve().parent.parent.parent
 
-    # Hekit core commands
+    # hekit core commands
     HEKIT_COMMANDS = {
         "check-dependencies",
         "docker-build",
