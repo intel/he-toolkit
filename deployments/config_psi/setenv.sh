@@ -11,7 +11,7 @@ fi
 
 progdir="$(dirname "$progpath")"
 
-CONFIG_PSI_DIR="$(realpath "$progdir/..")"
+CONFIG_PSI_DIR="$(realpath "$progdir")"
 export CONFIG_PSI_DIR
 
 PYTHONPATH="$PYTHONPATH:$CONFIG_PSI_DIR/scripts"

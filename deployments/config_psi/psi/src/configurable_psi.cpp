@@ -4,6 +4,7 @@
 
 #include <helib/ArgMap.h>
 #include <helib/Matrix.h>
+
 #include <helib/helib.h>
 #include <helib/partialMatch.h>
 #include <helib/set.h>
@@ -234,7 +235,9 @@ int main(int argc, char* argv[]) {
   std::cout << "Done.\n";
 
   // Parse tableFile to build query
+  std::cout << "Configuring query...";
   auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
+  std::cout << "Done.\n";
 
   if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
     // Plaintext query and plaintext DB

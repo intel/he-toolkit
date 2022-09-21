@@ -35,7 +35,7 @@ deployments/config_psi/scripts/natural.py
 deployments/config_psi/scripts/ptxt.py
 deployments/config_psi/scripts/tests/test_decode.py
 deployments/config_psi/scripts/tests/test_encode.py
-deployments/config_psi/tests/setenv.sh
+deployments/config_psi/setenv.sh
 deployments/config_psi/tests/test_config_psi.py
 dev_reqs.txt
 docker/Dockerfile.base

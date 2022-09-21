@@ -214,7 +214,7 @@ class ClientEncoder(Encoder):
 
     def total_rows(self, num_records: int) -> int:
         """Return number of rows"""
-        return math.ceil(num_records / self.repeat)  # repeats == segments
+        return math.ceil(num_records / self.params.nslots)
 
 
 class ServerEncoder(Encoder):
@@ -240,7 +240,7 @@ class ServerEncoder(Encoder):
 
     def total_rows(self, num_records: int) -> int:
         """Return number of rows"""
-        return math.ceil(num_records / self.params.nslots)
+        return math.ceil(num_records / self.repeat)  # repeats == segments
 
 
 def how_many_entries_in_file(filename: str) -> int:

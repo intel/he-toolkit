@@ -60,7 +60,7 @@ export_cmake = "install/lib/cmake/GTest"
 
 [[psi]]
 name = "configurable-psi"
-src_dir = "!toolkit-path!/expr/psi"
+src_dir = "!toolkit-path!/deployments/config_psi/psi"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -Dhelib_DIR=$%helib%/export_cmake$
                -DENABLE_TESTS=ON
