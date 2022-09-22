@@ -12,7 +12,7 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser, HelpFormatter
 from typing import Tuple
 
-from kit.utils.subparsers import register_subparser, validate_input
+from kit.utils.subparsers import register_subparser
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
@@ -32,12 +32,6 @@ def parse_cmdline() -> Tuple:
     parser.set_defaults(fn=None)
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolkit version"
-    )
-    parser.add_argument(
-        "--config",
-        type=validate_input,
-        default="~/.hekit/default.config",
-        help="use a non-default configuration file instead",
     )
 
     # create subparsers for each command

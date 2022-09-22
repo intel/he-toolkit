@@ -9,6 +9,7 @@ from typing import Dict, List
 
 from kit.utils.files import list_dirs, load_toml
 from kit.utils.config import config_required
+from kit.utils.subparsers import validate_input
 from kit.utils.typing import PathType
 
 # Number of separation spaces for columns
@@ -105,5 +106,11 @@ def set_list_subparser(subparsers):
         "list",
         help="Lists installed components",
         description="lists installed components",
+    )
+    parser_list.add_argument(
+        "--config",
+        type=validate_input,
+        default="~/.hekit/default.config",
+        help="use a non-default configuration file instead",
     )
     parser_list.set_defaults(fn=list_components)

@@ -383,7 +383,9 @@ def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
 def set_plugin_subparser(subparsers) -> None:
     """Create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
-        "plugins", description="handle third party plugins"
+        "plugins",
+        description="Handle third party plugins",
+        help="Handle third party plugins",
     )
     subparsers_plugin = parser_plugin.add_subparsers(help="sub-command help")
 

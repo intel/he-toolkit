@@ -74,6 +74,12 @@ def set_remove_subparser(subparsers):
         description="removes/uninstalls components",
     )
     parser_remove.add_argument(
+        "--config",
+        type=validate_input,
+        default="~/.hekit/default.config",
+        help="use a non-default configuration file instead",
+    )
+    parser_remove.add_argument(
         "--all", action="store_true", help="remove all components"
     )
     parser_remove.add_argument("-y", action="store_false", help="say yes to prompts")

@@ -75,12 +75,22 @@ def set_install_subparser(subparsers):
     actions = ["install", "build", "fetch"]
 
     for action in actions:
-        parser = subparsers.add_parser(action, description=f"{action} components")
+        parser = subparsers.add_parser(
+            action,
+            description=f"{action.capitalize()} components",
+            help=f"{action.capitalize()} components",
+        )
         parser.add_argument(
             "recipe_file",
             metavar="recipe-file",
             type=validate_input,
             help=f"TOML file for {action}",
+        )
+        parser.add_argument(
+            "--config",
+            type=validate_input,
+            default="~/.hekit/default.config",
+            help="use a non-default configuration file instead",
         )
         parser.add_argument(
             "--recipe_arg",
