@@ -19,7 +19,7 @@ def test_main_config_is_symlink(hekit_path, input_files_path):
     cmd = f"{hekit_path} --config {input_files_path}/default_symlink.config list"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
-    assert "The config file cannot be a symlink" in act_result.stderr
+    assert "default_symlink.config cannot be a symlink" in act_result.stderr
     assert 0 != act_result.returncode
 
 
@@ -32,6 +32,8 @@ def test_main_config_name_has_null(mocker, input_files_path):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
+    mock_file_exists = mocker.patch("kit.utils.files.file_exists")
+    mock_file_exists.return_value = True
     with pytest.raises(SystemExit) as exc_info:
         main()
     mock_print.assert_called_with(
@@ -62,6 +64,8 @@ def test_main_toml_name_has_null(mocker, input_files_path):
     mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
     mock_parse_cmdline.return_value = args, ""
     mock_print = mocker.patch("kit.hekit.print")
+    mock_file_exists = mocker.patch("kit.utils.files.file_exists")
+    mock_file_exists.return_value = True
     with pytest.raises(SystemExit) as exc_info:
         main()
     mock_print.assert_called_with(

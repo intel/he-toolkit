@@ -8,7 +8,7 @@ from __future__ import annotations
 from re import findall
 from dataclasses import dataclass
 from typing import Dict, List
-from toml import dump, load
+from kit.utils.files import dump_toml, load_toml
 from kit.utils.tsort import tsort
 from kit.utils.typing import PathType
 
@@ -19,7 +19,7 @@ RecipeArgDict = Dict[str, str]
 def read_spec(component: str, instance: str, repo_location: PathType):
     """Return hekit.spec file as a dict"""
     path = f"{repo_location}/{component}/{instance}/hekit.spec"
-    spec = load(path)
+    spec = load_toml(path)
     # There should only be one instance
     return spec[component][0]
 
@@ -107,8 +107,8 @@ def fill_self_ref_string_dict(d: dict, repo_path: PathType) -> dict:
 
 
 def get_dependencies(instances_list: List) -> List[str]:
-    """ Returns a list of dependencies defined
-    and used in the recipe file """
+    """Returns a list of dependencies defined
+    and used in the recipe file"""
     dependency_list: List[str] = []
 
     def fill_dependencies_list(s: str, d: dict) -> None:
@@ -135,7 +135,7 @@ def get_dependencies(instances_list: List) -> List[str]:
 
 def fill_rloc_paths(d: dict, repo_location: PathType) -> dict:
     """Create absolute path for the top-level attribs that begin
-       with 'init_' or '_export_' by prepending repo location"""
+    with 'init_' or '_export_' by prepending repo location"""
     for k, v in d.items():
         if k.startswith("init_") or k.startswith("export_"):
             d[k] = f"{repo_location}/{v}"
@@ -184,7 +184,7 @@ class Spec:
         """Generator yield Spec objects.
         Process spec file: perform substitutions and expand paths."""
         # load the recipe file
-        toml_specs = load(filename)
+        toml_specs = load_toml(filename)
 
         # create dependency graph
         dependency_dict = {
@@ -284,8 +284,7 @@ class Spec:
     def to_toml_file(self, filename: PathType) -> None:
         """Write spec object to toml file"""
         obj_as_dict = self.to_toml_dict()
-        with open(filename, "w", encoding="utf-8") as f:
-            dump(obj_as_dict, f)
+        dump_toml(filename, obj_as_dict)
 
     def __getitem__(self, key: str):
         """Return value from key.

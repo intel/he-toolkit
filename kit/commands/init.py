@@ -7,7 +7,8 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
-from kit.utils.files import create_default_workspace
+from kit.utils.constants import Constants
+from kit.utils.files import create_default_workspace, dump_toml, file_exists
 from kit.utils.typing import PathType
 
 
@@ -16,12 +17,6 @@ class Tags:
 
     start_tag: str = "# >>> hekit start >>>\n"
     end_tag: str = "# <<<  hekit end  <<<\n"
-
-
-def file_exists(file: Path) -> bool:
-    """ Wrapper to check if file exists because Path.exists() cannot be mocked
-    directly due to being used internally by pytest creating some clash"""
-    return file.exists()
 
 
 def get_expanded_path(path: PathType) -> Path:
@@ -85,7 +80,7 @@ def append_to_rc(path: Path, content: str) -> None:
 
 
 def get_rc_file() -> Path:
-    """ Return the correct file to add shell commands"""
+    """Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
@@ -116,11 +111,27 @@ def create_default_config(dir_path: Path) -> None:
         print(f"{default_config_path} created")
 
 
+def create_plugin_data(dir_path: Path) -> None:
+    """Create the directory ~/.hekit/plugins"""
+    plugins_path = dir_path / "plugins"
+    plugins_path.mkdir(exist_ok=True)
+
+    # Setup plugin file
+    plugin_file_path = plugins_path / "plugins.toml"
+    if file_exists(plugin_file_path):
+        print(f"{plugin_file_path} file already exists")
+    else:
+        plugin_data: dict = {"plugins": {}}
+        dump_toml(plugin_file_path, plugin_data)
+        print(f"{plugin_file_path} created")
+
+
 def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
         dir_path = create_default_workspace()
         create_default_config(dir_path)
+        create_plugin_data(dir_path)
 
     # Backup the shell init file
     rc_file = get_rc_file()
@@ -133,8 +144,8 @@ def init_hekit(args) -> None:
 
     # Add new lines in the rc_file:
     # 1-Add hekit directory as part of environmental variable PATH
-    export_line = f"export HEKITPATH={args.hekit_root_dir}\n"
-    path_line = "PATH=$HEKITPATH:$PATH\n"
+    export_line = f"export HEKITPATH={Constants.HEKIT_ROOT_DIR}\n"
+    path_line = "PATH=$PATH:$HEKITPATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
         "if [ -n $(type -p register-python-argcomplete) ]; then\n"
@@ -149,10 +160,12 @@ def init_hekit(args) -> None:
     print(f"source {rc_file}")
 
 
-def set_init_subparser(subparsers, hekit_root_dir) -> None:
+def set_init_subparser(subparsers) -> None:
     """create the parser for the 'init' command"""
-    parser_init = subparsers.add_parser("init", help = "Initialize hekit", description="initialize hekit")
+    parser_init = subparsers.add_parser(
+        "init", help="Initialize hekit", description="initialize hekit"
+    )
     parser_init.add_argument(
         "--default-config", action="store_true", help="setup default config file"
     )
-    parser_init.set_defaults(fn=init_hekit, hekit_root_dir=hekit_root_dir)
+    parser_init.set_defaults(fn=init_hekit)

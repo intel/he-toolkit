@@ -33,6 +33,7 @@ utilize the latest Intel hardware features.
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
   - [Known Issues](#known-issues)
+- [Third Party Plugins](#third-party-plugins)
 - [Contributing](#contributing)
   - [Adding a New Command](#adding-a-new-command)
   - [Troubleshooting](#troubleshooting)
@@ -234,6 +235,10 @@ encrypted elements that are common to both sets. See the
   PALISADE. This error seems independent of the HE Toolkit and is currently
   being investigated.
 
+# Third Party Plugins
+Intel HE Toolkit provides the utilities to handle third party plugins that can
+be installed in the system to add new HE functionalities. See [PLUGINS](./kit/PLUGINS.md)
+for details about how to interact with them or create new plugins.
 
 # Contributing
 Intel HE Toolkit welcomes external contributions through pull requests to the
@@ -309,7 +314,6 @@ described the functionality of the new command.
 
 * Generic utilities or helper functions that can be used for several commands
   should be in [utils](kit/utils).
-
 
 ## Troubleshooting
 

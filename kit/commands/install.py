@@ -72,7 +72,7 @@ def get_recipe_arg_dict(recipe_arg: str) -> Union[Dict[str, str], None]:
 
 def set_install_subparser(subparsers):
     """create the parser for the 'install' command"""
-    actions = ["Install", "Build", "Fetch"]
+    actions = ["install", "build", "fetch"]
 
     for action in actions:
         parser = subparsers.add_parser(action, description=f"{action} components")

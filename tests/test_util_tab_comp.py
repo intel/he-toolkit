@@ -2,71 +2,110 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from os import getcwd, chdir
+from toml import dump
 from pathlib import Path
-from kit.utils.tab_completion import components_completer, instances_completer
+from kit.utils.constants import PluginState, PluginsConfig
+from kit.utils.tab_completion import (
+    get_plugins_by_state,
+    components_completer,
+    instances_completer,
+)
 
 
-def test_get_instances_after_fetch(mocker, args_tab, comp_data):
-    exp_comp = [comp_data["comp"]]
-    exp_inst = [comp_data["inst_v1"], comp_data["inst_v2"]]
-    mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
-    mock_list_dirs.side_effect = [exp_comp, exp_inst]
+def test_get_instances_two_instances(mocker, tmp_path):
+    """Verify that the SW returns the lists of a component with two instances"""
+    args = Mockargs()
+    exp_comp = "hexl"
+    exp_inst = ["1.0.1", "1.2.3"]
+    mock_load_config = mocker.patch("kit.utils.tab_completion.load_config")
+    mock_load_config.return_value = Config(tmp_path)
+    create_plugin_file(tmp_path, exp_comp, exp_inst)
 
-    act_comp = components_completer("", args_tab)
-    act_inst = instances_completer("", args_tab)
-    assert act_comp == exp_comp
+    act_comp = components_completer("", args)
+    act_inst = instances_completer("", args)
+    assert act_comp == [exp_comp]
     assert act_inst == exp_inst
 
 
-def test_get_instances_after_remove_v1(mocker, args_tab, comp_data):
-    exp_comp = [comp_data["comp"]]
-    exp_inst = [comp_data["inst_v2"]]
-    mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
-    mock_list_dirs.side_effect = [exp_comp, exp_inst]
+def test_get_instances_one_instance(mocker, tmp_path):
+    """Verify that the SW returns the lists of a component with one instance"""
+    args = Mockargs()
+    exp_comp = "hexl"
+    exp_inst = ["1.2.3"]
+    mock_load_config = mocker.patch("kit.utils.tab_completion.load_config")
+    mock_load_config.return_value = Config(tmp_path)
+    create_plugin_file(tmp_path, exp_comp, exp_inst)
 
-    act_comp = components_completer("", args_tab)
-    act_inst = instances_completer("", args_tab)
-    assert act_comp == exp_comp
+    act_comp = components_completer("", args)
+    act_inst = instances_completer("", args)
+    assert act_comp == [exp_comp]
     assert act_inst == exp_inst
 
 
-def test_get_instances_after_remove_v2(mocker, args_tab):
-    exp_comp = []
-    exp_inst = []
-    mock_list_dirs = mocker.patch("kit.utils.tab_completion.list_dirs")
-    mock_list_dirs.side_effect = [exp_comp, exp_inst]
+def test_get_instances_empty(mocker, tmp_path):
+    """Verify that the SW returns an empty lists when there is no components"""
+    args = Mockargs()
+    mock_load_config = mocker.patch("kit.utils.tab_completion.load_config")
+    mock_load_config.return_value = Config(tmp_path)
 
-    act_comp = components_completer("", args_tab)
-    act_inst = instances_completer("", args_tab)
-    assert act_comp == exp_comp
-    assert act_inst == exp_inst
+    act_comp = components_completer("", args)
+    act_inst = instances_completer("", args)
+    assert act_comp == []
+    assert act_inst == []
+
+
+def test_get_plugins_by_state_enable(create_tmp_file):
+    """Verify that the SW returns the enabled plugins"""
+    act_data = get_plugins_by_state(PluginState.ENABLE, create_tmp_file)
+    assert "plugin_a" in act_data
+    assert "plugin_c" not in act_data
+    assert "plugin_e" not in act_data
+
+
+def test_get_plugins_by_state_disable(create_tmp_file):
+    """Verify that the SW returns the disabled plugins"""
+    act_data = get_plugins_by_state(PluginState.DISABLE, create_tmp_file)
+    assert "plugin_c" in act_data
+    assert "plugin_a" not in act_data
+    assert "plugin_e" not in act_data
 
 
 """Utilities used by the tests"""
 
 
-class MockArgs:
-    def __init__(self, fn, component, instance, upto_stage):
+class Config:
+    def __init__(self, repo_location):
+        self.repo_location = repo_location
+
+
+class Mockargs:
+    def __init__(self):
         self.tests_path = Path(__file__).resolve().parent
-        self.version = False
-        self.component = component
-        self.instance = instance
+        self.component = "hexl"
         self.config = f"{self.tests_path}/input_files/default.config"
-        self.recipe_file = f"{self.tests_path}/input_files/test.toml"
-        self.fn = fn
-        self.upto_stage = upto_stage
-        self.force = False
-        self.all = False
-        self.y = True
-        self.recipe_arg = {}
+
+
+def create_plugin_file(tmp_path, component, instances):
+    component_path = tmp_path / component
+    component_path.mkdir(exist_ok=True)
+
+    for instance in instances:
+        instance_path = component_path / instance
+        instance_path.mkdir(exist_ok=True)
 
 
 @pytest.fixture
-def comp_data():
-    return {"comp": "hexl", "inst_v1": "1.2.2", "inst_v2": "1.2.3"}
+def create_tmp_file(tmp_path):
+    file_name = tmp_path / "test.toml"
+    file_data = {
+        PluginsConfig.KEY: {
+            "plugin_a": {"version": "1.0.0", "state": PluginState.ENABLE},
+            "plugin_c": {"version": "1.0.0", "state": PluginState.DISABLE},
+            "plugin_e": {"version": "1.0.0", "state": "g"},
+        }
+    }
 
+    with file_name.open("w", encoding="utf-8") as f:
+        dump(file_data, f)
 
-@pytest.fixture
-def args_tab(comp_data):
-    return MockArgs(None, comp_data["comp"], instance="", upto_stage="")
+    return file_name

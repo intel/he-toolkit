@@ -8,7 +8,7 @@ from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT  # nosec B404
 from typing import Iterable, Callable, Union, List, Tuple, Dict
-import toml
+from kit.utils.files import dump_toml, load_toml
 from kit.utils.spec import Spec
 
 
@@ -22,7 +22,7 @@ class BuildError(Exception):
 
 def chain_run(funcs: Iterable[Callable]):
     """Run functions sequentially. Fail at first function with failed
-       return value."""
+    return value."""
     for fn in funcs:
         success, return_code = fn()
         if not success:
@@ -56,7 +56,7 @@ def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
 
 def try_run(spec: dict, attrib: str):
     """Try to run the attrib in the spec.
-       Do nothing (pass success) if no key in dict.
+    Do nothing (pass success) if no key in dict.
     """
     try:
         return run(spec[attrib])
@@ -87,8 +87,7 @@ class ComponentBuilder:
 
         # load previous from info file
         try:
-            with open(f"{self._location}/hekit.info", encoding="utf-8") as info_file:
-                self._info_file = toml.load(info_file)
+            self._info_file = load_toml(f"{self._location}/hekit.info")
         except FileNotFoundError:
             self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
 
@@ -118,14 +117,13 @@ class ComponentBuilder:
 
     def already_successful(self, stage):
         """Returns True if stage already recorded in info file
-           as successful"""
+        as successful"""
         return self._info_file["status"][stage] == "success"
 
     def update_info_file(self, stage, success):
         """Updates the hekit.info file"""
-        with open(f"{self._location}/hekit.info", "w", encoding="utf-8") as info_file:
-            self._info_file["status"][stage] = "success" if success else "failure"
-            toml.dump(self._info_file, info_file)
+        self._info_file["status"][stage] = "success" if success else "failure"
+        dump_toml(f"{self._location}/hekit.info", self._info_file)
 
     def reset_stage_info_file(self, stage):
         """Reset the stage value that was read from hekit.info file"""

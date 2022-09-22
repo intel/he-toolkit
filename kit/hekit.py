@@ -9,11 +9,10 @@ import sys
 
 from os import geteuid
 from sys import stderr, exit as sys_exit
-from argparse import ArgumentParser,HelpFormatter
-from pathlib import Path
+from argparse import ArgumentParser, HelpFormatter
 from typing import Tuple
 
-from kit.utils.subparsers import discover_subparsers_from, validate_input
+from kit.utils.subparsers import register_subparser, validate_input
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
@@ -25,12 +24,11 @@ if sys.version_info < (3, 8):
 def parse_cmdline() -> Tuple:
     """Parse commandline commands"""
 
-    # resolve first to follow the symlink, if any
-    hekit_root_dir = Path(__file__).resolve().parent.parent
-
-    formatter = lambda prog: HelpFormatter(prog,max_help_position=25)
     # create the top-level parser
-    parser = ArgumentParser(prog="hekit",formatter_class=formatter)
+    parser = ArgumentParser(
+        prog="hekit",
+        formatter_class=lambda prog: HelpFormatter(prog, max_help_position=25),
+    )
     parser.set_defaults(fn=None)
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolkit version"
@@ -44,14 +42,9 @@ def parse_cmdline() -> Tuple:
 
     # create subparsers for each command
     subparsers = parser.add_subparsers(
-    title="Sub Commands", description="Sub Commands List")
-
-
-    for func in discover_subparsers_from(["commands", "tools"], hekit_root_dir / "kit"):
-        try:
-            func(subparsers)
-        except TypeError:
-            func(subparsers, hekit_root_dir)
+        title="Sub Commands", description="Sub Commands List"
+    )
+    register_subparser(subparsers)
 
     # try to enable tab completion
     enable_tab_completion(parser)

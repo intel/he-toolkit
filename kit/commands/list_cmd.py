@@ -7,8 +7,7 @@ from pathlib import Path
 from itertools import chain
 from typing import Dict, List
 
-from toml import load
-from kit.utils.files import list_dirs
+from kit.utils.files import list_dirs, load_toml
 from kit.utils.config import config_required
 from kit.utils.typing import PathType
 
@@ -17,8 +16,8 @@ _SEP_SPACES = 2
 
 
 class RepoProperties:
-    """ Contains a dictionary with the structure of the repo
-        and widths of the widest component and instance"""
+    """Contains a dictionary with the structure of the repo
+    and widths of the widest component and instance"""
 
     def __init__(self, repo_location: str, separation_spaces: int = _SEP_SPACES):
         # Get the components and instances
@@ -50,7 +49,7 @@ class RepoProperties:
     @staticmethod
     def _repo_struct(path: PathType) -> Dict[str, List[str]]:
         """Return a dictionary with sorted keys as components and values as
-           sorted list of instances"""
+        sorted list of instances"""
         path = Path(path)
         return {component: list_dirs(path / component) for component in list_dirs(path)}
 
@@ -75,7 +74,7 @@ def list_components(args):
         for comp_inst in inst_list:
             try:
                 info_filepath = repo_location / comp_name / comp_inst / "hekit.info"
-                info_file = load(info_filepath)
+                info_file = load_toml(info_filepath)
                 print(
                     f"{comp_name:{width_comp}} {comp_inst:{width_inst}}",
                     f"{info_file['status']['fetch']:{width_status}}",
@@ -103,6 +102,8 @@ def list_components(args):
 def set_list_subparser(subparsers):
     """create the parser for the 'list' command"""
     parser_list = subparsers.add_parser(
-        "list", help="Lists installed components", description= "lists installed components"
+        "list",
+        help="Lists installed components",
+        description="lists installed components",
     )
     parser_list.set_defaults(fn=list_components)

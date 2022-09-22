@@ -24,7 +24,6 @@ except ImportError:
         print("This command is disabled. To enable it install the docker-py dependency")
         print("  pip install docker")
 
-
 else:
 
     def try_setup_docker(args):
@@ -123,7 +122,7 @@ def create_tar_gz_file(
 
 def setup_docker(args):
     """Build the docker for the toolkit"""
-    ROOT = Path(args.hekit_root_dir)
+    ROOT = Constants.HEKIT_ROOT_DIR
     docker_filepaths = ROOT / "docker"
     staging_path = ROOT / "__staging__"
 
@@ -205,7 +204,7 @@ def setup_docker(args):
         print(f"docker run -it {Constants.toolkit_label}")
 
 
-def set_docker_subparser(subparsers, hekit_root_dir):
+def set_docker_subparser(subparsers):
     """create the parser for the 'docker-build' command"""
     parser_docker_build = subparsers.add_parser(
         "docker-build", help="Docker build of the toolkit"
@@ -228,4 +227,4 @@ def set_docker_subparser(subparsers, hekit_root_dir):
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"
     )
-    parser_docker_build.set_defaults(fn=try_setup_docker, hekit_root_dir=hekit_root_dir)
+    parser_docker_build.set_defaults(fn=try_setup_docker)

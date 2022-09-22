@@ -4,8 +4,8 @@
 [[hexl]]
 skip = false
 version = "1.2.3"
-name = "1.2.3"
-fetch = "git clone https://github.com/intel/hexl.git --branch %version%"
+name = "v1.2.3"
+fetch = "git clone https://github.com/intel/hexl.git --branch v%version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
@@ -21,9 +21,9 @@ export_cmake = "install/lib/cmake/hexl-%version%"
 
 [[gsl]]
 skip = false
-version = "3.1.0"
+version = "v3.1.0"
 name = "v3.1.0"
-fetch = "git clone https://github.com/microsoft/GSL.git --branch %name%"
+fetch = "git clone https://github.com/microsoft/GSL.git --branch %version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
@@ -38,9 +38,9 @@ export_cmake = "install/share/cmake/Microsoft.GSL"
 
 [[zstd]]
 skip = false
-version = "1.4.5"
+version = "v1.4.5"
 name = "v1.4.5"
-fetch = "git clone https://github.com/facebook/zstd.git --branch %name%"
+fetch = "git clone https://github.com/facebook/zstd.git --branch %version%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
@@ -59,14 +59,14 @@ export_cmake = "install/lib/cmake/zstd"
 
 [[seal]]
 skip = false
-version = "3.7.2"
+version = "v3.7.2"
 name = "v3.7.2"
 root = "%name%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
 init_install_dir = "build"
 export_install_dir = "install"
-fetch = "git clone https://github.com/microsoft/SEAL.git --branch %name%"
+fetch = "git clone https://github.com/microsoft/SEAL.git --branch %version%"
 pre-build = """cmake -S %init_fetch_dir%/SEAL -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%
                -DSEAL_BUILD_DEPS=OFF
@@ -79,7 +79,7 @@ post-build = ""
 install = "cmake --install %init_install_dir%"
 export_cmake = "install/lib/cmake/SEAL-3.7"
 # Dependencies
-hexl = "hexl/1.2.3"
+hexl = "hexl/v1.2.3"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
 
@@ -102,7 +102,7 @@ init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
-hexl = "hexl/1.2.3"
+hexl = "hexl/v1.2.3"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
 
@@ -125,7 +125,7 @@ init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
-hexl = "hexl/1.2.3"
+hexl = "hexl/v1.2.3"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
 
@@ -149,6 +149,6 @@ init_install_dir = ""
 install = ""
 # Dependencies
 seal = "seal/v3.7.2"
-hexl = "hexl/1.2.3"
+hexl = "hexl/v1.2.3"
 GSL = "gsl/v3.1.0"
 zstd = "zstd/v1.4.5"
