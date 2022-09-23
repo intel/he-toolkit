@@ -70,8 +70,7 @@ def set_remove_subparser(subparsers):
     """create the parser for the 'remove' command"""
     parser_remove = subparsers.add_parser(
         "remove",
-        help="Removes/uninstalls components",
-        description="removes/uninstalls components",
+        description="Removes/uninstalls components",
     )
     parser_remove.add_argument(
         "--config",

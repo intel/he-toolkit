@@ -20,8 +20,7 @@ def set_gen_primes_subparser(subparsers):
 
     parser = subparsers.add_parser(
         "gen-primes",
-        help="Generate primes in range [n, m] where n, m are positive integers",
-        description="generate primes in range [n, m] where n, m are positive integers",
+        description="Generate primes in range [n, m] where n, m are positive integers",
     )
     parser.add_argument("start", type=int, default=2, help="start number")
     parser.add_argument("stop", type=int, default=100, help="stop number")
@@ -170,8 +169,7 @@ def set_gen_algebras_subparser(subparsers):
     """Register subparser to generate algebras"""
     parser = subparsers.add_parser(
         "algebras",
-        help="Generate ZZ_p[x]/phi(X) algebras",
-        description="generate ZZ_p[x]/phi(X) algebras",
+        description="Generate ZZ_p[x]/phi(X) algebras",
     )
 
     parser.add_argument(

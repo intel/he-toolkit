@@ -9,7 +9,7 @@ import sys
 
 from os import geteuid
 from sys import stderr, exit as sys_exit
-from argparse import ArgumentParser, HelpFormatter
+from argparse import ArgumentParser, RawTextHelpFormatter
 from typing import Tuple
 
 from kit.utils.subparsers import register_subparser
@@ -27,7 +27,7 @@ def parse_cmdline() -> Tuple:
     # create the top-level parser
     parser = ArgumentParser(
         prog="hekit",
-        formatter_class=lambda prog: HelpFormatter(prog, max_help_position=25),
+        formatter_class=RawTextHelpFormatter,
     )
     parser.set_defaults(fn=None)
     parser.add_argument(
@@ -35,10 +35,12 @@ def parse_cmdline() -> Tuple:
     )
 
     # create subparsers for each command
-    subparsers = parser.add_subparsers(
-        title="Sub Commands", description="Sub Commands List"
-    )
+    subparsers = parser.add_subparsers(metavar="sub-command")
     register_subparser(subparsers)
+
+    # Get the name and description for each sub-command
+    msg = [f"\n{k:{20}} ({v.description})" for k, v in subparsers.choices.items()]
+    subparsers.help = f"feature to be execcuted, valid options are: {''.join(msg)}"
 
     # try to enable tab completion
     enable_tab_completion(parser)

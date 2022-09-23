@@ -3,6 +3,7 @@
 
 """This module creates the directory structure and initial files to set up a new project"""
 
+from argparse import HelpFormatter
 from shutil import copytree
 from pathlib import Path
 from re import findall
@@ -105,7 +106,9 @@ def create_new_project(args) -> None:
 def set_new_subparser(subparsers):
     """create the parser for the 'new' command"""
     parser_new = subparsers.add_parser(
-        "new", help="Create a new project", description="create a new project"
+        "new",
+        description="Create a new project",
+        formatter_class=lambda prog: HelpFormatter(prog, max_help_position=25),
     )
     parser_new.add_argument("name", type=validate_input, help="project name")
     parser_new.add_argument(
@@ -117,7 +120,8 @@ def set_new_subparser(subparsers):
     parser_new.add_argument(
         "--based-on",
         type=str,
-        help="base project",
+        help="base project, options are {logistic-regression, psi, secure-query}",
         choices=["logistic-regression", "psi", "secure-query"],
+        metavar="EXAMPLE",
     )
     parser_new.set_defaults(fn=create_new_project)

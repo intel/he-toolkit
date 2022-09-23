@@ -104,8 +104,7 @@ def set_list_subparser(subparsers):
     """create the parser for the 'list' command"""
     parser_list = subparsers.add_parser(
         "list",
-        help="Lists installed components",
-        description="lists installed components",
+        description="Lists installed components",
     )
     parser_list.add_argument(
         "--config",

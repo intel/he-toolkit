@@ -384,8 +384,7 @@ def set_plugin_subparser(subparsers) -> None:
     """Create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
         "plugins",
-        description="Handle third party plugins",
-        help="Handle third party plugins",
+        description="handle third party plugins",
     )
     subparsers_plugin = parser_plugin.add_subparsers(help="sub-command help")
 

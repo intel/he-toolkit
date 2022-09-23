@@ -148,9 +148,8 @@ def check_dependencies(args) -> None:
 def set_check_dep_subparser(subparsers):
     """create the parser for the 'check-dependencies' command"""
     parser_check_dependencies = subparsers.add_parser(
-        "check_dependencies",
-        help="Checks system dependencies",
-        description="checks system dependencies",
+        "check-dependencies",
+        description="Checks system dependencies",
     )
     parser_check_dependencies.add_argument(
         "dependencies_file",
