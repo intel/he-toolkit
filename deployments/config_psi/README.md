@@ -113,7 +113,7 @@ This script has a similar usage to the encoder script as it also accepts an
 optional config file via `--config <config-file>`.
 
 The decode script also accepts the flag `--entries ENTRIES` which signifies the
-number of plaintext entries required to decode from the input file. 
+number of plaintext entries required to decode from the input file.
 
 **NOTE:** This cannot exceed the total number of plaintext entries present in
 the file.
