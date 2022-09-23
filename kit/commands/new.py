@@ -105,6 +105,7 @@ def create_new_project(args) -> None:
 
 def set_new_subparser(subparsers):
     """create the parser for the 'new' command"""
+    base_options = ["logistic-regression", "psi", "secure-query"]
     parser_new = subparsers.add_parser(
         "new",
         description="Create a new project",
@@ -120,8 +121,8 @@ def set_new_subparser(subparsers):
     parser_new.add_argument(
         "--based-on",
         type=str,
-        help="base project, options are {logistic-regression, psi, secure-query}",
-        choices=["logistic-regression", "psi", "secure-query"],
+        help=f"base project. Options are: {', '.join(base_options)}",
+        choices=base_options,
         metavar="EXAMPLE",
     )
     parser_new.set_defaults(fn=create_new_project)

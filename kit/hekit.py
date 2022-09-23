@@ -12,7 +12,7 @@ from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser, RawTextHelpFormatter
 from typing import Tuple
 
-from kit.utils.subparsers import register_subparser
+from kit.utils.subparsers import get_options_description, register_subparser
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
@@ -39,8 +39,7 @@ def parse_cmdline() -> Tuple:
     register_subparser(subparsers)
 
     # Get the name and description for each sub-command
-    msg = [f"\n{k:{20}} ({v.description})" for k, v in subparsers.choices.items()]
-    subparsers.help = f"feature to be execcuted, valid options are: {''.join(msg)}"
+    subparsers.help = get_options_description(subparsers.choices, width=20)
 
     # try to enable tab completion
     enable_tab_completion(parser)

@@ -118,3 +118,11 @@ def validate_input(input_value: str) -> str:
         raise ValueError("Input is not valid due to non-printable characters")
 
     return input_value
+
+
+def get_options_description(parser_choices: Dict, width: int) -> str:
+    """Return the name and usage of each sub-command"""
+    msg = "".join(
+        [f"\n{k:{width}} ({v.description})" for k, v in parser_choices.items()]
+    )
+    return f"feature to be execcuted. Options are: {msg}"
