@@ -40,6 +40,10 @@ pre-build = """cmake -S %init_fetch_dir%/HElib -B %init_build_dir%
 build = "cmake --build %init_build_dir% -j"
 install = "cmake --install %init_install_dir%"
 export_cmake = "install/share/cmake/helib"
+# Build the utils directory
+post-install = """bash -c 'cmake -S %init_fetch_dir%/HElib/utils -B %init_fetch_dir%/HElib/utils/build \
+                  -Dhelib_DIR=%export_cmake% \
+                  && cmake --build %init_fetch_dir%/HElib/utils/build -j'"""
 # Dependencies
 ntl = "ntl/11.5.1"
 hexl = "hexl/1.2.5"

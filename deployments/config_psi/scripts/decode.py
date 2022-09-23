@@ -67,7 +67,7 @@ def parse_args(argv: List[str] = None):
         help="set ptxt params and composite columns",
     )
     parser.add_argument(
-        "--entries", type=Natural, default=0, help="number of input queries"
+        "--entries", type=Natural, default=0, help="number of ptxt input queries"
     )
     return parser.parse_args(argv) if argv else parser.parse_args()
 
