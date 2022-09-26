@@ -46,7 +46,7 @@ To encode data like the example shown above, users can use the script provided
 in `scripts/encode.py`.
 
 This script performs two types of encoding; client
-encoding (default), and server encoding when supplied the `--server` flag.
+encoding (default) and server encoding when supplied the `--server` flag.
 Server encoding attempts to encode each row and column entry as a single
 plaintext whereas the client encoding attempts to pack each query row into a
 single row of plaintexts.
