@@ -162,7 +162,7 @@ def init_hekit(args) -> None:
 
 def set_init_subparser(subparsers) -> None:
     """create the parser for the 'init' command"""
-    parser_init = subparsers.add_parser("init", description="Initialize hekit")
+    parser_init = subparsers.add_parser("init", description="initialize hekit")
     parser_init.add_argument(
         "--default-config", action="store_true", help="setup default config file"
     )

@@ -17,14 +17,14 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     config_file = create_config_file(tmp_path)
 
     # Test fetch command
-    cmd = f"{hekit_path} fetch {input_files_path}/test.toml --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test.toml"
     act_result = execute_process(cmd)
     assert f"fetch" in act_result.stdout
     assert not act_result.stderr
     assert 0 == act_result.returncode
 
     # Test list command after fetch
-    cmd = f"{hekit_path} list --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (
         f"{component}   {instance}   success                         "
@@ -34,14 +34,14 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     assert 0 == act_result.returncode
 
     # Test build command
-    cmd = f"{hekit_path} build {input_files_path}/test.toml --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} build {input_files_path}/test.toml"
     act_result = execute_process(cmd)
     assert "build" in act_result.stdout
     assert not act_result.stderr
     assert 0 == act_result.returncode
 
     # Test list command after build
-    cmd = f"{hekit_path} list --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (
         f"{component}   {instance}   success    success              "
@@ -51,14 +51,14 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     assert 0 == act_result.returncode
 
     # Test install command
-    cmd = f"{hekit_path} install {input_files_path}/test.toml --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} install {input_files_path}/test.toml"
     act_result = execute_process(cmd)
     assert "install" in act_result.stdout
     assert not act_result.stderr
     assert 0 == act_result.returncode
 
     # Test list command after install
-    cmd = f"{hekit_path} list --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (
         f"{component}   {instance}   success    success    success   "
@@ -68,7 +68,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     assert 0 == act_result.returncode
 
     # Test remove command
-    cmd = f"{hekit_path} remove {component} {instance} --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} remove {component} {instance}"
     act_result = execute_process(cmd)
     assert (
         f"{component}   {instance}   success    success    success   "

@@ -207,7 +207,7 @@ def setup_docker(args):
 def set_docker_subparser(subparsers):
     """create the parser for the 'docker-build' command"""
     parser_docker_build = subparsers.add_parser(
-        "docker-build", description="Docker build of the toolkit"
+        "docker-build", description="docker build of the toolkit"
     )
     parser_docker_build.add_argument("--id", type=int, help="custom user and group id")
     parser_docker_build.add_argument(

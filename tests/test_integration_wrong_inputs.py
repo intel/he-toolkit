@@ -16,7 +16,7 @@ from kit.commands.install import install_components
 def test_main_config_is_symlink(hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the config file is a symlink"""
-    cmd = f"{hekit_path} list --config {input_files_path}/default_symlink.config"
+    cmd = f"{hekit_path} --config {input_files_path}/default_symlink.config list"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert "default_symlink.config cannot be a symlink" in act_result.stderr
@@ -48,7 +48,7 @@ def test_main_toml_is_symlink(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file is a symlink"""
     config_file = create_config_file(tmp_path)
-    cmd = f"{hekit_path} fetch {input_files_path}/test_symlink.toml --config {config_file} "
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_symlink.toml"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert "The TOML file cannot be a symlink" in act_result.stderr
@@ -80,7 +80,7 @@ def test_main_toml_wrong_format(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file contains a float value instead of a string"""
     config_file = create_config_file(tmp_path)
-    cmd = f"{hekit_path} fetch {input_files_path}/test_wrong_format.toml --config {config_file} "
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_wrong_format.toml"
     act_result = execute_process(cmd)
     assert "while running subcommand" in act_result.stderr
     assert (
@@ -93,7 +93,7 @@ def test_main_toml_missing_value(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file does not have a value in the key=value pair"""
     config_file = create_config_file(tmp_path)
-    cmd = f"{hekit_path} fetch {input_files_path}/test_missing_value.toml --config {config_file} "
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_value.toml"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert (
@@ -107,7 +107,7 @@ def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the recipe file has a missing quote in key="value" pair"""
     config_file = create_config_file(tmp_path)
-    cmd = f"{hekit_path} fetch {input_files_path}/test_missing_quotes.toml --config {config_file}"
+    cmd = f"{hekit_path} --config {config_file} fetch {input_files_path}/test_missing_quotes.toml"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
     assert (

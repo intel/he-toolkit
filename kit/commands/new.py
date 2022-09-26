@@ -108,7 +108,7 @@ def set_new_subparser(subparsers):
     base_options = ["logistic-regression", "psi", "secure-query"]
     parser_new = subparsers.add_parser(
         "new",
-        description="Create a new project",
+        description="create a new project",
         formatter_class=lambda prog: HelpFormatter(prog, max_help_position=25),
     )
     parser_new.add_argument("name", type=validate_input, help="project name")

@@ -14,6 +14,9 @@ from kit.utils.typing import PathType
 from kit.utils.files import files_in_dir, load_toml
 
 
+ParserDict = Dict[str, ArgumentParser]
+
+
 def register_subparser(subparsers) -> None:
     """Register surparsers"""
     for func in get_subparsers_kit(
@@ -120,9 +123,6 @@ def validate_input(input_value: str) -> str:
     return input_value
 
 
-def get_options_description(parser_choices: Dict, width: int) -> str:
+def get_options_description(parser_choices: ParserDict, width: int) -> str:
     """Return the name and usage of each sub-command"""
-    msg = "".join(
-        [f"\n{k:{width}} ({v.description})" for k, v in parser_choices.items()]
-    )
-    return f"feature to be execcuted. Options are: {msg}"
+    return "\n".join(f"{k:{width}} {v.description}" for k, v in parser_choices.items())
