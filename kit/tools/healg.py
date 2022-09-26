@@ -168,8 +168,7 @@ def compute_prime_factors(numbers, factor_util="factor"):
 def set_gen_algebras_subparser(subparsers):
     """Register subparser to generate algebras"""
     parser = subparsers.add_parser(
-        "algebras",
-        description="generate ZZ_p[x]/phi(X) algebras",
+        "algebras", description="generate ZZ_p[x]/phi(X) algebras"
     )
 
     parser.add_argument(
