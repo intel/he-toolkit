@@ -20,7 +20,7 @@ is to use `hekit` to install the `recipes/config-psi.toml` recipe file.
 
 ## Usage
 The `config_psi` directory is split into `psi` and `scripts`. The `psi`
-directory contains code which performs the core PSI operation. The `scrips`
+directory contains code which performs the core PSI operation. The `scripts`
 directory contains utility methods for encoding and decoding data.
 
 Before using the encode/decode python scripts or running the included pytests
