@@ -61,7 +61,7 @@ example of this look at this example [config.toml](scripts/config.toml).
 
 The encoder outputs the encoded data to stdout and thus saving the output to a
 file one can use
-```
+```bash
 ./encode.py data.raw > data.encoded
 ```
 to save the encoded data to a file called `data.encoded`. To see an example
