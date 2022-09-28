@@ -18,7 +18,7 @@ alphanumeric, alphabetical, or numeric.
 
 The encoder can be used to encode both query (client) and database (server)
 data. By default the encoder will perform client encoding but using the
-`--server` flag, the encoder will perform server encoding instead. 
+`--server` flag, the encoder will perform server encoding instead.
 
 Server encoding attempts to encode each row and column entry as a single
 plaintext whereas the client encoding attempts to pack each raw query row into
