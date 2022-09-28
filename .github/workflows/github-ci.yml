@@ -101,7 +101,8 @@ jobs:
     strategy:
       matrix:
         c_compiler: [clang-10, gcc-10]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-latest
+        node: [20.04,22.04]
         include: # use clang++ and gcc+ with clang only
           - c_compiler: clang-10
             cxx_compiler: clang++-10
