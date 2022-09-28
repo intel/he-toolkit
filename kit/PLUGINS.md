@@ -134,8 +134,8 @@ the following example template
 def set_TBD_subparser(subparsers):
     """create the parser for the TDB plugin"""
     parser_TBD = subparsers.add_parser("my-plugin", description="ADD-SUBPARSER-DESCRIPTION")
-    parser_TBD.add_argument("ARG1", description="ADD-ARG-DESCRIPTION")
-    parser_TBD.add_argument("ARG2", description="ADD-ARG-DESCRIPTION")
+    parser_TBD.add_argument("ARG1", help="ADD-ARG-DESCRIPTION")
+    parser_TBD.add_argument("ARG2", help="ADD-ARG-DESCRIPTION")
     parser_TBD.set_defaults(fn=ADD_NEW_FUNCTIONALITY)
 ```
 
@@ -150,10 +150,10 @@ must use the plugin's arguments, for instance:
 ```python
 def ADD_NEW_FUNCTIONALITY(args) -> None:
     """Executes new functionality"""
-    if(args.ARG1)
+    if(args.ARG1):
         # logic for ARG1
         ...
-    if(args.ARG2)
+    if(args.ARG2):
         # logic for ARG2
         ...
 ```
