@@ -1,4 +1,4 @@
 #!/bin/bash
 
 toolkit_root_dir="${HEKITPATH:-"."}"
-PYTHONPATH="$toolkit_root_dir" python3 -m kit.hekit $@
+PYTHONPATH="$toolkit_root_dir:$PYTHONPATH" python3 -m kit.hekit $@
