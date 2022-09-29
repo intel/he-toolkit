@@ -334,6 +334,17 @@ described the functionality of the new command.
   Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
   as `~/.bashrc`.
 
+* When writing recipe files, there is a known issue when chaining bash
+  commands such as
+  ```
+  pre-build = "cd .. && ls"
+  ```
+  where `hekit` does not know how to interpret the `&&` symbol. To resolve this
+  issue, wrap the commands in `bash -c 'command1 && command2 && ...'` to
+  produce
+  ```
+  pre-build = "bash -c 'cd .. && ls'"
+  ```
 
 # Contributors
 The Intel past and present contributors to this project, sorted by last name, are
