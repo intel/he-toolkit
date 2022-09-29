@@ -3,6 +3,7 @@
 
 """This module fetches, builds, or installs the requested libraries"""
 
+from argparse import HelpFormatter
 from pathlib import Path
 from typing import Dict, Union
 from kit.utils.component_builder import components_to_build_from, chain_run
@@ -75,7 +76,11 @@ def set_install_subparser(subparsers):
     actions = ["install", "build", "fetch"]
 
     for action in actions:
-        parser = subparsers.add_parser(action, description=f"{action} components")
+        parser = subparsers.add_parser(
+            action,
+            description=f"{action} components",
+            formatter_class=lambda prog: HelpFormatter(prog, max_help_position=30),
+        )
         parser.add_argument(
             "recipe_file",
             metavar="recipe-file",

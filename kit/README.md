@@ -23,8 +23,8 @@ environment to evaluate homomorphic encryption technology.
 ## Global Options
 
 `-h, --help`: Shows the help message.
-
 `--version`: Displays Intel HE toolkit version.
+`--config CONFIG`:  use a non-default configuration file instead
 
 ## Commands
 The option `-h` can be used to get details about the arguments and usage of
@@ -33,11 +33,11 @@ each command.
 | Command | Description | Usage
 |-----------|-----------|-----------|
 | init | Initializes hekit. | hekit init [--default-config]
-| list | Lists installed components. |  hekit [--config CONFIG_FILE] list
-| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] [-f] recipe-file
-| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] [-f] recipe-file
-| fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--config CONFIG_FILE] [--recipe_arg RECIPE_ARG] recipe-file
-| remove | Uninstalls instances or components. | hekit remove [--config CONFIG_FILE] [--all] [component] [instance]
+| list | Lists installed components. |  hekit list
+| install | Installs components defined in [recipe file](#recipe-file). | hekit install [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| build | Builds components defined in [recipe file](#recipe-file). | hekit build [--recipe_arg RECIPE_ARG] [-f] recipe-file
+| fetch | Fetches components defined in [recipe file](#recipe-file) | hekit fetch [--recipe_arg RECIPE_ARG] recipe-file
+| remove | Uninstalls instances or components. | hekit remove [--all] [component] [instance]
 | check-dependencies | Checks system dependencies. | hekit check-dependencies dependencies-file
 | new | Create a new project. | hekit new [--directory DIRECTORY] [--based-on {logistic-regression,psi,secure-query}] name|
 | plugins | Handle third party plugins. See [Plugins](./PLUGINS.md). | hekit plugins {list,install,remove,enable,disable}
@@ -52,8 +52,8 @@ be available, for instance:
 ```
 repo_location = "~/.hekit/components"
 ```
-The commands `list`, `fetch`, `build`, `install` and `remove` use a
-default configuration file located in `~/.hekit/default.config`. However, the
+The commands `list`, `fetch`, `build`, `install` and `remove` use by
+default a configuration file located in `~/.hekit/default.config`. However, the
 argument `--config CONFIG_FILE` can be used to define the location of a
 non-default configuration file.
 

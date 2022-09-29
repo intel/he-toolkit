@@ -9,10 +9,14 @@ import sys
 
 from os import geteuid
 from sys import stderr, exit as sys_exit
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 from typing import Tuple
 
-from kit.utils.subparsers import register_subparser, validate_input
+from kit.utils.subparsers import (
+    get_options_description,
+    register_subparser,
+    validate_input,
+)
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
@@ -25,7 +29,11 @@ def parse_cmdline() -> Tuple:
     """Parse commandline commands"""
 
     # create the top-level parser
-    parser = ArgumentParser(prog="hekit")
+    parser = ArgumentParser(
+        prog="hekit",
+        description="execute Intel HE Toolkit commands",
+        formatter_class=RawTextHelpFormatter,
+    )
     parser.set_defaults(fn=None)
     parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolkit version"
@@ -38,8 +46,11 @@ def parse_cmdline() -> Tuple:
     )
 
     # create subparsers for each command
-    subparsers = parser.add_subparsers(help="sub-command help")
+    subparsers = parser.add_subparsers(metavar="sub-command")
     register_subparser(subparsers)
+
+    # Get the name and description for each sub-command
+    subparsers.help = get_options_description(subparsers.choices, width=20)
 
     # try to enable tab completion
     enable_tab_completion(parser)
