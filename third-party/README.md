@@ -1,4 +1,4 @@
-# Thisrd-party plugins
+# Third-party plugins
 
 This directory contains some third-party plugins that provide `hekit` with
 additional functionality.
