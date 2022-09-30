@@ -32,6 +32,7 @@ utilize the latest Intel hardware features.
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
+    - [New Examples](#new-examples)
   - [Known Issues](#known-issues)
 - [Third Party Plugins](#third-party-plugins)
 - [Contributing](#contributing)
@@ -130,8 +131,9 @@ the `hekit` command
 ```bash
 hekit docker-build
 ```
-See [here](docker) for a detailed description on the usage and components of
-this build.
+Additionally, the docker build can optionally be used via
+[VS Code Server](docker/README.md#using-vs-code-server). See [here](docker) for
+a detailed description on the usage and components of this build.
 
 ## System build
 Alternatively, one can build the toolkit's HE components using the following
@@ -222,6 +224,12 @@ entry of both the client and the server sets, then using the HElib BGV scheme,
 it encrypts the client set and computes the intersection, returning all the
 encrypted elements that are common to both sets. See the
 [README](he-samples/examples/psi/README.md) for usage information.
+
+### New Examples
+Using the `hekit new` command users can create example projects of their own.
+These can be entirely new projects or projects based on one of the provided
+examples listed above. For more on the usage of the `hekit new` command see
+[here](kit/README.md#new).
 
 ## Known Issues
 * Running ```./hekit init --default-config``` produces the error
