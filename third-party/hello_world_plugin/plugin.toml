@@ -1,4 +1,4 @@
 [plugin]
-name = "hello_world_plugin"
+name = "hello-world"
 version = "1.0.0"
 start = "start.py"
