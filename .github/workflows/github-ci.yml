@@ -100,14 +100,18 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        cc_compiler: [clang-10, gcc-10]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        c_compiler: [clang-10, gcc-10]
+        os: [ubuntu-latest]
+        version: [ubuntu-20.04]
         include: # use clang++ and gcc+ with clang only
-        os: [ubuntu-20.04]
-          - cc_compiler: clang-10
+          - c_compiler: clang-10
             cxx_compiler: clang++-10
-          - cc_compiler: gcc-10
+          - c_compiler: gcc-10
             cxx_compiler: g++-10
+        exclude:
+        version: [ubuntu-22.04]
+          - c_compiler: clang-10
+            cxx_compiler: clang++-10
 
     steps:
       - uses: actions/checkout@v3
