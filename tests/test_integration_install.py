@@ -10,6 +10,15 @@ from tests.common_utils import (
 )
 
 
+def test_debug_mode(hekit_path):
+    madeup_filename = "MadeUpFileName"
+    cmd = f"{hekit_path} --debug install {madeup_filename}"
+    act_result = execute_process(cmd)
+    assert not act_result.stdout
+    assert f"FileNotFoundError: File '{madeup_filename}' not found" in act_result.stderr
+    assert 0 != act_result.returncode
+
+
 def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     """Verify that fetch, build, install, list and remove commands
     are executed without failures"""
