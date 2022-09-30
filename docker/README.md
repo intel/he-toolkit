@@ -16,10 +16,12 @@
       - [Commands used outside of the Docker Container](#commands-used-outside-of-the-docker-container)
   - [Getting Started with a Project](#getting-started-with-a-project)
   - [Common Issues](#common-issues)
+    - [Permission](#permission)
     - [System config](#system-config)
     - [Proxy](#proxy)
     - [Dockerhub](#dockerhub)
     - [Docker](#docker)
+    - [Rebuilding](#rebuilding)
     - [Performance](#performance)
 
 
@@ -248,6 +250,12 @@ Provided examples include:
 ## Common Issues
 The following documents common issues, causes, and potential solutions.
 
+### Permission
+Running `hekit docker-build` produces a `Permission denied` error. The `hekit`
+command does not allow users to call it with root privileges. Please ensure
+that all necessary users are added to the `docker` user group to avoid this
+issue.
+
 ### System config
 apt-get command fail with message: `Release file for link is not valid yet
 (invalid for another Xd Xh Xmin Xs)`. Ubuntu system time must correct for the
@@ -286,6 +294,14 @@ check if the docker container is running with `docker ps`. If the container is
 running, attach with the `docker attach` command. If the docker container is
 not running restart the container with `docker start` or if the container has
 been deleted create a new one with `docker run`.
+
+### Rebuilding
+When rebuilding the HE Toolkit docker images using `hekit docker-build`,
+`hekit` relies on a "staging" directory to load HE Toolkit files into the
+docker container for use. Occasionally, this "staging" directory can become
+corrupt or change and cause issues when rebuilding the docker images. Please
+use `hekit docker-build --clean` to remove the staging directory and allow
+`hekit` to recreate the HE Toolkit components to be copied into the docker.
 
 ### Performance
 Performance for certain samples may vary from inside the docker
