@@ -98,6 +98,7 @@ class MockArgs:
         self.fn = setup_docker
         self.id = None
         self.version = False
+        self.debug = False
         self.y = True
 
 

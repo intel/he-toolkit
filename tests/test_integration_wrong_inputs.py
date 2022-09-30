@@ -123,6 +123,7 @@ def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
 class MockArgs:
     def __init__(self):
         self.version = False
+        self.debug = False
         self.component = "hexl"
         self.instance = "1.2.3"
         self.fn = install_components
