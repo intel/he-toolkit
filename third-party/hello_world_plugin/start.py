@@ -1,7 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from hello_world_plugin.hello import print_msg
+from hello_world.hello import print_msg
 
 
 def set_hello_subparser(subparsers):

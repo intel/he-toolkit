@@ -12,12 +12,12 @@ from zipfile import is_zipfile, ZipFile
 from pathlib import Path
 from toml import loads as toml_loads
 from kit.utils.constants import Constants, PluginsConfig, PluginState
-from kit.utils.files import list_dirs, load_toml, dump_toml
 from kit.utils.subparsers import (
     get_options_description,
     get_plugin_arg_choices,
     validate_input,
 )
+from kit.utils.files import list_dirs, load_toml, dump_toml, dash_to_underscore
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 PluginSettings = Dict[str, str]
@@ -161,7 +161,7 @@ def move_plugin_data(
 ) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
     if PluginType.DIR == plugin_type:
-        copytree(plugin_path, dest_path / plugin_name)
+        copytree(plugin_path, dest_path / dash_to_underscore(plugin_name))
     elif PluginType.TAR == plugin_type:
         with tar_open(plugin_path) as f:
             tar_items = [item for item in f.getmembers() if plugin_name in item.name]
