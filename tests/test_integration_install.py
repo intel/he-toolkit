@@ -10,9 +10,11 @@ from tests.common_utils import (
 )
 
 
-def test_debug_mode(hekit_path):
+def test_debug_mode(tmp_path, hekit_path):
+
+    config_file = create_config_file(tmp_path)
     madeup_filename = "MadeUpFileName"
-    cmd = f"{hekit_path} --debug install {madeup_filename}"
+    cmd = f"{hekit_path} --config {config_file} --debug install {madeup_filename}"
     act_result = execute_process(cmd)
     assert not act_result.stdout
     assert f"FileNotFoundError: File '{madeup_filename}' not found" in act_result.stderr
