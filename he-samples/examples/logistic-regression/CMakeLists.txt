@@ -36,7 +36,7 @@ set(OpenMP_omp_LIBRARY omp)
 find_package(OpenMP REQUIRED)
 
 add_executable(lr_test CXX.cxx)
-target_link_libraries(lr_test PRIVATE OpenMP::OpenMP_CXX)
+
 
 file(GLOB CODE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_executable(lr_test ${CODE_SRCS})
