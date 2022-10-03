@@ -34,7 +34,7 @@ add_executable(secure-query ${CODE_SRCS})
 
 
 target_include_directories(secure-query PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(lr_test PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(secure-query PRIVATE OpenMP::OpenMP_CXX)
 
 target_link_libraries(secure-query PRIVATE SEAL::seal)
 target_link_libraries(secure-query PRIVATE Threads::Threads)
