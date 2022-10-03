@@ -1,13 +1,77 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-
-def print_msg(args) -> None:
-    """Executes new functionality"""
-    msg = quote() if args.quote else "hello world"
-    print(msg)
+from typing import Dict, List
 
 
-def quote() -> str:
-    """Print some quote"""
-    return "Look both ways before crossing the road"
+class HelloWorlds:
+
+    _hello_worlds: Dict[str, str] = {
+        "AF": "hello wêreld",  # Afrikaans
+        "SQ": "përshendetje botë",  # Albanian
+        "AR": "مرحبا بالعالم",  # Arabic
+        "HY": "բարեւ աշխարհ",  # Armenian
+        "AZ": "salam dunya",  # Azerbaijani
+        "EU": "kaixo mundua",  # Basque
+        "BE": "прывітанне сусвет",  # Belarusian
+        "BG": "здравей свят",  # Bulgarian
+        "CA": "hola món",  # Catalan
+        "ZH": "你好世界",  # Chinese
+        "CO": "salutu mondu",  # Corsican
+        "HR": "pozdrav svijete",  # Croatian
+        "CS": "ahoj světe",  # Czech
+        "DA": "hej verden",  # Danish
+        "NL": "hallo wereld",  # Dutch
+        "EN": "hello world",  # English
+        "FI": "hei maailma",  # Finnish
+        "FR": "bonjour le monde",  # French
+        "KA": "გამარჯობა მსოფლიო",  # Georgian
+        "DE": "hallo welt",  # German
+        "EL": "γειά σου κόσμε",  # Greek
+        "IW": "שלום עולם",  # Hebrew
+        "HU": "helló világ",  # Hungarian
+        "IS": "halló heimur",  # Icelandic
+        "GA": "dia duit ar domhan",  # Irish
+        "IT": "ciao mondo",  # Italian
+        "JA": "こんにちは世界",  # Japanese
+        "KK": "сәлем әлем",  # Kazakh
+        "KO": "안녕하세요 세계",  # Korean
+        "LA": "salve mundi",  # Latin
+        "LV": "sveika pasaule",  # Latvian
+        "LT": "labas pasauli",  # Lithuanian
+        "MS": "hai dunia",  # Malay
+        "MN": "сайн уу ертөнц",  # Mongolian
+        "NO": "hei verden",  # Norwegian
+        "FA": "سلام دنیا",  # Persian
+        "PL": "witaj świecie",  # Polish
+        "PT": "olá mundo",  # Portuguese
+        "RO": "salut lume",  # Romanian
+        "RU": "привет мир",  # Russian
+        "SM": "talofa le lalolagi",  # Samoan
+        "GD": "hàlo a shaoghail",  # Scottish Gaelic
+        "SR": "здраво свете",  # Serbian
+        "SK": "ahoj svet",  # Slovak
+        "ES": "hola mundo",  # Spanish
+        "SU": "halo dunya",  # Sudanese
+        "SV": "hej världen",  # Swedish
+        "TG": "салом ҷаҳон",  # Tajik
+        "TH": "สวัสดีชาวโลก",  # Thai
+        "TR": "selam dünya",  # Turkish
+        "TK": "salam dünýä",  # Turkmen
+        "UK": "привіт світ",  # Ukrainian
+        "UR": "ہیلو دنیا",  # Urdu
+        "VI": "Chào thế giới",  # Vietnamese
+        "CY": "helo byd",  # Welsh
+    }
+
+    @classmethod
+    def print_msg(cls, args) -> None:
+        """Executes new functionality"""
+        # Choices in `--lang` should block unknown
+        msg = cls._hello_worlds[args.language]
+        print(msg)
+
+    @classmethod
+    def get_available_languages(cls) -> List[str]:
+        """Returns as a list the available languages"""
+        return list(cls._hello_worlds.keys())
