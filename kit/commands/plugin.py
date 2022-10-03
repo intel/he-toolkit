@@ -176,7 +176,7 @@ def remove_plugin_data(
     plugin_name: str, dest_path: Path = PluginsConfig.ROOT_DIR
 ) -> None:
     """Remove a plugin folder if it exists"""
-    plugin_path = dest_path / plugin_name
+    plugin_path = dest_path / dash_to_underscore(plugin_name)
     if Path(plugin_path).exists():
         rmtree(plugin_path)
 
