@@ -30,6 +30,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
+set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
+set(OpenMP_CXX_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
+set(OpenMP_CXX_LIB_NAMES "libomp" "libgomp" "libiomp5")
+set(OpenMP_libomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+set(OpenMP_libgomp_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+set(OpenMP_libiomp5_LIBRARY ${OpenMP_CXX_LIB_NAMES})
+
 file(GLOB CODE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_executable(lr_test ${CODE_SRCS})
 
