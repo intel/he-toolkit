@@ -33,8 +33,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}
 file(GLOB CODE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_executable(lr_test ${CODE_SRCS})
 
-target_link_libraries(lr_test PRIVATE OpenMP::OpenMP_CXX)
+
 target_include_directories(lr_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(lr_test PRIVATE OpenMP::OpenMP_CXX)
 
 target_link_libraries(lr_test PRIVATE SEAL::seal)
 target_link_libraries(lr_test PRIVATE Threads::Threads)
