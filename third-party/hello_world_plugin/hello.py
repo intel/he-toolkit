@@ -5,6 +5,9 @@ from typing import Dict, List
 
 
 class HelloWorlds:
+    """This class holds 'hello world' in different languages using the standard 2-letter codes for languages,
+    https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+    """
 
     _hello_worlds: Dict[str, str] = {
         "AF": "hello wêreld",  # Afrikaans
@@ -68,10 +71,10 @@ class HelloWorlds:
     def print_msg(cls, args) -> None:
         """Executes new functionality"""
         # Choices in `--lang` should block unknown
-        msg = cls._hello_worlds[args.language]
+        msg = cls._hello_worlds[args.lang]
         print(msg)
 
     @classmethod
     def get_available_languages(cls) -> List[str]:
         """Returns as a list the available languages"""
-        return list(cls._hello_worlds.keys())
+        return sorted(cls._hello_worlds.keys())

@@ -10,7 +10,7 @@ def set_hello_subparser(subparsers):
     parser.add_argument(
         "--lang",
         metavar="language",
-        type=str,
+        type=str.upper,
         default="EN",
         choices=HelloWorlds.get_available_languages(),
         help="say hello world in this language",
