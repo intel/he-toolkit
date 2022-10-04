@@ -33,7 +33,7 @@ file(GLOB CODE_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_executable(secure-query ${CODE_SRCS})
 
 
-target_link_libraries(lr_test PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(secure-query PRIVATE OpenMP::OpenMP_CXX)
 target_include_directories(secure-query PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
