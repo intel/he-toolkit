@@ -36,6 +36,9 @@ def parse_cmdline() -> Tuple:
     )
     parser.set_defaults(fn=None)
     parser.add_argument(
+        "--debug", action="store_true", help="if exception occurs print out stacktrace"
+    )
+    parser.add_argument(
         "--version", action="store_true", help="display Intel HE toolkit version"
     )
     parser.add_argument(

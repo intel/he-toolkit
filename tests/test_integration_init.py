@@ -65,3 +65,4 @@ class MockArgs:
         self.fn = init_hekit
         self.hekit_root_dir = Path("/home")
         self.version = False
+        self.debug = False
