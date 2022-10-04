@@ -28,7 +28,6 @@ RUN apt update && \
                    build-essential                \
                    byobu                          \
                    clang-10                       \
-                   clang-omp                      \
                    cmake                          \
                    curl                           \
                    file                           \
