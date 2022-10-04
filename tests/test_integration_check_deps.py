@@ -87,6 +87,7 @@ class MockArgs:
         self.config = f"{self.tests_path}/input_files/default.config"
         self.fn = check_dependencies
         self.version = False
+        self.debug = False
 
 
 class MockSubprocess:
