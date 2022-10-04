@@ -39,6 +39,7 @@ target_include_directories(secure-query PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/incl
 
 target_link_libraries(secure-query PRIVATE SEAL::seal)
 target_link_libraries(secure-query PRIVATE Threads::Threads)
+target_link_libraries(secure-query PRIVATE libgflags)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/datasets/us_state_capitals.csv
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
