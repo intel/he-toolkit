@@ -40,7 +40,7 @@ if (${ENABLE_SEAL})
     )
 
   add_executable(sample-kernels-seal ${SAMPLE_KERNEL_SEAL_SRC})
-
+  target_link_libraries(sample-kernels-seal PRIVATE OpenMP::OpenMP_CXX)
   target_include_directories(sample-kernels-seal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
   target_link_libraries(sample-kernels-seal PRIVATE SEAL::seal seal_kernel_executor)
