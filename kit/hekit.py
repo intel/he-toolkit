@@ -42,9 +42,6 @@ def parse_cmdline() -> Tuple:
         "--version", action="store_true", help="display Intel HE toolkit version"
     )
     parser.add_argument(
-        "--debug", action="store_true", help="If exception occurs print out stacktrace"
-    )
-    parser.add_argument(
         "--config",
         type=validate_input,
         default="~/.hekit/default.config",
