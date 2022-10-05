@@ -32,14 +32,10 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}
 file(GLOB CODE_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_executable(secure-query ${CODE_SRCS})
 
-
-
 target_include_directories(secure-query PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 
 target_link_libraries(secure-query PRIVATE SEAL::seal)
 target_link_libraries(secure-query PRIVATE Threads::Threads)
-
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/datasets/us_state_capitals.csv
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
