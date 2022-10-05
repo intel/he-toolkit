@@ -158,6 +158,8 @@ jobs:
           - c_compiler: clang-12
             cxx_compiler: clang++-12
         exclude: # Skip clang-10 on ubuntu-22.04
+          - c_compiler: clang-10
+            os: ubuntu-22.04
           - c_compiler: clang-12
             os: ubuntu-20.04
 
