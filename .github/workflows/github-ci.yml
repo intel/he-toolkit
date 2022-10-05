@@ -171,16 +171,12 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
-          setup-clang:
+
 
       - name: he-toolkit-seal-ubuntu-22
-        runs-on: ubuntu-22.04
-        steps:
-           run: |
-            sudo apt install libomp-dev
-            echo "CC=clang">> $GITHUB_ENV
-            echo "CXX=clang++" >> $GITHUB_ENV
-
+        if: matrix.os == "ubuntu-22.04" &&  matrix.c_compiler == "clang"
+        run: |
+          sudo apt install libomp-dev
 
       - name: Build and install SEAL, examples, and sample kernels recipe
         run: |
