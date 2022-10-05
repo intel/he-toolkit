@@ -36,14 +36,14 @@ jobs:
     name: he-toolkit-seal-ubuntu-22
     runs-on: ubuntu-22.04
     steps:
-      -uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       # Required for clang-14
-      -run: sudo apt install libomp-dev
-      -run: |
+      - run: sudo apt install libomp-dev
+      - run: |
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         echo "CC=clang">> $GITHUB_ENV
         echo "CXX=clang++" >> $GITHUB_ENV
-      -run: |
+      - run: |
         ./hekit --config default.config install .github/hekit-recipes/seal.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
         ./hekit --config default.config list
         echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
