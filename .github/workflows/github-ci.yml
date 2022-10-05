@@ -148,19 +148,19 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10,clang-12]
+        c_compiler: [clang-10, gcc-10,clang-13]
         os: [ubuntu-20.04,ubuntu-22.04]
         include: # use clang++ and gcc+ with clang only
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-12
-            cxx_compiler: clang++-12
+          - c_compiler: clang-13
+            cxx_compiler: clang++-13
         exclude: # Skip clang-10 on ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          - c_compiler: clang-12
+          - c_compiler: clang-13
             os: ubuntu-20.04
 
     steps:
@@ -174,7 +174,7 @@ jobs:
 
 
       - name: he-toolkit-seal-ubuntu-22
-        if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-12'
+        if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-13'
         run: |
           sudo apt install libomp-dev
 
