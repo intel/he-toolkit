@@ -5,7 +5,7 @@
 ## Synthetic data generation for LR HE example
 ##################################################
 find_package(Python3 COMPONENTS Interpreter Development)
-if (Python3_VERSION LESS 3.8)
+if (Python3_VERSION VERSION_LESS 3.8)
   message(FATAL_ERROR "python >= 3.8 is required")
 endif()
 
