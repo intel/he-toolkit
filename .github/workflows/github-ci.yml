@@ -40,6 +40,7 @@ jobs:
       # Required for clang-14
       - run: sudo apt install libomp-dev
       - run: |
+          pip3 install toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=clang">> $GITHUB_ENV
           echo "CXX=clang++" >> $GITHUB_ENV
