@@ -175,8 +175,8 @@ jobs:
         if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-10'
         run: |
           sudo apt install libomp-dev
-          echo "CC=clang-11" >> $GITHUB_ENV
-          echo "CXX=clang++-11" >> $GITHUB_ENV
+          echo "CC=clang-12" >> $GITHUB_ENV
+          echo "CXX=clang++-12" >> $GITHUB_ENV
 
       - name: Build and install SEAL, examples, and sample kernels recipe
         run: |
