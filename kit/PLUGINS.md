@@ -97,13 +97,17 @@ hekit plugins refresh
 
 ## Creating a new plugin
 The simplest version of a plugin must include a main directory
-that contains a TOML file and at least one python file, as shown
+that contains a TOML file and at least one python file as shown
 in the following example
 ```
 my-plugin
+    |- __init__.py
     |- new-plugin.py
     |- plugin.toml
 ```
+
+Note that it is recommended to have an `__init__.py` file as the plugins are
+treated as python packages.
 
 For delivering a plugin in zip or tarball format, a common file
 packaging utility must be applied to the previous structure.
