@@ -33,7 +33,6 @@ jobs:
         with:
           extra_args: --all-files
 
-
   test-hekit:
     name: Test hekit commands
     runs-on: ubuntu-20.04
@@ -172,12 +171,10 @@ jobs:
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
 
-
       - name: he-toolkit-seal-ubuntu-22
         if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-14'
         run: |
           sudo apt install libomp-dev
-
 
       - name: Build and install SEAL, examples, and sample kernels recipe
         run: |
