@@ -175,7 +175,7 @@ jobs:
 
       - name: he-toolkit-seal-ubuntu-22
         runs-on: ubuntu-22.04
-        defaults:
+        steps:
            run: |
             sudo apt install libomp-dev
             echo "CC=clang">> $GITHUB_ENV
