@@ -69,3 +69,8 @@ def dump_toml(file_name: PathType, content: dict) -> None:
 
     with file_path.open("w", encoding="utf-8") as f:
         dump(content, f)
+
+
+def dash_to_underscore(name: str) -> str:
+    """Return string with dashes changed to underscores."""
+    return name.replace("-", "_")

@@ -146,7 +146,7 @@ def test_healg_negative_arg_p(hekit_path):
 def test_healg_max_arg_p(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     p is equal to sys.maxsize"""
-    cmd = cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
+    cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
     act_result = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -p: invalid parse_range_for_primes value"
@@ -190,7 +190,7 @@ def test_healg_negative_arg_d(hekit_path):
 def test_healg_max_arg_d(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     d is equal to sys.maxsize"""
-    cmd = cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
+    cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
     act_result = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -d: invalid parse_range_for_primes value"
