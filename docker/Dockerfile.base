@@ -59,7 +59,7 @@ RUN ["pip", "install", "toml", "argcomplete"]
 RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  10 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 20 && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  10 && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 20 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 20
     # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
