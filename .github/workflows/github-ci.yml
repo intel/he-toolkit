@@ -40,15 +40,15 @@ jobs:
       # Required for clang-14
       - run: sudo apt install libomp-dev
       - run: |
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo "CC=clang">> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "CC=clang">> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
       - run: |
-        ./hekit --config default.config install .github/hekit-recipes/seal.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-        ./hekit --config default.config list
-        echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
-        echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
-        echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
+          ./hekit --config default.config install .github/hekit-recipes/seal.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
+          echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
 
   test-hekit:
     name: Test hekit commands
