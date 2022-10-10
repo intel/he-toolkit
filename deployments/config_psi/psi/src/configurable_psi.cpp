@@ -222,14 +222,15 @@ int main(int argc, char* argv[]) {
   if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
     std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
                      " ...";
-    *ptxt_db_ptr =
-        readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, *pkp);
+    ptxt_db_ptr = std::make_unique<helib::Database<Ptxt>>(
+        readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, *pkp));
     std::cout << "Done.\n";
   } else {  // Load ctxt DB
     std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
                      " ...";
-    *ctxt_db_ptr = readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath,
-                                               contextp, *pkp);
+    ctxt_db_ptr = std::make_unique<helib::Database<helib::Ctxt>>(
+        readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath, contextp,
+                                    *pkp));
     std::cout << "Done.\n";
   }
 

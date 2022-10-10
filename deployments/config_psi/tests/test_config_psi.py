@@ -62,6 +62,7 @@ def test_ptxt_to_ptxt(setup, tmp_path, out_str):
     # Run PSI pipeline
     act_result = run_psi(
         [
+            "--single-run",
             "--ptxt-query",
             "--ptxt-db",
             params_file.with_suffix(".pk"),
@@ -73,8 +74,8 @@ def test_ptxt_to_ptxt(setup, tmp_path, out_str):
     )
 
     expected_result = out_str % (
-        "ptxt-to-ptxt",
         f"{db}.ptxt",
+        "ptxt-to-ptxt",
         f"{query}.ptxt",
         tmp_path / "resultFile",
     )
@@ -107,6 +108,7 @@ def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
     # Run PSI pipeline
     act_result = run_psi(
         [
+            "--single-run",
             "--ptxt-db",
             params_file.with_suffix(".pk"),
             table_file,
@@ -117,8 +119,8 @@ def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
     )
 
     expected_out_str = out_str % (
-        "ctxt-to-ptxt",
         f"{db}.ptxt",
+        "ctxt-to-ptxt",
         f"{query}.ctxt",
         tmp_path / "resultFile",
     )
@@ -150,6 +152,7 @@ def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
     # Run PSI pipeline
     act_result = run_psi(
         [
+            "--single-run",
             "--ptxt-query",
             params_file.with_suffix(".pk"),
             table_file,
@@ -160,8 +163,8 @@ def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
     )
 
     expected_result = out_str % (
-        "ptxt-to-ctxt",
         f"{str(db)}.ctxt",
+        "ptxt-to-ctxt",
         f"{str(query)}.ptxt",
         tmp_path / "resultFile",
     )
@@ -193,6 +196,7 @@ def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
     # Run PSI pipeline
     act_result = run_psi(
         [
+            "--single-run",
             params_file.with_suffix(".pk"),
             table_file,
             db.with_suffix(".ctxt"),
@@ -202,8 +206,8 @@ def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
     )
 
     expected_result = out_str % (
-        "ctxt-to-ctxt",
         f"{str(db)}.ctxt",
+        "ctxt-to-ctxt",
         f"{str(query)}.ctxt",
         tmp_path / "resultFile",
     )
@@ -230,15 +234,15 @@ def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
 
 @pytest.fixture
 def out_str() -> str:
-    """Requires a 3-tuple (pipeline-combo, db-name, query-name, result-name)
-    e.g. ('ctxt-to-ctxt', 'db.ctxt', 'query.ctxt', 'resultFile')"""
+    """Requires a 3-tuple (db-name, pipeline-combo, query-name, result-name)
+    e.g. ('db.ctxt', 'ctxt-to-ctxt', 'query.ctxt', 'resultFile')"""
 
     return (
         "Threads available: 1\n"
         "Loading HE Context and Public Key...Done.\n"
+        "Reading database from file %s ...Done.\n"
         "Configuring query...Done.\n"
         "Executing %s comparison\n"
-        "Reading database from file %s ...Done.\n"
         "Reading query data from file %s ...Done.\n"
         "Performing database lookup...Done.\n"
         "Writing result to file %s ...Done.\n"
