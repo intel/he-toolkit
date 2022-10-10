@@ -130,6 +130,15 @@ jobs:
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
 
+      - name: Run PSI config tests
+        run: |
+          ./hekit --config default.config install .github/hekit-recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "CONFIG_PSI_DIR"=$HOME/.hekit/components/deployments/config_psi/psi/build" >> $GITHUB_ENV
+
+      - name: Run unit tests
+        run: ${Config_PSI_BUILD_DIR}/bin/unit-test
+
   build-and-test-toolkit-seal:
     name: HE Toolkit SEAL 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
     runs-on: ${{matrix.os}}
