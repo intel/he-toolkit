@@ -46,10 +46,10 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
 }
 
 // Database lookup where both the query and dabatase are not encrypted.
-void plaintextAllLookup(sharedContext& contextp, helib::PubKey& pk,
-                        helib::QueryType& query,
-                        helib::Database<Ptxt>& database,
-                        CmdLineOpts& cmdLineOpts) {
+void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
+                        const helib::QueryType& query,
+                        const helib::Database<Ptxt>& database,
+                        const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -72,10 +72,10 @@ void plaintextAllLookup(sharedContext& contextp, helib::PubKey& pk,
 }
 
 // Database lookup where the query is not encrypted but the dabatase is.
-void plaintextQueryLookup(sharedContext& contextp, helib::PubKey& pk,
-                          helib::QueryType& query,
-                          helib::Database<helib::Ctxt>& database,
-                          CmdLineOpts& cmdLineOpts) {
+void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
+                          const helib::QueryType& query,
+                          const helib::Database<helib::Ctxt>& database,
+                          const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -101,9 +101,10 @@ void plaintextQueryLookup(sharedContext& contextp, helib::PubKey& pk,
 }
 
 // Database lookup where the query is encrypted but the dabatase is not.
-void plaintextDBLookup(sharedContext& contextp, helib::PubKey& pk,
-                       helib::QueryType& query, helib::Database<Ptxt>& database,
-                       CmdLineOpts& cmdLineOpts) {
+void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
+                       const helib::QueryType& query,
+                       const helib::Database<Ptxt>& database,
+                       const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -129,10 +130,10 @@ void plaintextDBLookup(sharedContext& contextp, helib::PubKey& pk,
 }
 
 // Database lookup where both the query and dabatase are encrypted.
-void encryptedAllLookup(sharedContext& contextp, helib::PubKey& pk,
-                        helib::QueryType& query,
-                        helib::Database<helib::Ctxt>& database,
-                        CmdLineOpts& cmdLineOpts) {
+void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
+                        const helib::QueryType& query,
+                        const helib::Database<helib::Ctxt>& database,
+                        const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -210,24 +211,24 @@ int main(int argc, char* argv[]) {
 
   // Load Context and PubKey
   sharedContext contextp;
-  std::unique_ptr<helib::PubKey> pkp;
+  std::unique_ptr<const helib::PubKey> pkp;
   std::cout << "Loading HE Context and Public Key...";
   std::tie(contextp, pkp) =
       loadContextAndKey<helib::PubKey>(cmdLineOpts.pkFilePath);
   std::cout << "Done.\n";
 
-  std::unique_ptr<helib::Database<Ptxt>> ptxt_db_ptr;
-  std::unique_ptr<helib::Database<helib::Ctxt>> ctxt_db_ptr;
+  std::unique_ptr<const helib::Database<Ptxt>> ptxt_db_ptr;
+  std::unique_ptr<const helib::Database<helib::Ctxt>> ctxt_db_ptr;
   // Load DB once
   if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
-    std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
-                     " ...";
+    std::cout << "Reading database from file " << cmdLineOpts.databaseFilePath
+              << " ...";
     ptxt_db_ptr = std::make_unique<helib::Database<Ptxt>>(
         readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, *pkp));
     std::cout << "Done.\n";
   } else {  // Load ctxt DB
-    std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
-                     " ...";
+    std::cout << "Reading database from file " << cmdLineOpts.databaseFilePath
+              << " ...";
     ctxt_db_ptr = std::make_unique<helib::Database<helib::Ctxt>>(
         readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath, contextp,
                                     *pkp));
@@ -236,7 +237,7 @@ int main(int argc, char* argv[]) {
 
   // Parse tableFile to build query
   std::cout << "Configuring query...";
-  auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
+  const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
   std::cout << "Done.\n";
 
   // REPL
