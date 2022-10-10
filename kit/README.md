@@ -23,8 +23,11 @@ environment to evaluate homomorphic encryption technology.
 ## Global Options
 
 `-h, --help`: shows the help message.
+
 `--version`: displays Intel HE toolkit version.
+
 `--debug`: enables debug mode. Currently only prints a backtrace of error raised.
+
 `--config CONFIG`: use a non-default configuration file instead of default path.
 
 ## Commands

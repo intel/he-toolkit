@@ -296,10 +296,10 @@ described the functionality of the new command.
       """create the parser for the 'ACTION' command"""
       parser_ACTION = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
       parser_ACTION.add_argument(
-          "ARG1", description="ADD-ARG-DESCRIPTION"
+          "ARG1", help="ADD-ARG-DESCRIPTION"
       )
       parser_ACTION.add_argument(
-          "ARG2", description="ADD-ARG-DESCRIPTION"
+          "ARG2", help="ADD-ARG-DESCRIPTION"
       )
       parser_ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
   ```
@@ -310,10 +310,10 @@ described the functionality of the new command.
   ```python
   def NEW_FUNCTIONALITY(args) -> None:
       """Executes new functionality"""
-      if(args.ARG1)
-          pass
-      elif(args.ARG2)
-          pass
+      if(args.ARG1):
+          # code goes here
+      elif(args.ARG2):
+          # code goes here
   ```
 
 * The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
