@@ -57,15 +57,15 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang]
+        c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: # use clang++ and gcc+ with clang only
+        include: # using clang-10, gcc-10 and clang-14 versions
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang
-            cxx_compiler: clang++
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
         exclude: # Skip clang-10 on ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
@@ -105,15 +105,15 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang]
+        c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: # use clang++ and gcc+ with clang only
+        include: # using clang-10, gcc-10 and clang-14 versions
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang
-            cxx_compiler: clang++
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
         exclude: # Skip clang-10 on ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
@@ -149,7 +149,7 @@ jobs:
       matrix:
         c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: # use clang++ and gcc+ with clang only
+        include: # using clang-10, gcc-10 and clang-14 versions
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
