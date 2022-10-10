@@ -27,6 +27,7 @@ struct CmdLineOpts {
   bool isColumn = false;
   long nthreads = 1;
   long offset = 0;
+  bool singleRun = false;
 };
 
 // Utility function which performs a binary sum of Matrix rows.
@@ -46,14 +47,9 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
 
 // Database lookup where both the query and dabatase are not encrypted.
 void plaintextAllLookup(sharedContext& contextp, helib::PubKey& pk,
-                        helib::QueryType& query, CmdLineOpts& cmdLineOpts) {
-  // Read in database
-  std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
-                   " ...";
-  helib::Database<Ptxt> database =
-      readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, pk);
-  std::cout << "Done.\n";
-
+                        helib::QueryType& query,
+                        helib::Database<Ptxt>& database,
+                        CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -77,14 +73,9 @@ void plaintextAllLookup(sharedContext& contextp, helib::PubKey& pk,
 
 // Database lookup where the query is not encrypted but the dabatase is.
 void plaintextQueryLookup(sharedContext& contextp, helib::PubKey& pk,
-                          helib::QueryType& query, CmdLineOpts& cmdLineOpts) {
-  // Read in database
-  std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
-                   " ...";
-  helib::Database<helib::Ctxt> database =
-      readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath, contextp, pk);
-  std::cout << "Done.\n";
-
+                          helib::QueryType& query,
+                          helib::Database<helib::Ctxt>& database,
+                          CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -111,14 +102,8 @@ void plaintextQueryLookup(sharedContext& contextp, helib::PubKey& pk,
 
 // Database lookup where the query is encrypted but the dabatase is not.
 void plaintextDBLookup(sharedContext& contextp, helib::PubKey& pk,
-                       helib::QueryType& query, CmdLineOpts& cmdLineOpts) {
-  // Read in database
-  std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
-                   " ...";
-  helib::Database<Ptxt> database =
-      readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, pk);
-  std::cout << "Done.\n";
-
+                       helib::QueryType& query, helib::Database<Ptxt>& database,
+                       CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -145,14 +130,9 @@ void plaintextDBLookup(sharedContext& contextp, helib::PubKey& pk,
 
 // Database lookup where both the query and dabatase are encrypted.
 void encryptedAllLookup(sharedContext& contextp, helib::PubKey& pk,
-                        helib::QueryType& query, CmdLineOpts& cmdLineOpts) {
-  // Read in database
-  std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
-                   " ...";
-  helib::Database<helib::Ctxt> database =
-      readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath, contextp, pk);
-  std::cout << "Done.\n";
-
+                        helib::QueryType& query,
+                        helib::Database<helib::Ctxt>& database,
+                        CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
                    " ...";
@@ -213,6 +193,8 @@ int main(int argc, char* argv[]) {
            nullptr)
       .arg("--column", cmdLineOpts.isColumn,
            "Flag to signify input is in column format.", nullptr)
+      .arg("--single-run", cmdLineOpts.singleRun, "Run the service once.",
+           nullptr)
       .parse(argc, argv);
 
   if (cmdLineOpts.nthreads < 1) {
@@ -234,28 +216,49 @@ int main(int argc, char* argv[]) {
       loadContextAndKey<helib::PubKey>(cmdLineOpts.pkFilePath);
   std::cout << "Done.\n";
 
+  std::unique_ptr<helib::Database<Ptxt>> ptxt_db_ptr;
+  std::unique_ptr<helib::Database<helib::Ctxt>> ctxt_db_ptr;
+  // Load DB once
+  if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
+    std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
+                     " ...";
+    *ptxt_db_ptr =
+        readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, *pkp);
+    std::cout << "Done.\n";
+  } else {  // Load ctxt DB
+    std::cout << "Reading database from file " + cmdLineOpts.databaseFilePath +
+                     " ...";
+    *ctxt_db_ptr = readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath,
+                                               contextp, *pkp);
+    std::cout << "Done.\n";
+  }
+
   // Parse tableFile to build query
   std::cout << "Configuring query...";
   auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
   std::cout << "Done.\n";
 
-  if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
-    // Plaintext query and plaintext DB
-    std::cout << "Executing ptxt-to-ptxt comparison\n";
-    plaintextAllLookup(contextp, *pkp, query, cmdLineOpts);
-  } else if (cmdLineOpts.ptxtQuery && !cmdLineOpts.ptxtDB) {
-    // Plaintext query and encrypted DB
-    std::cout << "Executing ptxt-to-ctxt comparison\n";
-    plaintextQueryLookup(contextp, *pkp, query, cmdLineOpts);
-  } else if (!cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
-    // Encrypted query and plaintext DB
-    std::cout << "Executing ctxt-to-ptxt comparison\n";
-    plaintextDBLookup(contextp, *pkp, query, cmdLineOpts);
-  } else {
-    // Encrypted query and encrypted DB
-    std::cout << "Executing ctxt-to-ctxt comparison\n";
-    encryptedAllLookup(contextp, *pkp, query, cmdLineOpts);
-  }
+  // REPL
+  do {
+    if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
+      // Plaintext query and plaintext DB
+      std::cout << "Executing ptxt-to-ptxt comparison\n";
+      plaintextAllLookup(contextp, *pkp, query, *ptxt_db_ptr, cmdLineOpts);
+    } else if (cmdLineOpts.ptxtQuery && !cmdLineOpts.ptxtDB) {
+      // Plaintext query and encrypted DB
+      std::cout << "Executing ptxt-to-ctxt comparison\n";
+      plaintextQueryLookup(contextp, *pkp, query, *ctxt_db_ptr, cmdLineOpts);
+    } else if (!cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
+      // Encrypted query and plaintext DB
+      std::cout << "Executing ctxt-to-ptxt comparison\n";
+      plaintextDBLookup(contextp, *pkp, query, *ptxt_db_ptr, cmdLineOpts);
+    } else {
+      // Encrypted query and encrypted DB
+      std::cout << "Executing ctxt-to-ctxt comparison\n";
+      encryptedAllLookup(contextp, *pkp, query, *ctxt_db_ptr, cmdLineOpts);
+    }
+  } while (!cmdLineOpts.singleRun);
+  // End REPL
 
   return 0;
 }
