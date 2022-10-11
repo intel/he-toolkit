@@ -59,8 +59,8 @@ jobs:
       matrix:
         c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: 
-          # pairing cc compiler with relavent cxx compiler 
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
@@ -112,8 +112,8 @@ jobs:
       matrix:
         c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: 
-          # pairing cc compiler with relavent cxx compiler 
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
@@ -159,7 +159,7 @@ jobs:
       matrix:
         c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: 
+        include:
           # pairing cc compiler with relavent cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
