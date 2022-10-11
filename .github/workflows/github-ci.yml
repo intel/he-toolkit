@@ -57,7 +57,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang-11]
+        c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
         include: 
           # pairing cc compiler with relavent cxx compiler 
@@ -65,8 +65,8 @@ jobs:
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-11
-            cxx_compiler: clang++-11
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
         exclude:
           # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
@@ -110,7 +110,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang-11]
+        c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
         include: 
           # pairing cc compiler with relavent cxx compiler 
@@ -118,8 +118,8 @@ jobs:
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-11
-            cxx_compiler: clang++-11
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
         exclude:
           # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
@@ -160,7 +160,7 @@ jobs:
         c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
         include: 
-          # pairing cc compiler with relavent cxx compiler 
+          # pairing cc compiler with relavent cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
