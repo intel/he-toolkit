@@ -63,8 +63,8 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
                         const helib::Database<Ptxt>& database,
                         const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
-                   " ...";
+  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
+            << " ...";
   helib::Matrix<Ptxt> queryData =
       readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -78,7 +78,7 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Write result to file
-  std::cout << "Writing result to file " + cmdLineOpts.outFilePath + " ...";
+  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 }
@@ -89,8 +89,8 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
                           const helib::Database<helib::Ctxt>& database,
                           const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
-                   " ...";
+  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
+            << " ...";
   helib::Matrix<Ptxt> queryData =
       readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -107,7 +107,7 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Write result to file
-  std::cout << "Writing result to file " + cmdLineOpts.outFilePath + " ...";
+  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 }
@@ -118,8 +118,8 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
                        const helib::Database<Ptxt>& database,
                        const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
-                   " ...";
+  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
+            << " ...";
   helib::Matrix<helib::Ctxt> queryData =
       readQueryFromFile<helib::Ctxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -136,7 +136,7 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Write result to file
-  std::cout << "Writing result to file " + cmdLineOpts.outFilePath + " ...";
+  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 }
@@ -147,8 +147,8 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
                         const helib::Database<helib::Ctxt>& database,
                         const CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " + cmdLineOpts.queryFilePath +
-                   " ...";
+  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
+            << " ...";
   helib::Matrix<helib::Ctxt> queryData =
       readQueryFromFile<helib::Ctxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -165,7 +165,7 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Write result to file
-  std::cout << "Writing result to file " + cmdLineOpts.outFilePath + " ...";
+  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 }
@@ -250,13 +250,12 @@ int main(int argc, char* argv[]) {
     std::cout << "Done.\n";
   }
 
-  // Parse tableFile to build query
-  std::cout << "Configuring query...";
-  const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
-  std::cout << "Done.\n";
+  do {  // REPL
+    // Parse tableFile to build query
+    std::cout << "Configuring query...";
+    const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
+    std::cout << "Done.\n";
 
-  // REPL
-  do {
     if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
       // Plaintext query and plaintext DB
       std::cout << "Executing ptxt-to-ptxt comparison\n";
@@ -274,8 +273,7 @@ int main(int argc, char* argv[]) {
       std::cout << "Executing ctxt-to-ctxt comparison\n";
       encryptedAllLookup(contextp, *pkp, query, *ctxt_db_ptr, cmdLineOpts);
     }
-  } while (!(gSignalStatus || cmdLineOpts.singleRun));
-  // End REPL
+  } while (!(gSignalStatus || cmdLineOpts.singleRun));  // End REPL
 
-  return 0;
+  return gSignalStatus;
 }
