@@ -10,10 +10,22 @@
 #include <helib/set.h>
 #include <io.h>
 
+#include <csignal>  // std::signal
 #include <iostream>
 #include <type_traits>  // std::decay
 
 using sharedContext = std::shared_ptr<helib::Context>;
+
+// Global signal status
+namespace {
+volatile std::sig_atomic_t gSignalStatus = false;
+}  // namespace
+
+// Capture signal and change status
+void signal_handler(int signal) {
+  std::cout << "\n\n*** External interrupt detected! ***\n\n";
+  gSignalStatus = true;
+}
 
 // Struct to hold command line arguments
 struct CmdLineOpts {
@@ -209,6 +221,9 @@ int main(int argc, char* argv[]) {
 
   /*********************** Main Program **************************/
 
+  // Install a signal handler
+  std::signal(SIGINT, signal_handler);
+
   // Load Context and PubKey
   sharedContext contextp;
   std::unique_ptr<const helib::PubKey> pkp;
@@ -259,7 +274,7 @@ int main(int argc, char* argv[]) {
       std::cout << "Executing ctxt-to-ctxt comparison\n";
       encryptedAllLookup(contextp, *pkp, query, *ctxt_db_ptr, cmdLineOpts);
     }
-  } while (!cmdLineOpts.singleRun);
+  } while (!(gSignalStatus || cmdLineOpts.singleRun));
   // End REPL
 
   return 0;
