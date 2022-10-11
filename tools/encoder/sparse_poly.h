@@ -5,9 +5,9 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace hekit::poly {
-
 class SparsePoly {
  public:
   SparsePoly() = default;
@@ -44,5 +44,5 @@ class SparsePoly {
   // indices and coeff
   std::map<long, long> coeffs_;
 };
-
+using SparseMultiPoly = std::vector<SparsePoly>;
 }  // namespace hekit::poly
