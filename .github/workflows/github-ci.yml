@@ -57,21 +57,23 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang-14]
+        c_compiler: [clang-10, gcc-10, clang-11]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: # using clang-10, gcc-10 and clang-14 versions
+        include: 
+          # pairing cc compiler with relavent cxx compiler 
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-14
-            cxx_compiler: clang++-14
-        exclude: # Skip clang-10 on ubuntu-22.04
+          - c_compiler: clang-11
+            cxx_compiler: clang++-11
+        exclude:
+          # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
+          # Clang-14 not pre-installed on Ubuntu-20
           - c_compiler: clang-14
             os: ubuntu-20.04
-
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -108,18 +110,21 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang-14]
+        c_compiler: [clang-10, gcc-10, clang-11]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: # using clang-10, gcc-10 and clang-14 versions
+        include: 
+          # pairing cc compiler with relavent cxx compiler 
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-14
-            cxx_compiler: clang++-14
-        exclude: # Skip clang-10 on ubuntu-22.04
+          - c_compiler: clang-11
+            cxx_compiler: clang++-11
+        exclude:
+          # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
+          # Clang-14 not pre-installed on Ubuntu-20
           - c_compiler: clang-14
             os: ubuntu-20.04
     steps:
@@ -154,16 +159,19 @@ jobs:
       matrix:
         c_compiler: [clang-10, gcc-10, clang-14]
         os: [ubuntu-20.04, ubuntu-22.04]
-        include: # using clang-10, gcc-10 and clang-14 versions
+        include: 
+          # pairing cc compiler with relavent cxx compiler 
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-        exclude: # Skip clang-10 on ubuntu-22.04
+        exclude:
+          # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
+          # Clang-14 not pre-installed on Ubuntu-20
           - c_compiler: clang-14
             os: ubuntu-20.04
 
