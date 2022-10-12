@@ -57,7 +57,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang-14]
+        c_compiler: [clang-10, gcc-10, clang-12]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
@@ -65,14 +65,14 @@ jobs:
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-14
-            cxx_compiler: clang++-14
+          - c_compiler: clang-12
+            cxx_compiler: clang++-12
         exclude:
           # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
           # Clang-14 not pre-installed on Ubuntu-20
-          - c_compiler: clang-14
+          - c_compiler: clang-12
             os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -110,7 +110,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10, clang-14]
+        c_compiler: [clang-10, gcc-10, clang-12]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
@@ -118,14 +118,14 @@ jobs:
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-          - c_compiler: clang-14
-            cxx_compiler: clang++-14
+          - c_compiler: clang-12
+            cxx_compiler: clang++-12
         exclude:
           # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
           # Clang-14 not pre-installed on Ubuntu-20
-          - c_compiler: clang-14
+          - c_compiler: clang-12
             os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
