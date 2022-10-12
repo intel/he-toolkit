@@ -36,7 +36,7 @@ set(PSI_DIR "${helib_DIR}/../../../../fetch/HElib/misc/psi/io")
 
 add_executable(psi ${CMAKE_CURRENT_SOURCE_DIR}/src/configurable_psi.cpp)
 
-target_include_directories(psi PRIVATE  ${UTILS_DIR} ${PSI_DIR})
+target_include_directories(psi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${UTILS_DIR} ${PSI_DIR} ${JSON_DIR})
 
 target_link_libraries(psi helib)
 

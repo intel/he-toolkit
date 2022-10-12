@@ -14,6 +14,8 @@
 #include <iostream>
 #include <type_traits>  // std::decay
 
+#include "readConfig.h"
+
 using sharedContext = std::shared_ptr<helib::Context>;
 
 // Global signal status
@@ -26,21 +28,6 @@ void signal_handler(int signal) {
   std::cout << "\n\n*** External interrupt detected! ***\n\n";
   gSignalStatus = true;
 }
-
-// Struct to hold command line arguments
-struct CmdLineOpts {
-  std::string pkFilePath;
-  std::string tableFilePath;
-  std::string databaseFilePath;
-  std::string queryFilePath;
-  std::string outFilePath;
-  bool ptxtQuery = false;
-  bool ptxtDB = false;
-  bool isColumn = false;
-  long nthreads = 1;
-  long offset = 0;
-  bool singleRun = false;
-};
 
 // Utility function which performs a binary sum of Matrix rows.
 // Destructive to `matrix`
@@ -187,23 +174,25 @@ int main(int argc, char* argv[]) {
       .separator(helib::ArgMap::Separator::WHITESPACE)
       .required()
       .positional()
-      .arg("<pkFile>", cmdLineOpts.pkFilePath, "Public Key file.", nullptr)
-      .arg("<tableFile>", cmdLineOpts.tableFilePath,
-           "File containing table description and query string.", nullptr)
-      .arg("<databaseFile>", cmdLineOpts.databaseFilePath, "Database file.",
+      .arg("<configFile>", cmdLineOpts.configFilePath, "JSON config file.",
            nullptr)
-      .arg("<queryFile>", cmdLineOpts.queryFilePath, "Query file.", nullptr)
-      .arg("<outFile>", cmdLineOpts.outFilePath, "Output file.", nullptr)
+      // .arg("<pkFile>", cmdLineOpts.pkFilePath, "Public Key file.", nullptr)
+      // .arg("<tableFile>", cmdLineOpts.tableFilePath,
+      // "File containing table description and query string.", nullptr)
+      // .arg("<databaseFile>", cmdLineOpts.databaseFilePath, "Database file.",
+      // nullptr)
+      // .arg("<queryFile>", cmdLineOpts.queryFilePath, "Query file.", nullptr)
+      // .arg("<outFile>", cmdLineOpts.outFilePath, "Output file.", nullptr)
       .named()
       .optional()
       .arg("-n", cmdLineOpts.nthreads, "Number of threads.")
       .arg("--offset", cmdLineOpts.offset,
            "Offset in bytes when writing to file.")
       .toggle()
-      .arg("--ptxt-query", cmdLineOpts.ptxtQuery,
-           "Use plaintext query as input.", nullptr)
-      .arg("--ptxt-db", cmdLineOpts.ptxtDB, "Use plaintext DB as input.",
-           nullptr)
+      // .arg("--ptxt-query", cmdLineOpts.ptxtQuery,
+      // "Use plaintext query as input.", nullptr)
+      // .arg("--ptxt-db", cmdLineOpts.ptxtDB, "Use plaintext DB as input.",
+      // nullptr)
       .arg("--column", cmdLineOpts.isColumn,
            "Flag to signify input is in column format.", nullptr)
       .arg("--single-run", cmdLineOpts.singleRun, "Run the service once.",
@@ -223,6 +212,58 @@ int main(int argc, char* argv[]) {
 
   // Install a signal handler
   std::signal(SIGINT, signal_handler);
+
+  // TODO(jlhcrawford): Add JSON support
+  // - Configure what we do via the command line
+  // - ie. --ptxt-db --ptxt-query
+  //
+  // eg: { he_data: {
+  //         data_source: filesys,
+  //         config: { source: filepath }
+  //       },
+  //       db: {
+  //         data_source: filesys,
+  //         type: ptxt/ctxt,
+  //         config: { source: filepath }
+  //       },
+  //       query: {
+  //         type: ptxt/ctxt,
+  //         data_source: filesys,
+  //         config: { source: filepath }
+  //       },
+  //       output: {
+  //         data_source: filesys,
+  //         config: {source: filepath }
+  //       }
+  //     }
+  //
+  // DataConn* factory(const std::string& data_conn_type, const json_obj&
+  // config) {
+  //   if (data_conn_type == "filesys") {
+  //     return new FileSys(config);
+  //   } else {
+  //     throw runtime_error("Invalid data connection '" + data_conn_type +
+  //     "'");
+  //   }
+  // }
+  //
+  // STEPS
+  // 1. Read in JSON config
+  // 2. Read in filepaths (db, query)
+  // 3. Implement interface for filesys
+  // 4. Get working for single-run
+  //
+
+  // Load JSON config file
+  std::cout << "Loading config file...";
+  // Pass in cmdLineOpts obejct and update
+  try {
+    loadConfigFile(cmdLineOpts);
+  } catch (const std::exception& e) {
+    std::cerr << "\nExit due to invalid JSON config:\n\t" << e.what()
+              << std::endl;
+  }
+  std::cout << "Done.\n";
 
   // Load Context and PubKey
   sharedContext contextp;

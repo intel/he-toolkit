@@ -62,14 +62,23 @@ install = "cmake --install %init_build_dir%"
 export_cmake = "install/lib/cmake/GTest"
 
 
+[[json]]
+name = "nlohmann-json"
+version = "v3.11.2"
+fetch = "git clone https://github.com/nlohmann/json.git --branch %version%"
+export_fetch = "fetch/json"
+
+
 [[psi]]
 name = "configurable-psi"
 src_dir = "!toolkit-path!/deployments/config_psi/psi"
 pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -Dhelib_DIR=$%helib%/export_cmake$
                -DENABLE_TESTS=ON
+               -DJSON_DIR=$%json%/export_fetch$/single_include
                -DGTest_DIR=$%gtest%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 # Dependencies
 helib = "helib/psi-io"
+json = "json/nlohmann-json"
 gtest = "gtest/v1.12.1"
