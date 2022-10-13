@@ -132,7 +132,7 @@ jobs:
 
       - name: Run PSI config tests
         run: |
-          ./hekit --config default.config install .hekit/components/recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config default.config list
           echo "CONFIG_PSI_TEST_DIR"=$HOME/.hekit/components/deployments/config_psi/psi/build" >> $GITHUB_ENV
 
