@@ -134,15 +134,15 @@ jobs:
         run: |
           ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config default.config list
-          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/deployments/config_psi/psi/build" >> $GITHUB_ENV
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
 
       - name: Run unit tests
         run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
 
       - name: Run PSI config pytests
         run: |
-          source $HOME/.hekit/components/deployments/config_psi/setenv.sh
-          pytest $HOME/.hekit/components/deployments/config_psi/scripts/tests
+          source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/scripts/tests
 
 #   build-and-test-toolkit-seal:
 #     name: HE Toolkit SEAL 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
