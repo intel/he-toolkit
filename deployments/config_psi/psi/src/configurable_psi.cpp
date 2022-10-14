@@ -213,47 +213,6 @@ int main(int argc, char* argv[]) {
   // Install a signal handler
   std::signal(SIGINT, signal_handler);
 
-  // TODO(jlhcrawford): Add JSON support
-  // - Configure what we do via the command line
-  // - ie. --ptxt-db --ptxt-query
-  //
-  // eg: { he_data: {
-  //         data_source: filesys,
-  //         config: { source: filepath }
-  //       },
-  //       db: {
-  //         data_source: filesys,
-  //         type: ptxt/ctxt,
-  //         config: { source: filepath }
-  //       },
-  //       query: {
-  //         type: ptxt/ctxt,
-  //         data_source: filesys,
-  //         config: { source: filepath }
-  //       },
-  //       output: {
-  //         data_source: filesys,
-  //         config: {source: filepath }
-  //       }
-  //     }
-  //
-  // DataConn* factory(const std::string& data_conn_type, const json_obj&
-  // config) {
-  //   if (data_conn_type == "filesys") {
-  //     return new FileSys(config);
-  //   } else {
-  //     throw runtime_error("Invalid data connection '" + data_conn_type +
-  //     "'");
-  //   }
-  // }
-  //
-  // STEPS
-  // 1. Read in JSON config
-  // 2. Read in filepaths (db, query)
-  // 3. Implement interface for filesys
-  // 4. Get working for single-run
-  //
-
   // Load JSON config file
   std::cout << "Loading config file...";
   // Pass in cmdLineOpts obejct and update
@@ -262,6 +221,7 @@ int main(int argc, char* argv[]) {
   } catch (const std::exception& e) {
     std::cerr << "\nExit due to invalid JSON config:\n\t" << e.what()
               << std::endl;
+    return EXIT_FAILURE;
   }
   std::cout << "Done.\n";
 

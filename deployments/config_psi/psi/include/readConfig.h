@@ -26,17 +26,36 @@ struct CmdLineOpts {
   bool singleRun = false;
 };
 
+// eg: { he_data: {
+//         data_source: filesys,
+//         config: { source: filepath }
+//       },
+//       db: {
+//         data_source: filesys,
+//         type: ptxt/ctxt,
+//         config: { source: filepath }
+//       },
+//       query: {
+//         type: ptxt/ctxt,
+//         data_source: filesys,
+//         config: { source: filepath, table: filepath }
+//       },
+//       output: {
+//         data_source: filesys,
+//         config: {source: filepath }
+//       }
+//     }
+//
+
 // Read in JSON config file
 void loadConfigFile(CmdLineOpts& options) {
   std::fstream configFile(options.configFilePath);
   auto config = json::parse(configFile);
 
-  // These two won't work
   config.at("he_data").at("config").at("source").get_to(options.pkFilePath);
-  config.at("he_data").at("config").at("source").get_to(options.tableFilePath);
-
   config.at("db").at("config").at("source").get_to(options.databaseFilePath);
   config.at("query").at("config").at("source").get_to(options.queryFilePath);
+  config.at("query").at("config").at("table").get_to(options.tableFilePath);
   config.at("output").at("config").at("source").get_to(options.outFilePath);
 
   if (config.at("db").at("type") == "ptxt") {
@@ -49,6 +68,16 @@ void loadConfigFile(CmdLineOpts& options) {
 }
 
 // Create filesys concrete class
+// DataConn* factory(const std::string& data_conn_type, const json_obj&
+// config) {
+//   if (data_conn_type == "filesys") {
+//     return new FileSys(config);
+//   } else {
+//     throw runtime_error("Invalid data connection '" + data_conn_type +
+//     "'");
+//   }
+// }
+
 // if (config.at("he_data").at("data_source") == "filesys") {
 //   return new FileSys(config);
 // } else {
