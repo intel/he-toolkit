@@ -142,7 +142,7 @@ jobs:
       - name: Run PSI config pytests
         run: |
           source deployments/config_psi/setenv.sh
-          pytest deployments/config_psi/scripts/tests
+          pytest deployments/config_psi/scripts/tests/
 
 #   build-and-test-toolkit-seal:
 #     name: HE Toolkit SEAL 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
