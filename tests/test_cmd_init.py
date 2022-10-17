@@ -64,9 +64,7 @@ def test_append_to_rc(file_with_data):
     assert lines == [
         "the beginning\n",
         "\n",
-        "# >>> hekit start >>>\n",
         "the contents\n",
-        "# <<<  hekit end  <<<\n",
         "\n",
     ]
 
