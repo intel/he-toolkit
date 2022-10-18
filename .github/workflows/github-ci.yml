@@ -272,6 +272,19 @@ jobs:
           echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
           echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
 
+      - name: Run PSI example
+        run: |
+          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
+
+      - name: Build PSI config tests
+        run: |
+          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
+
       - name: Run PSI config unit tests
         run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
 
@@ -280,13 +293,6 @@ jobs:
           source deployments/config_psi/setenv.sh
           pytest deployments/config_psi/tests/
           pytest deployments/config_psi/scripts/tests/
-
-      - name: Run PSI example
-        run: |
-          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
-          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
-          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
-          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
 
       - name: Run Secure Query example
         run: |
