@@ -15,9 +15,9 @@ on:
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
 
-###############
+################
 # Ubuntu 20.04 #
-###############
+################
 jobs:
   format:
     name: Format
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         run: |
-          pip3 install docker pytest pytest-mock pytest-xdist toml
+          pip3 install docker pytest pytest-mock pytest-xdist toml 
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
@@ -57,13 +57,23 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [gcc-10,clang-10]
-        os: [ubuntu-20.04]
-        include: # use clang++ and gcc+ with clang only
+        c_compiler: [clang-10, gcc-10, clang-12]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
+          - c_compiler: clang-12
+            cxx_compiler: clang++-12
+        exclude:
+          # Clang-10 not pre-installed on Ubuntu-22
+          - c_compiler: clang-10
+            os: ubuntu-22.04
+          # Clang-14 not pre-installed on Ubuntu-20
+          - c_compiler: clang-12
+            os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -100,21 +110,30 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10]
-        os: [ubuntu-20.04]
-        include: # use clang++ and gcc+ with clang only
+        c_compiler: [clang-10, gcc-10, clang-12]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-
+          - c_compiler: clang-12
+            cxx_compiler: clang++-12
+        exclude:
+          # Clang-10 not pre-installed on Ubuntu-22
+          - c_compiler: clang-10
+            os: ubuntu-22.04
+          # Clang-14 not pre-installed on Ubuntu-20
+          - c_compiler: clang-12
+            os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup
         run: |
           pip3 install toml pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
+          echo "CC=${{matrix.cc_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
 
       - name: Build and install HElib and example recipe
@@ -130,18 +149,19 @@ jobs:
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
 
-      - name: Run PSI config tests
+      - name: Build PSI config tests
         run: |
           ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
           ./hekit --config default.config list
           echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
 
-      - name: Run unit tests
-        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
+      -name: Run PSI config unit tests
+       run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
 
       - name: Run PSI config pytests
         run: |
           source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/tests/
           pytest deployments/config_psi/scripts/tests/
 
   build-and-test-toolkit-seal:
@@ -152,13 +172,23 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [gcc-10,clang-10]
-        os: [ubuntu-20.04]
-        include: # use clang++ and gcc+ with clang only
+        c_compiler: [clang-10, gcc-10, clang-12]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relavent cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
+          - c_compiler: clang-12
+            cxx_compiler: clang++-12
+        exclude:
+          # Clang-10 not pre-installed on Ubuntu-22
+          - c_compiler: clang-10
+            os: ubuntu-22.04
+          # Clang-14 not pre-installed on Ubuntu-20
+          - c_compiler: clang-12
+            os: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -168,6 +198,12 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
+
+      - name: he-toolkit-seal-ubuntu-22
+        if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-12'
+        run: |
+          sudo apt install libomp-dev
+
 
       - name: Build and install SEAL, examples, and sample kernels recipe
         run: |
@@ -189,7 +225,7 @@ jobs:
           cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
-      - name: Run unit tests
+      - name: Run sample kernels unit test
         run: ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
 
       # SEAL sample kernels
@@ -273,6 +309,21 @@ jobs:
           echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
           echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
 
+      - name: Build PSI config tests
+        run: |
+          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
+
+      - name: Run PSI config unit tests
+        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
+
+      - name: Run PSI config pytests
+        run: |
+          source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/tests/
+          pytest deployments/config_psi/scripts/tests/
+
       - name: Run PSI example
         run: |
           echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
@@ -292,24 +343,10 @@ jobs:
           cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
-      - name: Run unit tests
+      - name: Run sample kernels unit test
         run: |
           ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
           ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
-
-      - name: Run PSI config tests
-        run: |
-          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit --config default.config list
-          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
-
-      - name: Run unit tests
-        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
-
-      - name: Run PSI config pytests
-        run: |
-          source deployments/config_psi/setenv.sh
-          pytest deployments/config_psi/scripts/tests/
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
