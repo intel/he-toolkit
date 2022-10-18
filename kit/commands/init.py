@@ -127,7 +127,7 @@ def create_plugin_data(dir_path: Path) -> None:
 
 
 def get_rc_new_lines() -> str:
-    """Return the lines that will be added in the rc file"""
+    """Return the lines that will be added to the rc file"""
     # 1-Add hekit directory as part of environmental variable PATH
     export_line = f"export HEKITPATH={Constants.HEKIT_ROOT_DIR}\n"
     path_line = "PATH=$PATH:$HEKITPATH\n"
@@ -154,18 +154,19 @@ def init_hekit(args) -> None:
     user_answer = input(
         f"The hekit init command will update the file {rc_file} to append the following lines:\n\n"
         f"{rc_new_content}\n"
+        "NOTE: a backup file will be created before updating it.\n"
         "Do you want to continue with this action? (y/n) "
     )
     if user_answer not in ("y", "Y"):
         print(
-            f"Please, execute the following actions manually:\n"
+            f"Please execute the following actions manually:\n"
             f"1. Open the file {rc_file}\n"
             "2. Add the lines shown in the previous message\n"
-            f"3. Source your shell init file as: source {rc_file}"
+            f"3. Source your shell config file with: source {rc_file}"
         )
         return
 
-    # Backup the shell init file
+    # Backup the shell config file
     rc_backup_file = create_backup(rc_path)
     print("Backup file created at", rc_backup_file)
 
@@ -175,7 +176,7 @@ def init_hekit(args) -> None:
     append_to_rc(rc_path, rc_new_content)
 
     # Instructions for user
-    print("Please, source your shell init file as follows")
+    print("Please, source your shell config file as follows")
     print(f"source {rc_file}")
 
 

@@ -30,10 +30,10 @@ def test_init_hekit_rcfile_unmodified(mocker, tmp_path):
     # Create a new config file
     main()
     mockers.mock_print.assert_any_call(
-        "Please, execute the following actions manually:\n"
+        "Please execute the following actions manually:\n"
         f"1. Open the file {tmp_path}/.mybashfile\n"
         "2. Add the lines shown in the previous message"
-        f"\n3. Source your shell init file as: source {tmp_path}/.mybashfile"
+        f"\n3. Source your shell config file with: source {tmp_path}/.mybashfile"
     )
 
 
