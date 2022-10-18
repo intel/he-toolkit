@@ -272,12 +272,6 @@ jobs:
           echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
           echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
 
-      - name: Build PSI config tests
-        run: |
-          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit --config default.config list
-          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
-
       - name: Run PSI config unit tests
         run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
 
