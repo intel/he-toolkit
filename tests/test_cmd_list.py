@@ -7,7 +7,7 @@ from kit.commands.list_cmd import list_components, RepoProperties, _SEP_SPACES
 
 
 def test_get_repo_properties_max_width(mocker):
-    exp_comps = ["1234567", "123", "12345678"]
+    exp_comps = ["1234567", "123", "123456789"]
     exp_inst1 = ["123"]
     exp_inst2 = ["1", "1234567890123456"]
     exp_inst3 = ["123456"]
@@ -18,7 +18,7 @@ def test_get_repo_properties_max_width(mocker):
         exp_comps[1]: exp_inst2,
         exp_comps[2]: exp_inst3,
     }
-    exp_width_comp = 8 + _SEP_SPACES
+    exp_width_comp = 9 + _SEP_SPACES
     exp_width_inst = 16 + _SEP_SPACES
 
     act_props = RepoProperties("")
@@ -34,7 +34,7 @@ def test_get_repo_properties_without_instances(mocker):
     mock_list_dirs.side_effect = [exp_comps, exp_inst1]
     exp_repo_structure = {exp_comps[0]: exp_inst1}
     exp_width_comp = 20 + _SEP_SPACES
-    exp_width_inst = 0 + _SEP_SPACES
+    exp_width_inst = 8 + _SEP_SPACES
 
     act_props = RepoProperties("")
     assert act_props.structure == exp_repo_structure
@@ -48,8 +48,8 @@ def test_get_repo_properties_without_components(mocker):
     mock_list_dirs = mocker.patch("kit.commands.list_cmd.list_dirs")
     mock_list_dirs.side_effect = [exp_comps, exp_inst1]
     exp_repo_structure = {}
-    exp_width_comp = 0 + _SEP_SPACES
-    exp_width_inst = 0 + _SEP_SPACES
+    exp_width_comp = 9 + _SEP_SPACES
+    exp_width_inst = 8 + _SEP_SPACES
 
     act_props = RepoProperties("")
     assert act_props.structure == exp_repo_structure
@@ -302,8 +302,13 @@ def install_failure():
 
 def get_width_and_header(comp_name, comp_inst, separation_spaces=_SEP_SPACES):
     width = 10
-    width_comp = len(comp_name) + separation_spaces
-    width_inst = len(comp_inst) + separation_spaces
+
+    width_comp = (
+        len(comp_name) if len(comp_name) > len("component") else len("component")
+    )
+    width_comp += separation_spaces
+    width_inst = len(comp_inst) if len(comp_inst) > len("instance") else len("instance")
+    width_inst += separation_spaces
     return width, f"{comp_name:{width_comp}} {comp_inst:{width_inst}}"
 
 
