@@ -52,7 +52,7 @@ jobs:
         run: ./hekit init
 
       - name: Run test hekit command
-        run: pwd && cd && hekit
+        shell: pwd && cd && hekit
 
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
