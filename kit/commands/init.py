@@ -133,7 +133,7 @@ def get_rc_new_lines() -> str:
     path_line = "PATH=$PATH:$HEKITPATH\n"
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
-        "if [ -n $(type -p register-python-argcomplete) ]; then\n"
+        'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
         '  eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
@@ -159,7 +159,7 @@ def init_hekit(args) -> None:
     )
     if user_answer not in ("y", "Y"):
         print(
-            f"Please execute the following actions manually:\n"
+            "Please execute the following actions manually:\n"
             f"1. Open the file {rc_file}\n"
             "2. Add the lines shown in the previous message\n"
             f"3. Source your shell config file with: source {rc_file}"
