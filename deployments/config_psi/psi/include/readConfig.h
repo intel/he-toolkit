@@ -18,6 +18,10 @@ struct CmdLineOpts {
   std::string databaseFilePath;
   std::string queryFilePath;
   std::string outFilePath;
+  json heConfig;
+  json dbConfig;
+  json queryConfig;
+  json outConfig;
   bool ptxtQuery = false;
   bool ptxtDB = false;
   bool isColumn = false;
@@ -52,11 +56,15 @@ void loadConfigFile(CmdLineOpts& options) {
   std::fstream configFile(options.configFilePath);
   auto config = json::parse(configFile);
 
-  config.at("he_data").at("config").at("source").get_to(options.pkFilePath);
-  config.at("db").at("config").at("source").get_to(options.databaseFilePath);
-  config.at("query").at("config").at("source").get_to(options.queryFilePath);
-  config.at("query").at("config").at("table").get_to(options.tableFilePath);
-  config.at("output").at("config").at("source").get_to(options.outFilePath);
+  config.at("he_data").at("config").get_to(options.heConfig);
+  options.heConfig.at("source").get_to(options.pkFilePath);
+  config.at("db").at("config").get_to(options.dbConfig);
+  options.dbConfig.at("source").get_to(options.databaseFilePath);
+  config.at("query").at("config").get_to(options.queryConfig);
+  options.queryConfig.at("source").get_to(options.queryFilePath);
+  options.queryConfig.at("table").get_to(options.tableFilePath);
+  config.at("output").at("config").get_to(options.outConfig);
+  options.outConfig.at("source").get_to(options.outFilePath);
 
   if (config.at("db").at("type") == "ptxt") {
     options.ptxtDB = true;

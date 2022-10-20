@@ -52,6 +52,7 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Read in the query data
   std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
             << " ...";
+  // queryConn.read(pointer to query data?);
   helib::Matrix<Ptxt> queryData =
       readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -236,6 +237,9 @@ int main(int argc, char* argv[]) {
   std::unique_ptr<const helib::Database<Ptxt>> ptxt_db_ptr;
   std::unique_ptr<const helib::Database<helib::Ctxt>> ctxt_db_ptr;
   // Load DB once
+  // DataConn* db_conn = factory(config);
+  // Database = db_conn.read();
+  // Query q = query_conn.read();
   if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
     std::cout << "Reading database from file " << cmdLineOpts.databaseFilePath
               << " ...";
@@ -250,6 +254,9 @@ int main(int argc, char* argv[]) {
                                     *pkp));
     std::cout << "Done.\n";
   }
+
+  DataConn* query_conn = factory(/*data_conn_type=*/"filesys",
+                                 /*json config=*/cmdLineOpts.queryConfig);
 
   do {  // REPL
     // Parse tableFile to build query

@@ -21,6 +21,7 @@ default.config
 deployments/README.md
 deployments/config_psi/README.md
 deployments/config_psi/psi/CMakeLists.txt
+deployments/config_psi/psi/include/data_connection.h
 deployments/config_psi/psi/include/readConfig.h
 deployments/config_psi/psi/src/configurable_psi.cpp
 deployments/config_psi/psi/tests/CMakeLists.txt
