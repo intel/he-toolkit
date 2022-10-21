@@ -73,7 +73,7 @@ def append_to_rc(path: Path, content: str) -> None:
 
     # newline to not accidentally mix with existing content
     # newline to end as courtesy to space our code
-    lines = ["\n", Tags.start_tag, content, Tags.end_tag, "\n"]
+    lines = ["\n", content, "\n"]
     with path.open("a") as rc_file:
         for line in lines:
             rc_file.write(line)
@@ -126,6 +126,20 @@ def create_plugin_data(dir_path: Path) -> None:
         print(f"{plugin_file_path} created")
 
 
+def get_rc_new_lines() -> str:
+    """Return the lines that will be added to the rc file"""
+    # 1-Add hekit directory as part of environmental variable PATH
+    export_line = f"export HEKITPATH={Constants.HEKIT_ROOT_DIR}\n"
+    path_line = "PATH=$PATH:$HEKITPATH\n"
+    # 2-Register hekit link and hekit.py script to enable tab completion
+    eval_lines = (
+        'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
+        '  eval "$(register-python-argcomplete hekit)"\n'
+        "fi\n"
+    )
+    return "".join([Tags.start_tag, export_line, path_line, eval_lines, Tags.end_tag])
+
+
 def init_hekit(args) -> None:
     """Initialize hekit"""
     if args.default_config:
@@ -133,30 +147,36 @@ def init_hekit(args) -> None:
         create_default_config(dir_path)
         create_plugin_data(dir_path)
 
-    # Backup the shell init file
+    rc_new_content = get_rc_new_lines()
     rc_file = get_rc_file()
     rc_path = get_expanded_path(rc_file)
+
+    user_answer = input(
+        f"The hekit init command will update the file {rc_file} to append the following lines:\n\n"
+        f"{rc_new_content}\n"
+        "NOTE: a backup file will be created before updating it.\n"
+        "Do you want to continue with this action? (y/n) "
+    )
+    if user_answer not in ("y", "Y"):
+        print(
+            "Please execute the following actions manually:\n"
+            f"1. Open the file {rc_file}\n"
+            "2. Add the lines shown in the previous message\n"
+            f"3. Source your shell config file with: source {rc_file}"
+        )
+        return
+
+    # Backup the shell config file
     rc_backup_file = create_backup(rc_path)
     print("Backup file created at", rc_backup_file)
 
     # Remove current hekit section, if it exists
     remove_from_rc(rc_path)
-
     # Add new lines in the rc_file:
-    # 1-Add hekit directory as part of environmental variable PATH
-    export_line = f"export HEKITPATH={Constants.HEKIT_ROOT_DIR}\n"
-    path_line = "PATH=$PATH:$HEKITPATH\n"
-    # 2-Register hekit link and hekit.py script to enable tab completion
-    eval_lines = (
-        "if [ -n $(type -p register-python-argcomplete) ]; then\n"
-        '  eval "$(register-python-argcomplete hekit)"\n'
-        "fi\n"
-    )
-    content = "".join([export_line, path_line, eval_lines])
-    append_to_rc(rc_path, content)
+    append_to_rc(rc_path, rc_new_content)
 
     # Instructions for user
-    print("Please, source your shell init file as follows")
+    print("Please source your shell config file as follows")
     print(f"source {rc_file}")
 
 
