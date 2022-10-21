@@ -1,6 +1,6 @@
 # Intel Homomorphic Encryption Toolkit
 
-[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg)](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml)
+[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg?branch=main)](https://github.com/intel/he-toolkit)
 
 Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
 delivering innovation around HE with the aim of providing both the community

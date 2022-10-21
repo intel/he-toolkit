@@ -107,12 +107,11 @@ jobs:
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-
     steps:
       - uses: actions/checkout@v3
       - name: Setup
         run: |
-          pip3 install toml
+          pip3 install toml pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
@@ -130,6 +129,21 @@ jobs:
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
           ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
 
+      - name: Build PSI config tests
+        run: |
+          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
+
+      - name: Run PSI config unit tests
+        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
+
+      - name: Run PSI config pytests
+        run: |
+          source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/tests/
+          pytest deployments/config_psi/scripts/tests/
+
   build-and-test-toolkit-seal:
     name: HE Toolkit SEAL 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
     runs-on: ${{matrix.os}}
@@ -145,7 +159,6 @@ jobs:
             cxx_compiler: clang++-10
           - c_compiler: gcc-10
             cxx_compiler: g++-10
-
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -175,7 +188,7 @@ jobs:
           cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
-      - name: Run unit tests
+      - name: Run sample kernels unit test
         run: ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
 
       # SEAL sample kernels
@@ -252,13 +265,6 @@ jobs:
           echo "QUERY_BUILD_DIR=$HE_WORKSPACE/examples/secure-query/build" >> $GITHUB_ENV
           echo "LR_BUILD_DIR=$HE_WORKSPACE/examples/logistic-regression/build" >> $GITHUB_ENV
 
-      - name: Build sample kernels
-        run: |
-          ./hekit --config $CONFIG_FILE build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit --config $CONFIG_FILE list
-          echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
-          echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
-
       - name: Run PSI example
         run: |
           echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
@@ -278,7 +284,29 @@ jobs:
           cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
 
-      - name: Run unit tests
+      - name: Build PSI config tests
+        run: |
+          ./hekit --config $CONFIG_FILE install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config $CONFIG_FILE list
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
+
+      - name: Run PSI config unit tests
+        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
+
+      - name: Run PSI config pytests
+        run: |
+          source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/tests/
+          pytest deployments/config_psi/scripts/tests/
+
+      - name: Build sample kernels
+        run: |
+          ./hekit --config $CONFIG_FILE build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config $CONFIG_FILE list
+          echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
+
+      - name: Run sample kernels unit test
         run: |
           ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
           ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
