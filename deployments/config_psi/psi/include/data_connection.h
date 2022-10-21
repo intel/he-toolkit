@@ -43,23 +43,26 @@ class FileSys : public DataConn {
     connect();
   }
 
-  void connect() {}
+  void connect() override {}
 
-  void disconnect() {}
+  void disconnect() override {}
 
   template <typename T>
-  void read(T& out, const helib::PubKey& pk) {
-    out = std::make_unique<T>(readQueryFromFile<T>(source, pk));
+  Data read() override {
+    std::ifstream ifs(source);
+    Data data(ifs);
+    data.read();
+    return data;
   }
 
   template <typename T>
-  void write(const T& out) {
-    writeResultsToFile(source, out, /*offset=*/0);
+  void write(const Data& data) override {
+    data.write();
   }
 
-  void process() {}
+  void process() override {}
 
-  ~FileSys() { disconnect(); }
+  ~FileSys() override { disconnect(); }
 };
 
 // Factory method that creates the FileSys concrete class
