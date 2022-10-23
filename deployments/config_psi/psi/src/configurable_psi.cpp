@@ -14,7 +14,7 @@
 #include <iostream>
 #include <type_traits>  // std::decay
 
-#include "readConfig.h"
+#include "read_config.h"
 
 using sharedContext = std::shared_ptr<helib::Context>;
 
@@ -255,8 +255,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Done.\n";
   }
 
-  DataConn* query_conn = factory(/*data_conn_type=*/"filesys",
-                                 /*json config=*/cmdLineOpts.queryConfig);
+  DataConn* query_conn =
+      DataConn::make(/*data_conn_type=*/"filesys",
+                     /*json config=*/cmdLineOpts.queryConfig);
 
   do {  // REPL
     // Parse tableFile to build query

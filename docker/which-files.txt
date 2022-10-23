@@ -22,8 +22,8 @@ deployments/README.md
 deployments/config_psi/README.md
 deployments/config_psi/psi/CMakeLists.txt
 deployments/config_psi/psi/include/data_connection.h
-deployments/config_psi/psi/include/data_consumer.h
-deployments/config_psi/psi/include/readConfig.h
+deployments/config_psi/psi/include/data_record.h
+deployments/config_psi/psi/include/read_config.h
 deployments/config_psi/psi/src/configurable_psi.cpp
 deployments/config_psi/psi/tests/CMakeLists.txt
 deployments/config_psi/psi/tests/TestLookup.cpp
