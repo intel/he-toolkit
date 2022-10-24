@@ -162,6 +162,12 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   std::cout << "Done.\n";
 }
 
+void update_opts(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
+  cmdLineOpts.tableFilePath = record.metadata("ql");
+  cmdLineOpts.queryFilePath = record.metadata("source");
+  // TODO(JC) maybe write file to disk here, if not exist?
+}
+
 int main(int argc, char* argv[]) {
   // PSI Steps
   // 1. Read in context and pk file
@@ -220,7 +226,7 @@ int main(int argc, char* argv[]) {
 
   // Load JSON config file
   std::cout << "Loading config file...";
-  // Pass in cmdLineOpts obejct and update
+  // Pass in cmdLineOpts object and update
   try {
     loadConfigFile(cmdLineOpts);
   } catch (const std::exception& e) {
@@ -259,14 +265,17 @@ int main(int argc, char* argv[]) {
     std::cout << "Done.\n";
   }
 
+  // TODO(JC) change to be connection type dynamic
   std::unique_ptr<DataConn> query_conn = DataConn::make(
-      DataConn::Type::FileSys, DataConnConfig{cmdLineOpts.queryConfig});
+      DataConn::Type::FileSys, FileSysConfig{cmdLineOpts.queryConfig});
 
   do {  // REPL
     // Parse tableFile to build query
     std::cout << "Configuring query...";
     auto query_record = query_conn.read();
-    // TODO(JC) pass in stream to read in query
+    // Assume data to disk
+    update_opts(cmdLineOpts, query_record);
+    // Process query
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";
 

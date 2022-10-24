@@ -4,39 +4,24 @@
 
 #pragma once
 
-class InDataRecord {
- public:
-  void read() = 0;
-};
+#include <fstream>
 
-class OutDataRecord {
- public:
+struct DataRecord {
+  void read() = 0;
   void write() = 0;
 };
 
-class InFileRecord : public InDataRecord {
+class FileRecord : public DataRecord {
  private:
-  std::ifstream file_stream_;
+  std::fstream file_stream_;
 
  public:
-  InFileRecord(const std::ifstream& file_stream) : file_stream_(file_stream) {}
+  FileRecord(const std::fstream& file_stream) : file_stream_(file_stream) {}
 
   void read() override { file_stream_.read(); }
-
-  auto& stream() { return file_stream_; }
-};
-
-class OutFileRecord : public OutDataRecord {
- private:
-  std::ofstream file_stream_;
-
- public:
-  OutFileRecord(const std::ofstream& file_stream) : file_stream_(file_stream) {}
 
   void write(const char* data, size_t size) override {
     // Write blob of data?
     file_stream_.write(data, size);
   }
-
-  auto& stream() { return file_stream_; }
 };
