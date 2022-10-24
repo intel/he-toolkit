@@ -71,7 +71,7 @@ jobs:
           # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
-          # Clang-14 not pre-installed on Ubuntu-20
+          # skip Clang-12 on Ubuntu-20
           - c_compiler: clang-12
             os: ubuntu-20.04
     steps:
@@ -124,7 +124,7 @@ jobs:
           # Clang-10 not pre-installed on Ubuntu-22
           - c_compiler: clang-10
             os: ubuntu-22.04
-          # Clang-14 not pre-installed on Ubuntu-20
+          # skip Clang-12 on Ubuntu-20
           - c_compiler: clang-12
             os: ubuntu-20.04
     steps:
