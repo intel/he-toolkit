@@ -32,23 +32,26 @@ struct CmdLineOpts {
 
 // eg: { he_data: {
 //         data_source: filesys,
-//         config: { source: filepath }
+//         config: { source: filepath, io: read }
 //       },
 //       db: {
 //         data_source: filesys,
 //         type: ptxt/ctxt,
-//         config: { source: filepath }
+//         config: { source: filepath, io: read }
 //       },
 //       query: {
 //         type: ptxt/ctxt,
 //         data_source: filesys,
-//         config: { source: filepath, table: filepath }
+//         config: { source: directory, ext: "ctxt", meta_ext: "heql", io: read
+//         }
 //       },
 //       output: {
 //         data_source: filesys,
-//         config: {source: filepath }
+//         config: {source: filepath, io: write }
 //       }
 //     }
+//
+// extension = { ctxt, ptxt, heql }
 //
 
 // Read in JSON config file
@@ -74,21 +77,3 @@ void loadConfigFile(CmdLineOpts& options) {
     options.ptxtQuery = true;
   }
 }
-
-// Create filesys concrete class
-// DataConn* factory(const std::string& data_conn_type, const json_obj&
-// config) {
-//   if (data_conn_type == "filesys") {
-//     return new FileSys(config);
-//   } else {
-//     throw runtime_error("Invalid data connection '" + data_conn_type +
-//     "'");
-//   }
-// }
-
-// if (config.at("he_data").at("data_source") == "filesys") {
-//   return new FileSys(config);
-// } else {
-//   throw runtime_error("Invalid data connection '" +
-//   config.at("he_data").at("data_source") + "'");
-// }
