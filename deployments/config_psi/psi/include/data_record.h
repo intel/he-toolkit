@@ -9,10 +9,9 @@
 #include <string>
 
 struct DataRecord {
-  void read(const char* data, size_t size) = 0;
-  void write(const char* data, size_t size) = 0;
-  long size() const = 0;
-  std::string metadata(const std::string& name) = 0;
+  virtual void read(char* data, size_t size) = 0;
+  virtual void write(char* data, size_t size) = 0;
+  virtual std::string metadata(const std::string& name) const = 0;
 };
 
 class FileRecord : public DataRecord {
@@ -20,31 +19,41 @@ class FileRecord : public DataRecord {
   std::fstream file_stream_;
   std::map<std::string, std::string> metadata_;
 
+  std::ios_base::openmode modeFromString(const std::string& mode_string) {
+    if (mode_string == "read") {
+      return std::ios::binary | std::ios::in;
+    }
+    if (mode_string == "write") {
+      return std::ios::binary | std::ios::out;
+    }
+    if (mode_string == "duplex") {
+      return std::ios::binary | std::ios::in | std::ios::out;
+    }
+    throw std::runtime_error("Unknown file mode '" + mode_string + "'");
+  }
+
  public:
   FileRecord(const std::string& filename, const std::string& metadata_filename,
              const std::string& mode) {
-    file_stream_.open(filename, mode);
+    file_stream_.open(filename, modeFromString(mode));
     metadata_["source"] = filename;
-    auto ifs = std::ifstream(metadata_filename, mode);
+    auto ifs = std::ifstream(metadata_filename, modeFromString(mode));
     std::stringstream ss;
-    while (auto line = std::string{}; std::getline(line, ifs)) {
+    std::string line;
+    while (std::getline(ifs, line)) {
       ss << line;
     }
     // TODO(JC) This needs to get the key dynamically
     metadata_["heql"] = ss.str();
   }
 
-  void read(const char* data, size_t size) override {
-    file_stream_.read(data, size);
-  }
+  void read(char* data, size_t size) override { file_stream_.read(data, size); }
 
-  void write(const char* data, size_t size) override {
+  void write(char* data, size_t size) override {
     file_stream_.write(data, size);
   }
 
-  long size() const { return file_streams_.size(); }
-
-  std::string metadata(const std::string& name) override {
+  std::string metadata(const std::string& name) const override {
     return metadata_.at(name);
   }
 };

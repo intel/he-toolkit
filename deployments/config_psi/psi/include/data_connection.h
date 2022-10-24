@@ -17,23 +17,12 @@
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 // Interface for Data Connection
 struct DataConn {
-  enum class Type { FILESYS, KAFKA };
-  static DataConn* make(const Type& conn_type, const json& config) {
-    switch (conn_type) {
-      case Type::FILESYS:
-        return new FileSys(config);
-      case Type::KAFKA:
-        throw std::logic_error("Data connection for Kafka not implemented");
-      default:
-        throw std::runtime_error("Invalid data connection '" + data_conn_type +
-                                 "'");
-    }
-  }
-  virtual void open() const = 0;
-  virtual void close() const = 0;
+  virtual void open() = 0;
+  virtual void close() = 0;
   virtual std::unique_ptr<DataRecord> read() const = 0;
   virtual void write(const DataRecord& data) const = 0;
   virtual ~DataConn() = default;
@@ -63,36 +52,39 @@ class FileSysConfig : public DataConnConfig {
     } else if (json_config.at("io") == "write") {
       mode_ = "write";
     } else {
-      throw std::runtime_error("Invalid io argument '" + json_config.at("io") +
-                               "'");
+      throw std::runtime_error(std::string("Invalid io argument '") +
+                               json_config.at("io").get<std::string>() + "'");
     }
   }
 
   std::string directory() const { return directory_; }
-  std::set extensions() const { return extensions_; }
+  std::string extension() const { return extension_; }
+  std::string meta_ext() const { return meta_ext_; }
   std::string mode() const { return mode_; }
 };
 
 // Concrete class implementing access of a local file system
 class FileSys : public DataConn {
  private:
-  using fs = std::filesystem;
   FileSysConfig config_;
+  mutable long current_entry_ = 0;
   std::vector<std::pair<fs::directory_entry, fs::directory_entry>> filenames_;
 
  public:
   // Factory method
+  FileSys(const FileSysConfig& config) : config_(config) { open(); }
   FileSys() = delete;
-  FileSys(const FileSysConfig& config) : config_(config) { open(config_); }
 
   void open() override {
-    auto dir = config.querySource();
-    auto it = filesystem::directory_iterator(dir);
-    std::vector<std::string> filenames;
-    std::copy_if(it, {}, filenames.begin(), [](const auto& filepath) {
-      return filepath.is_regular_file() &&
-             config_.extensions().contains(filepath.path().extension());
-    });
+    auto it = fs::directory_iterator(config_.directory());
+    std::vector<fs::directory_entry> filenames;
+    std::copy_if(it, {}, filenames.begin(),
+                 [extension = config_.extension(),
+                  meta_ext = config_.meta_ext()](const auto& filepath) {
+                   return filepath.is_regular_file() &&
+                          (extension == filepath.path().extension() ||
+                           meta_ext == filepath.path().extension());
+                 });
     std::sort(filenames.begin(), filenames.end());
 
     if (filenames.size() % 2 == 1) {
@@ -108,11 +100,44 @@ class FileSys : public DataConn {
 
   void close() override {}  // This is supposed to do nothing
 
-  std::unique_ptr<DataRecord> read() override {
-    return FileRecord(filenames_.path().string(), config_.mode());
+  std::unique_ptr<DataRecord> read() const override {
+    if (current_entry_ >= filenames_.size()) {
+      return nullptr;
+    }
+    auto [filename, metadata_filename] = filenames_.at(current_entry_++);
+    auto fn = filename.path().string();
+    auto mfn = metadata_filename.path().string();
+    return std::make_unique<DataRecord>(FileRecord(fn, mfn, config_.mode()));
   }
 
   // Currently this will do nothing because the file will already exist for PSI
   // but the behaviour could change in the future.
-  void write(const DataRecord& data) override {}
+  void write(const DataRecord& data) const override {}
 };
+
+enum class Type { FILESYS, KAFKA };
+
+std::string typeToString(const Type& type) {
+  switch (type) {
+    case Type::FILESYS:
+      return "filesys";
+    case Type::KAFKA:
+      return "kafka";
+    default:
+      throw std::logic_error("Unknown type.");
+  }
+}
+
+static std::unique_ptr<DataConn> makeDataConn(const Type& conn_type,
+                                              const DataConnConfig& config) {
+  switch (conn_type) {
+    case Type::FILESYS:
+      return std::make_unique<DataConn>(
+          FileSys(dynamic_cast<const FileSysConfig&>(config)));
+    case Type::KAFKA:
+      throw std::logic_error("Data connection for Kafka not implemented");
+    default:
+      throw std::runtime_error(std::string("Invalid data connection '") +
+                               typeToString(conn_type) + "'");
+  }
+}

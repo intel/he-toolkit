@@ -14,10 +14,11 @@
 #include <iostream>
 #include <type_traits>  // std::decay
 
+#include "data_connection.h"
 #include "read_config.h"
 
 using sharedContext = std::shared_ptr<helib::Context>;
-template <Key>
+template <typename Key>
 using uniqueKey = std::unique_ptr<const Key>;
 template <typename T>
 using uniqueDB = std::unique_ptr<const helib::Database<T>>;
@@ -265,13 +266,13 @@ int main(int argc, char* argv[]) {
   }
 
   // TODO(JC) change to be connection type dynamic
-  std::unique_ptr<DataConn> query_conn = DataConn::make(
-      DataConn::Type::FileSys, FileSysConfig{cmdLineOpts.queryConfig});
+  std::unique_ptr<DataConn> query_conn =
+      makeDataConn(Type::FILESYS, FileSysConfig{cmdLineOpts.queryConfig});
 
   do {  // REPL
     // Parse tableFile to build query
     std::cout << "Configuring query...";
-    auto query_record = query_conn.read();
+    auto query_record = query_conn->read();
     // Assume data to disk
     update_opts(cmdLineOpts, query_record);
     // Process query
