@@ -17,6 +17,10 @@
 #include "read_config.h"
 
 using sharedContext = std::shared_ptr<helib::Context>;
+template <Key>
+using uniqueKey = std::unique_ptr<const Key>;
+template <typename T>
+using uniqueDB = std::unique_ptr<const helib::Database<T>>;
 
 // Global signal status
 namespace {
@@ -228,14 +232,14 @@ int main(int argc, char* argv[]) {
 
   // Load Context and PubKey
   sharedContext contextp;
-  std::unique_ptr<const helib::PubKey> pkp;
+  uniqueKey<helib::PubKey> pkp;
   std::cout << "Loading HE Context and Public Key...";
   std::tie(contextp, pkp) =
       loadContextAndKey<helib::PubKey>(cmdLineOpts.pkFilePath);
   std::cout << "Done.\n";
 
-  std::unique_ptr<const helib::Database<Ptxt>> ptxt_db_ptr;
-  std::unique_ptr<const helib::Database<helib::Ctxt>> ctxt_db_ptr;
+  uniqueDB<Ptxt> ptxt_db_ptr;
+  uniqueDB<helib::Ctxt> ctxt_db_ptr;
   // Load DB once
   // DataConn* db_conn = factory(config);
   // Database = db_conn.read();
@@ -255,13 +259,14 @@ int main(int argc, char* argv[]) {
     std::cout << "Done.\n";
   }
 
-  DataConn* query_conn =
-      DataConn::make(/*data_conn_type=*/"filesys",
-                     /*json config=*/cmdLineOpts.queryConfig);
+  std::unique_ptr<DataConn> query_conn = DataConn::make(
+      DataConn::Type::FileSys, DataConnConfig{cmdLineOpts.queryConfig});
 
   do {  // REPL
     // Parse tableFile to build query
     std::cout << "Configuring query...";
+    auto query_record = query_conn.read();
+    // TODO(JC) pass in stream to read in query
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";
 
