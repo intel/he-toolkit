@@ -48,8 +48,8 @@ jobs:
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
 
-      - name: Run test hekit init
-        run:  cd && hekit
+      - name: Run Init hekit
+        run: cd && hekit "toolkit-path=${GITHUB_WORKSPACE}"
 
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
