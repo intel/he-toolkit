@@ -89,15 +89,17 @@ class FileSys : public DataConn {
                  });
     std::sort(filenames.begin(), filenames.end());
 
-    // if (filenames.size() % 2 == 1) {
-    // throw std::runtime_error("Some files do not have matching metadata.");
-    // }
     for (long i = 0; i < filenames.size() - 1; i += 2) {
       const auto& first_path = filenames[i].path();
       const auto& second_path = filenames[i + 1].path();
       if (first_path.stem() != second_path.stem()) {
         i--;  // Loop incrementor only adds 1
         std::cerr << "No match found.\n";
+        continue;
+      }
+      if (first_path.extension() == config_.meta_ext()) {
+        filenames_.emplace_back(second_path, first_path);
+        continue;
       }
       filenames_.emplace_back(first_path, second_path);
     }
@@ -110,8 +112,6 @@ class FileSys : public DataConn {
       return nullptr;
     }
     auto [filename, metadata_filename] = filenames_.at(current_entry_++);
-    // auto fn = filename.path().string();
-    // auto mfn = metadata_filename.path().string();
     return std::make_unique<FileRecord>(filename, metadata_filename,
                                         config_.mode());
   }

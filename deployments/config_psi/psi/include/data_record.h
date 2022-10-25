@@ -37,6 +37,7 @@ class FileRecord : public DataRecord {
              const std::string& mode) {
     file_stream_.open(filename, modeFromString(mode));
     metadata_["source"] = filename;
+    metadata_["meta_source"] = metadata_filename;
     auto ifs = std::ifstream(metadata_filename, modeFromString(mode));
     std::stringstream ss;
     std::string line;

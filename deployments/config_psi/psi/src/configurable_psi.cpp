@@ -166,8 +166,8 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
 }
 
 void update_opts(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
-  cmdLineOpts.tableFilePath = record.metadata("heql");
   cmdLineOpts.queryFilePath = record.metadata("source");
+  cmdLineOpts.tableFilePath = record.metadata("meta_source");
   // TODO(JC) maybe write file to disk here, if not exist?
 }
 
