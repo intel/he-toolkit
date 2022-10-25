@@ -64,8 +64,8 @@ void loadConfigFile(CmdLineOpts& options) {
   config.at("db").at("config").get_to(options.dbConfig);
   options.dbConfig.at("source").get_to(options.databaseFilePath);
   config.at("query").at("config").get_to(options.queryConfig);
-  options.queryConfig.at("source").get_to(options.queryFilePath);
-  options.queryConfig.at("table").get_to(options.tableFilePath);
+  // options.queryConfig.at("source").get_to(options.queryFilePath);
+  // options.queryConfig.at("table").get_to(options.tableFilePath);
   config.at("output").at("config").get_to(options.outConfig);
   options.outConfig.at("source").get_to(options.outFilePath);
 

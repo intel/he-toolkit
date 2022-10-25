@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <string>
@@ -68,7 +69,7 @@ class FileSys : public DataConn {
  private:
   FileSysConfig config_;
   mutable long current_entry_ = 0;
-  std::vector<std::pair<fs::directory_entry, fs::directory_entry>> filenames_;
+  std::vector<std::pair<std::string, std::string>> filenames_;
 
  public:
   // Factory method
@@ -79,7 +80,7 @@ class FileSys : public DataConn {
   void open() override {
     auto it = fs::directory_iterator(config_.directory());
     std::vector<fs::directory_entry> filenames;
-    std::copy_if(it, {}, filenames.begin(),
+    std::copy_if(it, {}, std::back_inserter(filenames),
                  [extension = config_.extension(),
                   meta_ext = config_.meta_ext()](const auto& filepath) {
                    return filepath.is_regular_file() &&
@@ -88,14 +89,17 @@ class FileSys : public DataConn {
                  });
     std::sort(filenames.begin(), filenames.end());
 
-    if (filenames.size() % 2 == 1) {
-      throw std::runtime_error("Some files do not have matching metadata.");
-    }
-    for (long i = 0; i < filenames.size(); i += 2) {
-      if (filenames[i].path().stem() != filenames[i + 1].path().stem()) {
-        throw std::runtime_error("File has no matching metadata or data.");
+    // if (filenames.size() % 2 == 1) {
+    // throw std::runtime_error("Some files do not have matching metadata.");
+    // }
+    for (long i = 0; i < filenames.size() - 1; i += 2) {
+      const auto& first_path = filenames[i].path();
+      const auto& second_path = filenames[i + 1].path();
+      if (first_path.stem() != second_path.stem()) {
+        i--;  // Loop incrementor only adds 1
+        std::cerr << "No match found.\n";
       }
-      filenames_.emplace_back(filenames[i], filenames[i + 1]);
+      filenames_.emplace_back(first_path, second_path);
     }
   }
 
@@ -106,9 +110,10 @@ class FileSys : public DataConn {
       return nullptr;
     }
     auto [filename, metadata_filename] = filenames_.at(current_entry_++);
-    auto fn = filename.path().string();
-    auto mfn = metadata_filename.path().string();
-    return std::make_unique<FileRecord>(fn, mfn, config_.mode());
+    // auto fn = filename.path().string();
+    // auto mfn = metadata_filename.path().string();
+    return std::make_unique<FileRecord>(filename, metadata_filename,
+                                        config_.mode());
   }
 
   // Currently this will do nothing because the file will already exist for PSI

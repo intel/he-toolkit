@@ -10,8 +10,10 @@
 #include <helib/set.h>
 #include <io.h>
 
+#include <chrono>   // Debug
 #include <csignal>  // std::signal
 #include <iostream>
+#include <thread>       // Debug
 #include <type_traits>  // std::decay
 
 #include "data_connection.h"
@@ -270,12 +272,19 @@ int main(int argc, char* argv[]) {
     // Parse tableFile to build query
     std::cout << "Configuring query...";
     auto query_record_ptr = query_conn->read();
+    if (query_record_ptr == nullptr) {
+      std::cerr << "No record (nullptr received)." << std::endl;
+      // TODO(JC) Remove sleep
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      continue;
+    }
     // Assume data to disk
     update_opts(cmdLineOpts, *query_record_ptr);
-    // Process query
+    // Reading the heql
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";
 
+    // Process query
     if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
       // Plaintext query and plaintext DB
       std::cout << "Executing ptxt-to-ptxt comparison\n";
