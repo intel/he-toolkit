@@ -26,9 +26,6 @@ class FileRecord : public DataRecord {
     if (mode_string == "write") {
       return std::ios::binary | std::ios::out;
     }
-    if (mode_string == "duplex") {
-      return std::ios::binary | std::ios::in | std::ios::out;
-    }
     throw std::runtime_error("Unknown file mode '" + mode_string + "'");
   }
 
