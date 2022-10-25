@@ -247,9 +247,6 @@ int main(int argc, char* argv[]) {
   uniqueDB<Ptxt> ptxt_db_ptr;
   uniqueDB<helib::Ctxt> ctxt_db_ptr;
   // Load DB once
-  // DataConn* db_conn = factory(config);
-  // Database = db_conn.read();
-  // Query q = query_conn.read();
   if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
     std::cout << "Reading database from file " << cmdLineOpts.databaseFilePath
               << " ...";
@@ -267,14 +264,14 @@ int main(int argc, char* argv[]) {
 
   // TODO(JC) change to be connection type dynamic
   std::unique_ptr<DataConn> query_conn =
-      makeDataConn(Type::FILESYS, FileSysConfig{cmdLineOpts.queryConfig});
+      makeDataConn(Type::FILESYS, cmdLineOpts.queryConfig);
 
   do {  // REPL
     // Parse tableFile to build query
     std::cout << "Configuring query...";
-    auto query_record = query_conn->read();
+    auto query_record_ptr = query_conn->read();
     // Assume data to disk
-    update_opts(cmdLineOpts, query_record);
+    update_opts(cmdLineOpts, *query_record_ptr);
     // Process query
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";

@@ -73,6 +73,7 @@ class FileSys : public DataConn {
  public:
   // Factory method
   FileSys(const FileSysConfig& config) : config_(config) { open(); }
+  FileSys(const json& config) : FileSys(FileSysConfig(config)) {}
   FileSys() = delete;
 
   void open() override {
@@ -107,7 +108,7 @@ class FileSys : public DataConn {
     auto [filename, metadata_filename] = filenames_.at(current_entry_++);
     auto fn = filename.path().string();
     auto mfn = metadata_filename.path().string();
-    return std::make_unique<DataRecord>(FileRecord(fn, mfn, config_.mode()));
+    return std::make_unique<FileRecord>(fn, mfn, config_.mode());
   }
 
   // Currently this will do nothing because the file will already exist for PSI
@@ -129,11 +130,10 @@ std::string typeToString(const Type& type) {
 }
 
 static std::unique_ptr<DataConn> makeDataConn(const Type& conn_type,
-                                              const DataConnConfig& config) {
+                                              const json& config) {
   switch (conn_type) {
     case Type::FILESYS:
-      return std::make_unique<DataConn>(
-          FileSys(dynamic_cast<const FileSysConfig&>(config)));
+      return std::make_unique<FileSys>(config);
     case Type::KAFKA:
       throw std::logic_error("Data connection for Kafka not implemented");
     default:
