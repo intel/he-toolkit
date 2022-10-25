@@ -49,7 +49,7 @@ jobs:
         run: pytest tests/ -n 8 --dist loadgroup
 
       - name: Run Init hekit
-        run: cd && hekit 
+        run: cd && pwd
 
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
