@@ -43,7 +43,7 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double>,
     std::vector<long> is;
     for (double num : nums) {
       const auto [a, frac_exp] = EncodeHelper(num);
-      polys.push_back(a);
+      polys.push_back(laurentEncode(a, frac_exp));
       is.push_back(frac_exp);
     }
     return EncPoly<poly::SparseMultiPoly>{polys, is};
