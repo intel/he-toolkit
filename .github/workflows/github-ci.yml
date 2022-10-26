@@ -51,7 +51,10 @@ jobs:
         run: pytest tests/ -n 8 --dist loadgroup
 
       - name: Run Init hekit
-        run: ./hekit init
+        run: |
+           ./hekit init 
+           echo "y"
+           source ~/.bashrc
 
 
 #   build-and-test-toolkit-palisade:
