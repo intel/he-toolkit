@@ -45,11 +45,12 @@ jobs:
         run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
 
       - name: Run Init hekit
-        run: cd && pwd
+        run: cd && ./hekit
 
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
