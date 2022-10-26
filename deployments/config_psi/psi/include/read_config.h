@@ -67,7 +67,7 @@ void loadConfigFile(CmdLineOpts& options) {
   // options.queryConfig.at("source").get_to(options.queryFilePath);
   // options.queryConfig.at("table").get_to(options.tableFilePath);
   config.at("output").at("config").get_to(options.outConfig);
-  options.outConfig.at("source").get_to(options.outFilePath);
+  // options.outConfig.at("source").get_to(options.outFilePath);
 
   if (config.at("db").at("type") == "ptxt") {
     options.ptxtDB = true;

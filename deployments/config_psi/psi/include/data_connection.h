@@ -45,8 +45,13 @@ class FileSysConfig : public DataConnConfig {
  public:
   FileSysConfig(const json& json_config) {
     json_config.at("directory").get_to(directory_);
-    json_config.at("ext").get_to(extension_);
-    json_config.at("meta_ext").get_to(meta_ext_);
+    // These are optional
+    if (json_config.contains("ext")) {
+      json_config.at("ext").get_to(extension_);
+    }
+    if (json_config.contains("meta_ext")) {
+      json_config.at("meta_ext").get_to(meta_ext_);
+    }
 
     // TODO(JC) Use correct stream modes
     if (json_config.at("io") == "read") {

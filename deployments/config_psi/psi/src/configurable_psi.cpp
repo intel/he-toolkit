@@ -47,9 +47,8 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
 
 void update_opts_output(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
-  filepath.filename().replace_extension(".result");
-  cmdLineOpts.outFilePath =
-      fs::path(record.metadata("source")) / filepath.filename();
+  cmdLineOpts.outFilePath = fs::path(record.metadata("source")) /
+                            filepath.replace_extension(".result").filename();
 }
 
 // Utility function which performs a binary sum of Matrix rows.
