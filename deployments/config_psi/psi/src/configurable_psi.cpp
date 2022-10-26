@@ -12,6 +12,7 @@
 
 #include <chrono>   // Debug
 #include <csignal>  // std::signal
+#include <filesystem>
 #include <iostream>
 #include <thread>       // Debug
 #include <type_traits>  // std::decay
@@ -25,6 +26,8 @@ using uniqueKey = std::unique_ptr<const Key>;
 template <typename T>
 using uniqueDB = std::unique_ptr<const helib::Database<T>>;
 
+namespace fs = std::filesystem;
+
 // Global signal status
 namespace {
 volatile std::sig_atomic_t gSignalStatus = false;
@@ -34,6 +37,19 @@ volatile std::sig_atomic_t gSignalStatus = false;
 void signal_handler(int signal) {
   std::cout << "\n\n*** External interrupt detected! ***\n\n";
   gSignalStatus = true;
+}
+
+void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
+  cmdLineOpts.queryFilePath = record.metadata("source");
+  cmdLineOpts.tableFilePath = record.metadata("meta_source");
+  // TODO(JC) maybe write file to disk here, if not exist?
+}
+
+void update_opts_output(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
+  auto filepath = fs::path(cmdLineOpts.queryFilePath);
+  filepath.filename().replace_extension(".result");
+  cmdLineOpts.outFilePath =
+      fs::path(record.metadata("source")) / filepath.filename();
 }
 
 // Utility function which performs a binary sum of Matrix rows.
@@ -55,7 +71,7 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
 void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
                         const helib::QueryType& query,
                         const helib::Database<Ptxt>& database,
-                        const CmdLineOpts& cmdLineOpts) {
+                        CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
             << " ...";
@@ -72,6 +88,14 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Sum resultant mask(s) into single mask w.r.t. query
   auto sum = binSumRows(match);
 
+  // Create data connection for outfile
+  std::unique_ptr<DataConn> out_conn =
+      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
+  auto out_record_ptr = out_conn->createDataRecord();
+
+  // Update cmdLineOpts
+  update_opts_output(cmdLineOpts, *out_record_ptr);
+
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
@@ -82,7 +106,7 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
 void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
                           const helib::QueryType& query,
                           const helib::Database<helib::Ctxt>& database,
-                          const CmdLineOpts& cmdLineOpts) {
+                          CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
             << " ...";
@@ -101,6 +125,14 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Sum resultant mask(s) into single mask w.r.t. query
   auto sum = binSumRows(match);
 
+  // Create data connection for outfile
+  std::unique_ptr<DataConn> out_conn =
+      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
+  auto out_record_ptr = out_conn->createDataRecord();
+
+  // Update cmdLineOpts
+  update_opts_output(cmdLineOpts, *out_record_ptr);
+
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
@@ -111,7 +143,7 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
 void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
                        const helib::QueryType& query,
                        const helib::Database<Ptxt>& database,
-                       const CmdLineOpts& cmdLineOpts) {
+                       CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
             << " ...";
@@ -129,6 +161,14 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
 
   // Sum resultant mask(s) into single mask w.r.t. query
   auto sum = binSumRows(match);
+
+  // Create data connection for outfile
+  std::unique_ptr<DataConn> out_conn =
+      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
+  auto out_record_ptr = out_conn->createDataRecord();
+
+  // Update cmdLineOpts
+  update_opts_output(cmdLineOpts, *out_record_ptr);
 
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
@@ -140,7 +180,7 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
 void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
                         const helib::QueryType& query,
                         const helib::Database<helib::Ctxt>& database,
-                        const CmdLineOpts& cmdLineOpts) {
+                        CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
             << " ...";
@@ -159,16 +199,18 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Sum resultant mask(s) into single mask w.r.t. query
   auto sum = binSumRows(match);
 
+  // Create data connection for outfile
+  std::unique_ptr<DataConn> out_conn =
+      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
+  auto out_record_ptr = out_conn->createDataRecord();
+
+  // Update cmdLineOpts
+  update_opts_output(cmdLineOpts, *out_record_ptr);
+
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
-}
-
-void update_opts(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
-  cmdLineOpts.queryFilePath = record.metadata("source");
-  cmdLineOpts.tableFilePath = record.metadata("meta_source");
-  // TODO(JC) maybe write file to disk here, if not exist?
 }
 
 int main(int argc, char* argv[]) {
@@ -279,7 +321,7 @@ int main(int argc, char* argv[]) {
       continue;
     }
     // Assume data to disk
-    update_opts(cmdLineOpts, *query_record_ptr);
+    update_opts_input(cmdLineOpts, *query_record_ptr);
     // Reading the heql
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";

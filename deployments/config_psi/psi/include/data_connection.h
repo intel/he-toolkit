@@ -26,6 +26,7 @@ struct DataConn {
   virtual void close() = 0;
   virtual std::unique_ptr<DataRecord> read() const = 0;
   virtual void write(const DataRecord& data) const = 0;
+  virtual std::unique_ptr<DataRecord> createDataRecord() const = 0;
   virtual ~DataConn() = default;
 };
 
@@ -53,8 +54,10 @@ class FileSysConfig : public DataConnConfig {
     } else if (json_config.at("io") == "write") {
       mode_ = "write";
     } else {
-      throw std::runtime_error(std::string("Invalid io argument '") +
-                               json_config.at("io").get<std::string>() + "'");
+      std::ostringstream msg;
+      msg << "Invalid io argument '" << json_config.at("io").get<std::string>()
+          << "'";
+      throw std::runtime_error(msg.str());
     }
   }
 
@@ -71,13 +74,7 @@ class FileSys : public DataConn {
   mutable long current_entry_ = 0;
   std::vector<std::pair<std::string, std::string>> filenames_;
 
- public:
-  // Factory method
-  FileSys(const FileSysConfig& config) : config_(config) { open(); }
-  FileSys(const json& config) : FileSys(FileSysConfig(config)) {}
-  FileSys() = delete;
-
-  void open() override {
+  void openForRead() {
     auto it = fs::directory_iterator(config_.directory());
     std::vector<fs::directory_entry> filenames;
     std::copy_if(it, {}, std::back_inserter(filenames),
@@ -105,6 +102,31 @@ class FileSys : public DataConn {
     }
   }
 
+  // This may do something in the future.
+  void openForWrite() {}
+
+ public:
+  // Factory method
+  FileSys(const FileSysConfig& config) : config_(config) { open(); }
+  FileSys(const json& config) : FileSys(FileSysConfig(config)) {}
+  FileSys() = delete;
+
+  void open() override {
+    if (config_.mode() == "read") {
+      openForRead();
+      return;
+    }
+
+    if (config_.mode() == "write") {
+      openForWrite();
+      return;
+    }
+
+    std::ostringstream msg;
+    msg << "Unknown file mode '" << config_.mode() << "'";
+    throw std::runtime_error(msg.str());
+  }
+
   void close() override {}  // This is supposed to do nothing
 
   std::unique_ptr<DataRecord> read() const override {
@@ -112,13 +134,17 @@ class FileSys : public DataConn {
       return nullptr;
     }
     auto [filename, metadata_filename] = filenames_.at(current_entry_++);
-    return std::make_unique<FileRecord>(filename, metadata_filename,
-                                        config_.mode());
+    return std::make_unique<FileRecord>(filename, config_.mode(),
+                                        metadata_filename);
   }
 
   // Currently this will do nothing because the file will already exist for PSI
   // but the behaviour could change in the future.
   void write(const DataRecord& data) const override {}
+
+  std::unique_ptr<DataRecord> createDataRecord() const override {
+    return std::make_unique<FileRecord>(config_.directory(), config_.mode());
+  }
 };
 
 enum class Type { FILESYS, KAFKA };
@@ -140,9 +166,10 @@ static std::unique_ptr<DataConn> makeDataConn(const Type& conn_type,
     case Type::FILESYS:
       return std::make_unique<FileSys>(config);
     case Type::KAFKA:
-      throw std::logic_error("Data connection for Kafka not implemented");
+      throw std::logic_error("Data connection for Kafka not implemented.");
     default:
-      throw std::runtime_error(std::string("Invalid data connection '") +
-                               typeToString(conn_type) + "'");
+      std::ostringstream msg;
+      msg << "Invalid data connection '" << typeToString(conn_type) << "'";
+      throw std::runtime_error(msg.str());
   }
 }
