@@ -5,13 +5,13 @@
 
 from argparse import HelpFormatter
 from pathlib import Path
-from typing import Dict, Union
-from kit.utils.component_builder import components_to_build_from, chain_run
+from typing import Callable, Dict, Union
+from kit.utils.component_builder import components_to_build_from, chain_run, hekit_print
 from kit.utils.subparsers import validate_input
 from kit.utils.config import config_required
 
 
-def _stages(upto_stage: str):
+def _stages(upto_stage: str) -> Callable:
     """Return a generator"""
     if upto_stage not in ("fetch", "build", "install"):
         raise ValueError(f"Not a valid stage value '{upto_stage}'")
@@ -44,9 +44,9 @@ def install_components(args):
 
     for component in components:
         comp_label = f"{component.component_name()}/{component.instance_name()}"
-        print(comp_label)
+        hekit_print("component/instance:", comp_label)
         if component.skip():
-            print("Skipping", comp_label)
+            hekit_print("Skipping component/instance:", comp_label)
             continue
 
         # upto_stage is re-executed only when "force" flag is set.

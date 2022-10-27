@@ -11,6 +11,13 @@ from typing import Iterable, Callable, Union, List, Tuple, Dict
 from kit.utils.files import dump_toml, load_toml
 from kit.utils.spec import Spec
 
+RunOutput = Tuple[bool, int]
+
+
+def hekit_print(*args):
+    """print but prefixes [HEKIT]"""
+    print("[HEKIT]", *args)
+
 
 class BuildError(Exception):
     """Exception for something wrong with the build."""
@@ -32,17 +39,17 @@ def chain_run(funcs: Iterable[Callable]):
             )
 
 
-def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
+def run(cmd_and_args: Union[str, List[str]]) -> RunOutput:
     """Takes either a string or list of strings and runs as command."""
     if not cmd_and_args:
         return True, 0
 
     if isinstance(cmd_and_args, str):
         cmd_and_args_list = shlex.split(cmd_and_args)
-        print(cmd_and_args)
+        hekit_print(cmd_and_args)
     else:
         cmd_and_args_list = cmd_and_args
-        print(" ".join(cmd_and_args))
+        hekit_print(" ".join(cmd_and_args))
     basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:  # nosec B603
         if proc.stdout is not None:
@@ -52,16 +59,6 @@ def run(cmd_and_args: Union[str, List[str]]) -> Tuple[bool, int]:
             raise ValueError("STDOUT is None")
     success = proc.returncode == 0
     return success, proc.returncode
-
-
-def try_run(spec: dict, attrib: str):
-    """Try to run the attrib in the spec.
-    Do nothing (pass success) if no key in dict.
-    """
-    try:
-        return run(spec[attrib])
-    except KeyError:
-        return True, 0
 
 
 def components_to_build_from(
@@ -94,6 +91,16 @@ class ComponentBuilder:
     def skip(self):
         """Returns skip value"""
         return self._spec.skip
+
+    def _try_run(self, attrib: str) -> RunOutput:
+        """Try to run the attrib in the spec.
+        Do nothing (pass success) if no key in dict.
+        """
+        hekit_print(attrib)
+        try:
+            return run(self._spec[attrib])
+        except KeyError:
+            return True, 0
 
     def component_name(self):
         """Returns component name"""
@@ -129,8 +136,8 @@ class ComponentBuilder:
         """Reset the stage value that was read from hekit.info file"""
         self._info_file["status"][stage] = ""
 
-    def _stage(self, stage: str):
-        print(stage)
+    def _stage(self, stage: str) -> RunOutput:
+        hekit_print(stage)
         if self.already_successful(stage):
             return True, 0
 
@@ -142,7 +149,7 @@ class ComponentBuilder:
         # The actual directory that is written to
         init_stage_dir = self._spec[f"init_{stage}_dir"]
         change_directory_to(Path(init_stage_dir).expanduser())
-        print("cwd:", Path.cwd())
+        hekit_print("current directory:", Path.cwd())
 
         try:
             chain_run(fns)
@@ -154,8 +161,7 @@ class ComponentBuilder:
 
     def pre_fetch(self):
         """Any steps after a fetch"""
-        print("pre-fetch")
-        return try_run(self._spec, "pre-fetch")
+        return self._try_run("pre-fetch")
 
     def fetch(self):
         """Fetch the source"""
@@ -163,13 +169,11 @@ class ComponentBuilder:
 
     def post_fetch(self):
         """Any steps after a fetch"""
-        print("post-fetch")
-        return try_run(self._spec, "post-fetch")
+        return self._try_run("post-fetch")
 
     def pre_build(self):
         """Any setup steps before building"""
-        print("pre-build")
-        return try_run(self._spec, "pre-build")
+        return self._try_run("pre-build")
 
     def build(self):
         """Build the software"""
@@ -177,19 +181,16 @@ class ComponentBuilder:
 
     def post_build(self):
         """Any steps after a build"""
-        print("post-build")
-        return try_run(self._spec, "post-build")
+        return self._try_run("post-build")
 
     def pre_install(self):
-        """Any steps after a install"""
-        print("pre-install")
-        return try_run(self._spec, "pre-install")
+        """Any steps before an install"""
+        return self._try_run("pre-install")
 
     def install(self):
         """Installation of the component, ready to use"""
         return self._stage("install")
 
     def post_install(self):
-        """Any steps after a install"""
-        print("post-install")
-        return try_run(self._spec, "post-install")
+        """Any steps after an install"""
+        return self._try_run("post-install")
