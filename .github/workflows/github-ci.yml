@@ -52,8 +52,7 @@ jobs:
 
       - name: Run Init hekit
         run: |
-           ./hekit init
-           echo "Input: y"
+           ./hekit init <<< y
 
 
 #   build-and-test-toolkit-palisade:
