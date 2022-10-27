@@ -9,9 +9,10 @@ import argparse
 import random
 import toml
 import sys
+import string
 from pydantic import BaseModel, validator
 from pathlib import Path
-from typing import List, Union
+from typing import Generator, List, Union
 
 
 class ColumnsDescription(BaseModel):
@@ -30,8 +31,27 @@ def real_matches(filename: str, pick: int) -> List[str]:
     return random.sample(lines, pick)
 
 
-def fake_rows(column_descriptions: List[ColumnsDescription]) -> str:
+def fake_rows(column_descriptions: List[ColumnsDescription], rows: int) -> Generator:
     """Generate fake entries."""
+
+    def column(collection, size):
+        if isinstance(collection, list):
+            return "".join(random.choices(collection, k=size))
+        elif collection == "alphabetic":
+            return "".join(random.choices(string.ascii_letters[26:], k=size))
+        elif collection == "alphanumeric":
+            return "".join(
+                random.choices(string.ascii_letters[26:] + string.digits, k=size)
+            )
+        elif collection == "numeric":
+            return "".join(random.choices(string.digits, k=size))
+        else:
+            raise ValueError(f"Unknown collection name '{collection}'")
+
+    for _ in range(rows):
+        yield " ".join(
+            column(desc.datatype, desc.char_size) for desc in column_descriptions
+        )
 
 
 def main():
@@ -58,7 +78,7 @@ def main():
 
     columns_descriptions = [ColumnsDescription(**desc) for desc in tobj.values()]
 
-    for row in fake_rows(columns_descriptions):
+    for row in fake_rows(columns_descriptions, args.total):
         print(row)
 
     return

@@ -1,10 +1,10 @@
 [columnA]
-datatype = "alphabetical"
+datatype = "alphabetic"
 char_size = 4
 
 
 [columnB]
-datatype = "numerical"
+datatype = "numeric"
 char_size = 5
 
 
