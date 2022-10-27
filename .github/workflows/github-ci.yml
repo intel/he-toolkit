@@ -52,8 +52,7 @@ jobs:
 
       - name: Run Init hekit
         run: |
-           ./hekit init 
-           echo "y"
+           ./hekit init
            source ~/.bashrc
 
 
