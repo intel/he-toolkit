@@ -3,32 +3,58 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+"""Simple program to generate dummy data for configurable PSI"""
+
 from __future__ import annotations
 
 import argparse
 import random
-import toml
 import sys
 import string
-from pydantic import BaseModel, validator
-from pathlib import Path
 from typing import Generator, List, Union
+
+import toml
+from pydantic import BaseModel, validator
 
 
 class ColumnsDescription(BaseModel):
-    """"""
+    """Description on columns to generate."""
 
     datatype: Union[str, List[str]]
-    char_size: int
+    char_size: int = 1
 
-    # TODO add validators
+    # @validator("datatype")
+    # def _set_known_collections(cls, collection):
+
+    @validator("datatype")
+    def _set_known_collections(
+        cls, collection: Union[str, List[str]]
+    ) -> Union[str, List[str]]:
+        """Converts known collection names to the collections themselves."""
+        if isinstance(collection, list):
+            return collection
+        if collection == "alphabetic":
+            return string.ascii_letters[26:]
+        if collection == "alphanumeric":
+            return string.ascii_letters[26:] + string.digits
+        if collection == "numeric":
+            return string.digits
+
+        raise ValueError(f"Unknown collection name '{collection}'")
+
+    @validator("char_size")
+    def _greater_than_or_equal_to_one(cls, size: int):
+        """check size is greater than or equal to one"""
+        if size < 1:
+            raise ValueError(f"size must be greater than or equal to one: '{size}'")
+        return size
 
 
 def real_matches(filename: str, pick: int) -> List[str]:
     """Read in file and pick n lines at random. Return list."""
-    with open(filename) as f:
-        f.readline()  # ignore header
-        lines = [line.strip() for line in f.readlines()]  # slurp file
+    with open(filename, encoding="utf-8") as fstrm:
+        fstrm.readline()  # ignore header
+        lines = [line.strip() for line in fstrm.readlines()]  # slurp file
     return random.sample(lines, pick)
 
 
@@ -36,23 +62,12 @@ def fake_rows(column_descriptions: List[ColumnsDescription], rows: int) -> Gener
     """Generate fake entries."""
 
     def column(collection, size):
-        if isinstance(collection, list):
-            return "".join(random.choices(collection, k=size))
-        elif collection == "alphabetic":
-            return "".join(random.choices(string.ascii_letters[26:], k=size))
-        elif collection == "alphanumeric":
-            return "".join(
-                random.choices(string.ascii_letters[26:] + string.digits, k=size)
-            )
-        elif collection == "numeric":
-            return "".join(random.choices(string.digits, k=size))
-        else:
-            raise ValueError(f"Unknown collection name '{collection}'")
+        return "".join(random.choices(collection, k=size))  # nosec B311
 
-    for _ in range(rows):
-        yield " ".join(
-            column(desc.datatype, desc.char_size) for desc in column_descriptions
-        )
+    return (
+        " ".join(column(desc.datatype, desc.char_size) for desc in column_descriptions)
+        for _ in range(rows)
+    )
 
 
 def main():
@@ -81,7 +96,7 @@ def main():
     if args.dbfile is None:
         for row in fake_rows(columns_descriptions, args.total):
             print(row)
-        exit(0)
+        sys.exit(0)
 
     # sanity check
     diff = args.total - args.real
@@ -90,7 +105,7 @@ def main():
             f"Number of chosen real matches '{args.real}' must not exceed total '{args.total}'",
             file=sys.stderr,
         )
-        exit(1)
+        sys.exit(1)
 
     queries = real_matches(args.dbfile, args.real)
     queries.extend(fake_rows(columns_descriptions, diff))
