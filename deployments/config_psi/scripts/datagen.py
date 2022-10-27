@@ -27,7 +27,8 @@ class ColumnsDescription(BaseModel):
 def real_matches(filename: str, pick: int) -> List[str]:
     """Read in file and pick n lines at random. Return list."""
     with open(filename) as f:
-        lines = list(f.readlines())  # Slurp file
+        f.readline()  # ignore header
+        lines = [line.strip() for line in f.readlines()]  # slurp file
     return random.sample(lines, pick)
 
 
@@ -72,16 +73,15 @@ def main():
     args = parser.parse_args()
 
     tobj = toml.load(args.columns_description)
+    columns_descriptions = [ColumnsDescription(**desc) for desc in tobj.values()]
 
     # print column headers
     print(" ".join(tobj.keys()))
 
-    columns_descriptions = [ColumnsDescription(**desc) for desc in tobj.values()]
-
-    for row in fake_rows(columns_descriptions, args.total):
-        print(row)
-
-    return
+    if args.dbfile is None:
+        for row in fake_rows(columns_descriptions, args.total):
+            print(row)
+        exit(0)
 
     # sanity check
     diff = args.total - args.real
@@ -93,12 +93,11 @@ def main():
         exit(1)
 
     queries = real_matches(args.dbfile, args.real)
-    queries.extend(fake_queries(diff, args.digits))
-
+    queries.extend(fake_rows(columns_descriptions, diff))
     random.shuffle(queries)  # works in place
 
     for line in queries:
-        print(line, end="")
+        print(line)
 
 
 if __name__ == "__main__":
