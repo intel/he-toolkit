@@ -53,7 +53,7 @@ jobs:
       - name: Run Init hekit
         run: |
            ./hekit init
-           source ~/.bashrc
+           echo "Do you want to continue with this action: y"
 
 
 #   build-and-test-toolkit-palisade:
