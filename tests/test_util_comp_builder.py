@@ -16,7 +16,7 @@ def test_stages_fetch(mocker, unskipped_components):
     comp = unskipped_components[0]
     upto_stage = "fetch"
 
-    the_stages = stages(upto_stage)
+    the_stages = stages(upto_stage, force=False)
     act_result = the_stages(comp)
     assert next(act_result) == comp.setup
     assert next(act_result) == comp.fetch
@@ -26,7 +26,7 @@ def test_stages_build(mocker, unskipped_components):
     comp = unskipped_components[1]
     upto_stage = "build"
 
-    the_stages = _stages(upto_stage)
+    the_stages = stages(upto_stage, force=False)
     act_result = the_stages(comp)
     assert next(act_result) == comp.setup
     assert next(act_result) == comp.fetch
@@ -37,7 +37,7 @@ def test_stages_install(mocker, unskipped_components):
     comp = unskipped_components[2]
     upto_stage = "install"
 
-    the_stages = stages(upto_stage)
+    the_stages = stages(upto_stage, force=False)
     act_result = the_stages(comp)
     assert next(act_result) == comp.setup
     assert next(act_result) == comp.fetch
@@ -172,3 +172,38 @@ def specs_data():
             self.repo_location = repo
 
     return filename, repo, recipe_arg, [Spec(), Spec(), Spec()]
+
+
+@pytest.fixture
+def unskipped_components():
+    return [MockComponent(False), MockComponent(False), MockComponent(False)]
+
+
+class MockComponent:
+    def __init__(self, skip):
+        self._skip = skip
+        self._result = (True, 0)
+
+    def skip(self):
+        return self._skip
+
+    def component_name(self):
+        return "component_test"
+
+    def instance_name(self):
+        return "instance_test"
+
+    def setup(self):
+        return self._result
+
+    def fetch(self):
+        return self._result
+
+    def build(self):
+        return self._result
+
+    def install(self):
+        return self._result
+
+    def reset_stage_info_file(self, stage):
+        pass

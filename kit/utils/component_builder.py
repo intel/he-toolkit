@@ -14,9 +14,10 @@ from kit.utils.spec import Spec
 RunOutput = Tuple[bool, int]
 
 
-def hekit_print(*args):
+def hekit_print(*args, **kwargs):
     """print but prefixes [HEKIT]"""
-    print("[HEKIT]", *args)
+    args = [arg.replace("\n", "\n[HEKIT]") for arg in map(str, args)]
+    print("[HEKIT]", *args, **kwargs)
 
 
 def stages(upto_stage: str, force: bool) -> Callable:

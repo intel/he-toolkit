@@ -6,6 +6,7 @@ from pathlib import Path
 from kit.commands.install import install_components, get_recipe_arg_dict
 
 
+# TODO(DCV) Cannot rely on chain_run not being run
 def test_install_components_all_unskipped(mocker, args, unskipped_components):
     """chain_run function is executed because skip is equal to False"""
     mock_component = mocker.patch("kit.commands.install.components_to_build_from")
@@ -20,6 +21,7 @@ def test_install_components_all_unskipped(mocker, args, unskipped_components):
     assert 3 == mock_chain_run.call_count
 
 
+# TODO(DCV) Cannot rely on chain_run not being run
 def test_install_components_all_skipped(mocker, args, skipped_components):
     """chain_run function is not executed because skip is equal to True"""
     mock_component = mocker.patch("kit.commands.install.components_to_build_from")
@@ -34,6 +36,7 @@ def test_install_components_all_skipped(mocker, args, skipped_components):
     mock_chain_run.assert_not_called()
 
 
+# TODO(DCV) Cannot rely on chain_run not being run
 def test_install_components_one_unskipped(mocker, args, one_unskipped_component):
     """chain_run function is executed once when skip is equal to False"""
     mock_component = mocker.patch("kit.commands.install.components_to_build_from")
