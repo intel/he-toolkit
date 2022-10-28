@@ -3,7 +3,7 @@
 
 """This module creates a default config file and modifies the shell init file to know about hekit"""
 
-# from os import environ as environment
+from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
@@ -81,8 +81,8 @@ def append_to_rc(path: Path, content: str) -> None:
 
 def get_rc_file() -> Path:
     """Return the correct file to add shell commands"""
-    # active_shell_path = Path(environment["SHELL"]).name
-    active_shell_path = "bash"
+    active_shell_path = Path(environment["SHELL"]).name
+    #active_shell_path = "bash"
     if active_shell_path == "bash":
         # if bash_profile file does not exist, try bashrc file
         rc_file = Path("~/.bash_profile").expanduser().resolve()
