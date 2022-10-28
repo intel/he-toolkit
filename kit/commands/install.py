@@ -17,7 +17,9 @@ def install_components(args):
     if Path(args.recipe_file).is_symlink():
         raise TypeError("The TOML file cannot be a symlink")
 
-    the_stages = stages(args.upto_stage, args.force)
+    # fetch cmmd does not have flag force
+    force = False if args.upto_stage == "fetch" else args.force
+    the_stages = stages(args.upto_stage, force)
 
     components = components_to_build_from(
         args.recipe_file, args.config.repo_location, args.recipe_arg

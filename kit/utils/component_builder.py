@@ -35,7 +35,7 @@ def stages(upto_stage: str, force: bool) -> Callable:
         # upto_stage is re-executed only when "force" flag is set.
         # if previous stages were executed successfully, they are going to be skipped.
         # For example, fetch and build could be skipped when executing install.
-        if upto_stage != "fetch" and force:
+        if force:
             component.reset_stage_info_file(upto_stage)
 
         yield component.setup
