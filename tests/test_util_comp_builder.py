@@ -8,7 +8,41 @@ from kit.utils.component_builder import (
     BuildError,
     components_to_build_from,
     ComponentBuilder,
+    stages,
 )
+
+
+def test_stages_fetch(mocker, unskipped_components):
+    comp = unskipped_components[0]
+    upto_stage = "fetch"
+
+    the_stages = stages(upto_stage)
+    act_result = the_stages(comp)
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+
+
+def test_stages_build(mocker, unskipped_components):
+    comp = unskipped_components[1]
+    upto_stage = "build"
+
+    the_stages = _stages(upto_stage)
+    act_result = the_stages(comp)
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+    assert next(act_result) == comp.build
+
+
+def test_stages_install(mocker, unskipped_components):
+    comp = unskipped_components[2]
+    upto_stage = "install"
+
+    the_stages = stages(upto_stage)
+    act_result = the_stages(comp)
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+    assert next(act_result) == comp.build
+    assert next(act_result) == comp.install
 
 
 def test_chain_run_all_success(mocker, funcs_success):

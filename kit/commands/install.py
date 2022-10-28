@@ -5,29 +5,10 @@
 
 from argparse import HelpFormatter
 from pathlib import Path
-from typing import Callable, Dict, Union
-from kit.utils.component_builder import components_to_build_from, chain_run, hekit_print
+from typing import Dict, Union
+from kit.utils.component_builder import components_to_build_from, chain_run, stages
 from kit.utils.subparsers import validate_input
 from kit.utils.config import config_required
-
-
-def _stages(upto_stage: str) -> Callable:
-    """Return a generator"""
-    if upto_stage not in ("fetch", "build", "install"):
-        raise ValueError(f"Not a valid stage value '{upto_stage}'")
-
-    def the_stages(component):
-        yield component.setup
-        yield component.fetch
-        if upto_stage == "fetch":
-            return
-        yield component.build
-        if upto_stage == "build":
-            return
-        yield component.install
-        return
-
-    return the_stages
 
 
 @config_required
@@ -36,25 +17,13 @@ def install_components(args):
     if Path(args.recipe_file).is_symlink():
         raise TypeError("The TOML file cannot be a symlink")
 
-    the_stages = _stages(args.upto_stage)
+    the_stages = stages(args.upto_stage, args.force)
 
     components = components_to_build_from(
         args.recipe_file, args.config.repo_location, args.recipe_arg
     )
 
     for component in components:
-        comp_label = f"{component.component_name()}/{component.instance_name()}"
-        hekit_print("component/instance:", comp_label)
-        if component.skip():
-            hekit_print("Skipping component/instance:", comp_label)
-            continue
-
-        # upto_stage is re-executed only when "force" flag is set.
-        # if previous stages were executed successfully, they are going to be skipped.
-        # For example, fetch and build could be skipped when executing install.
-        if args.upto_stage != "fetch" and args.force:
-            component.reset_stage_info_file(args.upto_stage)
-
         chain_run(the_stages(component))
 
 

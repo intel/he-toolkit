@@ -19,6 +19,37 @@ def hekit_print(*args):
     print("[HEKIT]", *args)
 
 
+def stages(upto_stage: str, force: bool) -> Callable:
+    """Return a generator"""
+    if upto_stage not in ("fetch", "build", "install"):
+        raise ValueError(f"Not a valid stage value '{upto_stage}'")
+
+    def the_stages(component):
+        comp_label = f"{component.component_name()}/{component.instance_name()}"
+        hekit_print("component/instance:", comp_label)
+        if component.skip():
+            hekit_print("Skipping component/instance:", comp_label)
+            return
+
+        # upto_stage is re-executed only when "force" flag is set.
+        # if previous stages were executed successfully, they are going to be skipped.
+        # For example, fetch and build could be skipped when executing install.
+        if upto_stage != "fetch" and force:
+            component.reset_stage_info_file(upto_stage)
+
+        yield component.setup
+        yield component.fetch
+        if upto_stage == "fetch":
+            return
+        yield component.build
+        if upto_stage == "build":
+            return
+        yield component.install
+        return
+
+    return the_stages
+
+
 class BuildError(Exception):
     """Exception for something wrong with the build."""
 
