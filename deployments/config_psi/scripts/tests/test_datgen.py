@@ -143,7 +143,7 @@ def test_throw_when_real_greater_than_total(input_data):
 
 @pytest.fixture
 def input_data(tmp_path) -> Tuple[Path, List[str]]:
-    """"""
+    """Fixture for creating input data. Returns path to file and raw data"""
     path = tmp_path / "input.csv"
     input_data = run(
         " ".join(
