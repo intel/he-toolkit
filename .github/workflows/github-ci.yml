@@ -53,7 +53,7 @@ jobs:
       - name: Run Init hekit
         run: |
            ./hekit init <<< y
-           $ env |grep PATH
+           env |grep PATH
 
 
 #   build-and-test-toolkit-palisade:
