@@ -53,7 +53,7 @@ jobs:
       - name: Run Init hekit
         run: |
            ./hekit init <<< y
-           'cd .. && .hekit'
+           'cd .. && hekit'
 
 
 #   build-and-test-toolkit-palisade:
