@@ -54,7 +54,7 @@ jobs:
         run: |
            ./hekit init <<< y
            source /home/runner/.bash_profile
-           env |grep PATH
+           cd .. && hekit
 
 
 #   build-and-test-toolkit-palisade:
