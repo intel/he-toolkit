@@ -17,9 +17,7 @@ def install_components(args):
     if Path(args.recipe_file).is_symlink():
         raise TypeError("The TOML file cannot be a symlink")
 
-    # fetch cmmd does not have flag force
-    force = False if args.upto_stage == "fetch" else args.force
-    the_stages = stages(args.upto_stage, force)
+    the_stages = stages(args.upto_stage, args.force)
 
     components = components_to_build_from(
         args.recipe_file, args.config.repo_location, args.recipe_arg
@@ -42,7 +40,7 @@ def get_recipe_arg_dict(recipe_arg: str) -> Union[Dict[str, str], None]:
         return None
 
 
-def set_install_subparser(subparsers):
+def set_install_subparser(subparsers) -> None:
     """create the parser for the 'install' command"""
     actions = ["install", "build", "fetch"]
 
@@ -64,8 +62,12 @@ def set_install_subparser(subparsers):
             type=get_recipe_arg_dict,
             help="Collection of key=value pairs separated by commas. The content of the TOML file will be replaced with this data.",
         )
-        if action != "fetch":
-            parser.add_argument(
-                "-f", "--force", action="store_true", help=f"Re-execute {action}"
-            )
+
+        if action == "fetch":
+            parser.set_defaults(fn=install_components, upto_stage=action, force=False)
+            return  # Don't include the rest
+
+        parser.add_argument(
+            "-f", "--force", action="store_true", help=f"Re-execute {action}"
+        )
         parser.set_defaults(fn=install_components, upto_stage=action)

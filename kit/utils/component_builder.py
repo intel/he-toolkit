@@ -14,14 +14,14 @@ from kit.utils.spec import Spec
 RunOutput = Tuple[bool, int]
 
 
-def hekit_print(*args, **kwargs):
+def hekit_print(*args, **kwargs) -> None:
     """print but prefixes [HEKIT]"""
-    args = [arg.replace("\n", "\n[HEKIT]") for arg in map(str, args)]
-    print("[HEKIT]", *args, **kwargs)
+    args_prefixed = [arg.replace("\n", "\n[HEKIT]") for arg in map(str, args)]
+    print("[HEKIT]", *args_prefixed, **kwargs)
 
 
 def stages(upto_stage: str, force: bool) -> Callable:
-    """Return a generator"""
+    """Return a generator function that handles a component"""
     if upto_stage not in ("fetch", "build", "install"):
         raise ValueError(f"Not a valid stage value '{upto_stage}'")
 
@@ -54,7 +54,7 @@ def stages(upto_stage: str, force: bool) -> Callable:
 class BuildError(Exception):
     """Exception for something wrong with the build."""
 
-    def __init__(self, message, error):
+    def __init__(self, message: str, error: int) -> None:
         super().__init__(message)
         self.error = error
 
@@ -84,11 +84,10 @@ def run(cmd_and_args: Union[str, List[str]]) -> RunOutput:
         hekit_print(" ".join(cmd_and_args))
     basename = Path(cmd_and_args_list[0]).name.upper()  # Capitalized
     with Popen(cmd_and_args_list, stdout=PIPE, stderr=STDOUT) as proc:  # nosec B603
-        if proc.stdout is not None:
-            for line in proc.stdout:
-                print(f"[{basename}]", line.decode("utf-8"), end="")
-        else:
+        if proc.stdout is None:
             raise ValueError("STDOUT is None")
+        for line in proc.stdout:
+            print(f"[{basename}]", line.decode("utf-8"), end="")
     success = proc.returncode == 0
     return success, proc.returncode
 
@@ -104,7 +103,7 @@ def components_to_build_from(
 class ComponentBuilder:
     """Objects of this class can orchestrate the build of a component"""
 
-    def __init__(self, spec: Spec):
+    def __init__(self, spec: Spec) -> None:
         """Initialize a ComponentBuilder from a Spec object"""
         if not isinstance(spec, Spec):
             raise TypeError(
@@ -120,7 +119,7 @@ class ComponentBuilder:
         except FileNotFoundError:
             self._info_file = {"status": {"fetch": "", "build": "", "install": ""}}
 
-    def skip(self):
+    def skip(self) -> bool:
         """Returns skip value"""
         return self._spec.skip
 
@@ -134,15 +133,15 @@ class ComponentBuilder:
         except KeyError:
             return True, 0
 
-    def component_name(self):
+    def component_name(self) -> str:
         """Returns component name"""
         return self._spec.component
 
-    def instance_name(self):
+    def instance_name(self) -> str:
         """Returns instance name"""
         return self._spec.name
 
-    def setup(self):
+    def setup(self) -> RunOutput:
         """Create the layout for the component"""
         root = Path(self._location)
         for dirname in ("fetch", "build", "install"):
@@ -154,12 +153,12 @@ class ComponentBuilder:
         # Should return successful
         return True, 0
 
-    def already_successful(self, stage):
+    def already_successful(self, stage: str) -> bool:
         """Returns True if stage already recorded in info file
         as successful"""
         return self._info_file["status"][stage] == "success"
 
-    def update_info_file(self, stage, success):
+    def update_info_file(self, stage: str, success: bool) -> None:
         """Updates the hekit.info file"""
         self._info_file["status"][stage] = "success" if success else "failure"
         dump_toml(f"{self._location}/hekit.info", self._info_file)
@@ -191,38 +190,38 @@ class ComponentBuilder:
             self.update_info_file(stage, success=False)
             return False, e.error
 
-    def pre_fetch(self):
+    def pre_fetch(self) -> RunOutput:
         """Any steps after a fetch"""
         return self._try_run("pre-fetch")
 
-    def fetch(self):
+    def fetch(self) -> RunOutput:
         """Fetch the source"""
         return self._stage("fetch")
 
-    def post_fetch(self):
+    def post_fetch(self) -> RunOutput:
         """Any steps after a fetch"""
         return self._try_run("post-fetch")
 
-    def pre_build(self):
+    def pre_build(self) -> RunOutput:
         """Any setup steps before building"""
         return self._try_run("pre-build")
 
-    def build(self):
+    def build(self) -> RunOutput:
         """Build the software"""
         return self._stage("build")
 
-    def post_build(self):
+    def post_build(self) -> RunOutput:
         """Any steps after a build"""
         return self._try_run("post-build")
 
-    def pre_install(self):
+    def pre_install(self) -> RunOutput:
         """Any steps before an install"""
         return self._try_run("pre-install")
 
-    def install(self):
+    def install(self) -> RunOutput:
         """Installation of the component, ready to use"""
         return self._stage("install")
 
-    def post_install(self):
+    def post_install(self) -> RunOutput:
         """Any steps after an install"""
         return self._try_run("post-install")
