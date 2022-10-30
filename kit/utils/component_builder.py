@@ -14,10 +14,10 @@ from kit.utils.spec import Spec
 RunOutput = Tuple[bool, int]
 
 
-def hekit_print(*args, **kwargs) -> None:
-    """print but prefixes [HEKIT]"""
-    args_prefixed = [arg.replace("\n", "\n[HEKIT]") for arg in map(str, args)]
-    print("[HEKIT]", *args_prefixed, **kwargs)
+def hekit_print(*args, box_msg="HEKIT", **kwargs) -> None:
+    """print but prefixes [HEKIT] or other if box_msg given"""
+    args_prefixed = [arg.replace("\n", f"\n[{box_msg}]") for arg in map(str, args)]
+    print(f"[{box_msg}]", *args_prefixed, **kwargs)
 
 
 def stages(upto_stage: str, force: bool) -> Callable:
@@ -87,7 +87,7 @@ def run(cmd_and_args: Union[str, List[str]]) -> RunOutput:
         if proc.stdout is None:
             raise ValueError("STDOUT is None")
         for line in proc.stdout:
-            print(f"[{basename}]", line.decode("utf-8"), end="")
+            hekit_print(line.decode("utf-8").rstrip(), box_msg=basename)
     success = proc.returncode == 0
     return success, proc.returncode
 
