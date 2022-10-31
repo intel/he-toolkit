@@ -53,7 +53,7 @@ jobs:
       - name: Run Init hekit
         run: |
           echo $SHELL
-          hekit init <<< y
+          ./hekit init <<< y
           source /home/runner/.bash_profile
           cd .. && hekit -h
 
