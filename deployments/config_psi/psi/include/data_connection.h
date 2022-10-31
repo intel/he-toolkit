@@ -6,18 +6,24 @@
 
 #include "data_record.h"
 
+#include <kafka/KafkaConsumer.h>
+#include <kafka/KafkaProducer.h>
+
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <map>
 #include <memory>
+#include <regex>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+using kConsumer = kafka::clients::KafkaConsumer;
+using kProducer = kafka::clients::KafkaProducer;
 namespace fs = std::filesystem;
 
 // Interface for Data Connection
@@ -33,6 +39,37 @@ struct DataConn {
 // Interface for Data Connection Configuration
 struct DataConnConfig {
   virtual ~DataConnConfig() = default;
+};
+
+class KafkaConfig : public DataConnConfig {
+ private:
+  std::string directory_;
+  std::string topic_;
+  std::string broker_;
+  std::string mode_;
+
+ public:
+  KafkaConfig(const json& json_config) {
+    json_config.at("directory").get_to(directory_);
+    json_config.at("topic").get_to(topic_);
+    json_config.at("broker").get_to(broker_);
+
+    if (json_config.at("io") == "read") {
+      mode_ = "read";
+    } else if (json_config.at("io") == "write") {
+      mode_ = "write";
+    } else {
+      std::ostringstream msg;
+      msg << "Invalid io argument '" << json_config.at("io").get<std::string>()
+          << "'";
+      throw std::runtime_error(msg.str());
+    }
+  }
+
+  std::string directory() const { return directory_; }
+  std::string topic() const { return topic_; }
+  std::string broker() const { return broker_; }
+  std::string mode() const { return mode_; }
 };
 
 class FileSysConfig : public DataConnConfig {
@@ -70,6 +107,125 @@ class FileSysConfig : public DataConnConfig {
   std::string extension() const { return extension_; }
   std::string meta_ext() const { return meta_ext_; }
   std::string mode() const { return mode_; }
+};
+
+// Concrete class implementing access of a Kafka connection
+class KafkaConn : public DataConn {
+ private:
+  KafkaConfig config_;
+  std::unique_ptr<kConsumer> consumer_ptr_;
+  std::unique_ptr<kProducer> producer_ptr_;
+
+  template <typename T>
+  std::string find(const std::string& key, const T& record) const {
+    for (const auto& header : record.headers()) {
+      // Assume the keys are unique
+      if (key == header.key) {
+        return header.value.toString();
+      }
+    }
+    throw std::runtime_error("Key '" + key + "' not found.");
+  }
+
+  std::string fixNewline(const std::string& s) const {
+    return std::regex_replace(s, std::regex(R"(\[0x0a\])"), "\n");
+  }
+
+ public:
+  KafkaConn(const KafkaConfig& config) : config_(config) { open(); }
+  KafkaConn(const json& config) : KafkaConn(KafkaConfig(config)) {}
+  KafkaConn() = delete;
+
+  void open() override {
+    if (config_.mode() == "read") {
+      kafka::Properties consumer_props({
+          {"bootstrap.servers", config_.broker()},
+          {"enable.auto.commit", "true"},
+          // TODO(JC) Change this name
+          {"group.id", "TestGroup"},
+          {"max.poll.records", "1"},
+      });
+      consumer_ptr_ = std::make_unique<kConsumer>(consumer_props);
+      consumer_ptr_->subscribe({config_.topic()});
+      return;
+    }
+
+    if (config_.mode() == "write") {
+      kafka::Properties producer_props({
+          {"bootstrap.servers", config_.broker()},
+          {"enable.idempotence", "true"},
+          {"message.max.bytes", "15728640"},
+      });
+      producer_ptr_ = std::make_unique<kProducer>(producer_props);
+      return;
+    }
+
+    std::ostringstream msg;
+    msg << "Unknown file mode '" << config_.mode() << "'";
+    throw std::runtime_error(msg.str());
+  }
+
+  void close() override {
+    if (config_.mode() == "read") {
+      consumer_ptr_->unsubscribe();
+      consumer_ptr_->close();
+    }
+    if (config_.mode() == "write") {
+      producer_ptr_->close();
+    }
+  }
+
+  std::unique_ptr<DataRecord> read() const override {
+    auto records = consumer_ptr_->poll(std::chrono::milliseconds(1000));
+    if (records.size() == 0) {
+      std::cout << "No record found.\n";
+      return nullptr;
+    }
+    if (records.size() > 1) {
+      throw std::runtime_error("More than one record detected.");
+    }
+    const auto& record = records.front();
+    if (record.value().size() == 0) {
+      return nullptr;
+    }
+    std::string job_id = find("JobID", record);
+    std::string metafile = job_id + ".heql";
+    fs::path metadata_filepath = fs::path(config_.directory()) / metafile;
+    std::string datafilename = job_id + ".query";
+    fs::path datafilepath = fs::path(config_.directory()) / datafilename;
+    if (record.error()) {
+      std::cerr << record.toString() << std::endl;
+    } else {
+      // Write Kafka record to disk
+      std::ofstream metadata(metadata_filepath, std::ios::out);
+      if (!metadata.is_open()) {
+        std::ostringstream msg;
+        msg << "Could not open file '" << metadata_filepath << "'";
+        throw std::runtime_error(msg.str());
+      }
+      metadata << fixNewline(find("HEQL", record));
+
+      std::ofstream datafile(datafilepath, std::ios::out | std::ios::binary);
+      if (!datafile.is_open()) {
+        std::ostringstream msg;
+        msg << "Could not open file '" << datafilepath << "'";
+        throw std::runtime_error(msg.str());
+      }
+      const auto& value = record.value();
+      datafile.write(reinterpret_cast<const char*>(value.data()), value.size());
+    }
+
+    return std::make_unique<FileRecord>(datafilepath, config_.mode(),
+                                        metadata_filepath);
+  }
+
+  void write(const DataRecord& data) const override {}
+
+  std::unique_ptr<DataRecord> createDataRecord() const override {
+    return std::make_unique<FileRecord>("name", config_.mode());
+  }
+
+  ~KafkaConn() { close(); }
 };
 
 // Concrete class implementing access of a local file system
@@ -171,7 +327,7 @@ static std::unique_ptr<DataConn> makeDataConn(const Type& conn_type,
     case Type::FILESYS:
       return std::make_unique<FileSys>(config);
     case Type::KAFKA:
-      throw std::logic_error("Data connection for Kafka not implemented.");
+      return std::make_unique<KafkaConn>(config);
     default:
       std::ostringstream msg;
       msg << "Invalid data connection '" << typeToString(conn_type) << "'";

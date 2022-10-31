@@ -42,16 +42,38 @@ struct CmdLineOpts {
 //       query: {
 //         type: ptxt/ctxt,
 //         data_source: filesys,
-//         config: { source: directory, ext: "ctxt", meta_ext: "heql", io: read
+//         config: { directory: directory, ext: "ctxt", meta_ext: "heql", io:
+//         read
 //         }
 //       },
 //       output: {
 //         data_source: filesys,
-//         config: {source: filepath, io: write }
+//         config: {directory: filepath, io: write }
 //       }
 //     }
 //
 // extension = { ctxt, ptxt, heql }
+//
+//  KAFKA
+//       query: {
+//         type: ptxt/ctxt,
+//         data_source: kafka,
+//         config: {directory: filepath, ext: "ctxt", meta_ext: "heql", topic:
+//         "topic-name", broker: "ip:port", io: read
+//         }
+//       },
+//       output: {
+//         data_source: kafka,
+//         config: {directory: filepath, topic: "topic-name", broker: "ip:port",
+//         io: write }
+//       }
+//
+//       KAFKA HEADER
+//       TIMESTAMP
+//       QL
+//       UID
+//       BID
+//       JID
 //
 
 // Read in JSON config file

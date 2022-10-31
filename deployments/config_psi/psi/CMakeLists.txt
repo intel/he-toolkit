@@ -34,11 +34,26 @@ find_package(helib REQUIRED)
 set(UTILS_DIR "${helib_DIR}/../../../../fetch/HElib/utils/common")
 set(PSI_DIR "${helib_DIR}/../../../../fetch/HElib/misc/psi/io")
 
+# target: psi
 add_executable(psi ${CMAKE_CURRENT_SOURCE_DIR}/src/configurable_psi.cpp)
-
 target_include_directories(psi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${UTILS_DIR} ${PSI_DIR} ${JSON_DIR})
 
-target_link_libraries(psi helib)
+add_library(kafka-api INTERFACE)
+target_include_directories(kafka-api INTERFACE ${KAFKA_INCLUDE})
+if (KAFKA_DIR) # Custom/local installation of librdkafka
+  target_include_directories(kafka-api SYSTEM INTERFACE ${KAFKA_DIR}/include)
+  target_link_directories(kafka-api INTERFACE ${KAFKA_DIR}/lib)
+endif()
+target_link_libraries(kafka-api INTERFACE rdkafka)
+target_link_libraries(psi helib kafka-api)
+
+# target:main
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+#add_executable(main
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/queue_system_connection.cpp)
+#target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#target_link_libraries(main kafka-api)
 
 if (ENABLE_TESTS)
   add_subdirectory(tests)

@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
 
   // TODO(JC) change to be connection type dynamic
   std::unique_ptr<DataConn> query_conn =
-      makeDataConn(Type::FILESYS, cmdLineOpts.queryConfig);
+      makeDataConn(Type::KAFKA, cmdLineOpts.queryConfig);
 
   do {  // REPL
     // Parse tableFile to build query
