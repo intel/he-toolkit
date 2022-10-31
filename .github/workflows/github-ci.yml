@@ -52,10 +52,7 @@ jobs:
 
       - name: Run Init hekit
         run: |
-           % echo $SHELL
-           /bin/zsh
-           % which bash
-           /bin/bash
+           export PATH=$PATH:$HEKITPATH
            ./hekit init <<< y
            source /home/runner/.bash_profile
            cd .. && hekit -h
