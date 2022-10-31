@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Init hekit
         run: |
-           % echo $SHELL
+           echo $0
            export PATH=$PATH:$
            ./hekit init <<< y
            source /home/runner/.bash_profile
