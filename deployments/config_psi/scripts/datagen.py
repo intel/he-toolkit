@@ -61,11 +61,14 @@ def real_matches(filename: str, pick: int) -> List[str]:
 def fake_rows(column_descriptions: List[ColumnsDescription], rows: int) -> Generator:
     """Generate fake entries."""
 
-    def column(collection, size):
+    def generate_column(collection, size):
         return "".join(random.choices(collection, k=size))  # nosec B311
 
     return (
-        " ".join(column(desc.datatype, desc.char_size) for desc in column_descriptions)
+        " ".join(
+            generate_column(desc.datatype, desc.char_size)
+            for desc in column_descriptions
+        )
         for _ in range(rows)
     )
 
