@@ -50,7 +50,9 @@ jobs:
 
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
-    if: ${{ false }} # Disable this job for now as it fails due to HEXL-PALISADE issue (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
+    # Disable this job for now as it fails due to HEXL-PALISADE issue
+    # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
+    if: ${{ false }}
     runs-on: ${{matrix.os}}
     defaults:
       run:
@@ -68,7 +70,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         run: |
-          pip3 install toml
+          pip3 install pydantic toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
