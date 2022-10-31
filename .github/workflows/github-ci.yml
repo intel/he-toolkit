@@ -52,10 +52,13 @@ jobs:
 
       - name: Run Init hekit
         run: |
-           $type bash
+           % echo $SHELL
+           /bin/zsh
+           % which bash
+           /bin/bash
            ./hekit init <<< y
            source /home/runner/.bash_profile
-           cd .. && hekit -h 
+           cd .. && hekit -h
 
 
 #   build-and-test-toolkit-palisade:
