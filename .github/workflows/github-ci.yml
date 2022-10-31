@@ -52,7 +52,6 @@ jobs:
 
       - name: Run Init hekit
         run: |
-           ps $$
            ./hekit init <<< y
            source /home/runner/.bash_profile
            cd .. && hekit -h
