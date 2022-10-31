@@ -52,6 +52,7 @@ jobs:
 
       - name: Run Init hekit
         run: |
+           readlink /proc/$$/exe
            ./hekit init <<< y
            source /home/runner/.bash_profile
            cd .. && hekit -h
