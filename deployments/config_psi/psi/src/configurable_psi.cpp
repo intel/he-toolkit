@@ -47,6 +47,9 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
 
 void update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
+  // TODO(JC) This has introduced a bug with filesys. It appends to the old
+  // name so only works the first time.
+  // eg: dir -> dir/filename1 -> dir/filename1/filename2
   cmdLineOpts.outFilePath = fs::path(cmdLineOpts.outFilePath) /
                             filepath.replace_extension(".result").filename();
 }
@@ -103,7 +106,7 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Create data connection for outfile
   // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
+      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts so it knows the output filename
   update_opts_output(cmdLineOpts);
@@ -145,7 +148,7 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Create data connection for outfile
   // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
+      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
   update_opts_output(cmdLineOpts);
@@ -187,7 +190,7 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Create data connection for outfile
   // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
+      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
   update_opts_output(cmdLineOpts);
@@ -229,7 +232,7 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Create data connection for outfile
   // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
+      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
   update_opts_output(cmdLineOpts);
@@ -340,7 +343,7 @@ int main(int argc, char* argv[]) {
 
   // TODO(JC) change to be connection type dynamic
   std::unique_ptr<DataConn> query_conn =
-      makeDataConn(Type::KAFKA, cmdLineOpts.queryConfig);
+      makeDataConn(cmdLineOpts.queryConnType, cmdLineOpts.queryConfig);
 
   do {  // REPL
     // Parse tableFile to build query

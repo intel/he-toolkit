@@ -22,6 +22,8 @@ struct CmdLineOpts {
   json dbConfig;
   json queryConfig;
   json outConfig;
+  Type queryConnType;
+  Type outConnType;
   bool ptxtQuery = false;
   bool ptxtDB = false;
   bool isColumn = false;
@@ -97,5 +99,19 @@ void loadConfigFile(CmdLineOpts& options) {
 
   if (config.at("query").at("type") == "ptxt") {
     options.ptxtQuery = true;
+  }
+
+  auto out_type = config.at("output").at("data_source").get<std::string>();
+  if (out_type == "filesys") {
+    options.outConnType = Type::FILESYS;
+  } else if (out_type == "kafka") {
+    options.outConnType = Type::KAFKA;
+  }
+
+  auto query_type = config.at("query").at("data_source").get<std::string>();
+  if (query_type == "filesys") {
+    options.queryConnType = Type::FILESYS;
+  } else if (query_type == "kafka") {
+    options.queryConnType = Type::KAFKA;
   }
 }
