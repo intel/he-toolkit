@@ -48,7 +48,7 @@ jobs:
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
 
-      - name: Run Init hekit
+      - name: hekit init
         run: |
           export SHELL=/bin/bash
           ./hekit init <<< y
