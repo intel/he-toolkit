@@ -48,6 +48,13 @@ jobs:
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
 
+      - name: hekit init
+        run: |
+          export SHELL=/bin/bash
+          ./hekit init <<< y
+          source /home/runner/.bash_profile
+          cd .. && hekit -h
+
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
     # Disable this job for now as it fails due to HEXL-PALISADE issue
