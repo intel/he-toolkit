@@ -71,7 +71,7 @@ def test_total_flag(CONFIG_PSI_DIR):
     assert rows + 1 == result.stdout.count("\n")
 
 
-def test_real_flag(input_data):
+def test_real_flag(input_data, CONFIG_PSI_DIR):
     """Test creating new csv from input data"""
     input_size = 5
     result_size = 8
@@ -110,7 +110,7 @@ def test_real_flag(input_data):
     assert len(input_set & result_set) == intersect_size + 1
 
 
-def test_throw_when_real_greater_than_total(input_data):
+def test_throw_when_real_greater_than_total(input_data, CONFIG_PSI_DIR):
     """datagen throws when trying to select more values than total size"""
     result_size = 2
     intersect_size = 3
