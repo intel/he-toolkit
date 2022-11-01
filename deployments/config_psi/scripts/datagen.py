@@ -23,9 +23,6 @@ class ColumnsDescription(BaseModel):
     datatype: Union[str, List[str]]
     char_size: int = 1
 
-    # @validator("datatype")
-    # def _set_known_collections(cls, collection):
-
     @validator("datatype")
     def _set_known_collections(
         cls, collection: Union[str, List[str]]
