@@ -8,16 +8,19 @@
 #include <map>
 #include <string>
 
+using Metadata = std::map<std::string, std::string>;
+
 struct DataRecord {
   virtual void read(char* data, size_t size) = 0;
   virtual void write(char* data, size_t size) = 0;
   virtual std::string metadata(const std::string& name) const = 0;
+  virtual const std::stringstream& data_stream() const = 0;
 };
 
 class FileRecord : public DataRecord {
  private:
   std::fstream file_stream_;
-  std::map<std::string, std::string> metadata_;
+  Metadata metadata_;
 
   void openForRead(const std::string& filename,
                    const std::string& metadata_filename) {
@@ -73,4 +76,30 @@ class FileRecord : public DataRecord {
   std::string metadata(const std::string& name) const override {
     return metadata_.at(name);
   }
+
+  const std::stringstream& data_stream() const override {
+    throw std::logic_error("Not implemented");
+  }
+};
+
+class KafkaRecord : public DataRecord {
+ private:
+  std::stringstream data_stream_;
+  Metadata metadata_;
+
+ public:
+  KafkaRecord(const Metadata& metadata) : metadata_(metadata) {}
+
+  // Not implementing for now
+  void read(char* data, size_t size) override {}
+
+  void write(char* data, size_t size) override {
+    data_stream_.write(data, size);
+  }
+
+  std::string metadata(const std::string& name) const override {
+    return metadata_.at(name);
+  }
+
+  const std::stringstream& data_stream() const override { return data_stream_; }
 };

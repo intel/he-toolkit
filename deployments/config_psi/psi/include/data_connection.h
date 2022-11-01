@@ -32,7 +32,8 @@ struct DataConn {
   virtual void close() = 0;
   virtual std::unique_ptr<DataRecord> read() const = 0;
   virtual void write(const DataRecord& data) const = 0;
-  virtual std::unique_ptr<DataRecord> createDataRecord() const = 0;
+  virtual std::unique_ptr<DataRecord> createDataRecord(
+      const Metadata& metadata = {}) const = 0;
   virtual ~DataConn() = default;
 };
 
@@ -219,10 +220,42 @@ class KafkaConn : public DataConn {
                                         metadata_filepath);
   }
 
-  void write(const DataRecord& data) const override {}
+  void write(const DataRecord& data) const override {
+    // TODO(JC) Create topic based on IDs
+    std::stringstream record_stream;
+    record_stream << data.data_stream().rdbuf();
+    record_stream.seekg(0, std::ios::end);
+    auto record_size = record_stream.tellg();
+    record_stream.seekg(0);
+    kafka::Value value(reinterpret_cast<char*>(record_stream.rdbuf()),
+                       record_size);
 
-  std::unique_ptr<DataRecord> createDataRecord() const override {
-    return std::make_unique<FileRecord>("name", config_.mode());
+    // Create record
+    auto record = kafka::clients::producer::ProducerRecord(
+        config_.topic(),
+        /*partition=*/0, /*kafka::Key*/ kafka::NullKey, /*kafka::Value*/ value);
+
+    // Send to Kafka
+    producer_ptr_->send(
+        record,
+        // The delivery report handler
+        [](const kafka::clients::producer::RecordMetadata& metadata,
+           const kafka::Error& error) {
+          if (!error) {
+            std::cout << "% Message delivered: " << metadata.toString()
+                      << std::endl;
+          } else {
+            std::cerr << "% Message delivery failed: " << error.message()
+                      << std::endl;
+          }
+        },
+        // The memory block given by record.value() would be copied
+        kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
+  }
+
+  std::unique_ptr<DataRecord> createDataRecord(
+      const Metadata& metadata = {}) const override {
+    return std::make_unique<KafkaRecord>(metadata);
   }
 
   ~KafkaConn() { close(); }
@@ -303,7 +336,8 @@ class FileSys : public DataConn {
   // but the behaviour could change in the future.
   void write(const DataRecord& data) const override {}
 
-  std::unique_ptr<DataRecord> createDataRecord() const override {
+  std::unique_ptr<DataRecord> createDataRecord(
+      const Metadata& metadata = {}) const override {
     return std::make_unique<FileRecord>(config_.directory(), config_.mode());
   }
 };

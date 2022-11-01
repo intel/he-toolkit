@@ -45,9 +45,9 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
   // TODO(JC) maybe write file to disk here, if not exist?
 }
 
-void update_opts_output(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
+void update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
-  cmdLineOpts.outFilePath = fs::path(record.metadata("source")) /
+  cmdLineOpts.outFilePath = fs::path(cmdLineOpts.outFilePath) /
                             filepath.replace_extension(".result").filename();
 }
 
@@ -64,6 +64,19 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
 
   // Result should be a single entry
   return helib::Matrix<TXT>(vec.at(0), 1, 1);
+}
+
+void writeDataToRecord(DataRecord& out_record, const CmdLineOpts& cmdLineOpts) {
+  std::ifstream ifs(cmdLineOpts.outFilePath,
+                    std::ios::in | std::ios::binary | std::ios::ate);
+  if (!ifs.is_open()) {
+    std::ostringstream msg;
+    msg << "Could not open file '" << cmdLineOpts.outFilePath << "'";
+    throw std::runtime_error(msg.str());
+  }
+  auto filesize = ifs.tellg();
+  ifs.seekg(0);
+  out_record.write(reinterpret_cast<char*>(ifs.rdbuf()), filesize);
 }
 
 // Database lookup where both the query and dabatase are not encrypted.
@@ -88,17 +101,22 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
+  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
-  auto out_record_ptr = out_conn->createDataRecord();
+      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
 
-  // Update cmdLineOpts
-  update_opts_output(cmdLineOpts, *out_record_ptr);
+  // Update cmdLineOpts so it knows the output filename
+  update_opts_output(cmdLineOpts);
 
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
+
+  auto out_record_ptr = out_conn->createDataRecord();
+  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+
+  out_conn->write(*out_record_ptr);
 }
 
 // Database lookup where the query is not encrypted but the dabatase is.
@@ -125,17 +143,22 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
+  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
-  auto out_record_ptr = out_conn->createDataRecord();
+      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
-  update_opts_output(cmdLineOpts, *out_record_ptr);
+  update_opts_output(cmdLineOpts);
 
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
+
+  auto out_record_ptr = out_conn->createDataRecord();
+  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+
+  out_conn->write(*out_record_ptr);
 }
 
 // Database lookup where the query is encrypted but the dabatase is not.
@@ -162,17 +185,22 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
+  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
-  auto out_record_ptr = out_conn->createDataRecord();
+      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
-  update_opts_output(cmdLineOpts, *out_record_ptr);
+  update_opts_output(cmdLineOpts);
 
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
+
+  auto out_record_ptr = out_conn->createDataRecord();
+  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+
+  out_conn->write(*out_record_ptr);
 }
 
 // Database lookup where both the query and dabatase are encrypted.
@@ -199,17 +227,22 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
+  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
-      makeDataConn(Type::FILESYS, cmdLineOpts.outConfig);
-  auto out_record_ptr = out_conn->createDataRecord();
+      makeDataConn(Type::KAFKA, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
-  update_opts_output(cmdLineOpts, *out_record_ptr);
+  update_opts_output(cmdLineOpts);
 
   // Write result to file
   std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
   writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
+
+  auto out_record_ptr = out_conn->createDataRecord();
+  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+
+  out_conn->write(*out_record_ptr);
 }
 
 int main(int argc, char* argv[]) {
