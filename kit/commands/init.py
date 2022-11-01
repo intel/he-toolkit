@@ -82,8 +82,6 @@ def append_to_rc(path: Path, content: str) -> None:
 def get_rc_file() -> Path:
     """Return the correct file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
-    print(f"SHELL = {active_shell_path}")
-    # active_shell_path = "bash"
     if active_shell_path == "bash":
         # if bash_profile file does not exist, try bashrc file
         rc_file = Path("~/.bash_profile").expanduser().resolve()
