@@ -8,13 +8,13 @@ from subprocess import run
 from typing import List, Tuple
 
 
-def test_default():
+def test_default(CONFIG_PSI_DIR):
     """Test ./datagen column-description with no options"""
     # Run datagen
     result = run(
         [
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/datagen.py",
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/columns.toml",
+            CONFIG_PSI_DIR + "/scripts/datagen.py",
+            CONFIG_PSI_DIR + "/scripts/columns.toml",
         ],
         encoding="utf-8",
         capture_output=True,
@@ -28,14 +28,14 @@ def test_default():
     assert 11 == result.stdout.count("\n")
 
 
-def test_total_flag():
+def test_total_flag(CONFIG_PSI_DIR):
     """Test the use of the total flag correctly determines number of rows"""
     # Run datagen with 4 rows
     rows = 4
     result = run(
         [
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/datagen.py",
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/columns.toml",
+            CONFIG_PSI_DIR + "/scripts/datagen.py",
+            CONFIG_PSI_DIR + "/scripts/columns.toml",
             "--total",
             str(rows),
         ],
@@ -54,8 +54,8 @@ def test_total_flag():
     rows = 15
     result = run(
         [
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/datagen.py",
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/columns.toml",
+            CONFIG_PSI_DIR + "/scripts/datagen.py",
+            CONFIG_PSI_DIR + "/scripts/columns.toml",
             "--total",
             str(rows),
         ],
@@ -83,8 +83,8 @@ def test_real_flag(input_data):
     # Create the new data selecting 3 random rows from input data
     result = run(
         [
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/datagen.py",
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/columns.toml",
+            CONFIG_PSI_DIR + "/scripts/datagen.py",
+            CONFIG_PSI_DIR + "/scripts/columns.toml",
             str(path),
             "--total",
             str(result_size),
@@ -121,8 +121,8 @@ def test_throw_when_real_greater_than_total(input_data):
     # Create the new data selecting 3 random rows from input data
     result = run(
         [
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/datagen.py",
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/columns.toml",
+            CONFIG_PSI_DIR + "/scripts/datagen.py",
+            CONFIG_PSI_DIR + "/scripts/columns.toml",
             str(path),
             "--total",
             str(result_size),
@@ -142,14 +142,19 @@ def test_throw_when_real_greater_than_total(input_data):
 
 
 @pytest.fixture
-def input_data(tmp_path) -> Tuple[Path, List[str]]:
+def CONFIG_PSI_DIR() -> str:
+    return os.environ["CONFIG_PSI_DIR"]
+
+
+@pytest.fixture
+def input_data(tmp_path, CONFIG_PSI_DIR) -> Tuple[Path, List[str]]:
     """Fixture for creating input data. Returns path to file and raw data"""
     path = tmp_path / "input.csv"
     input_data = run(
         " ".join(
             [
-                os.environ["CONFIG_PSI_DIR"] + "/scripts/datagen.py",
-                os.environ["CONFIG_PSI_DIR"] + "/scripts/columns.toml",
+                CONFIG_PSI_DIR + "/scripts/datagen.py",
+                CONFIG_PSI_DIR + "/scripts/columns.toml",
                 "--total",
                 "4",
                 ">",
