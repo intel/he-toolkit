@@ -25,11 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Required for pre-commit
-      - run: pip3 install bandit black cpplint docker mypy pylint types-toml
+      - run: pip3 install bandit black cpplint docker mypy pydantic pylint pylint-pydantic types-toml
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.3
+      - uses: pre-commit/action@v3.0.0
         with:
           extra_args: --all-files
 
@@ -48,9 +48,18 @@ jobs:
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
 
+      - name: hekit init
+        run: |
+          export SHELL=/bin/bash
+          ./hekit init <<< y
+          source /home/runner/.bash_profile
+          cd .. && hekit -h
+
   build-and-test-toolkit-palisade:
     name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
-    if: ${{ false }} # Disable this job for now as it fails due to HEXL-PALISADE issue (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
+    # Disable this job for now as it fails due to HEXL-PALISADE issue
+    # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
+    if: ${{ false }}
     runs-on: ${{matrix.os}}
     defaults:
       run:
@@ -141,7 +150,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         run: |
-          pip3 install toml pytest
+          pip3 install toml pydantic pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
