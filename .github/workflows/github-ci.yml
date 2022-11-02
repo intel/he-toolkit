@@ -73,10 +73,10 @@ jobs:
           # Clang-14 is default version on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          # skip Clang-12 on Ubuntu-20
+          # skip Clang-12 on Ubuntu-20.04
           - c_compiler: clang-12
             os: ubuntu-20.04
-          # gcc-11 not pre-installed on ubuntu 20.04
+          # gcc-11 not pre-installed on Ubuntu-20.04
           - c_compiler: gcc-11
             os: ubuntu-20.04
     steps:
@@ -131,10 +131,10 @@ jobs:
           # Clang-14 is default version on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          # skip Clang-12 on Ubuntu-20
+          # skip Clang-12 on Ubuntu-20.04
           - c_compiler: clang-12
             os: ubuntu-20.04
-          # gcc-11 not pre-installed on ubuntu 20.04
+          # gcc-11 not pre-installed on Ubuntu-20.04
           - c_compiler: gcc-11
             os: ubuntu-20.04
     steps:
@@ -198,10 +198,10 @@ jobs:
           # Clang-14 is default version on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          # Clang-14 not pre-installed on Ubuntu-20
+          # Clang-14 not pre-installed on Ubuntu-20.04
           - c_compiler: clang-14
             os: ubuntu-20.04
-          # gcc-11 not pre-installed on ubuntu 20.04
+          # gcc-11 not pre-installed on Ubuntu-20.04
           - c_compiler: gcc-11
             os: ubuntu-20.04
 
