@@ -39,5 +39,3 @@ Python Version 3.8
 | Clang-14     | Pass                    | Pass  |
 
 \* Under investigation
-
-
