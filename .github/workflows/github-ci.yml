@@ -70,12 +70,13 @@ jobs:
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # Clang-10 not pre-installed on Ubuntu-22
+          # Clang-14 is default version on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
           # skip Clang-12 on Ubuntu-20
           - c_compiler: clang-12
             os: ubuntu-20.04
+          # gcc-11 not pre-installed on ubuntu 20.04
           - c_compiler: gcc-11
             os: ubuntu-20.04
     steps:
@@ -127,12 +128,13 @@ jobs:
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # Clang-10 not pre-installed on Ubuntu-22
+          # Clang-14 is default version on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
           # skip Clang-12 on Ubuntu-20
           - c_compiler: clang-12
             os: ubuntu-20.04
+          # gcc-11 not pre-installed on ubuntu 20.04
           - c_compiler: gcc-11
             os: ubuntu-20.04
     steps:
@@ -141,7 +143,7 @@ jobs:
         run: |
           pip3 install toml pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "CC=${{matrix.cc_compiler}}" >> $GITHUB_ENV
+          echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
 
       - name: Build and install HElib and example recipe
@@ -193,12 +195,13 @@ jobs:
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # Clang-10 not pre-installed on Ubuntu-22
+          # Clang-14 is default version on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
           # Clang-14 not pre-installed on Ubuntu-20
           - c_compiler: clang-14
             os: ubuntu-20.04
+          # gcc-11 not pre-installed on ubuntu 20.04
           - c_compiler: gcc-11
             os: ubuntu-20.04
 
