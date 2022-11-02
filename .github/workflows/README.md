@@ -1,12 +1,18 @@
-# CI Notes
-There are known issues when compiling with clang. 
+| Ubuntu 20 | HELIB             | SEAL  |
+|-----------|-------------------|-------|
+| Clang-10 | Pass              | Pass  |
+| Clang-11 | Pass              | Pass  |
+| Clang-12 | Pass              | Fail* |
+| Clang-13 | Not Pre-installed |       |
+| Clang-14 | Not Pre-installed |       |
 
-| Compiler Ver | Ubuntu-20 Status | Ubuntu-22 Status |
-|--------------|------------------|-----------------:|
-| Clang-10     | Pass             | N/A              |
-| Clang-11     | Pass             | Pass             |
-| Clang-12     | Fail*            | Fail*            |
-| Clang-13     | N/A              | Fail*            |
-| Clang-14     | N/A              | Pass             |
 
-\* Fail to link OpenMP library or find OpenMP flags
+| Ubuntu 22 |    HELIB                | SEAL  |
+|-----------|-------------------------|-------|
+| Clang-10  | Not supported on the OS         |
+| Clang-11 | Pass                    | Pass  |
+| Clang-12 | Pass                    | Fail* |
+| Clang-13 | Pass                    | Fail* |
+| Clang-14 | Pass                    | Pass  |
+
+\* Under investigation 
