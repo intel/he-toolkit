@@ -45,13 +45,14 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
   // TODO(JC) maybe write file to disk here, if not exist?
 }
 
-void update_opts_output(CmdLineOpts& cmdLineOpts) {
+std::string update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
+  cmdLineOpts.outConfig.at("directory").get_to(cmdLineOpts.outFilePath);
   // TODO(JC) This has introduced a bug with filesys. It appends to the old
   // name so only works the first time.
   // eg: dir -> dir/filename1 -> dir/filename1/filename2
-  cmdLineOpts.outFilePath = fs::path(cmdLineOpts.outFilePath) /
-                            filepath.replace_extension(".result").filename();
+  return fs::path(cmdLineOpts.outFilePath) /
+         filepath.replace_extension(".result").filename();
 }
 
 // Utility function which performs a binary sum of Matrix rows.
@@ -69,12 +70,11 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
   return helib::Matrix<TXT>(vec.at(0), 1, 1);
 }
 
-void writeDataToRecord(DataRecord& out_record, const CmdLineOpts& cmdLineOpts) {
-  std::ifstream ifs(cmdLineOpts.outFilePath,
-                    std::ios::in | std::ios::binary | std::ios::ate);
+void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary | std::ios::ate);
   if (!ifs.is_open()) {
     std::ostringstream msg;
-    msg << "Could not open file '" << cmdLineOpts.outFilePath << "'";
+    msg << "Could not open file '" << filename << "'";
     throw std::runtime_error(msg.str());
   }
   auto filesize = ifs.tellg();
@@ -88,8 +88,8 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
                         const helib::Database<Ptxt>& database,
                         CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
-            << " ...";
+  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
+            << "' ...";
   // queryConn.read(pointer to query data?);
   helib::Matrix<Ptxt> queryData =
       readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
@@ -109,15 +109,15 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts so it knows the output filename
-  update_opts_output(cmdLineOpts);
+  auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
-  writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
+  std::cout << "Writing result to file '" << out_filename << "' ...";
+  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
   auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+  writeDataToRecord(*out_record_ptr, out_filename);
 
   out_conn->write(*out_record_ptr);
 }
@@ -128,8 +128,8 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
                           const helib::Database<helib::Ctxt>& database,
                           CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
-            << " ...";
+  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
+            << "' ...";
   helib::Matrix<Ptxt> queryData =
       readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -151,15 +151,15 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
-  update_opts_output(cmdLineOpts);
+  auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
-  writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
+  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
+  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
   auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+  writeDataToRecord(*out_record_ptr, out_filename);
 
   out_conn->write(*out_record_ptr);
 }
@@ -170,8 +170,8 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
                        const helib::Database<Ptxt>& database,
                        CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
-            << " ...";
+  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
+            << "' ...";
   helib::Matrix<helib::Ctxt> queryData =
       readQueryFromFile<helib::Ctxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -193,15 +193,15 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
-  update_opts_output(cmdLineOpts);
+  auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
-  writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
+  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
+  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
   auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+  writeDataToRecord(*out_record_ptr, out_filename);
 
   out_conn->write(*out_record_ptr);
 }
@@ -212,8 +212,8 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
                         const helib::Database<helib::Ctxt>& database,
                         CmdLineOpts& cmdLineOpts) {
   // Read in the query data
-  std::cout << "Reading query data from file " << cmdLineOpts.queryFilePath
-            << " ...";
+  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
+            << "' ...";
   helib::Matrix<helib::Ctxt> queryData =
       readQueryFromFile<helib::Ctxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
@@ -235,15 +235,15 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
   // Update cmdLineOpts
-  update_opts_output(cmdLineOpts);
+  auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file " << cmdLineOpts.outFilePath << " ...";
-  writeResultsToFile(cmdLineOpts.outFilePath, sum, cmdLineOpts.offset);
+  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
+  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
   auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, cmdLineOpts);
+  writeDataToRecord(*out_record_ptr, out_filename);
 
   out_conn->write(*out_record_ptr);
 }
@@ -326,20 +326,17 @@ int main(int argc, char* argv[]) {
   uniqueDB<Ptxt> ptxt_db_ptr;
   uniqueDB<helib::Ctxt> ctxt_db_ptr;
   // Load DB once
+  std::cout << "Reading database from file '" << cmdLineOpts.databaseFilePath
+            << "' ...";
   if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
-    std::cout << "Reading database from file " << cmdLineOpts.databaseFilePath
-              << " ...";
     ptxt_db_ptr = std::make_unique<helib::Database<Ptxt>>(
         readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, *pkp));
-    std::cout << "Done.\n";
   } else {  // Load ctxt DB
-    std::cout << "Reading database from file " << cmdLineOpts.databaseFilePath
-              << " ...";
     ctxt_db_ptr = std::make_unique<helib::Database<helib::Ctxt>>(
         readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath, contextp,
                                     *pkp));
-    std::cout << "Done.\n";
   }
+  std::cout << "Done.\n";
 
   // TODO(JC) change to be connection type dynamic
   std::unique_ptr<DataConn> query_conn =
