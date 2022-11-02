@@ -27,13 +27,16 @@ deployments/config_psi/psi/tests/CMakeLists.txt
 deployments/config_psi/psi/tests/TestLookup.cpp
 deployments/config_psi/psi/tests/main.cpp
 deployments/config_psi/scripts/README.md
+deployments/config_psi/scripts/columns.toml
 deployments/config_psi/scripts/config.py
 deployments/config_psi/scripts/config.toml
+deployments/config_psi/scripts/datagen.py
 deployments/config_psi/scripts/decode.py
 deployments/config_psi/scripts/encode.py
 deployments/config_psi/scripts/example_result.ptxt
 deployments/config_psi/scripts/natural.py
 deployments/config_psi/scripts/ptxt.py
+deployments/config_psi/scripts/tests/test_datagen.py
 deployments/config_psi/scripts/tests/test_decode.py
 deployments/config_psi/scripts/tests/test_encode.py
 deployments/config_psi/setenv.sh
