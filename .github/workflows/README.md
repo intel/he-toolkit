@@ -1,11 +1,14 @@
 
 ## OS-Compiler's HE-Toolkit test
 
+Python Version 3.8
+
 # Ubuntu 20.04
 
 | Ubuntu 20.04 | HELIB | SEAL |
 |--------------|-------|------|
 | Clang-10     | Pass  | Pass |
+| gcc-10       | Pass  | Pass |
 
 #  Ubuntu 22.04
 
@@ -13,8 +16,10 @@
 |--------------|------ |------|
 | Clang-12     | Pass  | *    |
 | Clang-14     | Pass  | Pass |
+| gcc-10       | Pass  | Pass |
+| gcc-11       | Pass  | Pass |
 
-## Known Combatability Issues
+## Known compatibility Issues
 
 | Ubuntu 20.04 | HELIB             | SEAL  |
 |-----------   |-------------------|-------|
