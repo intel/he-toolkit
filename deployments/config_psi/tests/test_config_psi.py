@@ -1,34 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import pytest
 import os
 from pathlib import Path
 from subprocess import run
 from shlex import split
-
-
-def decrypt_and_decode(helib_utils_path, args: list, config: Path) -> str:
-    """Decrypt and decode ctxt file"""
-    decrypt = [helib_utils_path / "build/bin/decrypt"]
-    run(decrypt + args, check=True)
-    return run(
-        [
-            os.environ["CONFIG_PSI_DIR"] + "/scripts/decode.py",
-            "--config",
-            config,
-            config.parent / "resultFile.ptxt",
-        ],
-        encoding="utf-8",
-        capture_output=True,
-        check=True,
-    )
-
-
-def run_psi(args: list):
-    """Run the PSI executable in a subprocess"""
-    cmd = Path("~/.hekit/components/psi/configurable-psi/build/bin/psi").expanduser()
-    return run([cmd, *args], encoding="utf-8", capture_output=True)
 
 
 def test_setup(setup):
@@ -58,18 +36,13 @@ def test_setup(setup):
 def test_ptxt_to_ptxt(setup, tmp_path, out_str):
     """Run the full ptxt-to-ptxt pipeline"""
     params_file, config_file, table_file, db, query = setup
+    filesys_config = create_config(tmp_path, "filesys", "ptxt", "ptxt")
 
     # Run PSI pipeline
     act_result = run_psi(
         [
+            filesys_config,
             "--single-run",
-            "--ptxt-query",
-            "--ptxt-db",
-            params_file.with_suffix(".pk"),
-            table_file,
-            db.with_suffix(".ptxt"),
-            query.with_suffix(".ptxt"),
-            tmp_path / "resultFile",
         ]
     )
 
@@ -77,11 +50,11 @@ def test_ptxt_to_ptxt(setup, tmp_path, out_str):
         f"{db}.ptxt",
         "ptxt-to-ptxt",
         f"{query}.ptxt",
-        tmp_path / "resultFile",
+        "test_query.result",
     )
 
     # Check PSI printout
-    assert not act_result.stderr
+    # assert not act_result.stderr
     assert 0 == act_result.returncode
     assert act_result.stdout == expected_result
     # Check ptxt result
@@ -90,7 +63,7 @@ def test_ptxt_to_ptxt(setup, tmp_path, out_str):
             os.environ["CONFIG_PSI_DIR"] + "/scripts/decode.py",
             "--config",
             config_file,
-            tmp_path / "resultFile",
+            "test_query.result",
         ],
         encoding="utf-8",
         capture_output=True,
@@ -104,17 +77,13 @@ def test_ptxt_to_ptxt(setup, tmp_path, out_str):
 def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
     """Run the full ctxt-to-ptxt pipeline"""
     params_file, config_file, table_file, db, query = setup
+    filesys_config = create_config(tmp_path, "filesys", "ptxt", "ctxt")
 
     # Run PSI pipeline
     act_result = run_psi(
         [
+            filesys_config,
             "--single-run",
-            "--ptxt-db",
-            params_file.with_suffix(".pk"),
-            table_file,
-            db.with_suffix(".ptxt"),
-            query.with_suffix(".ctxt"),
-            tmp_path / "resultFile",
         ]
     )
 
@@ -122,11 +91,11 @@ def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
         f"{db}.ptxt",
         "ctxt-to-ptxt",
         f"{query}.ctxt",
-        tmp_path / "resultFile",
+        "test_query.result",
     )
 
     # Check PSI printout
-    assert not act_result.stderr
+    # assert not act_result.stderr
     assert 0 == act_result.returncode
     assert act_result.stdout == expected_out_str
     # Check ptxt result
@@ -136,7 +105,7 @@ def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
             "-o",
             tmp_path / "resultFile.ptxt",
             params_file.with_suffix(".sk"),
-            tmp_path / "resultFile",
+            "test_query.result",
         ],
         config_file,
     )
@@ -148,17 +117,13 @@ def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
 def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
     """Run the full ptxt-to-ctxt pipeline"""
     params_file, config_file, table_file, db, query = setup
+    filesys_config = create_config(tmp_path, "filesys", "ctxt", "ptxt")
 
     # Run PSI pipeline
     act_result = run_psi(
         [
+            filesys_config,
             "--single-run",
-            "--ptxt-query",
-            params_file.with_suffix(".pk"),
-            table_file,
-            db.with_suffix(".ctxt"),
-            query.with_suffix(".ptxt"),
-            tmp_path / "resultFile",
         ]
     )
 
@@ -166,11 +131,11 @@ def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
         f"{str(db)}.ctxt",
         "ptxt-to-ctxt",
         f"{str(query)}.ptxt",
-        tmp_path / "resultFile",
+        "test_query.result",
     )
 
     # Check PSI printout
-    assert not act_result.stderr
+    # assert not act_result.stderr
     assert 0 == act_result.returncode
     assert act_result.stdout == expected_result
     # Check ptxt result
@@ -180,7 +145,7 @@ def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
             "-o",
             tmp_path / "resultFile.ptxt",
             params_file.with_suffix(".sk"),
-            tmp_path / "resultFile",
+            "test_query.result",
         ],
         config_file,
     )
@@ -192,16 +157,13 @@ def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
 def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
     """Run the full ctxt-to-ctxt pipeline"""
     params_file, config_file, table_file, db, query = setup
+    filesys_config = create_config(tmp_path, "filesys", "ctxt", "ctxt")
 
     # Run PSI pipeline
     act_result = run_psi(
         [
+            filesys_config,
             "--single-run",
-            params_file.with_suffix(".pk"),
-            table_file,
-            db.with_suffix(".ctxt"),
-            query.with_suffix(".ctxt"),
-            tmp_path / "resultFile",
         ]
     )
 
@@ -209,11 +171,11 @@ def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
         f"{str(db)}.ctxt",
         "ctxt-to-ctxt",
         f"{str(query)}.ctxt",
-        tmp_path / "resultFile",
+        "test_query.result",
     )
 
     # Check PSI printout
-    assert not act_result.stderr
+    # assert not act_result.stderr
     assert 0 == act_result.returncode
     assert act_result.stdout == expected_result
     # Check ptxt result
@@ -223,13 +185,73 @@ def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
             "-o",
             tmp_path / "resultFile.ptxt",
             params_file.with_suffix(".sk"),
-            tmp_path / "resultFile",
+            "test_query.result",
         ],
         config_file,
     )
     assert not ret.stderr
     assert 0 == ret.returncode
     assert ret.stdout == "Match on line '1'\nMatch on line '3'\n"
+
+
+def decrypt_and_decode(helib_utils_path, args: list, config: Path) -> str:
+    """Decrypt and decode ctxt file"""
+    decrypt = [helib_utils_path / "build/bin/decrypt"]
+    run(decrypt + args, check=True)
+    return run(
+        [
+            os.environ["CONFIG_PSI_DIR"] + "/scripts/decode.py",
+            "--config",
+            config,
+            config.parent / "resultFile.ptxt",
+        ],
+        encoding="utf-8",
+        capture_output=True,
+        check=True,
+    )
+
+
+def run_psi(args: list):
+    """Run the PSI executable in a subprocess"""
+    cmd = Path("~/.hekit/components/psi/configurable-psi/build/bin/psi").expanduser()
+    return run([cmd, *args], encoding="utf-8", capture_output=True)
+
+
+def create_config(tmp_path, data_source, db_type, query_type):
+    json_data = {
+        "he_data": {
+            "data_source": f"{data_source}",
+            "config": {"source": f"{tmp_path}/test.pk"},
+        },
+        "db": {
+            "type": f"{db_type}",
+            "data_source": f"{data_source}",
+            "config": {"source": f"{tmp_path}/test_db.{db_type}"},
+        },
+        "query": {
+            "type": f"{query_type}",
+            "data_source": f"{data_source}",
+            "config": {
+                "directory": f"{tmp_path}/",
+                "ext": f".{query_type}",
+                "meta_ext": ".heql",
+                "io": "read",
+            },
+        },
+        "output": {
+            "data_source": f"{data_source}",
+            "config": {
+                "directory": f"{tmp_path}/output",
+                "io": "write",
+            },
+        },
+    }
+
+    output_file = tmp_path / "data_source-config.json"
+    with open(output_file, "w") as outfile:
+        json.dump(json_data, outfile)
+
+    return output_file.resolve()
 
 
 @pytest.fixture
@@ -239,6 +261,7 @@ def out_str() -> str:
 
     return (
         "Threads available: 1\n"
+        "Loading config file...Done.\n"
         "Loading HE Context and Public Key...Done.\n"
         "Reading database from file %s ...Done.\n"
         "Configuring query...Done.\n"
@@ -255,7 +278,7 @@ def setup(cwd, tmp_path, helib_utils_path, test_params_and_input_data):
 
     params = "test.params"
     config = "test_config.toml"
-    table = "test.table"
+    table = "test_query.heql"
     db = "test_db"
     query = "test_query"
 
