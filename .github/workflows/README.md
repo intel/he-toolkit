@@ -15,4 +15,4 @@
 | Clang-13 | Pass                    | Fail* |
 | Clang-14 | Pass                    | Pass  |
 
-\* Under investigation 
+\* Under investigation
