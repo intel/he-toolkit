@@ -13,8 +13,9 @@ using Metadata = std::map<std::string, std::string>;
 struct DataRecord {
   virtual void read(char* data, size_t size) = 0;
   virtual void write(char* data, size_t size) = 0;
+  virtual void write(std::istream& stream) = 0;
   virtual std::string metadata(const std::string& name) const = 0;
-  virtual const std::stringstream& data_stream() const = 0;
+  virtual std::stringstream& data_stream() = 0;
 };
 
 class FileRecord : public DataRecord {
@@ -73,18 +74,21 @@ class FileRecord : public DataRecord {
     file_stream_.write(data, size);
   }
 
+  void write(std::istream& stream) override {}
+
   std::string metadata(const std::string& name) const override {
     return metadata_.at(name);
   }
 
-  const std::stringstream& data_stream() const override {
+  std::stringstream& data_stream() override {
     throw std::logic_error("Not implemented");
   }
 };
 
 class KafkaRecord : public DataRecord {
  private:
-  std::stringstream data_stream_;
+  std::stringstream data_stream_{std::ios::in | std::ios::out |
+                                 std::ios::binary};
   Metadata metadata_;
 
  public:
@@ -97,9 +101,15 @@ class KafkaRecord : public DataRecord {
     data_stream_.write(data, size);
   }
 
+  // This is for copying a buffer
+  void write(std::istream& stream) override {
+    data_stream_ << stream.rdbuf();
+    std::cout << "BUFFER:\n" << data_stream_.str() << std::endl;
+  }
+
   std::string metadata(const std::string& name) const override {
     return metadata_.at(name);
   }
 
-  const std::stringstream& data_stream() const override { return data_stream_; }
+  std::stringstream& data_stream() override { return data_stream_; }
 };

@@ -71,15 +71,14 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
 }
 
 void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
-  std::ifstream ifs(filename, std::ios::in | std::ios::binary | std::ios::ate);
+  std::ifstream ifs(filename, std::ios::binary);
   if (!ifs.is_open()) {
     std::ostringstream msg;
     msg << "Could not open file '" << filename << "'";
     throw std::runtime_error(msg.str());
   }
-  auto filesize = ifs.tellg();
-  ifs.seekg(0);
-  out_record.write(reinterpret_cast<char*>(ifs.rdbuf()), filesize);
+  // This is the buffer not the stream
+  out_record.write(ifs);
 }
 
 // Database lookup where both the query and dabatase are not encrypted.
