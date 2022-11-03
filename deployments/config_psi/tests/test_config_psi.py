@@ -50,7 +50,7 @@ def test_ptxt_to_ptxt(setup, tmp_path, out_str):
         f"{db}.ptxt",
         "ptxt-to-ptxt",
         f"{query}.ptxt",
-        "test_query.result",
+        tmp_path / "test_query.result",
     )
 
     # Check PSI printout
@@ -91,7 +91,7 @@ def test_ctxt_to_ptxt(setup, tmp_path, out_str, helib_utils_path):
         f"{db}.ptxt",
         "ctxt-to-ptxt",
         f"{query}.ctxt",
-        "test_query.result",
+        tmp_path / "test_query.result",
     )
 
     # Check PSI printout
@@ -131,7 +131,7 @@ def test_ptxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
         f"{str(db)}.ctxt",
         "ptxt-to-ctxt",
         f"{str(query)}.ptxt",
-        "test_query.result",
+        tmp_path / "test_query.result",
     )
 
     # Check PSI printout
@@ -171,7 +171,7 @@ def test_ctxt_to_ctxt(setup, tmp_path, out_str, helib_utils_path):
         f"{str(db)}.ctxt",
         "ctxt-to-ctxt",
         f"{str(query)}.ctxt",
-        "test_query.result",
+        tmp_path / "test_query.result",
     )
 
     # Check PSI printout
@@ -241,13 +241,13 @@ def create_config(tmp_path, data_source, db_type, query_type):
         "output": {
             "data_source": f"{data_source}",
             "config": {
-                "directory": f"{tmp_path}/output",
+                "directory": f"{tmp_path}",
                 "io": "write",
             },
         },
     }
 
-    output_file = tmp_path / "data_source-config.json"
+    output_file = tmp_path / "filesys-config.json"
     with open(output_file, "w") as outfile:
         json.dump(json_data, outfile)
 
@@ -263,12 +263,12 @@ def out_str() -> str:
         "Threads available: 1\n"
         "Loading config file...Done.\n"
         "Loading HE Context and Public Key...Done.\n"
-        "Reading database from file %s ...Done.\n"
+        "Reading database from file '%s' ...Done.\n"
         "Configuring query...Done.\n"
         "Executing %s comparison\n"
-        "Reading query data from file %s ...Done.\n"
+        "Reading query data from file '%s' ...Done.\n"
         "Performing database lookup...Done.\n"
-        "Writing result to file %s ...Done.\n"
+        "Writing result to file '%s' ...Done.\n"
     )
 
 

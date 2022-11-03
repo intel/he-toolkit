@@ -154,7 +154,7 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
+  std::cout << "Writing result to file '" << out_filename << "' ...";
   writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
@@ -196,7 +196,7 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
+  std::cout << "Writing result to file '" << out_filename << "' ...";
   writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
@@ -238,7 +238,7 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto out_filename = update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
+  std::cout << "Writing result to file '" << out_filename << "' ...";
   writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
