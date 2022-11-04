@@ -24,6 +24,7 @@ class Configurator:
     @classmethod
     def abort():
         # MSG=$1
+        # WIP: variables
         print("\n")
         print("ERROR: $MSG")
         print()

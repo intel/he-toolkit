@@ -5,7 +5,7 @@ from openfhe_plugin.configurator import Configurator
 
 
 def set_openfhe_subparser(subparsers):
-    parser = subparsers.add_parser("openfhe", description="OpenFHE configurator")
+    parser = subparsers.add_parser("openfhe", description="OpenFHE configurator WIP")
     parser.add_argument(
         "exists",
         help="If a previous staging directory exists, delete? [y/n] : ",
