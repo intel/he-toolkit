@@ -189,7 +189,9 @@ class KafkaConn : public DataConn {
     if (record.value().size() == 0) {
       return nullptr;
     }
-    std::string job_id = find("JobID", record);
+    auto bank_id = find("BID", record);
+    auto user_id = find("UID", record);
+    auto job_id = find("JobID", record);
     std::string metafile = job_id + ".heql";
     fs::path metadata_filepath = fs::path(config_.directory()) / metafile;
     std::string datafilename = job_id + ".query";
@@ -215,18 +217,23 @@ class KafkaConn : public DataConn {
       const auto& value = record.value();
       datafile.write(reinterpret_cast<const char*>(value.data()), value.size());
     }
+    // Create out topic
+    std::ostringstream out_topic;
+    out_topic << bank_id << "." << user_id << "." << job_id;
 
-    return std::make_unique<FileRecord>(datafilepath, config_.mode(),
-                                        metadata_filepath);
+    return std::make_unique<FileRecord>(
+        datafilepath, config_.mode(), Metadata{{"out-topic", out_topic.str()}},
+        metadata_filepath);
   }
 
   void write(DataRecord& data) const override {
     // TODO(JC) Create topic based on IDs
     kafka::Value value(data.data(), data.size());
 
+    auto topic_name = data.metadata("out-topic");
     // Create record
     auto record = kafka::clients::producer::ProducerRecord(
-        config_.topic(),
+        topic_name,
         /*partition=*/0, /*kafka::Key*/ kafka::NullKey, /*kafka::Value*/ value);
 
     // Send to Kafka

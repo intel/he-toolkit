@@ -51,11 +51,11 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
   // TODO(JC) maybe write file to disk here, if not exist?
 }
 
-std::string update_opts_output(CmdLineOpts& cmdLineOpts) {
+void update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
   cmdLineOpts.outConfig.at("directory").get_to(cmdLineOpts.outFilePath);
-  return fs::path(cmdLineOpts.outFilePath) /
-         filepath.replace_extension(".result").filename();
+  cmdLineOpts.outFilename = fs::path(cmdLineOpts.outFilePath) /
+                            filepath.replace_extension(".result").filename();
 }
 
 // Utility function which performs a binary sum of Matrix rows.
@@ -113,22 +113,13 @@ void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
   // Sum resultant mask(s) into single mask w.r.t. query
   auto sum = binSumRows(match);
 
-  // Create data connection for outfile
-  std::unique_ptr<DataConn> out_conn =
-      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
-
   // Update cmdLineOpts so it knows the output filename
-  auto out_filename = update_opts_output(cmdLineOpts);
+  update_opts_output(cmdLineOpts);
 
   // Write result to file
-  std::cout << "Writing result to file '" << out_filename << "' ...";
-  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
+  std::cout << "Writing result to file '" << cmdLineOpts.outFilename << "' ...";
+  writeResultsToFile(cmdLineOpts.outFilename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
-
-  auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, out_filename);
-
-  out_conn->write(*out_record_ptr);
 }
 
 int main(int argc, char* argv[]) {
@@ -224,6 +215,11 @@ int main(int argc, char* argv[]) {
   auto query_conn =
       makeDataConn(cmdLineOpts.queryConnType, cmdLineOpts.queryConfig);
 
+  using QueryCtxt = helib::Ctxt;
+  using QueryPtxt = Ptxt;
+  using DbCtxt = helib::Ctxt;
+  using DbPtxt = Ptxt;
+
   do {  // REPL
     // Parse tableFile to build query
     std::cout << "Configuring query...";
@@ -257,6 +253,18 @@ int main(int argc, char* argv[]) {
       std::cout << "Executing ctxt-to-ctxt comparison\n";
       databaseLookup<QueryCtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
                                         cmdLineOpts);
+    }
+
+    // Create data connection for outfile
+    std::unique_ptr<DataConn> out_conn =
+        makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
+    if (cmdLineOpts.outConnType == Type::KAFKA) {
+      auto out_topic = query_record_ptr->metadata("out-topic");
+      auto out_record_ptr =
+          out_conn->createDataRecord({{"out-topic", out_topic}});
+      writeDataToRecord(*out_record_ptr, cmdLineOpts.outFilename);
+
+      out_conn->write(*out_record_ptr);
     }
   } while (!(gSignalStatus || cmdLineOpts.singleRun));  // End REPL
 

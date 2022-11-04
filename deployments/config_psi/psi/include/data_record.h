@@ -51,8 +51,11 @@ class FileRecord : public DataRecord {
   }
 
  public:
+  // Note: metadata may override anything read in from the metadata file
   FileRecord(const std::string& filename, const std::string& mode,
-             const std::string& metadata_filename = "") {
+             const Metadata& metadata,
+             const std::string& metadata_filename = "")
+      : metadata_(metadata) {
     if (mode == "read") {
       (metadata_filename.empty()) ? openForRead(filename)
                                   : openForRead(filename, metadata_filename);
@@ -68,6 +71,10 @@ class FileRecord : public DataRecord {
     msg << "Unknown file mode '" << mode << "'";
     throw std::runtime_error(msg.str());
   }
+
+  FileRecord(const std::string& filename, const std::string& mode,
+             const std::string& metadata_filename = "")
+      : FileRecord(filename, mode, {}, metadata_filename) {}
 
   void read(char* data, size_t size) override { file_stream_.read(data, size); }
 

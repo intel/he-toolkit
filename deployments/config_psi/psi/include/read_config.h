@@ -18,6 +18,7 @@ struct CmdLineOpts {
   std::string databaseFilePath;
   std::string queryFilePath;
   std::string outFilePath;
+  std::string outFilename;
   json heConfig;
   json dbConfig;
   json queryConfig;
