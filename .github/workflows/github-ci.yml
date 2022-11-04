@@ -56,7 +56,7 @@ jobs:
           cd .. && hekit -h
 
   build-and-test-toolkit-palisade:
-    name: HEKit PALISADE [${{ matrix.os }}, ${{ matrix.c_compiler }}]
+    name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }}
     # Disable this job for now as it fails due to HEXL-PALISADE issue
     # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
     if: ${{ false }}
@@ -79,14 +79,16 @@ jobs:
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # clang-14 not supported on ubuntu-20.04
-          - os: ubuntu-20.04  
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
             c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - os: ubuntu-22.04
             c_compiler: clang-10
           - os: ubuntu-22.04
-            c_compiler: gcc-10   
+            c_compiler: gcc-10
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -116,7 +118,7 @@ jobs:
           retention-days: 90 # Maximum for free version
 
   build-and-test-toolkit-helib:
-    name: HEKit HElib [${{ matrix.os }}, ${{ matrix.c_compiler }}]
+    name: HEKit HElib | ${{ matrix.os }} ${{ matrix.c_compiler }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -136,9 +138,11 @@ jobs:
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # clang-14 not supported on ubuntu-20.04
-          - os: ubuntu-20.04  
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
             c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - os: ubuntu-22.04
             c_compiler: clang-10
@@ -182,7 +186,7 @@ jobs:
           pytest deployments/config_psi/scripts/tests/
 
   build-and-test-toolkit-seal:
-    name: HEKit SEAL [${{ matrix.os }}, ${{ matrix.c_compiler }}]
+    name: HEKit SEAL | ${{ matrix.os }} ${{ matrix.c_compiler }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -202,9 +206,11 @@ jobs:
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # clang-14 not supported on ubuntu-20.04
-          - os: ubuntu-20.04  
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
             c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - os: ubuntu-22.04
             c_compiler: clang-10
