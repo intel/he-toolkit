@@ -31,13 +31,20 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double>,
 
   double epsilon() { return epsil_; }
 
-  EncPoly<poly::SparsePoly> encode(const double& num) const override {
+  EncPolyBase<poly::SparsePoly> encode(const double& num) const override {
     const auto [a, frac_exp] = EncodeHelper(num);
-    if (frac_degree_ > 0) return EncPoly{laurentFracEncode(a), {}};
-    return EncPoly{laurentEncode(a, frac_exp), {frac_exp}};
+    if (frac_degree_ == 0L)
+      return EncPolyBase{laurentEncode(a, frac_exp), {frac_exp}};
+    else
+      return EncPolyFrac{laurentFracEncode(a)};
   }
 
-  EncPoly<poly::SparseMultiPoly> encode(
+  // EncPolyFrac<poly::SparsePoly> encode(const double& num) const override {
+  //   const auto [a, frac_exp] = EncodeHelper(num);
+  //   return EncPolyFrac{laurentFracEncode(a)};
+  // }
+
+  EncPolyBase<poly::SparseMultiPoly> encode(
       const std::vector<double>& nums) const override {
     std::vector<poly::SparsePoly> polys;
     std::vector<long> is;
@@ -46,10 +53,10 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double>,
       polys.push_back(laurentEncode(a, frac_exp));
       is.push_back(frac_exp);
     }
-    return EncPoly<poly::SparseMultiPoly>{polys, is};
+    return EncPolyBase<poly::SparseMultiPoly>{polys, is};
   }
 
-  double decode(const EncPoly<poly::SparsePoly>& en) const override {
+  double decode(const EncPolyBase<poly::SparsePoly>& en) const override {
     const auto& poly = en.poly();
     if (frac_degree_ > 0) {
       // frac_degree_ power of 2
@@ -71,7 +78,7 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double>,
   }
 
   std::vector<double> decode(
-      const EncPoly<poly::SparseMultiPoly>& en) const override {
+      const EncPolyBase<poly::SparseMultiPoly>& en) const override {
     const auto& polys = en.poly();
     std::vector<double> nums;
     nums.reserve(polys.size());

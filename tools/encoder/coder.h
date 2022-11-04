@@ -8,10 +8,10 @@
 namespace hekit::coder {
 
 template <typename Poly>
-class EncPoly {
+class EncPolyBase {
  public:
-  EncPoly() = delete;
-  EncPoly(const Poly& poly, const std::vector<long>& is)
+  EncPolyBase() = delete;
+  EncPolyBase(const Poly& poly, const std::vector<long>& is)
       : poly_(poly), is_(is) {}
   Poly& poly() { return poly_; }
   const Poly& poly() const { return poly_; }
@@ -23,16 +23,25 @@ class EncPoly {
   std::vector<long> is_;
 };
 
+template <typename Poly>
+class EncPolyFrac : public EncPolyBase<Poly> {
+ public:
+  EncPolyFrac() = delete;
+  EncPolyFrac(const Poly& poly) : EncPolyBase<Poly>{poly, {}} {}
+  Poly& poly() { return poly; }
+  const Poly& poly() const { return poly; }
+};
+
 template <typename Poly, typename Nums>
 struct Coder {
-  virtual EncPoly<Poly> encode(const Nums& nums) const = 0;
-  virtual Nums decode(const EncPoly<Poly>& enc_poly) const = 0;
+  virtual EncPolyBase<Poly> encode(const Nums& nums) const = 0;
+  virtual Nums decode(const EncPolyBase<Poly>& enc_poly) const = 0;
   virtual ~Coder() = default;
 };
 
 template <typename OutPoly, typename Nums>
-inline EncPoly<OutPoly> encode(const Nums& nums,
-                               const Coder<OutPoly, Nums>& coder) {
+inline EncPolyBase<OutPoly> encode(const Nums& nums,
+                                   const Coder<OutPoly, Nums>& coder) {
   return coder.encode(nums);
 }
 
