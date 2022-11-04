@@ -222,10 +222,7 @@ class KafkaConn : public DataConn {
 
   void write(DataRecord& data) const override {
     // TODO(JC) Create topic based on IDs
-    auto& record_stream = data.data_stream();
-    auto record_size = record_stream.tellp();
-    std::cout << "*********** record_size: " << record_size << std::endl;
-    kafka::Value value(record_stream.str().c_str(), record_size);
+    kafka::Value value(data.data(), data.size());
 
     // Create record
     auto record = kafka::clients::producer::ProducerRecord(

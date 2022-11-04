@@ -14,6 +14,7 @@
 #include <csignal>  // std::signal
 #include <filesystem>
 #include <iostream>
+#include <iterator>
 #include <thread>       // Debug
 #include <type_traits>  // std::decay
 
@@ -77,8 +78,10 @@ void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
     msg << "Could not open file '" << filename << "'";
     throw std::runtime_error(msg.str());
   }
+  std::istreambuf_iterator<char> it{ifs};
+  std::vector<char> buffer{it, {}};
   // This is the buffer not the stream
-  out_record.write(ifs);
+  out_record.write(buffer.data(), buffer.size());
 }
 
 // Database lookup where both the query and dabatase are not encrypted.
