@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <vector>
 
 using Metadata = std::map<std::string, std::string>;
 
@@ -14,7 +15,8 @@ struct DataRecord {
   virtual void read(char* data, size_t size) = 0;
   virtual void write(char* data, size_t size) = 0;
   virtual std::string metadata(const std::string& name) const = 0;
-  virtual const std::stringstream& data_stream() const = 0;
+  virtual char* data() = 0;
+  virtual std::size_t size() const = 0;
 };
 
 class FileRecord : public DataRecord {
@@ -77,29 +79,29 @@ class FileRecord : public DataRecord {
     return metadata_.at(name);
   }
 
-  const std::stringstream& data_stream() const override {
-    throw std::logic_error("Not implemented");
-  }
+  char* data() override { return nullptr; }
+  std::size_t size() const override { return 0; }
 };
 
 class KafkaRecord : public DataRecord {
  private:
-  std::stringstream data_stream_;
+  std::vector<char> buffer_;
   Metadata metadata_;
 
  public:
   KafkaRecord(const Metadata& metadata) : metadata_(metadata) {}
 
-  // Not implementing for now
+  // Not implementing this for now
   void read(char* data, size_t size) override {}
 
   void write(char* data, size_t size) override {
-    data_stream_.write(data, size);
+    buffer_ = std::vector<char>{data, data + size};
   }
 
   std::string metadata(const std::string& name) const override {
     return metadata_.at(name);
   }
 
-  const std::stringstream& data_stream() const override { return data_stream_; }
+  char* data() override { return buffer_.data(); }
+  std::size_t size() const override { return buffer_.size(); }
 };

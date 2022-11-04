@@ -31,7 +31,7 @@ struct DataConn {
   virtual void open() = 0;
   virtual void close() = 0;
   virtual std::unique_ptr<DataRecord> read() const = 0;
-  virtual void write(const DataRecord& data) const = 0;
+  virtual void write(DataRecord& data) const = 0;
   virtual std::unique_ptr<DataRecord> createDataRecord(
       const Metadata& metadata = {}) const = 0;
   virtual ~DataConn() = default;
@@ -91,7 +91,7 @@ class FileSysConfig : public DataConnConfig {
       json_config.at("meta_ext").get_to(meta_ext_);
     }
 
-    // TODO(JC) Use correct stream modes
+    // Use correct stream modes
     if (json_config.at("io") == "read") {
       mode_ = "read";
     } else if (json_config.at("io") == "write") {
@@ -220,15 +220,9 @@ class KafkaConn : public DataConn {
                                         metadata_filepath);
   }
 
-  void write(const DataRecord& data) const override {
+  void write(DataRecord& data) const override {
     // TODO(JC) Create topic based on IDs
-    std::stringstream record_stream;
-    record_stream << data.data_stream().rdbuf();
-    record_stream.seekg(0, std::ios::end);
-    auto record_size = record_stream.tellg();
-    record_stream.seekg(0);
-    kafka::Value value(reinterpret_cast<char*>(record_stream.rdbuf()),
-                       record_size);
+    kafka::Value value(data.data(), data.size());
 
     // Create record
     auto record = kafka::clients::producer::ProducerRecord(
@@ -334,7 +328,7 @@ class FileSys : public DataConn {
 
   // Currently this will do nothing because the file will already exist for PSI
   // but the behaviour could change in the future.
-  void write(const DataRecord& data) const override {}
+  void write(DataRecord& data) const override {}
 
   std::unique_ptr<DataRecord> createDataRecord(
       const Metadata& metadata = {}) const override {

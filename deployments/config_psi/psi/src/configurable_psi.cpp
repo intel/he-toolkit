@@ -14,6 +14,7 @@
 #include <csignal>  // std::signal
 #include <filesystem>
 #include <iostream>
+#include <iterator>
 #include <thread>       // Debug
 #include <type_traits>  // std::decay
 
@@ -48,9 +49,6 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
 std::string update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
   cmdLineOpts.outConfig.at("directory").get_to(cmdLineOpts.outFilePath);
-  // TODO(JC) This has introduced a bug with filesys. It appends to the old
-  // name so only works the first time.
-  // eg: dir -> dir/filename1 -> dir/filename1/filename2
   return fs::path(cmdLineOpts.outFilePath) /
          filepath.replace_extension(".result").filename();
 }
@@ -71,15 +69,16 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
 }
 
 void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
-  std::ifstream ifs(filename, std::ios::in | std::ios::binary | std::ios::ate);
+  std::ifstream ifs(filename, std::ios::binary);
   if (!ifs.is_open()) {
     std::ostringstream msg;
     msg << "Could not open file '" << filename << "'";
     throw std::runtime_error(msg.str());
   }
-  auto filesize = ifs.tellg();
-  ifs.seekg(0);
-  out_record.write(reinterpret_cast<char*>(ifs.rdbuf()), filesize);
+  std::istreambuf_iterator<char> it{ifs};
+  std::vector<char> buffer{it, {}};
+  // This is the buffer not the stream
+  out_record.write(buffer.data(), buffer.size());
 }
 
 template <typename QueryTxt, typename DbTxt>
