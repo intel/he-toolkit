@@ -56,24 +56,22 @@ jobs:
           cd .. && hekit -h
 
   build-and-test-toolkit-palisade:
-    name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
+    name: HEKit PALISADE os=${{ matrix.os }} compiler=${{ matrix.c_compiler }}
     # Disable this job for now as it fails due to HEXL-PALISADE issue
     # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
     if: ${{ false }}
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, clang-12, clang-14, gcc-10, gcc-11]
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
-          - c_compiler: clang-12
-            cxx_compiler: clang++-12
           - c_compiler: clang-14
             cxx_compiler: clang++-14
           - c_compiler: gcc-10
@@ -84,13 +82,8 @@ jobs:
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          - c_compiler: clang-12
-            os: ubuntu-22.04
           - c_compiler: gcc-10
             os: ubuntu-22.04
-          # unskip once issue is resolved
-          - c_compiler: clang-12
-            os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -120,21 +113,19 @@ jobs:
           retention-days: 90 # Maximum for free version
 
   build-and-test-toolkit-helib:
-    name: HE Toolkit HElib 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
-    runs-on: ${{matrix.os}}
+    name: HEKit HElib os=${{ matrix.os }} compiler=${{ matrix.c_compiler }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, clang-12, clang-14, gcc-10, gcc-11]
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
-          - c_compiler: clang-12
-            cxx_compiler: clang++-12
           - c_compiler: clang-14
             cxx_compiler: clang++-14
           - c_compiler: gcc-10
@@ -145,13 +136,8 @@ jobs:
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          - c_compiler: clang-12
-            os: ubuntu-22.04
           - c_compiler: gcc-10
             os: ubuntu-22.04
-          # unskip once issue is resolved
-          - c_compiler: clang-12
-            os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -190,21 +176,19 @@ jobs:
           pytest deployments/config_psi/scripts/tests/
 
   build-and-test-toolkit-seal:
-    name: HE Toolkit SEAL 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
-    runs-on: ${{matrix.os}}
+    name: HEKit SEAL os=${{ matrix.os }} compiler=${{ matrix.c_compiler }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, clang-12, clang-14, gcc-10, gcc-11]
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
-          - c_compiler: clang-12
-            cxx_compiler: clang++-12
           - c_compiler: clang-14
             cxx_compiler: clang++-14
           - c_compiler: gcc-10
@@ -215,13 +199,8 @@ jobs:
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - c_compiler: clang-10
             os: ubuntu-22.04
-          - c_compiler: clang-12
-            os: ubuntu-22.04
           - c_compiler: gcc-10
             os: ubuntu-22.04
-          # unskip once issue is resolved
-          - c_compiler: clang-12
-            os: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup
