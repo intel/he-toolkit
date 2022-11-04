@@ -27,6 +27,11 @@ using uniqueKey = std::unique_ptr<const Key>;
 template <typename T>
 using uniqueDB = std::unique_ptr<const helib::Database<T>>;
 
+using QueryCtxt = helib::Ctxt;
+using QueryPtxt = Ptxt;
+using DbCtxt = helib::Ctxt;
+using DbPtxt = Ptxt;
+
 namespace fs = std::filesystem;
 
 // Global signal status
@@ -97,6 +102,13 @@ void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
   std::cout << "Performing database lookup...";
   auto match = database.contains(query, queryData);
   std::cout << "Done.\n";
+
+  if constexpr (std::is_same_v<QueryTxt, QueryCtxt> ||
+                std::is_same_v<DbTxt, DbCtxt>) {
+    // Perform cleanup of all resultant ctxts.
+    // Relinearize, reduce, then drop special and small primes.
+    match.apply([](auto& x) { x.cleanUp(); });
+  }
 
   // Sum resultant mask(s) into single mask w.r.t. query
   auto sum = binSumRows(match);
@@ -227,11 +239,6 @@ int main(int argc, char* argv[]) {
     // Reading the heql
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";
-
-    using QueryCtxt = helib::Ctxt;
-    using QueryPtxt = Ptxt;
-    using DbCtxt = helib::Ctxt;
-    using DbPtxt = Ptxt;
 
     // Process query
     if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
