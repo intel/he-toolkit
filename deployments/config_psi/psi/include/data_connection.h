@@ -91,7 +91,7 @@ class FileSysConfig : public DataConnConfig {
       json_config.at("meta_ext").get_to(meta_ext_);
     }
 
-    // TODO(JC) Use correct stream modes
+    // Use correct stream modes
     if (json_config.at("io") == "read") {
       mode_ = "read";
     } else if (json_config.at("io") == "write") {

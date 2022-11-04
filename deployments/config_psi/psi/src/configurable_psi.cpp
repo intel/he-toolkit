@@ -49,9 +49,6 @@ void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
 std::string update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
   cmdLineOpts.outConfig.at("directory").get_to(cmdLineOpts.outFilePath);
-  // TODO(JC) This has introduced a bug with filesys. It appends to the old
-  // name so only works the first time.
-  // eg: dir -> dir/filename1 -> dir/filename1/filename2
   return fs::path(cmdLineOpts.outFilePath) /
          filepath.replace_extension(".result").filename();
 }
@@ -106,7 +103,6 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
-  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
@@ -148,7 +144,6 @@ void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
-  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
@@ -190,7 +185,6 @@ void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
-  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
@@ -232,7 +226,6 @@ void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
-  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
@@ -340,7 +333,6 @@ int main(int argc, char* argv[]) {
   }
   std::cout << "Done.\n";
 
-  // TODO(JC) change to be connection type dynamic
   std::unique_ptr<DataConn> query_conn =
       makeDataConn(cmdLineOpts.queryConnType, cmdLineOpts.queryConfig);
 
