@@ -82,17 +82,16 @@ void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
   out_record.write(reinterpret_cast<char*>(ifs.rdbuf()), filesize);
 }
 
-// Database lookup where both the query and dabatase are not encrypted.
-void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
-                        const helib::QueryType& query,
-                        const helib::Database<Ptxt>& database,
-                        CmdLineOpts& cmdLineOpts) {
+template <typename QueryTxt, typename DbTxt>
+void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
+                    const helib::QueryType& query,
+                    const helib::Database<DbTxt>& database,
+                    CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
             << "' ...";
   // queryConn.read(pointer to query data?);
-  helib::Matrix<Ptxt> queryData =
-      readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
+  auto queryData = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
 
   // Perform query lookup
@@ -104,7 +103,6 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
   auto sum = binSumRows(match);
 
   // Create data connection for outfile
-  // TODO(JC) Make this dynamic
   std::unique_ptr<DataConn> out_conn =
       makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
 
@@ -113,132 +111,6 @@ void plaintextAllLookup(sharedContext& contextp, const helib::PubKey& pk,
 
   // Write result to file
   std::cout << "Writing result to file '" << out_filename << "' ...";
-  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
-  std::cout << "Done.\n";
-
-  auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, out_filename);
-
-  out_conn->write(*out_record_ptr);
-}
-
-// Database lookup where the query is not encrypted but the dabatase is.
-void plaintextQueryLookup(sharedContext& contextp, const helib::PubKey& pk,
-                          const helib::QueryType& query,
-                          const helib::Database<helib::Ctxt>& database,
-                          CmdLineOpts& cmdLineOpts) {
-  // Read in the query data
-  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
-            << "' ...";
-  helib::Matrix<Ptxt> queryData =
-      readQueryFromFile<Ptxt>(cmdLineOpts.queryFilePath, pk);
-  std::cout << "Done.\n";
-
-  // Perform cleanup of all resultant ctxts.
-  // Relinearize, reduce, then drop special and small primes.
-  auto clean = [](auto& x) { x.cleanUp(); };
-  // Perform query lookup
-  std::cout << "Performing database lookup...";
-  auto match = database.contains(query, queryData).apply(clean);
-  std::cout << "Done.\n";
-
-  // Sum resultant mask(s) into single mask w.r.t. query
-  auto sum = binSumRows(match);
-
-  // Create data connection for outfile
-  // TODO(JC) Make this dynamic
-  std::unique_ptr<DataConn> out_conn =
-      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
-
-  // Update cmdLineOpts
-  auto out_filename = update_opts_output(cmdLineOpts);
-
-  // Write result to file
-  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
-  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
-  std::cout << "Done.\n";
-
-  auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, out_filename);
-
-  out_conn->write(*out_record_ptr);
-}
-
-// Database lookup where the query is encrypted but the dabatase is not.
-void plaintextDBLookup(sharedContext& contextp, const helib::PubKey& pk,
-                       const helib::QueryType& query,
-                       const helib::Database<Ptxt>& database,
-                       CmdLineOpts& cmdLineOpts) {
-  // Read in the query data
-  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
-            << "' ...";
-  helib::Matrix<helib::Ctxt> queryData =
-      readQueryFromFile<helib::Ctxt>(cmdLineOpts.queryFilePath, pk);
-  std::cout << "Done.\n";
-
-  // Perform cleanup of all resultant ctxts.
-  // Relinearize, reduce, then drop special and small primes.
-  auto clean = [](auto& x) { x.cleanUp(); };
-  // Perform query lookup
-  std::cout << "Performing database lookup...";
-  auto match = database.contains(query, queryData).apply(clean);
-  std::cout << "Done.\n";
-
-  // Sum resultant mask(s) into single mask w.r.t. query
-  auto sum = binSumRows(match);
-
-  // Create data connection for outfile
-  // TODO(JC) Make this dynamic
-  std::unique_ptr<DataConn> out_conn =
-      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
-
-  // Update cmdLineOpts
-  auto out_filename = update_opts_output(cmdLineOpts);
-
-  // Write result to file
-  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
-  writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
-  std::cout << "Done.\n";
-
-  auto out_record_ptr = out_conn->createDataRecord();
-  writeDataToRecord(*out_record_ptr, out_filename);
-
-  out_conn->write(*out_record_ptr);
-}
-
-// Database lookup where both the query and dabatase are encrypted.
-void encryptedAllLookup(sharedContext& contextp, const helib::PubKey& pk,
-                        const helib::QueryType& query,
-                        const helib::Database<helib::Ctxt>& database,
-                        CmdLineOpts& cmdLineOpts) {
-  // Read in the query data
-  std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
-            << "' ...";
-  helib::Matrix<helib::Ctxt> queryData =
-      readQueryFromFile<helib::Ctxt>(cmdLineOpts.queryFilePath, pk);
-  std::cout << "Done.\n";
-
-  // Perform cleanup of all resultant ctxts.
-  // Relinearize, reduce, then drop special and small primes.
-  auto clean = [](auto& x) { x.cleanUp(); };
-  // Perform query lookup
-  std::cout << "Performing database lookup...";
-  auto match = database.contains(query, queryData).apply(clean);
-  std::cout << "Done.\n";
-
-  // Sum resultant mask(s) into single mask w.r.t. query
-  auto sum = binSumRows(match);
-
-  // Create data connection for outfile
-  // TODO(JC) Make this dynamic
-  std::unique_ptr<DataConn> out_conn =
-      makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
-
-  // Update cmdLineOpts
-  auto out_filename = update_opts_output(cmdLineOpts);
-
-  // Write result to file
-  std::cout << "Writing result to file '" << cmdLineOpts.outFilePath << "' ...";
   writeResultsToFile(out_filename, sum, cmdLineOpts.offset);
   std::cout << "Done.\n";
 
@@ -338,8 +210,7 @@ int main(int argc, char* argv[]) {
   }
   std::cout << "Done.\n";
 
-  // TODO(JC) change to be connection type dynamic
-  std::unique_ptr<DataConn> query_conn =
+  auto query_conn =
       makeDataConn(cmdLineOpts.queryConnType, cmdLineOpts.queryConfig);
 
   do {  // REPL
@@ -358,23 +229,28 @@ int main(int argc, char* argv[]) {
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
     std::cout << "Done.\n";
 
+    using QueryCtxt = helib::Ctxt;
+    using QueryPtxt = Ptxt;
+    using DbCtxt = helib::Ctxt;
+    using DbPtxt = Ptxt;
+
     // Process query
     if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
-      // Plaintext query and plaintext DB
       std::cout << "Executing ptxt-to-ptxt comparison\n";
-      plaintextAllLookup(contextp, *pkp, query, *ptxt_db_ptr, cmdLineOpts);
+      databaseLookup<QueryPtxt, DbPtxt>(contextp, *pkp, query, *ptxt_db_ptr,
+                                        cmdLineOpts);
     } else if (cmdLineOpts.ptxtQuery && !cmdLineOpts.ptxtDB) {
-      // Plaintext query and encrypted DB
       std::cout << "Executing ptxt-to-ctxt comparison\n";
-      plaintextQueryLookup(contextp, *pkp, query, *ctxt_db_ptr, cmdLineOpts);
+      databaseLookup<QueryPtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
+                                        cmdLineOpts);
     } else if (!cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
-      // Encrypted query and plaintext DB
       std::cout << "Executing ctxt-to-ptxt comparison\n";
-      plaintextDBLookup(contextp, *pkp, query, *ptxt_db_ptr, cmdLineOpts);
+      databaseLookup<QueryCtxt, DbPtxt>(contextp, *pkp, query, *ptxt_db_ptr,
+                                        cmdLineOpts);
     } else {
-      // Encrypted query and encrypted DB
       std::cout << "Executing ctxt-to-ctxt comparison\n";
-      encryptedAllLookup(contextp, *pkp, query, *ctxt_db_ptr, cmdLineOpts);
+      databaseLookup<QueryCtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
+                                        cmdLineOpts);
     }
   } while (!(gSignalStatus || cmdLineOpts.singleRun));  // End REPL
 
