@@ -215,11 +215,6 @@ int main(int argc, char* argv[]) {
   auto query_conn =
       makeDataConn(cmdLineOpts.queryConnType, cmdLineOpts.queryConfig);
 
-  using QueryCtxt = helib::Ctxt;
-  using QueryPtxt = Ptxt;
-  using DbCtxt = helib::Ctxt;
-  using DbPtxt = Ptxt;
-
   do {  // REPL
     // Parse tableFile to build query
     std::cout << "Configuring query...";

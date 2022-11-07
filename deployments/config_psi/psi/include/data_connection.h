@@ -52,11 +52,12 @@ class KafkaConfig : public DataConnConfig {
  public:
   KafkaConfig(const json& json_config) {
     json_config.at("directory").get_to(directory_);
-    json_config.at("topic").get_to(topic_);
     json_config.at("broker").get_to(broker_);
 
     if (json_config.at("io") == "read") {
       mode_ = "read";
+      // Kafka topic is dynamic for outgoing messages
+      json_config.at("topic").get_to(topic_);
     } else if (json_config.at("io") == "write") {
       mode_ = "write";
     } else {
@@ -142,7 +143,6 @@ class KafkaConn : public DataConn {
       kafka::Properties consumer_props({
           {"bootstrap.servers", config_.broker()},
           {"enable.auto.commit", "true"},
-          // TODO(JC) Change this name
           {"group.id", "TestGroup"},
           {"max.poll.records", "1"},
       });
@@ -227,11 +227,9 @@ class KafkaConn : public DataConn {
   }
 
   void write(DataRecord& data) const override {
-    // TODO(JC) Create topic based on IDs
-    kafka::Value value(data.data(), data.size());
-
-    auto topic_name = data.metadata("out-topic");
     // Create record
+    kafka::Value value(data.data(), data.size());
+    auto topic_name = data.metadata("out-topic");
     auto record = kafka::clients::producer::ProducerRecord(
         topic_name,
         /*partition=*/0, /*kafka::Key*/ kafka::NullKey, /*kafka::Value*/ value);
