@@ -56,23 +56,39 @@ jobs:
           cd .. && hekit -h
 
   build-and-test-toolkit-palisade:
-    name: HE Toolkit PALISADE 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
+    name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }}
     # Disable this job for now as it fails due to HEXL-PALISADE issue
     # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
     if: ${{ false }}
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [gcc-10,clang-10]
-        os: [ubuntu-20.04]
-        include: # use clang++ and gcc+ with clang only
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
           - c_compiler: gcc-10
             cxx_compiler: g++-10
+          - c_compiler: gcc-11
+            cxx_compiler: g++-11
+        exclude:
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
+            c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
+          # clang-14 and gcc-11 default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            c_compiler: clang-10
+          - os: ubuntu-22.04
+            c_compiler: gcc-10
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -95,27 +111,43 @@ jobs:
       - name: Run PALISADE sample kernels
         run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
   build-and-test-toolkit-helib:
-    name: HE Toolkit HElib 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
-    runs-on: ${{matrix.os}}
+    name: HEKit HElib | ${{ matrix.os }} ${{ matrix.c_compiler }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [clang-10, gcc-10]
-        os: [ubuntu-20.04]
-        include: # use clang++ and gcc+ with clang only
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
           - c_compiler: gcc-10
             cxx_compiler: g++-10
+          - c_compiler: gcc-11
+            cxx_compiler: g++-11
+        exclude:
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
+            c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
+          # clang-14 and gcc-11 default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            c_compiler: clang-10
+          - os: ubuntu-22.04
+            c_compiler: gcc-10
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -154,20 +186,36 @@ jobs:
           pytest deployments/config_psi/scripts/tests/
 
   build-and-test-toolkit-seal:
-    name: HE Toolkit SEAL 'os=${{matrix.os}} compiler=${{matrix.cxx_compiler}}'
-    runs-on: ${{matrix.os}}
+    name: HEKit SEAL | ${{ matrix.os }} ${{ matrix.c_compiler }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        c_compiler: [gcc-10,clang-10]
-        os: [ubuntu-20.04]
-        include: # use clang++ and gcc+ with clang only
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
           - c_compiler: clang-10
             cxx_compiler: clang++-10
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
           - c_compiler: gcc-10
             cxx_compiler: g++-10
+          - c_compiler: gcc-11
+            cxx_compiler: g++-11
+        exclude:
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
+            c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
+          # clang-14 and gcc-11 default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            c_compiler: clang-10
+          - os: ubuntu-22.04
+            c_compiler: gcc-10
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -176,6 +224,11 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
+
+      - name: he-toolkit-seal-ubuntu-22
+        if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-14'
+        run: |
+          sudo apt install libomp-dev
 
       - name: Build and install SEAL, examples, and sample kernels recipe
         run: |
@@ -204,7 +257,7 @@ jobs:
       - name: Run SEAL sample kernels
         run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
@@ -324,7 +377,7 @@ jobs:
       - name: Run PALISADE sample kernels
         run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
@@ -334,7 +387,7 @@ jobs:
       - name: Run SEAL sample kernels
         run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
