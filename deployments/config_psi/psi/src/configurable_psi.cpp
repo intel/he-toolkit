@@ -36,21 +36,22 @@ namespace fs = std::filesystem;
 
 // Global signal status
 namespace {
-volatile std::sig_atomic_t gSignalStatus = false;
+volatile std::sig_atomic_t g_signal_status = false;
 }  // namespace
 
 // Capture signal and change status
 void signal_handler(int signal) {
   std::cout << "\n\n*** External interrupt detected! ***\n\n";
-  gSignalStatus = true;
+  g_signal_status = true;
 }
 
+// Update CmdLineOpts with the paths to the input query and HEQL data.
 void update_opts_input(CmdLineOpts& cmdLineOpts, const DataRecord& record) {
   cmdLineOpts.queryFilePath = record.metadata("source");
   cmdLineOpts.tableFilePath = record.metadata("meta_source");
-  // TODO(JC) maybe write file to disk here, if not exist?
 }
 
+// Update CmdLineOpts with the path to the outFile.
 void update_opts_output(CmdLineOpts& cmdLineOpts) {
   auto filepath = fs::path(cmdLineOpts.queryFilePath);
   cmdLineOpts.outConfig.at("directory").get_to(cmdLineOpts.outFilePath);
@@ -73,6 +74,7 @@ helib::Matrix<TXT> binSumRows(helib::Matrix<TXT>& matrix) {
   return helib::Matrix<TXT>(vec.at(0), 1, 1);
 }
 
+// Read in data from a file and write it to the output DataRecord object.
 void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
   std::ifstream ifs(filename, std::ios::binary);
   if (!ifs.is_open()) {
@@ -86,6 +88,7 @@ void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
   out_record.write(buffer.data(), buffer.size());
 }
 
+// Perform a database lookup given query data, HEQL query and database.
 template <typename QueryTxt, typename DbTxt>
 void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
                     const helib::QueryType& query,
@@ -95,12 +98,12 @@ void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
   std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
             << "' ...";
   // queryConn.read(pointer to query data?);
-  auto queryData = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath, pk);
+  auto query_data = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath, pk);
   std::cout << "Done.\n";
 
   // Perform query lookup
   std::cout << "Performing database lookup...";
-  auto match = database.contains(query, queryData);
+  auto match = database.contains(query, query_data);
   std::cout << "Done.\n";
 
   if constexpr (std::is_same_v<QueryTxt, QueryCtxt> ||
@@ -261,7 +264,7 @@ int main(int argc, char* argv[]) {
 
       out_conn->write(*out_record_ptr);
     }
-  } while (!(gSignalStatus || cmdLineOpts.singleRun));  // End REPL
+  } while (!(g_signal_status || cmdLineOpts.singleRun));  // End REPL
 
-  return gSignalStatus;
+  return g_signal_status;
 }

@@ -47,14 +47,6 @@ endif()
 target_link_libraries(kafka-api INTERFACE rdkafka)
 target_link_libraries(psi helib kafka-api)
 
-# target:main
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-#add_executable(main
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/queue_system_connection.cpp)
-#target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-#target_link_libraries(main kafka-api)
-
 if (ENABLE_TESTS)
   add_subdirectory(tests)
 endif()
