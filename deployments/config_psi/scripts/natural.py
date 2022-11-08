@@ -8,13 +8,13 @@ from typing import Union
 
 
 class Natural:
-    """Represent natural numbers including zero a.k.a positive integers."""
+    """Represent natural numbers including zero a.k.a non-negative integers."""
 
     def __init__(self, number: Union[int, str]) -> None:
         self.number = int(number)
         if self.number < 0:
             raise ValueError(
-                f"Number of entries must be a positive integer, not '{self.number}'"
+                f"Number of entries must be a non-negative integer, not '{self.number}'"
             )
 
     def __int__(self) -> int:
@@ -22,6 +22,9 @@ class Natural:
 
     def __le__(self, other: Union[Natural, int]) -> bool:
         return self.number <= int(other)
+
+    def __gt__(self, other: Union[Natural, int]) -> bool:
+        return self.number > int(other)
 
     # mypy says arg for __eq__ should be type object
     def __eq__(self, other: object) -> bool:
