@@ -140,12 +140,12 @@ class KafkaConn : public DataConn {
 
   void open() override {
     if (config_.mode() == "read") {
-      kafka::Properties consumer_props({
-          {"bootstrap.servers", config_.broker()},
-          {"enable.auto.commit", "true"},
-          {"group.id", "TestGroup"},
-          {"max.poll.records", "1"},
-      });
+      kafka::Properties consumer_props(
+          {{"bootstrap.servers", config_.broker()},
+           {"enable.auto.commit", "true"},
+           {"group.id", "TestGroup"},
+           {"max.poll.records", "1"},
+           {"receive.message.max.bytes", "157286400"}});
       consumer_ptr_ = std::make_unique<kConsumer>(consumer_props);
       consumer_ptr_->subscribe({config_.topic()});
       return;
@@ -155,7 +155,7 @@ class KafkaConn : public DataConn {
       kafka::Properties producer_props({
           {"bootstrap.servers", config_.broker()},
           {"enable.idempotence", "true"},
-          {"message.max.bytes", "15728640"},
+          {"message.max.bytes", "157286400"},
       });
       producer_ptr_ = std::make_unique<kProducer>(producer_props);
       return;
