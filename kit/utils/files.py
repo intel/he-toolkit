@@ -4,7 +4,7 @@
 """This module provides functions to list files and directories."""
 
 from os import walk
-from typing import Callable, List
+from typing import Callable, List, Optional
 from enum import Enum
 from pathlib import Path
 from toml import load, dump
@@ -25,7 +25,7 @@ def file_exists(file: Path) -> bool:
 
 
 def files_in_dir(
-    path: PathType, cond: Callable = None, ftype: FileType = FileType.FILES
+    path: PathType, cond: Optional[Callable] = None, ftype: FileType = FileType.FILES
 ) -> List[str]:
     """Returns a list of filenames in the directory given by path. Can be filtered by cond"""
     try:

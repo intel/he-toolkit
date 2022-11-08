@@ -12,7 +12,7 @@ import string
 from csv import DictReader
 from functools import partial
 from itertools import zip_longest
-from typing import Dict, List, Sequence, Iterable, Generator, Callable, Union
+from typing import Callable, Dict, Generator, Iterable, List, Optional, Sequence, Union
 
 from config import Config, ConfigError
 from ptxt import Ptxt, Params
@@ -252,7 +252,7 @@ def how_many_entries_in_file(filename: str) -> int:
     return 0
 
 
-def parse_args(argv: List[str] = None):
+def parse_args(argv: Optional[List[str]] = None):
     """Parse argv either passed in or from the command line"""
     parser = argparse.ArgumentParser(description="Encoder for client and server sides")
     parser.add_argument("datafile", type=str, help="Data file to encode")
