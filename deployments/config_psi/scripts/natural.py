@@ -1,7 +1,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Module simple class representing the positive integers"""
+"""Module simple class representing the non-negative integers"""
 
 from __future__ import annotations
 from typing import Union
@@ -22,6 +22,12 @@ class Natural:
 
     def __le__(self, other: Union[Natural, int]) -> bool:
         return self.number <= int(other)
+
+    def __ge__(self, other: Union[Natural, int]) -> bool:
+        return self.number >= int(other)
+
+    def __lt__(self, other: Union[Natural, int]) -> bool:
+        return self.number < int(other)
 
     def __gt__(self, other: Union[Natural, int]) -> bool:
         return self.number > int(other)

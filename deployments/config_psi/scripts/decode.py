@@ -87,7 +87,7 @@ def main(args):
                         value = sum(slot)
                         if value == 1:
                             print(f"Match on line '{line_num}'")
-
+                            continue
                         if value > 1:
                             print(
                                 f"Corruption line result '{line_num}' with slot '{slot}'"
