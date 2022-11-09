@@ -83,11 +83,11 @@ def main(args):
                 ptxt.from_json(jobj)
                 summed_segments = sum_segments(ptxt.slots(), args.config.segments)
                 for line_num, slot in enumerate(summed_segments, line_num):
-                    if args.entries == 0 or line_num <= args.entries:
+                    if args.entries == 0 or args.entries >= line_num:
                         value = sum(slot)
                         if value == 1:
                             print(f"Match on line '{line_num}'")
-
+                            continue
                         if value > 1:
                             print(
                                 f"Corruption line result '{line_num}' with slot '{slot}'"
