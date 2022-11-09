@@ -19,104 +19,104 @@ on:
 # Ubuntu 20.04 #
 ################
 jobs:
-  format:
-    name: Format
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      # Required for pre-commit
-      - run: pip3 install bandit black cpplint docker mypy pydantic pylint pylint-pydantic types-toml
-      - run: sudo snap install shfmt
-      - run: sudo apt install shellcheck
-      # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: --all-files
+  # format:
+  #   name: Format
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     # Required for pre-commit
+  #     - run: pip3 install bandit black cpplint docker mypy pydantic pylint pylint-pydantic types-toml
+  #     - run: sudo snap install shfmt
+  #     - run: sudo apt install shellcheck
+  #     # NOTE: This is deprecated in favor of pre-commit.ci
+  #     - uses: pre-commit/action@v3.0.0
+  #       with:
+  #         extra_args: --all-files
 
 
-  test-hekit:
-    name: Test hekit commands
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup
-        run: |
-          pip3 install docker pytest pytest-mock pytest-xdist toml
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - name: Run pytests
-        run: pytest tests/ -n 8 --dist loadgroup
+  # test-hekit:
+  #   name: Test hekit commands
+  #   runs-on: ubuntu-20.04
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Setup
+  #       run: |
+  #         pip3 install docker pytest pytest-mock pytest-xdist toml
+  #         echo "$HOME/.local/bin" >> $GITHUB_PATH
+  #     - name: Run pytests
+  #       run: pytest tests/ -n 8 --dist loadgroup
 
-      - name: hekit init
-        run: |
-          export SHELL=/bin/bash
-          ./hekit init <<< y
-          source /home/runner/.bash_profile
-          cd .. && hekit -h
+  #     - name: hekit init
+  #       run: |
+  #         export SHELL=/bin/bash
+  #         ./hekit init <<< y
+  #         source /home/runner/.bash_profile
+  #         cd .. && hekit -h
 
-  build-and-test-toolkit-palisade:
-    name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }}
-    # Disable this job for now as it fails due to HEXL-PALISADE issue
-    # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
-    if: ${{ false }}
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      matrix:
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
-        include:
-          # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
-          - c_compiler: clang-14
-            cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
-          - c_compiler: gcc-11
-            cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-10
-          - os: ubuntu-22.04
-            c_compiler: gcc-10
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup
-        run: |
-          pip3 install toml
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
-          echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
+  # build-and-test-toolkit-palisade:
+  #   name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }}
+  #   # Disable this job for now as it fails due to HEXL-PALISADE issue
+  #   # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
+  #   if: ${{ false }}
+  #   runs-on: ${{ matrix.os }}
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   strategy:
+  #     matrix:
+  #       c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+  #       os: [ubuntu-20.04, ubuntu-22.04]
+  #       include:
+  #         # pairing cc compiler with relevant cxx compiler
+  #         - c_compiler: clang-10
+  #           cxx_compiler: clang++-10
+  #         - c_compiler: clang-14
+  #           cxx_compiler: clang++-14
+  #         - c_compiler: gcc-10
+  #           cxx_compiler: g++-10
+  #         - c_compiler: gcc-11
+  #           cxx_compiler: g++-11
+  #       exclude:
+  #         # clang-14 and gcc-11 not supported on ubuntu-20.04
+  #         - os: ubuntu-20.04
+  #           c_compiler: clang-14
+  #         - os: ubuntu-20.04
+  #           c_compiler: gcc-11
+  #         # clang-14 and gcc-11 default on Ubuntu-22.04
+  #         - os: ubuntu-22.04
+  #           c_compiler: clang-10
+  #         - os: ubuntu-22.04
+  #           c_compiler: gcc-10
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Setup
+  #       run: |
+  #         pip3 install toml
+  #         echo "$HOME/.local/bin" >> $GITHUB_PATH
+  #         echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
+  #         echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
 
-      - name: Build and install PALISADE and sample kernels recipe
-        run: |
-          ./hekit --config default.config install .github/hekit-recipes/palisade.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
-          ./hekit --config default.config list
-          echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
+  #     - name: Build and install PALISADE and sample kernels recipe
+  #       run: |
+  #         ./hekit --config default.config install .github/hekit-recipes/palisade.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+  #         ./hekit --config default.config list
+  #         echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
 
-      - name: Run unit tests
-        run: ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
+  #     - name: Run unit tests
+  #       run: ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
-      # PALISADE sample kernels
-      - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
-      - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          retention-days: 90 # Maximum for free version
+  #     # PALISADE sample kernels
+  #     - name: Run PALISADE sample kernels
+  #       run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+  #     - name: Archive PALISADE sample kernel results
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+  #         path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+  #         retention-days: 90 # Maximum for free version
 
   build-and-test-toolkit-helib:
     name: HEKit HElib | ${{ matrix.os }} ${{ matrix.c_compiler }} ${{ matrix.python-version }}
