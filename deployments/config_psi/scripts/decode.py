@@ -9,7 +9,7 @@ import sys
 import argparse
 from itertools import islice
 from functools import partial
-from typing import List, Tuple, Iterable, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 from ptxt import Ptxt
 from config import Config
@@ -56,7 +56,7 @@ def parse_header(header_line: str) -> Tuple[int, int]:
     return int(num_rows), int(num_cols)
 
 
-def parse_args(argv: List[str] = None):
+def parse_args(argv: Optional[List[str]] = None):
     """Parse argv either passed in or from cmdline"""
     parser = argparse.ArgumentParser(description="Decode result")
     parser.add_argument("datafile", type=str, help="data file to decode")
