@@ -6,7 +6,7 @@
 import json
 from sys import stderr, exit as sys_exit
 from pathlib import Path
-from docker import from_env as docker_from_env
+from docker import from_env as docker_from_env  # type: ignore[attr-defined]
 from docker.errors import DockerException  # pylint: disable=unused-import
 
 
