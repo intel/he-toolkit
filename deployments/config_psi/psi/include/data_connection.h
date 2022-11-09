@@ -144,6 +144,7 @@ class KafkaConn : public DataConn {
           {{"bootstrap.servers", config_.broker()},
            {"enable.auto.commit", "true"},
            {"group.id", "TestGroup"},
+           {"auto.offset.reset", "smallest"},
            {"max.poll.records", "1"},
            {"receive.message.max.bytes", "157286400"}});
       consumer_ptr_ = std::make_unique<kConsumer>(consumer_props);
