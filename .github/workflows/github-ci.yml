@@ -158,13 +158,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+            python-version: ${{ matrix.python-version }}
       - name: Setup
         run: |
           pip3 install toml pydantic pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
-          with "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
+        # echo "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
 
       - name: Build and install HElib and example recipe
         run: |
