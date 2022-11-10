@@ -120,7 +120,7 @@ jobs:
 
   build-and-test-toolkit-helib:
     name: HEKit HElib | ${{ matrix.os }} ${{ matrix.c_compiler }} ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }} ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
