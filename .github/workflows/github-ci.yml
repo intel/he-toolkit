@@ -120,13 +120,13 @@ jobs:
 
   build-and-test-toolkit-helib:
     name: HEKit HElib | ${{ matrix.os }} ${{ matrix.c_compiler }} ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }} ${{ matrix.python-version }}
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
+        python-version: ["python3.8", "python3.9"]
         c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
@@ -158,17 +158,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-            python-version: ${{ matrix.python-version }}
       - name: Setup
         run: |
           pip3 install toml pydantic pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
-         # echo "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
+          with "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
 
       - name: Build and install HElib and example recipe
         run: |
