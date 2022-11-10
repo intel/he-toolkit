@@ -126,7 +126,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["python3.8", "python3.9"]
+        python-version: [python3.8, python3.9]
         c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
