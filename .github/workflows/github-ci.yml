@@ -126,7 +126,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["python3.8", "python3.9"]
+        python-version: ["3.8", "3.9"]
         c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
         os: [ubuntu-20.04, ubuntu-22.04]
         include:
@@ -152,23 +152,23 @@ jobs:
             c_compiler: gcc-10
           # python3.10 is default on Ubuntu-22.04
           - os: ubuntu-22.04
-            python-version: "python3.8"
+            python-version: "3.8"
           - os: ubuntu-22.04
-            python-version: "python3.9"
+            python-version: "3.9"
 
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
-            python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
       - name: Setup
         run: |
           pip3 install toml pydantic pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
-        # echo "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
+          #echo "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
           python --version
 
       - name: Build and install HElib and example recipe
