@@ -6,6 +6,7 @@
 
 #include "data_record.h"
 
+#include <kafka/AdminClient.h>
 #include <kafka/KafkaConsumer.h>
 #include <kafka/KafkaProducer.h>
 
@@ -133,6 +134,12 @@ class KafkaConn : public DataConn {
     return std::regex_replace(s, std::regex(R"(\[0x0a\])"), "\n");
   }
 
+  bool isTopicCreated(kafka::clients::AdminClient& adminClient,
+                      const std::string& topic) {
+    auto setTopics = adminClient.listTopics().topics;
+    return setTopics.find(topic) != setTopics.end();
+  }
+
  public:
   KafkaConn(const KafkaConfig& config) : config_(config) { open(); }
   KafkaConn(const json& config) : KafkaConn(KafkaConfig(config)) {}
@@ -140,6 +147,17 @@ class KafkaConn : public DataConn {
 
   void open() override {
     if (config_.mode() == "read") {
+      auto kafka_topic = config_.topic();
+      std::cout << "Subscribing to kafka topic: " << kafka_topic << std::endl;
+
+      kafka::Properties admin_props({
+          {"bootstrap.servers", config_.broker()},
+      });
+      kafka::clients::AdminClient adminClient(admin_props);
+      while (false == isTopicCreated(adminClient, kafka_topic)) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+      }
+
       kafka::Properties consumer_props(
           {{"bootstrap.servers", config_.broker()},
            {"enable.auto.commit", "true"},
@@ -250,7 +268,7 @@ class KafkaConn : public DataConn {
           }
         },
         // The memory block given by record.value() would be copied
-        kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
+        kProducer::SendOption::ToCopyRecordValue);
   }
 
   std::unique_ptr<DataRecord> createDataRecord(
