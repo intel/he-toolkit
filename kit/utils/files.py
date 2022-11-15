@@ -4,11 +4,13 @@
 """This module provides functions to list files and directories."""
 
 from os import walk
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 from enum import Enum
 from pathlib import Path
 from toml import load, dump
 from kit.utils.typing import PathType
+
+TomlDict = Dict[str, Any]
 
 
 class FileType(Enum):
@@ -49,7 +51,7 @@ def create_default_workspace(dir_path: str = "~") -> Path:
     return workspace_path
 
 
-def load_toml(file_name: PathType) -> Dict:
+def load_toml(file_name: PathType) -> TomlDict:
     """Load a toml file and return its content as a dict"""
     file_path = Path(file_name).expanduser()
 
@@ -63,7 +65,7 @@ def load_toml(file_name: PathType) -> Dict:
     return load(file_path)
 
 
-def dump_toml(file_name: PathType, content: Dict) -> None:
+def dump_toml(file_name: PathType, content: TomlDict) -> None:
     """Write a TOML file"""
     file_path = Path(file_name).expanduser()
 

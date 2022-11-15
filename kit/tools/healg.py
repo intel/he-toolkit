@@ -139,11 +139,11 @@ class PrimesFromFile:
 def parse_factor_line(line: str) -> Tuple[int, Tuple[int, ...]]:
     """'num: f1 f2 f3' -> (num, (f1, f2, f3))"""
     split_line = line.split()  # ['key:', 'v1', 'v2' , ...]
-    head = split_line[0]
+    head, *tail = split_line
     if head[-1] != ":":
         raise ValueError(f"{line} does not have valid key format")
-    key = int(head[:-1])
-    value = tuple(int(num) for num in split_line[1:])
+    key = int(head[:-1])  # exclude last char
+    value = tuple(map(int, tail))
     return key, value
 
 
