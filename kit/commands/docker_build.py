@@ -106,7 +106,7 @@ def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
 
 
 def create_tar_gz_file(
-    toolkit_tar_gz: PathType, archived_files: str, ROOT: str
+    toolkit_tar_gz: PathType, archived_files: PathType, ROOT: PathType
 ) -> None:
     """Archive several files in a tar.gz file"""
     toolkit_tar_gz = Path(toolkit_tar_gz)

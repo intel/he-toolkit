@@ -36,6 +36,8 @@ def gen_primes(args):
 
 def write_primes(start: int, stop: int, outfile=stdout) -> None:
     """Writes to outfile a list of primes from start to stop values inclusive"""
+    if start > stop:
+        raise ValueError(f"start '{start}' should not be larger than stop '{stop}'")
     numbers = range(start, stop + 1)
     prime_factors = compute_prime_factors(numbers)
     if prime_factors is None:
@@ -76,7 +78,7 @@ def str_to_range(s: str) -> range:
     try:
         fullmatch = regex.fullmatch(s)
         if fullmatch is None:
-            raise ArgumentTypeError(f"Wrong syntax for range given '{match}'.")
+            raise ArgumentTypeError(f"Wrong syntax for range given '{s}'.")
         match, start, end = fullmatch.groups()
         if match is None:
             raise ArgumentTypeError(f"Unknown error. Range with match '{match}'")
