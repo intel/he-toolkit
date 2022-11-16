@@ -130,7 +130,7 @@ class PrimesFromFile:
             self.max = self.primes[-1]
 
     def is_prime(self, n: int) -> bool:
-        """Return True if prime for numbers upto numbers in the file."""
+        """Return True if prime for numbers up to numbers in the file."""
         if n > self.max:
             raise ValueError(f"Cannot process number higher than {self.max}")
         return n in self.primes
