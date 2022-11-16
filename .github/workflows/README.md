@@ -1,6 +1,7 @@
 # CI Notes
 
-CI runs with Python 3.8
+CI runs with Python 3.8, 3.9 on Ubuntu 20.04
+CI runs with Python 3.10 on Ubuntu 22.04
 
 ## Compilers tested
 ### Ubuntu 20.04
