@@ -13,6 +13,17 @@ from tests.common_utils import (
 from kit.commands.install import install_components
 
 
+def test_debug_mode(tmp_path, hekit_path):
+
+    config_file = create_config_file(tmp_path)
+    madeup_filename = "MadeUpFileName"
+    cmd = f"{hekit_path} --config {config_file} --debug install {madeup_filename}"
+    act_result = execute_process(cmd)
+    assert not act_result.stdout
+    assert f"FileNotFoundError: File '{madeup_filename}' not found" in act_result.stderr
+    assert 0 != act_result.returncode
+
+
 def test_main_config_is_symlink(hekit_path, input_files_path):
     """Verify that the SW triggers an exception when
     the config file is a symlink"""
@@ -123,6 +134,7 @@ def test_main_toml_missing_quotes(tmp_path, hekit_path, input_files_path):
 class MockArgs:
     def __init__(self):
         self.version = False
+        self.debug = False
         self.component = "hexl"
         self.instance = "1.2.3"
         self.fn = install_components

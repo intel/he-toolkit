@@ -32,7 +32,10 @@ def test_gen_primes_start_greater_than_stop(hekit_path):
     cmd = f"{hekit_path} gen-primes 100 10"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
-    assert "TypeError(\"'NoneType' object is not iterable\")" in act_result.stderr
+    assert (
+        "ValueError(\"start '100' should not be larger than stop '10'\")"
+        in act_result.stderr
+    )
     assert 0 != act_result.returncode
 
 
@@ -146,7 +149,7 @@ def test_healg_negative_arg_p(hekit_path):
 def test_healg_max_arg_p(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     p is equal to sys.maxsize"""
-    cmd = cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
+    cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
     act_result = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -p: invalid parse_range_for_primes value"
@@ -190,7 +193,7 @@ def test_healg_negative_arg_d(hekit_path):
 def test_healg_max_arg_d(hekit_path):
     """Verify that gen-primes cmd is excuted correctly when
     d is equal to sys.maxsize"""
-    cmd = cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
+    cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
     act_result = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -d: invalid parse_range_for_primes value"

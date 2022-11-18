@@ -11,7 +11,10 @@ from importlib import import_module
 from importlib.util import spec_from_file_location, module_from_spec
 from kit.utils.constants import Constants, PluginsConfig, PluginState
 from kit.utils.typing import PathType
-from kit.utils.files import files_in_dir, load_toml
+from kit.utils.files import files_in_dir, load_toml, dash_to_underscore
+
+
+ParserDict = Dict[str, ArgumentParser]
 
 
 def register_subparser(subparsers) -> None:
@@ -44,7 +47,8 @@ def get_subparsers_plugins(
     """Import plugins in module_dirs, and discover and
     return a generator of set_.*_subparser functions"""
     for plugin_name, start_file in plugin_config.items():
-        expected_file = f"{plugin_root}/{plugin_name}/{start_file}"
+        plugin_dirname = dash_to_underscore(plugin_name)
+        expected_file = f"{plugin_root}/{plugin_dirname}/{start_file}"
         if not Path(expected_file).exists():
             continue
         imported_module = import_from_source_file(f"{start_file[:-3]}", expected_file)
@@ -63,7 +67,8 @@ def get_plugin_arg_choices(
     """Return the choices (list of plugin names) of the argument parser"""
     try:
         # Read the TOML file to identify plugin's name and start
-        toml_file = f"{plugin_root}/{plugin_name}/plugin.toml"
+        plugin_dirname = dash_to_underscore(plugin_name)
+        toml_file = f"{plugin_root}/{plugin_dirname}/plugin.toml"
         plugin_config = load_toml(toml_file)["plugin"]
         plugin_start = {plugin_config["name"]: plugin_config["start"]}
 
@@ -118,3 +123,8 @@ def validate_input(input_value: str) -> str:
         raise ValueError("Input is not valid due to non-printable characters")
 
     return input_value
+
+
+def get_options_description(parser_choices: ParserDict, width: int) -> str:
+    """Return the name and usage of each sub-command"""
+    return "\n".join(f"{k:{width}} {v.description}" for k, v in parser_choices.items())

@@ -72,18 +72,31 @@ repos:
           pass_filenames: false
           files: docker/which-files.txt
           args: [docker/which-files.txt]
-        - id: mypy
-          name: mypy
-          entry: .github/scripts/run-mypy.sh
-          language: script
-          pass_filenames: false
-        - id: pylint
-          name: pylint
-          entry: .github/scripts/run-pylint.sh
-          language: script
-          pass_filenames: false
         - id: bandit
           name: bandit
           entry: .github/scripts/run-bandit.sh
           language: script
           pass_filenames: false
+        - id: mypy-deployments
+          name: mypy-deployments
+          entry: .github/scripts/run-mypy.sh
+          language: script
+          pass_filenames: false
+          args:
+            - deployments
+        - id: mypy-kit
+          name: mypy-kit
+          entry: .github/scripts/run-mypy.sh
+          language: script
+          pass_filenames: false
+          args:
+            - -p
+            - kit
+        - id: pylint
+          name: pylint
+          entry: .github/scripts/run-pylint.sh
+          language: script
+          pass_filenames: false
+          args:
+            - kit
+            - deployments

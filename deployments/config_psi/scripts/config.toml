@@ -1,0 +1,15 @@
+[params]
+p = 257
+m = 80
+
+[config]
+columns = 3
+segments = 1
+
+[columns.encoding]
+column1 = "alphanumeric"
+column2 = "alphabetical"
+column3 = "numeric"
+
+[columns.composite]
+column2 = 2

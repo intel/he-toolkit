@@ -3,6 +3,7 @@
 
 """This module handles the usage of third party plugins"""
 
+from argparse import RawTextHelpFormatter
 from enum import Enum
 from shutil import rmtree, copytree
 from tarfile import is_tarfile, open as tar_open
@@ -11,8 +12,12 @@ from zipfile import is_zipfile, ZipFile
 from pathlib import Path
 from toml import loads as toml_loads
 from kit.utils.constants import Constants, PluginsConfig, PluginState
-from kit.utils.files import list_dirs, load_toml, dump_toml
-from kit.utils.subparsers import get_plugin_arg_choices, validate_input
+from kit.utils.subparsers import (
+    get_options_description,
+    get_plugin_arg_choices,
+    validate_input,
+)
+from kit.utils.files import list_dirs, load_toml, dump_toml, dash_to_underscore
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 PluginSettings = Dict[str, str]
@@ -156,7 +161,7 @@ def move_plugin_data(
 ) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
     if PluginType.DIR == plugin_type:
-        copytree(plugin_path, dest_path / plugin_name)
+        copytree(plugin_path, dest_path / dash_to_underscore(plugin_name))
     elif PluginType.TAR == plugin_type:
         with tar_open(plugin_path) as f:
             tar_items = [item for item in f.getmembers() if plugin_name in item.name]
@@ -171,7 +176,7 @@ def remove_plugin_data(
     plugin_name: str, dest_path: Path = PluginsConfig.ROOT_DIR
 ) -> None:
     """Remove a plugin folder if it exists"""
-    plugin_path = dest_path / plugin_name
+    plugin_path = dest_path / dash_to_underscore(plugin_name)
     if Path(plugin_path).exists():
         rmtree(plugin_path)
 
@@ -383,19 +388,23 @@ def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
 def set_plugin_subparser(subparsers) -> None:
     """Create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
-        "plugins", description="handle third party plugins"
+        "plugins",
+        description="handle third party plugins",
+        formatter_class=RawTextHelpFormatter,
     )
-    subparsers_plugin = parser_plugin.add_subparsers(help="sub-command help")
+    subparsers_plugin = parser_plugin.add_subparsers(metavar="sub-command")
 
     # list options
+    state_choices = ["all", PluginState.ENABLE, PluginState.DISABLE]
     parser_list = subparsers_plugin.add_parser(
         "list", description="print the list of all plugins"
     )
     parser_list.add_argument(
         "--state",
         default="all",
-        choices=["all", PluginState.ENABLE, PluginState.DISABLE],
-        help="filter the plugins by their state",
+        choices=state_choices,
+        help=f"filter the plugins by their state. Options are: {', '.join(state_choices)}",
+        metavar="STATE",
     )
     parser_list.set_defaults(fn=list_plugins)
 
@@ -406,7 +415,7 @@ def set_plugin_subparser(subparsers) -> None:
     parser_install.add_argument(
         "plugin",
         type=validate_input,
-        help="File with the plugin",
+        help="file with the plugin",
     )
     parser_install.add_argument(
         "--force", action="store_true", help="forces the installation process"
@@ -457,3 +466,8 @@ def set_plugin_subparser(subparsers) -> None:
         description="synchronize the information regarding the plugins on the system",
     )
     parser_list.set_defaults(fn=refresh_plugins, root_dir=PluginsConfig.ROOT_DIR)
+
+    # Get the name and description for each sub-command
+    subparsers_plugin.help = get_options_description(
+        subparsers_plugin.choices, width=10
+    )
