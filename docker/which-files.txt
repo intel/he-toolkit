@@ -190,6 +190,8 @@ tools/encoder/coder.h
 tools/encoder/nibnaf.h
 tools/encoder/sparse_poly.h
 tools/encoder/tests/test_nibnaf.cpp
+tools/encoder/tests/test_nibnaf_balanced_addition.cpp
 tools/encoder/tests/test_nibnaf_frac.cpp
+tools/encoder/tests/test_nibnaf_frac_addition.cpp
 tools/encoder/tests/test_nibnaf_multi.cpp
 tools/encoder/tests/test_sparse_poly.cpp
