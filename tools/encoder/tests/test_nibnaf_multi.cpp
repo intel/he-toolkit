@@ -31,6 +31,8 @@ TEST_P(NIBNAFMultiNum, testCompareOriginalToDecodedEncoded) {
   NIBNAFCoder coder;
   const auto& original = GetParam();
   const auto& encoded = coder.encode(original);
+  const auto& is = encoded.i();
+  for (int i = 0; i < original.size(); ++i) std::cout << is[i] << std::endl;
   const auto decoded = coder.decode(encoded);
 
   for (int i = 0; i < original.size(); ++i)

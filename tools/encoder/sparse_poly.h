@@ -17,6 +17,7 @@ class SparsePoly {
   long degree() const { return coeffs_.empty() ? 0L : coeffs_.rbegin()->first; }
   long operator[](long i) const { return coeff(i); }
   long& operator[](long i) { return coeffs_[i]; }
+
   SparsePoly operator+(const SparsePoly& other) const {
     auto res = other;
     for (const auto& [index, value] : coeffs_) {
@@ -24,6 +25,15 @@ class SparsePoly {
     }
     return res;
   }
+
+  SparsePoly shift(const SparsePoly& po, long i) {
+    SparsePoly tem = {};
+    for (const auto& [index, value] : coeffs_) {
+      tem[index + i] = value;
+    }
+    return tem;
+  }
+
   auto begin() noexcept { return coeffs_.begin(); }
   const auto begin() const noexcept { return coeffs_.begin(); }
   auto end() noexcept { return coeffs_.end(); }

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 namespace hekit::coder {
@@ -13,10 +14,13 @@ class EncPolyBase {
   EncPolyBase() = delete;
   EncPolyBase(const Poly& poly, const std::vector<long>& is)
       : poly_(poly), is_(is) {}
-  Poly& poly() { return poly_; }
-  const Poly& poly() const { return poly_; }
+  virtual Poly& poly() { return poly_; }
+  virtual const Poly& poly() const { return poly_; }
   auto& i() { return is_; }
   const auto& i() const { return is_; }
+  virtual EncPolyBase<Poly> operator+(const EncPolyBase<Poly>& rhs) const {
+    throw std::logic_error("EncPolyBase addition not implemented");
+  }
 
  private:
   Poly poly_;
@@ -24,12 +28,45 @@ class EncPolyBase {
 };
 
 template <typename Poly>
+class EncPolyBalanced : public EncPolyBase<Poly> {
+ public:
+  EncPolyBalanced() = delete;
+  EncPolyBalanced(const Poly& poly, const std::vector<long>& is)
+      : EncPolyBase<Poly>{poly, is} {}
+
+  EncPolyBase<Poly> operator+(const EncPolyBase<Poly>& rhs) const override {
+    EncPolyBalanced<Poly> tem(rhs.poly(), rhs.i());
+    auto& lhs = *this;
+    long in = std::abs(lhs.i()[0] - rhs.i()[0]);
+    if (lhs.i()[0] < rhs.i()[0])
+      tem.poly() = lhs.poly() + shift(rhs.poly(), in);
+    else
+      tem.poly() = shift(lhs.poly(), in) + rhs.poly;
+
+    tem.i().push_back(std::max(lhs.i()[0], rhs.i()[0]));
+    return EncPolyBalanced<Poly>{tem};
+  }
+};
+
+template <typename Poly>
+class EncPolyMultiBalanced : public EncPolyBase<Poly> {
+ public:
+  EncPolyMultiBalanced() = delete;
+  EncPolyMultiBalanced(const std::vector<Poly>& polys,
+                       const std::vector<long>& is)
+      : EncPolyBase<Poly>{polys, is} {}
+};
+
+template <typename Poly>
 class EncPolyFrac : public EncPolyBase<Poly> {
  public:
   EncPolyFrac() = delete;
   EncPolyFrac(const Poly& poly) : EncPolyBase<Poly>{poly, {}} {}
-  Poly& poly() { return poly; }
-  const Poly& poly() const { return poly; }
+
+  EncPolyBase<Poly> operator+(const EncPolyBase<Poly>& rhs) const override {
+    auto& lhs = *this;
+    return EncPolyFrac<Poly>{lhs.poly() + rhs.poly()};
+  }
 };
 
 template <typename Poly, typename Nums>

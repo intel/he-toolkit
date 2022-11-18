@@ -34,11 +34,12 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double>,
   EncPolyBase<poly::SparsePoly> encode(const double& num) const override {
     const auto [a, frac_exp] = EncodeHelper(num);
     if (frac_degree_ == 0L)
-      return EncPolyBase{laurentEncode(a, frac_exp), {frac_exp}};
+      return EncPolyBalanced{laurentEncode(a, frac_exp), {frac_exp}};
     else
       return EncPolyFrac{laurentFracEncode(a)};
   }
 
+  //*************
   // EncPolyFrac<poly::SparsePoly> encode(const double& num) const override {
   //   const auto [a, frac_exp] = EncodeHelper(num);
   //   return EncPolyFrac{laurentFracEncode(a)};
@@ -60,14 +61,14 @@ class NIBNAFCoder : public Coder<poly::SparsePoly, double>,
     const auto& poly = en.poly();
     if (frac_degree_ > 0) {
       // frac_degree_ power of 2
-      auto laurentFracEncode = [this, midpoint = frac_degree_ / 2](
+      auto laurentFracDecode = [this, midpoint = frac_degree_ / 2](
                                    double init, const auto& pair) {
         if (pair.first > midpoint)
           return init - pair.second * std::pow(this->rw_,
                                                pair.first - this->frac_degree_);
         return init + pair.second * std::pow(this->rw_, pair.first);
       };
-      return std::accumulate(poly.begin(), poly.end(), 0.0, laurentFracEncode);
+      return std::accumulate(poly.begin(), poly.end(), 0.0, laurentFracDecode);
     }
 
     auto laurentDecode = [this, i = en.i().front()](double init,
