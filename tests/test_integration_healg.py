@@ -32,7 +32,10 @@ def test_gen_primes_start_greater_than_stop(hekit_path):
     cmd = f"{hekit_path} gen-primes 100 10"
     act_result = execute_process(cmd)
     assert "Error while running subcommand" in act_result.stderr
-    assert "TypeError(\"'NoneType' object is not iterable\")" in act_result.stderr
+    assert (
+        "ValueError(\"start '100' should not be larger than stop '10'\")"
+        in act_result.stderr
+    )
     assert 0 != act_result.returncode
 
 
