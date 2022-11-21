@@ -174,6 +174,7 @@ recipes/config-psi.toml
 recipes/default.toml
 recipes/examples.toml
 recipes/kafka-config-psi.toml
+recipes/pilot-config-psi.toml
 recipes/sample-kernels.toml
 recipes/test.toml
 requirements.txt
