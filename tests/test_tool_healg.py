@@ -6,7 +6,9 @@ import os.path
 from sys import maxsize
 from argparse import ArgumentTypeError
 
-from kit.tools.healg import *
+from kit.tools.algebras import *
+from kit.tools.gen_primes import *
+from kit.utils.primes import *
 
 
 def test_powerset():

@@ -1,13 +1,15 @@
 # HE Tools
 
-The File `healg.py` contains useful commands to finds HE parameters based on user constraints. Next sections describe the details about them.
+The tools commands for `hekit` contain useful commands to finds HE parameters
+based on user constraints. Next sections describe the details about them.
 
 ## Dependencies
 - python >= 3.8
 
 ## gen-primes
 
-The command `hekit gen-primes` generates a list of sorted primes in range [n, m] where n and m are positive integers
+The command `hekit gen-primes` generates a list of sorted primes in range [n,
+m] where n and m are positive integers
 
 ### Options
 
@@ -26,9 +28,9 @@ To run the tool, simply provide start and stop arguments.  For example:
 hekit gen-primes 1 100
 ```
 
-## healg
+## algebras
 
-The command `hekit healg` given the plaintext prime `p` and the required number of
+The command `hekit algebras` given the plaintext prime `p` and the required number of
 p-boxes `d` returns the available algebras.
 
 ### Options

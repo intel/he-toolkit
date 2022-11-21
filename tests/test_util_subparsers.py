@@ -93,7 +93,7 @@ def test_get_subparsers_kit_tools_some(mocker, get_toolkit_path):
     and returns the functions that define the arguments"""
     exp_func = {"set_gen_algebras_subparser", "set_gen_primes_subparser"}
     mocker_files_in_dir = mocker.patch("kit.utils.subparsers.files_in_dir")
-    mocker_files_in_dir.return_value = ["healg.py"]
+    mocker_files_in_dir.return_value = ["algebras.py"]
 
     act_funcs = get_subparsers_kit(["tools"], get_toolkit_path / "kit")
     for func in act_funcs:
