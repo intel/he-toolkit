@@ -33,7 +33,7 @@ p-boxes `d` returns the available algebras.
 
 ### Options
 
-The `healg` command can be executed with the following options.
+The `algebras` command can be executed with the following options.
 
 | Option | Meaning |
 | --- | --- |

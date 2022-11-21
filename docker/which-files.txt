@@ -153,7 +153,8 @@ kit/commands/remove.py
 kit/hekit.py
 kit/tools/README.md
 kit/tools/__init__.py
-kit/tools/healg.py
+kit/tools/algebras.py
+kit/tools/gen_primes.py
 kit/utils/__init__.py
 kit/utils/archive.py
 kit/utils/component_builder.py
@@ -161,6 +162,7 @@ kit/utils/config.py
 kit/utils/constants.py
 kit/utils/docker_tools.py
 kit/utils/files.py
+kit/utils/primes.py
 kit/utils/spec.py
 kit/utils/subparsers.py
 kit/utils/tab_completion.py
