@@ -7,16 +7,17 @@ This guide demonstrates how to use HE-Toolkit project to plan and track survey q
 ### Step 1: 
 Install the system dependencies for the toolkit: python >= 3.8, pip, git are met. 
 
+pre-commit tools for development, file can install dependencies with:
+```bash
+pip install -r <requirements-file>
+```
+
 ### Step 2: Initialize hekit command using 
 ```bash
 git clone https://github.com/intel/he-toolkit.git
 cd he-toolkit
 ./hekit init --default-config
 ```
-pre-commit tools for development, file can install dependencies with:
-```bash
-pip install -r <requirements-file>
-``` 
 ### Running the docker build
 
 ### Step 1: 
@@ -29,6 +30,19 @@ hekit docker-build
  Allows users to interact with HE Toolkit via the VS Code IDE using following command
  ```bash
 hekit docker-build --enable vscode
+```
+### How to create a custom recipe file and use it with hekit
+
+Command for creating recipe file
+```bash
+hekit install recipes/default.toml
+```
+```bash
+hekit build recipes/sample-kernels.toml
+```
+and
+```bash
+hekit build recipes/examples.toml
 ```
 ### Run one of the examples
 
@@ -44,25 +58,12 @@ The command `new` can be used to create a new project.
 ```bash
 hekit new example
 ```
-### How to create a custom recipe file and use it with hekit
-
-Command for creating recipe file
-```bash
-hekit install recipes/default.toml
-```
-```bash
-hekit build recipes/sample-kernels.toml
-```
-and
-```bash
-hekit build recipes/examples.toml
-```
 
 ### How to create plugins and subcommands for hekit
 
 ## Plugins sub-commands
 ```bash
-hekit piluginlist
+hekit pilugins list
 ```
 | Sub-command | Description                       | Usage     |
 |-------------|-----------------------------------|-----------|
