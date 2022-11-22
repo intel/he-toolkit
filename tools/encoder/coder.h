@@ -35,16 +35,15 @@ class EncPolyBalanced : public EncPolyBase<Poly> {
       : EncPolyBase<Poly>{poly, is} {}
 
   EncPolyBase<Poly> operator+(const EncPolyBase<Poly>& rhs) const override {
-    EncPolyBalanced<Poly> tem(rhs.poly(), rhs.i());
-    auto& lhs = *this;
-    long in = std::abs(lhs.i()[0] - rhs.i()[0]);
-    if (lhs.i()[0] < rhs.i()[0])
-      tem.poly() = lhs.poly() + shift(rhs.poly(), in);
-    else
-      tem.poly() = shift(lhs.poly(), in) + rhs.poly;
+    const auto& lhs = *this;
+    EncPolyBalanced<Poly> tmp(rhs.poly(), rhs.i());
+    long in = std::abs(lhs.i().front() - rhs.i().front());
+    tmp.poly() = (lhs.i().front() < rhs.i().front())
+                     ? lhs.poly() + shift(rhs.poly(), in)
+                     : shift(lhs.poly(), in) + rhs.poly();
 
-    tem.i().push_back(std::max(lhs.i()[0], rhs.i()[0]));
-    return EncPolyBalanced<Poly>{tem};
+    tmp.i().push_back(std::max(lhs.i().front(), rhs.i().front()));
+    return tmp;
   }
 };
 

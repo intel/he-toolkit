@@ -26,14 +26,6 @@ class SparsePoly {
     return res;
   }
 
-  SparsePoly shift(const SparsePoly& po, long i) {
-    SparsePoly tem = {};
-    for (const auto& [index, value] : coeffs_) {
-      tem[index + i] = value;
-    }
-    return tem;
-  }
-
   auto begin() noexcept { return coeffs_.begin(); }
   const auto begin() const noexcept { return coeffs_.begin(); }
   auto end() noexcept { return coeffs_.end(); }
@@ -54,5 +46,14 @@ class SparsePoly {
   // indices and coeff
   std::map<long, long> coeffs_;
 };
+
+inline SparsePoly shift(const SparsePoly& poly, long i) {
+  SparsePoly tem{};
+  for (const auto& [index, value] : poly) {
+    tem[index + i] = value;
+  }
+  return tem;
+}
+
 using SparseMultiPoly = std::vector<SparsePoly>;
 }  // namespace hekit::poly
