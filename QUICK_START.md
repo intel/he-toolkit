@@ -2,8 +2,8 @@
 
 This guide are for those who wish to get set up quickly with Intel HE Toolit.
 
-In this guide, you will create a HE project, create custom build recipes, and
-augment the toolit via plugins.
+In this guide, you will create an HE project, create custom build recipes, and
+augment the toolkit via plugins.
 
 ### HE toolkit installation
 
@@ -34,7 +34,7 @@ set. Make sure to configure required proxy environment variables.
 hekit docker-build
 ```
 ### Step 2 (alternative): Using VS Code Server
- Allows users to interact with HE Toolkit via the VS Code IDE using following command
+Allows users to interact with HE Toolkit via the VS Code IDE using following command
  ```bash
 hekit docker-build --enable vscode
 ```
@@ -53,8 +53,8 @@ hekit build recipes/examples.toml
 ```
 ### Run one of the examples
 
-### Step 1: Running on example
-User can run many example commands by typing the command. For instance,
+### Step 1: Running an example
+Example programs can be run using the appropriate command. For instance,
 run_lr_example : will run the Logistic Regression example program.
 run_query_example: This will run a Secure Query example allowing users to query
 on a database of the 50 U.S. States.
