@@ -1,6 +1,6 @@
 # Intel Homomorphic Encryption Toolkit
 
-[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg)](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml)
+[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg?branch=main)](https://github.com/intel/he-toolkit)
 
 Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
 delivering innovation around HE with the aim of providing both the community
@@ -242,6 +242,12 @@ examples listed above. For more on the usage of the `hekit new` command see
   the PALISADE sample kernels to fail when building the HEXL library with
   PALISADE. This error seems independent of the HE Toolkit and is currently
   being investigated.
+
+* HE Toolkit `SEAL` examples currently do not work with `clang-12`
+  on `ubuntu 20.04` and is under investigation.
+
+* HE Toolkit `SEAL` examples currently do not work with `clang-12` and `clang-13`
+  on `ubuntu 22.04` and is under investigation.
 
 # Third Party Plugins
 Intel HE Toolkit provides the utilities to handle third party plugins that can

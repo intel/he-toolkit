@@ -13,6 +13,8 @@ from kit.utils.typing import PathType
 
 # Number of separation spaces for columns
 _SEP_SPACES = 2
+_HEADER_COL_1 = "COMPONENT"
+_HEADER_COL_2 = "INSTANCE"
 
 
 class RepoProperties:
@@ -24,10 +26,11 @@ class RepoProperties:
         self._repo_structure = RepoProperties._repo_struct(repo_location)
 
         # Get the width of the widest component
-        self.width_comp = self.max_len(self._repo_structure.keys())
+        all_components = [*self._repo_structure.keys(), _HEADER_COL_1]
+        self.width_comp = self.max_len(all_components)
 
         # Get the width of the widest instance
-        all_instances = self._repo_structure.values()
+        all_instances = [*self._repo_structure.values(), [_HEADER_COL_2]]
         self.width_inst = self.max_len(chain.from_iterable(all_instances))
 
         # Include column separation
@@ -67,7 +70,7 @@ def list_components(args):
 
     # Header
     print(
-        f"{'COMPONENT':{width_comp}} {'INSTANCE':{width_inst}} {'FETCH':{width_status}} {'BUILD':{width_status}} {'INSTALL':{width_status}}"
+        f"{_HEADER_COL_1:{width_comp}} {_HEADER_COL_2:{width_inst}} {'FETCH':{width_status}} {'BUILD':{width_status}} {'INSTALL':{width_status}}"
     )
 
     for comp_name, inst_list in repo_properties.structure.items():

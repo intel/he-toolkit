@@ -9,7 +9,7 @@ from kit.commands.init import init_hekit, create_default_workspace
 
 
 def test_init_hekit_create_config_file(mocker, tmp_path):
-    mockers = Mockers(mocker, tmp_path, True)
+    mockers = Mockers(mocker, tmp_path, default_config_flag=True)
     mockers.create_tmp_config_file()
     # Create a new config file
     main()
@@ -23,8 +23,22 @@ def test_init_hekit_create_config_file(mocker, tmp_path):
     mockers.mock_print.assert_any_call(f"source {mockers.filepath}")
 
 
+def test_init_hekit_rcfile_unmodified(mocker, tmp_path):
+    mockers = Mockers(mocker, tmp_path, default_config_flag=True)
+    mockers.mock_input.return_value = "n"
+    mockers.create_tmp_config_file()
+    # Create a new config file
+    main()
+    mockers.mock_print.assert_any_call(
+        "Please execute the following actions manually:\n"
+        f"1. Open the file {tmp_path}/.mybashfile\n"
+        "2. Add the lines shown in the previous message"
+        f"\n3. Source your shell config file with: source {tmp_path}/.mybashfile"
+    )
+
+
 def test_init_hekit_rcfile_FileNotFoundError(mocker, tmp_path):
-    mockers = Mockers(mocker, tmp_path, False)
+    mockers = Mockers(mocker, tmp_path, default_config_flag=False)
     with pytest.raises(SystemExit) as exc_info:
         main()
     mockers.mock_hekit_print.assert_called_with(
@@ -51,6 +65,7 @@ class Mockers:
         self.mock_get_rc_file.return_value = self.filepath
         self.mock_print = mocker.patch("kit.commands.init.print")
         self.mock_hekit_print = mocker.patch("kit.hekit.print")
+        self.mock_input = mocker.patch("kit.commands.init.input", return_value="y")
 
     def create_tmp_config_file(self):
         with self.filepath.open("w") as f:

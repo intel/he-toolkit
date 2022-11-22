@@ -1,0 +1,18 @@
+[columnA]
+datatype = "alphabetic"
+char_size = 4
+
+
+[columnB]
+datatype = "numeric"
+char_size = 5
+
+
+[columnC]
+datatype = "alphanumeric"
+char_size = 6
+
+
+[columnD]
+datatype = ['AB', 'CD', 'EF', 'GH', 'IJ', 'KL', 'MN', 'OP']
+char_size = 1
