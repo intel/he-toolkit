@@ -1,6 +1,9 @@
-## Quick Start Guide for Users
+## Quick Start Guide
 
-This guide demonstrates how to use HE-Toolkit project to plan and track survey questions. In this guide, you will create a HE-Toolkit project and add a custom recipes and plugins to track priorities for your tasks.
+This guide are for those who wish to get set up quickly with Intel HE Toolit.
+
+In this guide, you will create a HE project, create custom build recipes, and
+augment the toolit via plugins.
 
 ### HE toolkit installation
 
@@ -21,7 +24,11 @@ cd he-toolkit
 ### Running the docker build
 
 ### Step 1:
-Common errors: First error is `Permission denied`. To mitigate the error, ensure all users are added to the ‘docker’ user group. Other issue includes system config error. Make sure ubuntu system time must be correct for the physical location of the system. There are multiple proxy files that must be set. Make sure to configure required proxy environment variables.
+Common errors: First error is `Permission denied`. To mitigate the error,
+ensure all users are added to the ‘docker’ user group. Other issue includes
+system config error. Make sure ubuntu system time must be correct for the
+physical location of the system. There are multiple proxy files that must be
+set. Make sure to configure required proxy environment variables.
 ### Step 2: Install hekit docker build command below
 ```bash
 hekit docker-build
@@ -49,9 +56,12 @@ hekit build recipes/examples.toml
 ### Step 1: Running on example
 User can run many example commands by typing the command. For instance,
 run_lr_example : will run the Logistic Regression example program.
-run_query_example: This will run a Secure Query example allowing users to query on a database of the 50 U.S. States.
-run_sample_kernels_palisade: This will run several HE sample kernels in PALISADE including Matrix Multiplication and Logistic Regression
-run_psi_example: users to perform a set intersection between a user-defined "client set" and a "server set.
+run_query_example: This will run a Secure Query example allowing users to query
+on a database of the 50 U.S. States.
+run_sample_kernels_palisade: This will run several HE sample kernels in
+PALISADE including Matrix Multiplication and Logistic Regression
+run_psi_example: users to perform a set intersection between a user-defined
+"client set" and a "server set.
 
 ### Create a new project with hekit
 The command `new` can be used to create a new project.
@@ -63,7 +73,7 @@ hekit new example
 
 ## Plugins sub-commands
 ```bash
-hekit pilugins list
+hekit plugins list
 ```
 | Sub-command | Description                       | Usage     |
 |-------------|-----------------------------------|-----------|
@@ -75,18 +85,22 @@ hekit pilugins list
 | refresh     | Synchronize the information of the installed plugins. | hekit plugins refresh
 
 ### Creating a new plugin
-The simplest version of a plugin must include a main directory that contains a TOML file and at least one python file as shown in the following example
+The simplest version of a plugin must include a main directory that contains a
+TOML file and at least one python file as shown in the following example
 
 my-plugin
     |- __init__.py
     |- new-plugin.py
     |- plugin.toml
-Note that it is recommended to have an __init__.py file as the plugins are treated as python packages.
+Note that it is recommended to have an __init__.py file as the plugins are
+treated as python packages.
 
-For delivering a plugin in zip or tarball format, a common file packaging utility must be applied to the previous structure.
+For delivering a plugin in zip or tarball format, a common file packaging
+utility must be applied to the previous structure.
 
 ### TOML file
-The TOML file must be named plugin.toml. It defines the settings of the plugin such as name, version and entry point, as shown in the following example:
+The TOML file must be named plugin.toml. It defines the settings of the plugin
+such as name, version and entry point, as shown in the following example:
 
 [plugin]
 name = "my-plugin"
@@ -94,4 +108,6 @@ version = "1.1.0"
 start = "new-plugin.py"
 
 ### Main directory
-The plugin root directory must have the same name as the plugin, thus it must be the same as the name value defined in the TOML file. This name must be a unique label that will be used to identify the plugin in the system.
+The plugin root directory must have the same name as the plugin, thus it must
+be the same as the name value defined in the TOML file. This name must be a
+unique label that will be used to identify the plugin in the system.
