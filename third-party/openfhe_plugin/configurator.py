@@ -1,3 +1,7 @@
+import os
+import shutil
+
+
 class Configurator:
     OPENFHE_DEVELOPMENT_BRANCH = "v0.9.2"
     OPENFHE_HEXL_BRANCH = "main"
@@ -6,20 +10,33 @@ class Configurator:
     OPENFHE_REPO = "openfhe-development"
     OPENFHE_HEXL = ""
 
-    ROOT = ""
+    ROOT = os.getcwd()
 
     @classmethod
     def configure(args) -> None:
-        if args.exists in "Yy":
-            # remove ./openfhe-staging
-            print("previous staging directory deleted.")
-        elif args.exists in "Nn":
-            print("Unwilling to proceed - aborting.")
-            exit(1)
-        if (args.of_build) in "Yy":
-            OPENFHE_REPO = "openfhe-release"
-        if args.hexl_build in "Yy":
-            OPENFHE_HEXL = "openfhe-hexl"
+        # if args.del:
+        #     # remove ./openfhe-staging
+        #     try:
+        #         shutil.rmtree("./openfhe-staging")
+        #     except OSError as e:
+        #         print("Error: %s - %s." % (e.filename, e.strerror))
+        #     print("previous staging directory deleted.")
+        # else:
+        #     print("Unwilling to proceed - aborting.")
+        #     exit(1)
+        # if (args.ofhe_build):
+        #     OPENFHE_REPO = "openfhe-release"
+        # if args.hexl:
+        #     OPENFHE_HEXL = "openfhe-hexl"
+
+        if not OPENFHE_HEXL:
+            if OPENFHE_REPO == OPENFHE_DEVELOPMENT_REPO:
+                # run a different method - stage-openfhe-development-hexl.sh
+                print("running stage-openfhe-development.sh")
+            else:
+                print("Unsupported build type.")
+        else:
+            print("running stage-openfhe-development-hexl.sh")
 
     @classmethod
     def abort():
