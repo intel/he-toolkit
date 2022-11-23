@@ -1,11 +1,11 @@
-## Quick Start Guide
+# Quick Start Guide
 
 This guide are for those who wish to get set up quickly with Intel HE Toolit.
 
 In this guide, you will create an HE project, create custom build recipes, and
 augment the toolkit via plugins.
 
-### HE toolkit installation
+## HE toolkit installation
 
 ### Step 1:
 Install the system dependencies for the toolkit: python >= 3.8, pip, git are met.
@@ -21,7 +21,7 @@ git clone https://github.com/intel/he-toolkit.git
 cd he-toolkit
 ./hekit init --default-config
 ```
-### Running the docker build
+## Running the docker build
 
 ### Step 1:
 Common errors: First error is `Permission denied`. To mitigate the error,
@@ -38,7 +38,7 @@ Allows users to interact with HE Toolkit via the VS Code IDE using following com
  ```bash
 hekit docker-build --enable vscode
 ```
-### How to create a custom recipe file and use it with hekit
+## Create a custom recipe file and use it
 
 Command for creating recipe file
 ```bash
@@ -51,7 +51,7 @@ and
 ```bash
 hekit build recipes/examples.toml
 ```
-### Run one of the examples
+## Run an HE example program
 
 ### Step 1: Running an example
 Example programs can be run using the appropriate command. For instance,
@@ -63,15 +63,15 @@ PALISADE including Matrix Multiplication and Logistic Regression
 run_psi_example: users to perform a set intersection between a user-defined
 "client set" and a "server set.
 
-### Create a new project with hekit
+## Create a new project
 The command `new` can be used to create a new project.
 ```bash
 hekit new example
 ```
 
-### How to create plugins and subcommands for hekit
+## Augment `hekit` by creating plugins
 
-## Plugins sub-commands
+### Plugins sub-commands
 ```bash
 hekit plugins list
 ```
@@ -98,7 +98,7 @@ treated as python packages.
 For delivering a plugin in zip or tarball format, a common file packaging
 utility must be applied to the previous structure.
 
-### TOML file
+### The plugin TOML file
 The TOML file must be named plugin.toml. It defines the settings of the plugin
 such as name, version and entry point, as shown in the following example:
 
