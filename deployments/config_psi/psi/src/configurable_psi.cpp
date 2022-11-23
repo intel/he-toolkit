@@ -91,19 +91,28 @@ void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
 // Perform a database lookup given query data, HEQL query and database.
 template <typename QueryTxt, typename DbTxt>
 void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
-                    const helib::QueryType& query,
+                    const helib::QueryType& query, DataRecord& query_record,
                     const helib::Database<DbTxt>& database,
                     CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
             << "' ...";
-  // queryConn.read(pointer to query data?);
-  auto query_data = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath, pk);
+  std::string s(query_record.data(), query_record.size());
+  // TODO(JC) this may create unneccesary copies
+  auto query_data = readQueryFromStream<QueryTxt>(
+      make_stream_dispenser<std::stringstream>(s), pk);
+  HELIB_NTIMER_START(timer_readQueryFromFile);
+  // TODO(JC) Make dynamic
+  // auto query_data = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath,
+  // pk);
+  HELIB_NTIMER_STOP(timer_readQueryFromFile);
   std::cout << "Done.\n";
 
   // Perform query lookup
   std::cout << "Performing database lookup...";
+  HELIB_NTIMER_START(timer_lookup);
   auto match = database.contains(query, query_data);
+  HELIB_NTIMER_STOP(timer_lookup);
   std::cout << "Done.\n";
 
   if constexpr (std::is_same_v<QueryTxt, QueryCtxt> ||
@@ -114,14 +123,18 @@ void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
   }
 
   // Sum resultant mask(s) into single mask w.r.t. query
+  HELIB_NTIMER_START(timer_binSumRows);
   auto sum = binSumRows(match);
+  HELIB_NTIMER_STOP(timer_binSumRows);
 
   // Update cmdLineOpts so it knows the output filename
   update_opts_output(cmdLineOpts);
 
   // Write result to file
   std::cout << "Writing result to file '" << cmdLineOpts.outFilename << "' ...";
+  HELIB_NTIMER_START(timer_writeResultsToFile);
   writeResultsToFile(cmdLineOpts.outFilename, sum, cmdLineOpts.offset);
+  HELIB_NTIMER_STOP(timer_writeResultsToFile);
   std::cout << "Done.\n";
 }
 
@@ -185,7 +198,9 @@ int main(int argc, char* argv[]) {
   std::cout << "Loading config file...";
   // Pass in cmdLineOpts object and update
   try {
+    HELIB_NTIMER_START(timer_loadConfigFile);
     loadConfigFile(cmdLineOpts);
+    HELIB_NTIMER_STOP(timer_loadConfigFile);
   } catch (const std::exception& e) {
     std::cerr << "\nExit due to invalid JSON config:\n\t" << e.what()
               << std::endl;
@@ -196,8 +211,10 @@ int main(int argc, char* argv[]) {
   sharedContext contextp;
   uniqueKey<helib::PubKey> pkp;
   std::cout << "Loading HE Context and Public Key...";
+  HELIB_NTIMER_START(timer_loadContextAndKey);
   std::tie(contextp, pkp) =
       loadContextAndKey<helib::PubKey>(cmdLineOpts.pkFilePath);
+  HELIB_NTIMER_STOP(timer_loadContextAndKey);
   std::cout << "Done.\n";
 
   uniqueDB<Ptxt> ptxt_db_ptr;
@@ -205,6 +222,7 @@ int main(int argc, char* argv[]) {
   // Load DB once
   std::cout << "Reading database from file '" << cmdLineOpts.databaseFilePath
             << "' ...";
+  HELIB_NTIMER_START(timer_readDbFromFile);
   if (cmdLineOpts.ptxtDB) {  // Load ptxt DB
     ptxt_db_ptr = std::make_unique<helib::Database<Ptxt>>(
         readDbFromFile<Ptxt>(cmdLineOpts.databaseFilePath, contextp, *pkp));
@@ -213,6 +231,7 @@ int main(int argc, char* argv[]) {
         readDbFromFile<helib::Ctxt>(cmdLineOpts.databaseFilePath, contextp,
                                     *pkp));
   }
+  HELIB_NTIMER_STOP(timer_readDbFromFile);
   std::cout << "Done.\n";
 
   auto query_conn =
@@ -232,26 +251,28 @@ int main(int argc, char* argv[]) {
     // Assume data to disk
     update_opts_input(cmdLineOpts, *query_record_ptr);
     // Reading the heql
+    HELIB_NTIMER_START(timer_readHEQLFromFile);
     const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
+    HELIB_NTIMER_STOP(timer_readHEQLFromFile);
     std::cout << "Done.\n";
 
     // Process query
     if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
       std::cout << "Executing ptxt-to-ptxt comparison\n";
-      databaseLookup<QueryPtxt, DbPtxt>(contextp, *pkp, query, *ptxt_db_ptr,
-                                        cmdLineOpts);
+      databaseLookup<QueryPtxt, DbPtxt>(
+          contextp, *pkp, query, *query_record_ptr, *ptxt_db_ptr, cmdLineOpts);
     } else if (cmdLineOpts.ptxtQuery && !cmdLineOpts.ptxtDB) {
       std::cout << "Executing ptxt-to-ctxt comparison\n";
-      databaseLookup<QueryPtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
-                                        cmdLineOpts);
+      databaseLookup<QueryPtxt, DbCtxt>(
+          contextp, *pkp, query, *query_record_ptr, *ctxt_db_ptr, cmdLineOpts);
     } else if (!cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
       std::cout << "Executing ctxt-to-ptxt comparison\n";
-      databaseLookup<QueryCtxt, DbPtxt>(contextp, *pkp, query, *ptxt_db_ptr,
-                                        cmdLineOpts);
+      databaseLookup<QueryCtxt, DbPtxt>(
+          contextp, *pkp, query, *query_record_ptr, *ptxt_db_ptr, cmdLineOpts);
     } else {
       std::cout << "Executing ctxt-to-ctxt comparison\n";
-      databaseLookup<QueryCtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
-                                        cmdLineOpts);
+      databaseLookup<QueryCtxt, DbCtxt>(
+          contextp, *pkp, query, *query_record_ptr, *ctxt_db_ptr, cmdLineOpts);
     }
 
     // Create data connection for outfile
@@ -266,6 +287,15 @@ int main(int argc, char* argv[]) {
       out_conn->write(*out_record_ptr);
     }
   } while (!(g_signal_status || cmdLineOpts.singleRun));  // End REPL
+
+  helib::printNamedTimer(std::cout << std::endl, "timer_loadConfigFile");
+  helib::printNamedTimer(std::cout, "timer_loadContextAndKey");
+  helib::printNamedTimer(std::cout, "timer_readDbFromFile");
+  helib::printNamedTimer(std::cout, "timer_readHEQLFromFile");
+  helib::printNamedTimer(std::cout, "timer_readQueryFromFile");
+  helib::printNamedTimer(std::cout, "timer_lookup");
+  helib::printNamedTimer(std::cout, "timer_binSumRows");
+  helib::printNamedTimer(std::cout, "timer_writeResultsToFile");
 
   return g_signal_status;
 }

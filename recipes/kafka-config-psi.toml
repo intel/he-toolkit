@@ -27,8 +27,8 @@ install = "make install"
 
 
 [[helib]]
-version = "master"
-name = "psi-io"
+version = "streamio"
+name = "psi-io-streamio"
 root = "%name%"
 export_install_dir = "install"
 fetch = "git clone https://github.com/helibproject/HElib.git --branch %version%"
@@ -98,10 +98,11 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DKAFKA_DIR=$%librdkafka%/export_install_dir$
                -DJSON_DIR=$%json%/export_fetch$/single_include
                -DENABLE_TESTS=ON
+               -DCMAKE_BUILD_TYPE=Debug
                -DGTest_DIR=$%gtest%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 # Dependencies
-helib = "helib/psi-io"
+helib = "helib/psi-io-streamio"
 gtest = "gtest/v1.12.1"
 json = "json/nlohmann-json"
 kafka = "modern-cpp-kafka/v2022.10.12"

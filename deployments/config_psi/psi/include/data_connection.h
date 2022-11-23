@@ -240,9 +240,18 @@ class KafkaConn : public DataConn {
     std::ostringstream out_topic;
     out_topic << bank_id << "." << user_id << "." << job_id;
 
-    return std::make_unique<FileRecord>(
-        datafilepath, config_.mode(), Metadata{{"out-topic", out_topic.str()}},
-        metadata_filepath);
+    // return std::make_unique<FileRecord>(
+    // datafilepath, config_.mode(), Metadata{{"out-topic", out_topic.str()}},
+    // metadata_filepath);
+
+    // Create kakfa record and write data to record
+    auto kafka_record = std::make_unique<KafkaRecord>(
+        Metadata{{"out-topic", out_topic.str()},
+                 {"heql", fixNewline(find("HEQL", record))}});
+    kafka_record->write(
+        const_cast<char*>(reinterpret_cast<const char*>(record.value().data())),
+        record.value().size());
+    return kafka_record;
   }
 
   void write(DataRecord& data) const override {
