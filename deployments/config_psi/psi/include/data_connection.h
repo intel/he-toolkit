@@ -198,7 +198,7 @@ class KafkaConn : public DataConn {
   std::unique_ptr<DataRecord> read() const override {
     auto records = consumer_ptr_->poll(std::chrono::milliseconds(1000));
     if (records.size() == 0) {
-      std::cout << "No record found.\n";
+      // std::cout << "No record found.\n";
       return nullptr;
     }
     if (records.size() > 1) {

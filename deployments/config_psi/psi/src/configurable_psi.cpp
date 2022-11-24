@@ -220,14 +220,15 @@ int main(int argc, char* argv[]) {
 
   do {  // REPL
     // Parse tableFile to build query
-    std::cout << "Configuring query...";
     auto query_record_ptr = query_conn->read();
     if (query_record_ptr == nullptr) {
-      std::cerr << "No record (nullptr received)." << std::endl;
+      // std::cerr << "No record (nullptr received)." << std::endl;
       // TODO(JC) Remove sleep
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
       continue;
     }
+
+    std::cout << "Configuring query...";
     // Assume data to disk
     update_opts_input(cmdLineOpts, *query_record_ptr);
     // Reading the heql
