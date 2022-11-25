@@ -9,6 +9,9 @@ from kit.commands.init import init_hekit, create_default_workspace
 
 
 def test_init_hekit_create_config_file(mocker, tmp_path):
+    """Verify that the SW creates the folder and files after executing
+    the init command. Also, verify that the SW reports an error
+    when re-executing the init command because the files exist"""
     mockers = Mockers(mocker, tmp_path, default_config_flag=True)
     mockers.create_tmp_config_file()
     # Create a new config file
@@ -24,6 +27,8 @@ def test_init_hekit_create_config_file(mocker, tmp_path):
 
 
 def test_init_hekit_rcfile_unmodified(mocker, tmp_path):
+    """Verify that the SW shows the actions to modify the
+    rc file when the user selects manual modification"""
     mockers = Mockers(mocker, tmp_path, default_config_flag=True)
     mockers.mock_input.return_value = "n"
     mockers.create_tmp_config_file()
@@ -37,7 +42,55 @@ def test_init_hekit_rcfile_unmodified(mocker, tmp_path):
     )
 
 
+def test_init_hekit_bash_shell(mocker, tmp_path):
+    """Verify that the SW shows the actions to modify the
+    rc file when the user selects manual modification"""
+    mockers = Mockers(mocker, tmp_path, default_config_flag=True)
+    mockers.mock_input.return_value = "n"
+    mockers.create_tmp_config_file()
+
+    main()
+    mockers.mock_input.assert_any_call(
+        f"The hekit init command will update the file {tmp_path}/.mybashfile to append the following lines:\n\n"
+        "# >>> hekit start >>>\n"
+        "export HEKITPATH=/home/dcalderon/he-toolkit\n"
+        "PATH=$PATH:$HEKITPATH\n"
+        'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
+        '  eval "$(register-python-argcomplete hekit)"\n'
+        "fi\n"
+        "# <<<  hekit end  <<<\n\n"
+        "NOTE: a backup file will be created before updating it.\n"
+        "Do you want to continue with this action? (y/n) "
+    )
+
+
+def test_init_hekit_zsh_shell(mocker, tmp_path):
+    """Verify that the SW shows the actions to modify the
+    rc file when the user selects manual modification"""
+    mockers = Mockers(mocker, tmp_path, default_config_flag=True, active_shell="zsh")
+    mockers.mock_input.return_value = "n"
+    mockers.create_tmp_config_file()
+
+    main()
+    mockers.mock_input.assert_any_call(
+        f"The hekit init command will update the file {tmp_path}/.mybashfile to append the following lines:\n\n"
+        "# >>> hekit start >>>\n"
+        "export HEKITPATH=/home/dcalderon/he-toolkit\n"
+        "PATH=$PATH:$HEKITPATH\n"
+        "autoload -U bashcompinit\n"
+        "bashcompinit\n"
+        'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
+        '  eval "$(register-python-argcomplete hekit)"\n'
+        "fi\n"
+        "# <<<  hekit end  <<<\n\n"
+        "NOTE: a backup file will be created before updating it.\n"
+        "Do you want to continue with this action? (y/n) "
+    )
+
+
 def test_init_hekit_rcfile_FileNotFoundError(mocker, tmp_path):
+    """Verify that the SW throws an error when executing
+    init command and the rc file does not exist"""
     mockers = Mockers(mocker, tmp_path, default_config_flag=False)
     with pytest.raises(SystemExit) as exc_info:
         main()
@@ -53,7 +106,7 @@ def test_init_hekit_rcfile_FileNotFoundError(mocker, tmp_path):
 
 
 class Mockers:
-    def __init__(self, mocker, tmp_path, default_config_flag):
+    def __init__(self, mocker, tmp_path, default_config_flag, active_shell="bash"):
         self.filepath = tmp_path / ".mybashfile"
         self.mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
         self.mock_parse_cmdline.return_value = MockArgs(default_config_flag), ""
@@ -61,8 +114,8 @@ class Mockers:
             "kit.commands.init.create_default_workspace",
             return_value=create_default_workspace(tmp_path),
         )
-        self.mock_get_rc_file = mocker.patch("kit.commands.init.get_rc_file")
-        self.mock_get_rc_file.return_value = self.filepath
+        self.mock_get_rc_file = mocker.patch("kit.commands.init.get_shell_rc_file")
+        self.mock_get_rc_file.return_value = active_shell, self.filepath
         self.mock_print = mocker.patch("kit.commands.init.print")
         self.mock_hekit_print = mocker.patch("kit.hekit.print")
         self.mock_input = mocker.patch("kit.commands.init.input", return_value="y")

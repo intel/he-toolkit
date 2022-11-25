@@ -7,6 +7,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
+from typing import Tuple
 from kit.utils.constants import Constants
 from kit.utils.files import create_default_workspace, dump_toml, file_exists
 from kit.utils.typing import PathType
@@ -79,22 +80,27 @@ def append_to_rc(path: Path, content: str) -> None:
             rc_file.write(line)
 
 
-def get_rc_file() -> Path:
-    """Return the correct file to add shell commands"""
+def select_rc_file(primary_file: str, alternative_file: str) -> Path:
+    """Return the startup file's name"""
+    rc_file = Path(primary_file)
+    if not file_exists(rc_file.expanduser().resolve()):
+        rc_file = Path(alternative_file)
+
+    return rc_file
+
+
+def get_shell_rc_file() -> Tuple[str, Path]:
+    """Return the correct shell and file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
     if active_shell_path == "bash":
-        # if bash_profile file does not exist, try bashrc file
-        rc_file = Path("~/.bash_profile").expanduser().resolve()
-        if not file_exists(rc_file):
-            rc_file = Path("~/.bashrc")
-    # TODO add support for other popular shells
-    #    elif active_shell_path == "zsh":
-    #        rc_file = ""
+        rc_file = select_rc_file("~/.bash_profile", "~/.bashrc")
+    elif active_shell_path == "zsh":
+        rc_file = select_rc_file("~/.zprofile", "~/.zshrc")
     else:
         raise ValueError(f"Unknown shell '{active_shell_path}'")
 
-    return rc_file
+    return active_shell_path, rc_file
 
 
 def create_default_config(dir_path: Path) -> None:
@@ -126,17 +132,23 @@ def create_plugin_data(dir_path: Path) -> None:
         print(f"{plugin_file_path} created")
 
 
-def get_rc_new_lines() -> str:
+def get_rc_new_lines(active_shell: str) -> str:
     """Return the lines that will be added to the rc file"""
     # 1-Add hekit directory as part of environmental variable PATH
     export_line = f"export HEKITPATH={Constants.HEKIT_ROOT_DIR}\n"
     path_line = "PATH=$PATH:$HEKITPATH\n"
+
     # 2-Register hekit link and hekit.py script to enable tab completion
     eval_lines = (
         'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
         '  eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
+
+    if active_shell == "zsh":
+        pre_eval_lines = "autoload -U bashcompinit\nbashcompinit\n"
+        eval_lines = "".join([pre_eval_lines, eval_lines])
+
     return "".join([Tags.start_tag, export_line, path_line, eval_lines, Tags.end_tag])
 
 
@@ -147,9 +159,9 @@ def init_hekit(args) -> None:
         create_default_config(dir_path)
         create_plugin_data(dir_path)
 
-    rc_new_content = get_rc_new_lines()
-    rc_file = get_rc_file()
+    active_shell, rc_file = get_shell_rc_file()
     rc_path = get_expanded_path(rc_file)
+    rc_new_content = get_rc_new_lines(active_shell)
 
     user_answer = input(
         f"The hekit init command will update the file {rc_file} to append the following lines:\n\n"
