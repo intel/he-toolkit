@@ -17,13 +17,17 @@ def test_init_hekit_create_config_file(mocker, tmp_path):
     # Create a new config file
     main()
     mockers.mock_print.assert_any_call(f"{tmp_path}/.hekit/default.config created")
-    mockers.mock_print.assert_any_call(f"source {mockers.filepath}")
+    mockers.mock_print.assert_any_call(
+        "Please source your shell config file as follows\n" f"source {mockers.filepath}"
+    )
     # Try to create a new config file, but it exists
     main()
     mockers.mock_print.assert_any_call(
         f"{tmp_path}/.hekit/default.config file already exists"
     )
-    mockers.mock_print.assert_any_call(f"source {mockers.filepath}")
+    mockers.mock_print.assert_any_call(
+        "Please source your shell config file as follows\n" f"source {mockers.filepath}"
+    )
 
 
 def test_init_hekit_rcfile_unmodified(mocker, tmp_path):
@@ -36,7 +40,7 @@ def test_init_hekit_rcfile_unmodified(mocker, tmp_path):
     main()
     mockers.mock_print.assert_any_call(
         "Please execute the following actions manually:\n"
-        f"1. Open the file {tmp_path}/.mybashfile\n"
+        f"1. Open the file {tmp_path}/.mybashfile in an editor\n"
         "2. Add the lines shown in the previous message"
         f"\n3. Source your shell config file with: source {tmp_path}/.mybashfile"
     )
@@ -91,12 +95,18 @@ def test_init_hekit_zsh_shell(mocker, tmp_path):
 def test_init_hekit_rcfile_FileNotFoundError(mocker, tmp_path):
     """Verify that the SW throws an error when executing
     init command and the rc file does not exist"""
-    mockers = Mockers(mocker, tmp_path, default_config_flag=False)
+    mock_parse_cmdline = mocker.patch("kit.hekit.parse_cmdline")
+    mock_parse_cmdline.return_value = MockArgs(default_config_flag=False), ""
+    mock_hekit_print = mocker.patch("kit.hekit.print")
+    mock_exists = mocker.patch.dict(
+        "kit.commands.init.environment", {"SHELL": "myshell"}
+    )
+
     with pytest.raises(SystemExit) as exc_info:
         main()
-    mockers.mock_hekit_print.assert_called_with(
+    mock_hekit_print.assert_called_with(
         "Error while running subcommand\n",
-        f"FileNotFoundError(PosixPath('{tmp_path}/.mybashfile'))",
+        "ValueError(\"Unknown shell 'myshell'\")",
         file=stderr,
     )
     assert 0 != exc_info.value.code
