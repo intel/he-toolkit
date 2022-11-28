@@ -185,8 +185,7 @@ def init_hekit(args) -> None:
     append_to_rc(rc_path, rc_new_content)
 
     # Instructions for user
-    print("Please source your shell config file as follows")
-    print(f"source {rc_path}")
+    print("Please source your shell config file as follows\n" f"source {rc_path}")
 
 
 def set_init_subparser(subparsers) -> None:
