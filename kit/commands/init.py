@@ -80,13 +80,14 @@ def append_to_rc(path: Path, content: str) -> None:
             rc_file.write(line)
 
 
-def select_rc_file(primary_file: str, alternative_file: str) -> Path:
-    """Return the startup file's name"""
-    rc_file = Path(primary_file)
-    if not file_exists(rc_file.expanduser().resolve()):
-        rc_file = Path(alternative_file)
+def select_rc_file(*potential_files: str) -> Path:
+    """Return the first startup file's name for a file that exists"""
+    for filepath in map(Path, potential_files):
+        rc_file = filepath.expanduser().resolve()
+        if file_exists(rc_file):
+            return rc_file
 
-    return rc_file
+    raise FileNotFoundError(f"None of the files '{potential_files}' exist")
 
 
 def get_shell_rc_file() -> Tuple[str, Path]:
@@ -139,17 +140,25 @@ def get_rc_new_lines(active_shell: str) -> str:
     path_line = "PATH=$PATH:$HEKITPATH\n"
 
     # 2-Register hekit link and hekit.py script to enable tab completion
+    pre_eval_lines = (
+        "autoload -U bashcompinit\nbashcompinit\n" if active_shell == "zsh" else ""
+    )
     eval_lines = (
         'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
         '  eval "$(register-python-argcomplete hekit)"\n'
         "fi\n"
     )
 
-    if active_shell == "zsh":
-        pre_eval_lines = "autoload -U bashcompinit\nbashcompinit\n"
-        eval_lines = "".join([pre_eval_lines, eval_lines])
-
-    return "".join([Tags.start_tag, export_line, path_line, eval_lines, Tags.end_tag])
+    return "".join(
+        [
+            Tags.start_tag,
+            export_line,
+            path_line,
+            pre_eval_lines,
+            eval_lines,
+            Tags.end_tag,
+        ]
+    )
 
 
 def init_hekit(args) -> None:
