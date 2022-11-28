@@ -24,10 +24,11 @@ def compute_prime_factors(
     """Return generator. Keys m, Value prime factors.
     Process out to factor"""
 
-    command_and_args = [factor_util, *map(str, numbers)]
-    if len(command_and_args) < 2:
+    numbers = list(numbers)
+    if len(numbers) == 0:
         return None
 
+    command_and_args = [factor_util, *map(str, numbers)]
     try:
         out = run(command_and_args, stdout=PIPE, check=True)  # nosec B603
     except CalledProcessError as error:

@@ -197,9 +197,9 @@ tests/test_cmd_list.py
 tests/test_cmd_new.py
 tests/test_cmd_plugins.py
 tests/test_cmd_remove.py
+tests/test_integration_algebras.py
 tests/test_integration_check_deps.py
 tests/test_integration_docker.py
-tests/test_integration_healg.py
 tests/test_integration_init.py
 tests/test_integration_install.py
 tests/test_integration_wrong_inputs.py
