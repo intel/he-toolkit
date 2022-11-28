@@ -3,6 +3,7 @@
  */
 
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <nlohmann/json.hpp>
 
@@ -107,6 +108,10 @@ void loadConfigFile(CmdLineOpts& options) {
     options.outConnType = Type::FILESYS;
   } else if (out_type == "kafka") {
     options.outConnType = Type::KAFKA;
+  } else {
+    std::stringstream msg;
+    msg << "Unknown output data source type '" << out_type << "'";
+    throw std::runtime_error(msg.str());
   }
 
   auto query_type = config.at("query").at("data_source").get<std::string>();
@@ -114,5 +119,9 @@ void loadConfigFile(CmdLineOpts& options) {
     options.queryConnType = Type::FILESYS;
   } else if (query_type == "kafka") {
     options.queryConnType = Type::KAFKA;
+  } else {
+    std::stringstream msg;
+    msg << "Unknown query data source type '" << out_type << "'";
+    throw std::runtime_error(msg.str());
   }
 }
