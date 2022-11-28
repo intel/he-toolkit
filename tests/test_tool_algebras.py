@@ -95,21 +95,26 @@ def test_correct_for_d():
     # FIXME What to do about a p that is not prime?
     # assert correct_for_d(1, 3, 2) == (1, True)
     assert correct_for_d(p=2, d=8, m=15) == (4, True)
-    assert correct_for_d(2, 3, 2) == (3, False)
-    assert correct_for_d(3, 5, 3) == (5, False)
+    assert correct_for_d(127, 2, 18) == (1, True)
+    assert correct_for_d(127, 2, 16) == (2, False)
 
     # correct_for_d() expects that p=prime number
     # but does not explicitly check for it.
     # If non-prime passed in, correct functionality
     # is to still execute
     assert correct_for_d(4, 7, 3) == (1, True)
-    assert correct_for_d(4, 2, 4) == (2, False)
+
+    with pytest.raises(ValueError):
+        correct_for_d(2, 3, 2)
+
+    with pytest.raises(ValueError):
+        correct_for_d(3, 5, 3)
+
+    with pytest.raises(ValueError):
+        correct_for_d(2, 0, 5)
 
     with pytest.raises(ZeroDivisionError):
         correct_for_d(1, 3, 0)
-
-    with pytest.raises(UnboundLocalError):
-        correct_for_d(2, 0, 5)
 
 
 def test_str_to_range():

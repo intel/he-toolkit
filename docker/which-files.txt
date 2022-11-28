@@ -203,7 +203,7 @@ tests/test_integration_healg.py
 tests/test_integration_init.py
 tests/test_integration_install.py
 tests/test_integration_wrong_inputs.py
-tests/test_tool_healg.py
+tests/test_tool_algebras.py
 tests/test_util_comp_builder.py
 tests/test_util_config.py
 tests/test_util_docker_tool.py
