@@ -10,7 +10,6 @@ from filecmp import cmp as same_files
 from typing import Tuple
 from kit.utils.constants import Constants
 from kit.utils.files import create_default_workspace, dump_toml, file_exists
-from kit.utils.typing import PathType
 
 
 class Tags:
@@ -18,16 +17,6 @@ class Tags:
 
     start_tag: str = "# >>> hekit start >>>\n"
     end_tag: str = "# <<<  hekit end  <<<\n"
-
-
-def get_expanded_path(path: PathType) -> Path:
-    """Return the expanded path of a file if it exists,
-    otherwise raise an exception"""
-    path_file = Path(path).expanduser().resolve()
-    if not file_exists(path_file):
-        raise FileNotFoundError(path_file)
-
-    return path_file
 
 
 def create_backup(path: Path, ext: str = ".hekit.bak") -> Path:
@@ -81,7 +70,7 @@ def append_to_rc(path: Path, content: str) -> None:
 
 
 def select_rc_file(*potential_files: str) -> Path:
-    """Return the first startup file's name for a file that exists"""
+    """Return the first startup file's name (expanded) for a file that exists"""
     for filepath in map(Path, potential_files):
         rc_file = filepath.expanduser().resolve()
         if file_exists(rc_file):
@@ -168,12 +157,11 @@ def init_hekit(args) -> None:
         create_default_config(dir_path)
         create_plugin_data(dir_path)
 
-    active_shell, rc_file = get_shell_rc_file()
-    rc_path = get_expanded_path(rc_file)
+    active_shell, rc_path = get_shell_rc_file()
     rc_new_content = get_rc_new_lines(active_shell)
 
     user_answer = input(
-        f"The hekit init command will update the file {rc_file} to append the following lines:\n\n"
+        f"The hekit init command will update the file {rc_path} to append the following lines:\n\n"
         f"{rc_new_content}\n"
         "NOTE: a backup file will be created before updating it.\n"
         "Do you want to continue with this action? (y/n) "
@@ -181,9 +169,9 @@ def init_hekit(args) -> None:
     if user_answer not in ("y", "Y"):
         print(
             "Please execute the following actions manually:\n"
-            f"1. Open the file {rc_file}\n"
+            f"1. Open the file {rc_path} in an editor\n"
             "2. Add the lines shown in the previous message\n"
-            f"3. Source your shell config file with: source {rc_file}"
+            f"3. Source your shell config file with: source {rc_path}"
         )
         return
 
@@ -198,7 +186,7 @@ def init_hekit(args) -> None:
 
     # Instructions for user
     print("Please source your shell config file as follows")
-    print(f"source {rc_file}")
+    print(f"source {rc_path}")
 
 
 def set_init_subparser(subparsers) -> None:
