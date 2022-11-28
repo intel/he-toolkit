@@ -8,7 +8,6 @@ from argparse import ArgumentTypeError
 from subprocess import CalledProcessError
 
 from kit.tools.algebras import *
-from kit.tools.gen_primes import *
 
 
 def test_powerset():
