@@ -5,10 +5,10 @@ import pytest
 import os.path
 from sys import maxsize
 from argparse import ArgumentTypeError
+from subprocess import CalledProcessError
 
 from kit.tools.algebras import *
 from kit.tools.gen_primes import *
-from kit.utils.primes import *
 
 
 def test_powerset():
@@ -177,15 +177,3 @@ def test_PrimesFromFile_obj(primes_file_obj):
     # Cleanup
     if os.path.exists(f_primes):
         os.remove(f_primes)
-
-
-def test_parse_factor_line():
-    # parse_factor_line doesn't check for correctness
-    assert parse_factor_line("6: 2 3") == (6, (2, 3))
-    assert parse_factor_line("6: \t2 \t3") == (6, (2, 3))
-    assert parse_factor_line("6: 3 2") == (6, (3, 2))  # order matters
-    assert parse_factor_line("36: 2 2 3 3") == (36, (2, 2, 3, 3))
-
-    with pytest.raises(ValueError):
-        parse_factor_line("6 3 2")
-        parse_factor_line("6.1: 3 2")

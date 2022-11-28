@@ -208,6 +208,7 @@ tests/test_util_comp_builder.py
 tests/test_util_config.py
 tests/test_util_docker_tool.py
 tests/test_util_files.py
+tests/test_util_primes.py
 tests/test_util_spec.py
 tests/test_util_subparsers.py
 tests/test_util_tab_comp.py
