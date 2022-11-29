@@ -1,10 +1,12 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest.mock import PropertyMock
 import pytest
 from sys import stderr
 from pathlib import Path
 from kit.hekit import main
+from kit.utils.constants import Constants
 from kit.commands.init import init_hekit, create_default_workspace
 
 
@@ -57,7 +59,7 @@ def test_init_hekit_bash_shell(mocker, tmp_path):
     mockers.mock_input.assert_any_call(
         f"The hekit init command will update the file {tmp_path}/.mybashfile to append the following lines:\n\n"
         "# >>> hekit start >>>\n"
-        "export HEKITPATH=/home/dcalderon/he-toolkit\n"
+        "export HEKITPATH=/myhome/user/he-toolkit\n"
         "PATH=$PATH:$HEKITPATH\n"
         'if [ -n "$(type -p register-python-argcomplete)" ]; then\n'
         '  eval "$(register-python-argcomplete hekit)"\n'
@@ -79,7 +81,7 @@ def test_init_hekit_zsh_shell(mocker, tmp_path):
     mockers.mock_input.assert_any_call(
         f"The hekit init command will update the file {tmp_path}/.mybashfile to append the following lines:\n\n"
         "# >>> hekit start >>>\n"
-        "export HEKITPATH=/home/dcalderon/he-toolkit\n"
+        "export HEKITPATH=/myhome/user/he-toolkit\n"
         "PATH=$PATH:$HEKITPATH\n"
         "autoload -U bashcompinit\n"
         "bashcompinit\n"
@@ -129,6 +131,10 @@ class Mockers:
         self.mock_print = mocker.patch("kit.commands.init.print")
         self.mock_hekit_print = mocker.patch("kit.hekit.print")
         self.mock_input = mocker.patch("kit.commands.init.input", return_value="y")
+        self.const_hekit_path = mocker.patch.object(
+            Constants, "HEKIT_ROOT_DIR", new_callable=PropertyMock
+        )
+        self.const_hekit_path.return_value = Path("/myhome/user/he-toolkit")
 
     def create_tmp_config_file(self):
         with self.filepath.open("w") as f:

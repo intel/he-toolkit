@@ -8,11 +8,10 @@ from kit.commands.init import (
     create_backup,
     remove_from_rc,
     append_to_rc,
-    # select_rc_file
-    # get_shell_rc_file
+    select_rc_file,
+    get_shell_rc_file,
     create_default_config,
     create_plugin_data,
-    # get_rc_new_lines
 )
 
 
@@ -75,6 +74,67 @@ def test_append_to_rc_when_file_does_not_exist():
     with pytest.raises(FileNotFoundError) as execinfo:
         rc_path = Path("/test/notlikelyfile.txt")
         append_to_rc(rc_path, content="")
+
+
+def test_select_rc_file_error():
+    """Verify that the SW shows an error when the rc file is not found"""
+    with pytest.raises(FileNotFoundError) as exc_info:
+        act_file = select_rc_file(
+            "/mytmp/my_file", "/mylocal/another_file", "/myuser/file_with_data"
+        )
+    assert (
+        str(exc_info.value)
+        == f"None of the files '('/mytmp/my_file', '/mylocal/another_file', '/myuser/file_with_data')' exist"
+    )
+
+
+@pytest.mark.parametrize("file_with_data", ["test\n"], indirect=True)
+def test_select_rc_file_found(file_with_data):
+    """Verify that the SW returns the correct rc file"""
+    act_file = select_rc_file("/mytmp/my_file", "/mylocal/another_file", file_with_data)
+    assert act_file == file_with_data
+
+
+def test_get_shell_rc_file_bash(mocker):
+    """Verify that the SW returns the correct bash (bash) and rc file"""
+    exp_shell, exp_rc_file = "bash", "~/mybashcr"
+    mock_exists = mocker.patch.dict(
+        "kit.commands.init.environment", {"SHELL": exp_shell}
+    )
+    mock_select_rc_file = mocker.patch("kit.commands.init.select_rc_file")
+    mock_select_rc_file.return_value = exp_rc_file
+
+    act_sell, act_rc_file = get_shell_rc_file()
+    assert act_sell == exp_shell
+    assert act_rc_file == exp_rc_file
+
+
+def test_get_shell_rc_file_zsh(mocker):
+    """Verify that the SW returns the correct bash (zsh) and rc file"""
+    exp_shell, exp_rc_file = "zsh", "~/anotherbashcr"
+    mock_exists = mocker.patch.dict(
+        "kit.commands.init.environment", {"SHELL": exp_shell}
+    )
+    mock_select_rc_file = mocker.patch("kit.commands.init.select_rc_file")
+    mock_select_rc_file.return_value = exp_rc_file
+
+    act_sell, act_rc_file = get_shell_rc_file()
+    assert act_sell == exp_shell
+    assert act_rc_file == exp_rc_file
+
+
+def test_get_shell_rc_file_unknown_shell(mocker):
+    """Verify that the SW shows an error when the shell is unknown"""
+    exp_shell, exp_rc_file = "unknownshell", "~/itsbashcr"
+    mock_exists = mocker.patch.dict(
+        "kit.commands.init.environment", {"SHELL": exp_shell}
+    )
+    mock_select_rc_file = mocker.patch("kit.commands.init.select_rc_file")
+    mock_select_rc_file.return_value = exp_rc_file
+
+    with pytest.raises(ValueError) as exc_info:
+        act_sell, act_rc_file = get_shell_rc_file()
+    assert str(exc_info.value) == f"Unknown shell '{exp_shell}'"
 
 
 @pytest.mark.parametrize("create_config", ["default.config"], indirect=True)
