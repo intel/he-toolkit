@@ -258,7 +258,7 @@ int main(int argc, char* argv[]) {
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+        std::chrono::duration_cast<std::chrono::seconds>(stop - start);
     std::cout << "Elapsed time " << elapsed_time.count() << std::endl;
 
     // Create data connection for outfile
