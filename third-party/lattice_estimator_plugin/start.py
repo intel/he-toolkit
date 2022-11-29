@@ -5,7 +5,7 @@
 def set_lattice_estimator_subparser(subparsers):
     """create the parser for the lattice estimator plugin"""
     parser = subparsers.add_parser(
-        "hello-world", description="Albrecht et al.'s Lattice Estimator"
+        "lattice-estimator", description="Albrecht et al.'s Lattice Estimator"
     )
     parser.add_argument(
         "--lang",
