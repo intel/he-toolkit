@@ -56,11 +56,11 @@ jobs:
           source /home/runner/.bash_profile
           cd .. && hekit -h
 
-      # - name: Install zsh
-      #   run: |
-      #     sudo apt install zsh
-      #     export SHELL=/bin/zsh
-      #     echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install zsh
+        run: |
+          sudo apt install zsh
+          export SHELL=/bin/zsh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Check zsh
         shell: zsh {0}
