@@ -166,6 +166,7 @@ kit/utils/subparsers.py
 kit/utils/tab_completion.py
 kit/utils/tsort.py
 kit/utils/typing.py
+kit/utils/yes.py
 mypy.ini
 recipes/config-psi.toml
 recipes/default.toml

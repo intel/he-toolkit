@@ -9,6 +9,7 @@ from shutil import copyfile
 from filecmp import cmp as same_files
 from kit.utils.constants import Constants
 from kit.utils.files import create_default_workspace, dump_toml, file_exists
+from kit.utils.yes import is_yes
 from kit.utils.typing import PathType
 
 
@@ -157,7 +158,7 @@ def init_hekit(args) -> None:
         "NOTE: a backup file will be created before updating it.\n"
         "Do you want to continue with this action? (y/n) "
     )
-    if user_answer not in ("y", "Y"):
+    if not is_yes(user_answer):
         print(
             "Please execute the following actions manually:\n"
             f"1. Open the file {rc_file}\n"
