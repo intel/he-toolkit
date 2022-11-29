@@ -1,7 +1,7 @@
 # HE Tools
 
-The tools commands for `hekit` contain useful commands to finds HE parameters
-based on user constraints. Next sections describe the details about them.
+The tools for `hekit` consist of useful commands for finding HE parameters
+based on user constraints. The following sections describe their details and usage.
 
 ## Dependencies
 - python >= 3.8
@@ -9,7 +9,7 @@ based on user constraints. Next sections describe the details about them.
 ## gen-primes
 
 The command `hekit gen-primes` generates a list of sorted primes in range [n,
-m] where n and m are positive integers
+m] where n and m are positive integers.
 
 ### Options
 
