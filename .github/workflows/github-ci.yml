@@ -56,6 +56,11 @@ jobs:
           source /home/runner/.bash_profile
           cd .. && hekit -h
 
+      - name: Run zsh
+        run: |
+           echo $ZSH_NAME $ZSH_VERSION
+        shell: zsh
+
   build-and-test-toolkit-palisade:
     name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }} py${{ matrix.python-version }}
     # Disable this job for now as it fails due to HEXL-PALISADE issue
