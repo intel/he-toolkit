@@ -58,9 +58,14 @@ jobs:
 
       - name: Install zsh
         run: |
-          sudo apt-get install zsh
+          sudo apt install zsh
+          export SHELL=/bin/zsh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-        shell: zsh
+ 
+      - name: Check zsh
+        shell: zsh {0}
+        run: echo $ZSH_NAME $ZSH_VERSION
+
 
   build-and-test-toolkit-palisade:
     name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }} py${{ matrix.python-version }}
@@ -70,7 +75,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash
+        shell: bash 
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
