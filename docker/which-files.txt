@@ -219,6 +219,7 @@ third-party/lattice_estimator_plugin/__init__.py
 third-party/lattice_estimator_plugin/docker/.env
 third-party/lattice_estimator_plugin/docker/Dockerfile
 third-party/lattice_estimator_plugin/docker/docker-compose.yaml
+third-party/lattice_estimator_plugin/install.toml
 third-party/lattice_estimator_plugin/plugin.toml
 third-party/lattice_estimator_plugin/start.py
 tools/README.md
