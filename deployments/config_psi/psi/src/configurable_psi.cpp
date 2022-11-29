@@ -228,6 +228,8 @@ int main(int argc, char* argv[]) {
       continue;
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::cout << "Configuring query...";
     // Assume data to disk
     update_opts_input(cmdLineOpts, *query_record_ptr);
@@ -254,13 +256,19 @@ int main(int argc, char* argv[]) {
                                         cmdLineOpts);
     }
 
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto elapsed_time =
+        std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "Elapsed time " << elapsed_time.count() << std::endl;
+
     // Create data connection for outfile
     std::unique_ptr<DataConn> out_conn =
         makeDataConn(cmdLineOpts.outConnType, cmdLineOpts.outConfig);
     if (cmdLineOpts.outConnType == Type::KAFKA) {
       auto out_topic = query_record_ptr->metadata("out-topic");
-      auto out_record_ptr =
-          out_conn->createDataRecord({{"out-topic", out_topic}});
+      auto out_record_ptr = out_conn->createDataRecord(
+          Metadata{{"out-topic", out_topic},
+                   {"elapsed_time", std::to_string(elapsed_time.count())}});
       writeDataToRecord(*out_record_ptr, cmdLineOpts.outFilename);
 
       out_conn->write(*out_record_ptr);

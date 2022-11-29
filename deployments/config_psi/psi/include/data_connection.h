@@ -252,6 +252,9 @@ class KafkaConn : public DataConn {
     auto record = kafka::clients::producer::ProducerRecord(
         topic_name,
         /*partition=*/0, /*kafka::Key*/ kafka::NullKey, /*kafka::Value*/ value);
+    auto elapsed_time = data.metadata("elapsed_time");
+    auto kafka_value = kafka::Value(elapsed_time.c_str(), elapsed_time.size());
+    record.headers().push_back(kafka::Header("elapsed_time", kafka_value));
 
     // Send to Kafka
     producer_ptr_->send(
