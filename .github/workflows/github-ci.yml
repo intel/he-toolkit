@@ -61,7 +61,7 @@ jobs:
           sudo apt install zsh
           export SHELL=/bin/zsh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
- 
+
       - name: Check zsh
         shell: zsh {0}
         run: echo $ZSH_NAME $ZSH_VERSION
@@ -75,7 +75,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash 
+        shell: bash
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
