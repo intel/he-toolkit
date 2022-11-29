@@ -26,7 +26,7 @@ def test_powerset():
 
 def test_prime_factors():
     assert len(list(compute_prime_factors([x for x in range(10)]))) == 10
-    assert list(compute_prime_factors([1])) == [()]  # Special case
+    assert list(compute_prime_factors([1])) == [()]
     assert list(compute_prime_factors([5])) == [(5,)]
     assert list(compute_prime_factors([12])) == [(2, 2, 3)]
     # Note that largest prime pre-computed in primes.txt is 139999
@@ -36,7 +36,8 @@ def test_prime_factors():
 
     # cmdline factor util hangs with no input
     # compute_prime_factors should not hang if no input passed in
-    assert compute_prime_factors([]) is None
+    with pytest.raises(ValueError):
+        assert list(compute_prime_factors([]))
 
     with pytest.raises(ValueError):
         list(compute_prime_factors([-1]))
@@ -46,7 +47,10 @@ def test_prime_factors():
 
 
 def test_find_ms():
-    assert list(find_ms(ps=[], ds=[], factorize=compute_prime_factors)) == []
+    # No inputs given
+    with pytest.raises(ValueError):
+        assert list(find_ms(ps=[], ds=[], factorize=compute_prime_factors))
+
     assert set(find_ms([12], [5], compute_prime_factors)) == set(
         [(12, 5, (11,)), (12, 5, (22621,)), (12, 5, (11, 22621))]
     )

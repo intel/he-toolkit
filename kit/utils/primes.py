@@ -5,7 +5,7 @@
 
 from sys import stdout
 from subprocess import CalledProcessError, run, PIPE  # nosec B404
-from typing import Generator, Iterable, Optional, Tuple
+from typing import Generator, Iterable, Tuple
 
 
 def parse_factor_line(line: str) -> Tuple[int, Tuple[int, ...]]:
@@ -20,13 +20,13 @@ def parse_factor_line(line: str) -> Tuple[int, Tuple[int, ...]]:
 
 def compute_prime_factors(
     numbers: Iterable[int], factor_util: str = "factor"
-) -> Optional[Generator]:
+) -> Generator:
     """Return generator. Keys m, Value prime factors.
     Process out to factor"""
 
     numbers = list(numbers)
     if len(numbers) == 0:
-        return None
+        raise ValueError("Input numbers is empty")
 
     command_and_args = [factor_util, *map(str, numbers)]
     try:
