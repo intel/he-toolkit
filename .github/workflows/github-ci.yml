@@ -59,7 +59,7 @@ jobs:
       - name: Install zsh
         run: |
           sudo apt-get install zsh
-          echo $PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
         shell: zsh
 
   build-and-test-toolkit-palisade:
