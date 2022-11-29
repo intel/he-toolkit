@@ -28,6 +28,7 @@ jobs:
       - run: pip3 install bandit black cpplint docker mypy pydantic pylint pylint-pydantic types-toml
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
+      - run: sudo apt-get install zsh
       # NOTE: This is deprecated in favor of pre-commit.ci
       - uses: pre-commit/action@v3.0.0
         with:
@@ -57,8 +58,7 @@ jobs:
           cd .. && hekit -h
 
       - name: Run zsh
-        run: |
-           echo $ZSH_NAME $ZSH_VERSION
+        run: echo $PATH
         shell: zsh
 
   build-and-test-toolkit-palisade:
