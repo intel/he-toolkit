@@ -68,6 +68,7 @@ jobs:
         run: |
           sudo apt install zsh
           export SHELL=/bin/zsh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Check zsh
         shell: zsh {0}
