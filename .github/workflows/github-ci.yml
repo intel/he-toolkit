@@ -33,9 +33,8 @@ jobs:
         with:
           extra_args: --all-files
 
-
-  test-hekit:
-    name: Test hekit commands
+  test-hekit-bash:
+    name: Test hekit commands (bash)
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -46,6 +45,7 @@ jobs:
         run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Run pytests
         run: pytest tests/ -n 8 --dist loadgroup
 
@@ -56,16 +56,33 @@ jobs:
           source /home/runner/.bash_profile
           cd .. && hekit -h
 
+  test-hekit-zshell:
+    name: Test hekit commands (zshell)
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
       - name: Install zsh
         run: |
           sudo apt install zsh
           export SHELL=/bin/zsh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Check zsh
         shell: zsh {0}
         run: echo $ZSH_NAME $ZSH_VERSION
 
+      - name: Setup
+        run: |
+          pip3 install docker pytest pytest-mock pytest-xdist toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: hekit init
+        run: |
+          ./hekit init <<< y
+          source /home/runner/.zshell_profile
+          cd .. && hekit -h
 
   build-and-test-toolkit-palisade:
     name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }} py${{ matrix.python-version }}
