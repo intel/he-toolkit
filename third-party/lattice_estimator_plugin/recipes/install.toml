@@ -1,8 +1,0 @@
-# Copyright (C) 2022 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-[[lattice-estimator]]
-name = "latest"
-fetch = "git clone https://github.com/malb/lattice-estimator.git"
-# install will only copy what was fetched
-install = "cp %init_fetch_dir% %init_install_dir%"
