@@ -68,7 +68,7 @@ jobs:
         run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
           sudo apt install zsh -y
-          chsh -s /usr/bin/zsh
+          sudo chsh -s /usr/bin/zsh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Zsh-huh
