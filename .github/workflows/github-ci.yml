@@ -64,16 +64,12 @@ jobs:
         shell: zsh {0}
     steps:
       - uses: actions/checkout@v3
-      - name: Install zsh
+      - name: Setup
         shell: bash
         run: |
-          sudo apt install zsh
-          export SHELL=/bin/zsh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Setup
-        run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
+          sudo apt install zsh -y
+          zsh <<< 2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: hekit init
