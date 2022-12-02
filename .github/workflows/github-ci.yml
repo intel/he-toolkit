@@ -61,28 +61,24 @@ jobs:
     runs-on: ubuntu-20.04
     defaults:
       run:
-        shell: bash
+        shell: zsh {0}
     steps:
       - uses: actions/checkout@v3
       - name: Install zsh
+        shell: bash
         run: |
           sudo apt install zsh
           export SHELL=/bin/zsh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Check zsh
-        shell: zsh {0}
-        run: echo $ZSH_NAME $ZSH_VERSION
-
       - name: Setup
-        shell: zsh {0}
         run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: hekit init
-        shell: zsh {0}
         run: |
+          export SHELL=/bin/zsh
           ./hekit --debug init <<< y
           source /home/runner/.zshrc
           cd .. && hekit -h
