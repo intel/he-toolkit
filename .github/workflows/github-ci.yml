@@ -68,14 +68,8 @@ jobs:
         run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
           sudo apt install zsh -y
+          /usr/bin/zsh <<< 2
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Zsh-huh
-        run: |
-          which zsh || echo "No which zsh"
-          command -v zsh || echo "No command zsh"
-          ls -la /usr/bin/zsh || echo "No zsh at /usr/bin"
-          ls -la /bin/zsh || echo "No zsh at /bin/zsh"
 
       - name: hekit init
         shell: zsh {0}
