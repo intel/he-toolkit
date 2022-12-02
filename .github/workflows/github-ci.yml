@@ -83,8 +83,8 @@ jobs:
       - name: hekit init
         shell: zsh {0}
         run: |
-          ./hekit init <<< y
-          source /home/runner/.zshell_profile
+          ./hekit --debug init <<< y
+          source /home/runner/.zshrc
           cd .. && hekit -h
 
   build-and-test-toolkit-palisade:
