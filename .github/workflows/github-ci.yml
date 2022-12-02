@@ -75,11 +75,13 @@ jobs:
         run: echo $ZSH_NAME $ZSH_VERSION
 
       - name: Setup
+        shell: zsh {0}
         run: |
           pip3 install docker pytest pytest-mock pytest-xdist toml
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: hekit init
+        shell: zsh {0}
         run: |
           ./hekit init <<< y
           source /home/runner/.zshell_profile
