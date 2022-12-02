@@ -76,7 +76,7 @@ jobs:
           command -v zsh || echo "No command zsh"
           ls -la /usr/bin/zsh || echo "No zsh at /usr/bin"
           ls -la /bin/zsh || echo "No zsh at /bin/zsh"
-          /usr/bin/zsh <<< 2
+          ./usr/bin/zsh <<< 2
 
       - name: hekit init
         shell: zsh {0}
