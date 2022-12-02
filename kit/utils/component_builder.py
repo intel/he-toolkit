@@ -14,6 +14,21 @@ from kit.utils.spec import Spec
 RunOutput = Tuple[bool, int]
 
 
+def install_components_from_recipe_file(
+    recipe_file: str, upto_stage: str, repo_location: str, force: bool, recipe_args
+) -> None:
+    """install components from a recipe file upto a given stage"""
+    if Path(recipe_file).is_symlink():
+        raise TypeError("The TOML file cannot be a symlink")
+
+    the_stages = stages(upto_stage, force)
+
+    components = components_to_build_from(recipe_file, repo_location, recipe_args)
+
+    for component in components:
+        chain_run(the_stages(component))
+
+
 def hekit_print(*args, box_msg="HEKIT", **kwargs) -> None:
     """print but prefixes [HEKIT] or other if box_msg given"""
     args_prefixed = [arg.replace("\n", f"\n[{box_msg}]") for arg in map(str, args)]
