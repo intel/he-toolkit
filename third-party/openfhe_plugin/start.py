@@ -10,7 +10,7 @@ def set_openfhe_subparser(subparsers):
         "--delete",
         default=True,
         action="store_true",
-        help="If a previous staging directory exists, DELETE.",
+        help="If a previous staging directory exists, DELETE. (default option)",
     )
     parser.add_argument(
         "--no-delete",
@@ -28,10 +28,13 @@ def set_openfhe_subparser(subparsers):
         "--no-ofhe",
         dest="ofhe",
         action="store_false",
-        help="DO NOT install OpenFHE Release build.",
+        help="DO NOT install OpenFHE Release build. (default option)",
     )
     parser.add_argument(
-        "--hexl", default=True, action="store_true", help="Install HEXL build."
+        "--hexl",
+        default=True,
+        action="store_true",
+        help="Install HEXL build. (default option)",
     )
     parser.add_argument(
         "--no-hexl",
