@@ -175,6 +175,7 @@ plugins/hello_world/__init__.py
 plugins/hello_world/hello.py
 plugins/hello_world/plugin.toml
 plugins/hello_world/start.py
+plugins/lattice_estimator/README.md
 plugins/lattice_estimator/__init__.py
 plugins/lattice_estimator/docker/.env
 plugins/lattice_estimator/docker/Dockerfile

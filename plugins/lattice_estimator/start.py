@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from kit.utils.component_builder import install_components_from_recipe_file
-from kit.utils.config import config_required
+from pathlib import Path
 
 
 def set_lattice_estimator_subparser(subparsers):
@@ -19,13 +19,16 @@ def set_lattice_estimator_subparser(subparsers):
     parser.set_defaults(fn=setup)
 
 
-@config_required
 def setup(args):
-    """"""
+    """Setup the docker container to use the Lattice Estimator"""
     install_components_from_recipe_file(
-        "recipes/install.toml", "fetch", config.repo_location, force=False
+        recipe_file="./recipes/install.toml",
+        upto_stage="install",
+        repo_location=Path("./test").resolve(),
+        force=True,
+        recipe_args=None,
     )
 
 
 def run():
-    """"""
+    """Takes user straight into the docker container"""
