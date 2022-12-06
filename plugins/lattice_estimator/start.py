@@ -1,11 +1,15 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from kit.utils.component_builder import install_components_from_recipe_file
 from pathlib import Path
 
+# from subprocess import subprocess
+from kit.utils.component_builder import install_components_from_recipe_file
 
-def set_lattice_estimator_subparser(subparsers):
+PLUGIN_ROOT = Path(".").resolve()
+
+
+def set_lattice_estimator_subparser(subparsers) -> None:
     """create the parser for the lattice estimator plugin"""
     parser = subparsers.add_parser(
         "lattice-estimator", description="Albrecht et al.'s Lattice Estimator"
@@ -19,16 +23,21 @@ def set_lattice_estimator_subparser(subparsers):
     parser.set_defaults(fn=setup)
 
 
-def setup(args):
+def setup(args) -> None:
     """Setup the docker container to use the Lattice Estimator"""
+
+    # Install a fresh copy of the lattice estimator
     install_components_from_recipe_file(
-        recipe_file="./recipes/install.toml",
+        recipe_file=PLUGIN_ROOT / "recipes/install.toml",
         upto_stage="install",
-        repo_location=Path("./test").resolve(),
+        repo_location=PLUGIN_ROOT / "test",
         force=True,
         recipe_args=None,
     )
 
+    # Setup the docker container
+    # subprocess()
 
-def run():
-    """Takes user straight into the docker container"""
+
+def run(args) -> None:
+    """Take the user straight into the docker container"""

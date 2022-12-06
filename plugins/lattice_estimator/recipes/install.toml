@@ -5,4 +5,5 @@
 name = "latest"
 fetch = "git clone https://github.com/malb/lattice-estimator.git"
 # install will only copy what was fetched
-install = "cp %init_fetch_dir% %init_install_dir%"
+init_final_dir="install"
+install = "cp -r %init_fetch_dir%/* %init_final_dir%/*"
