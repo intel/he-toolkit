@@ -4,9 +4,8 @@
 """This module fetches, builds, or installs the requested libraries"""
 
 from argparse import HelpFormatter
-from pathlib import Path
 from typing import Dict, Union
-from kit.utils.component_builder import components_to_build_from, chain_run, stages
+from kit.utils.component_builder import install_components_from_recipe_file
 from kit.utils.subparsers import validate_input
 from kit.utils.config import config_required
 
@@ -14,17 +13,13 @@ from kit.utils.config import config_required
 @config_required
 def install_components(args):
     """Install command"""
-    if Path(args.recipe_file).is_symlink():
-        raise TypeError("The TOML file cannot be a symlink")
-
-    the_stages = stages(args.upto_stage, args.force)
-
-    components = components_to_build_from(
-        args.recipe_file, args.config.repo_location, args.recipe_arg
+    install_components_from_recipe_file(
+        args.recipe_file,
+        args.upto_stage,
+        args.config.repo_location,
+        args.force,
+        args.recipe_arg,
     )
-
-    for component in components:
-        chain_run(the_stages(component))
 
 
 def get_recipe_arg_dict(recipe_arg: str) -> Union[Dict[str, str], None]:

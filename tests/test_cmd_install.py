@@ -8,7 +8,9 @@ from kit.commands.install import install_components, get_recipe_arg_dict
 
 def test_install_components_all_unskipped(mocker, args, unskipped_components):
     """All components are installed because skip flag is equal to False"""
-    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
+    mock_component = mocker.patch(
+        "kit.utils.component_builder.components_to_build_from"
+    )
     mock_component.return_value = unskipped_components
     mock_print = mocker.patch("kit.utils.component_builder.print")
 
@@ -25,7 +27,9 @@ def test_install_components_all_unskipped(mocker, args, unskipped_components):
 
 def test_install_components_all_skipped(mocker, args, skipped_components):
     """All components are skipped because skip flag is equal to True"""
-    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
+    mock_component = mocker.patch(
+        "kit.utils.component_builder.components_to_build_from"
+    )
     mock_component.return_value = skipped_components
     mock_print = mocker.patch("kit.utils.component_builder.print")
 
@@ -42,7 +46,9 @@ def test_install_components_all_skipped(mocker, args, skipped_components):
 
 def test_install_components_one_unskipped(mocker, args, one_unskipped_component):
     """Only two of three components are skipped when skip flag is equal to False"""
-    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
+    mock_component = mocker.patch(
+        "kit.utils.component_builder.components_to_build_from"
+    )
     mock_component.return_value = one_unskipped_component
     mock_print = mocker.patch("kit.utils.component_builder.print")
 
