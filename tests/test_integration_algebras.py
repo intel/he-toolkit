@@ -8,7 +8,7 @@ from tests.common_utils import execute_process, hekit_path
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_arg_header(hekit_path):
-    """Verify that gen-primes cmd is executed correctly
+    """Verify that the algebras cmd is executed correctly
     when p and d are single numbers"""
     cmd = f"{hekit_path} algebras -p 2 -d 3"
     act_result = execute_process(cmd)
@@ -26,7 +26,7 @@ def test_arg_header(hekit_path):
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_arg_no_header(hekit_path):
-    """Verify that algebras cmd is executed correctly when
+    """Verify that the algebras cmd is executed correctly when
     --no-header flag is used"""
     cmd = f"{hekit_path} algebras -p 2 -d 3 --no-header"
     act_result = execute_process(cmd)
@@ -44,7 +44,7 @@ def test_arg_no_header(hekit_path):
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_arg_p(hekit_path):
-    """Verify that gen-primes cmd is executed correctly when
+    """Verify that the algebras cmd is executed correctly when
     p is a list of numbers"""
     cmd = f"{hekit_path} algebras -p 7,13 -d 1 --no-header"
     act_result = execute_process(cmd)
@@ -62,7 +62,7 @@ def test_arg_p(hekit_path):
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_negative_arg_p(hekit_path):
-    """Verify that gen-primes cmd triggers an error when
+    """Verify that the algebras cmd triggers an error when
     p is a negative number"""
     cmd = f"{hekit_path} algebras -p -7 -d 1 --no-header"
     act_result = execute_process(cmd)
@@ -75,7 +75,7 @@ def test_negative_arg_p(hekit_path):
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_max_arg_p(hekit_path):
-    """Verify that gen-primes cmd is executed correctly when
+    """Verify that the algebras cmd is executed correctly when
     p is equal to sys.maxsize"""
     cmd = f"{hekit_path} algebras -p {sys.maxsize} -d 7 --no-header"
     act_result = execute_process(cmd)
@@ -88,7 +88,7 @@ def test_max_arg_p(hekit_path):
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_arg_d(hekit_path):
-    """Verify that gen-primes cmd is executed correctly when
+    """Verify that the algebras cmd is executed correctly when
     d is a list of numbers"""
     cmd = f"{hekit_path} algebras -p 2 -d 3,5 --no-header"
     act_result = execute_process(cmd)
@@ -106,7 +106,7 @@ def test_arg_d(hekit_path):
 
 @pytest.mark.xdist_group(name="arg_group")
 def test_negative_arg_d(hekit_path):
-    """Verify that gen-primes cmd triggers an error when
+    """Verify that the algebras cmd triggers an error when
     d is a negative number"""
     cmd = f"{hekit_path} algebras -p 7 -d -1 --no-header"
     act_result = execute_process(cmd)
@@ -119,9 +119,9 @@ def test_negative_arg_d(hekit_path):
 
 @pytest.mark.skip(reason="Not realistic test because SW cannot handle that amount in d")
 def test_max_arg_d(hekit_path):
-    """Verify that gen-primes cmd is executed correctly when
+    """Verify that the algebras cmd is executed correctly when
     d is equal to sys.maxsize"""
-    cmd = f"{hekit_path} -p 7 -d {sys.maxsize} --no-header"
+    cmd = f"{hekit_path} algebras -p 7 -d {sys.maxsize} --no-header"
     act_result = execute_process(cmd)
     assert (
         "hekit algebras: error: argument -d: invalid parse_range_for_primes value"
