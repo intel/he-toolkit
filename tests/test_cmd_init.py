@@ -69,7 +69,7 @@ def test_append_to_rc(file_with_data):
 
 
 def test_append_to_rc_when_file_does_not_exist():
-    """Verify that the SW shows an error when trying yo append the
+    """Verify that the SW shows an error when trying to append the
     lines related to toolkit usage but rc file does not exist"""
     with pytest.raises(FileNotFoundError) as execinfo:
         rc_path = Path("/test/notlikelyfile.txt")
@@ -139,7 +139,7 @@ def test_get_shell_rc_file_unknown_shell(mocker):
 
 @pytest.mark.parametrize("create_config", ["default.config"], indirect=True)
 def test_create_default_config_file_exist(create_config, mocker):
-    """Verify that the SW print an error message when
+    """Verify that the SW prints an error message when
     the default config file exists"""
     exp_file = "default.config"
     mock_print = mocker.patch("kit.commands.init.print")
@@ -159,7 +159,7 @@ def test_create_default_config_file_created(mocker, tmp_path):
 
 @pytest.mark.parametrize("create_plugin", ["plugins.toml"], indirect=True)
 def test_create_plugin_data_file_exists(create_plugin, mocker):
-    """Verify that the SW print an error message when
+    """Verify that the SW prints an error message when
     the default plugin data exists"""
     exp_file = "plugins/plugins.toml"
     mock_print = mocker.patch("kit.commands.init.print")
