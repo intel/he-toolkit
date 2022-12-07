@@ -34,7 +34,7 @@ jobs:
           extra_args: --all-files
 
   test-hekit-bash:
-    name: Test hekit commands (bash)
+    name: Test hekit commands
     runs-on: ubuntu-20.04
     defaults:
       run:
