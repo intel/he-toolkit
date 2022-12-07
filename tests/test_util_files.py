@@ -51,7 +51,7 @@ def test_files_in_dir_commands_filter_None(get_toolkit_path):
 
 
 def test_files_in_dir_tools_filter_py(get_toolkit_path):
-    exp_files = {"healg.py"}
+    exp_files = {"algebras.py", "gen_primes.py"}
     module = get_toolkit_path / "kit" / "tools"
     filter = lambda f: f[0] != "_" and f.endswith(".py")
 
