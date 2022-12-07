@@ -7,6 +7,7 @@ from shutil import rmtree
 from os import listdir
 from kit.utils.tab_completion import components_completer, instances_completer
 from kit.utils.subparsers import validate_input
+from kit.utils.yes import is_yes
 from kit.utils.config import config_required
 
 
@@ -32,7 +33,7 @@ def remove_components(args):
                 user_answer = input(
                     f"All components in {repo_path} will be deleted. Do you want to continue? (y/n) "
                 )
-            if user_answer in ("y", "Y"):
+            if is_yes(user_answer):
                 rmtree(repo_path)
                 print("All components successfully removed")
         elif not component:
@@ -45,7 +46,7 @@ def remove_components(args):
                 user_answer = input(
                     f"All instances of component '{component}' will be deleted. Do you want to continue? (y/n) "
                 )
-            if user_answer in ("y", "Y"):
+            if is_yes(user_answer):
                 rmtree(comp_path)
                 print(f"All instances of component '{component}' successfully removed")
         else:
