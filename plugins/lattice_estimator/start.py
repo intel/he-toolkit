@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-
-# from subprocess import subprocess
+import sys
+import subprocess
 from kit.utils.component_builder import install_components_from_recipe_file
 
 PLUGIN_ROOT = Path(".").resolve()
@@ -25,18 +25,25 @@ def set_lattice_estimator_subparser(subparsers) -> None:
 
 def setup(args) -> None:
     """Setup the docker container to use the Lattice Estimator"""
-
     # Install a fresh copy of the lattice estimator
     install_components_from_recipe_file(
         recipe_file=PLUGIN_ROOT / "recipes/install.toml",
-        upto_stage="install",
+        upto_stage="fetch",
         repo_location=PLUGIN_ROOT / "test",
         force=True,
         recipe_args=None,
     )
 
-    # Setup the docker container
-    # subprocess()
+    try:
+        # Setup the docker container
+        output = subprocess.run(["docker", "compose", "build"], capture_output=True)
+        print(output)
+    except PermissionError as error:
+        print(
+            f"{error}. Check that `docker` is installed and that you are part of the `docker` group",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
 
 def run(args) -> None:
