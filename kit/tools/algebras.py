@@ -7,45 +7,14 @@ import math
 import re
 import shutil
 from argparse import ArgumentTypeError
-from subprocess import CalledProcessError, run, PIPE  # nosec B404
-from sys import stdout, stderr, exit as sys_exit
+from sys import stderr, exit as sys_exit
 from itertools import chain, combinations
 from collections import Counter
 from pathlib import Path
 from typing import Callable, Generator, Iterable, List, Optional, Tuple
 from kit.utils.typing import PathType
 from kit.utils.files import create_default_workspace
-
-
-def set_gen_primes_subparser(subparsers):
-    """Register subparser to generate primes"""
-
-    parser = subparsers.add_parser(
-        "gen-primes",
-        description="generate primes in range [n, m] where n, m are positive integers",
-    )
-    parser.add_argument("start", type=int, default=2, help="start number")
-    parser.add_argument("stop", type=int, default=100, help="stop number")
-    parser.set_defaults(fn=gen_primes)
-
-
-def gen_primes(args):
-    """Generates a list of primes from start to stop values inclusive"""
-    write_primes(args.start, args.stop)
-
-
-def write_primes(start: int, stop: int, outfile=stdout) -> None:
-    """Writes to outfile a list of primes from start to stop values inclusive"""
-    if start > stop:
-        raise ValueError(f"start '{start}' should not be larger than stop '{stop}'")
-    numbers = range(start, stop + 1)
-    prime_factors = compute_prime_factors(numbers)
-    if prime_factors is None:
-        raise ValueError(
-            f"No prime factors were found for between '{start}' and '{stop}', inclusively"
-        )
-    primes = [factors[0] for factors in prime_factors if len(factors) == 1]
-    print("\n".join(map(str, primes)), file=outfile)
+from kit.utils.primes import compute_prime_factors, write_primes
 
 
 def powerset(iterable: Iterable[int]) -> chain:
@@ -136,45 +105,6 @@ class PrimesFromFile:
         return n in self.primes
 
 
-def parse_factor_line(line: str) -> Tuple[int, Tuple[int, ...]]:
-    """'num: f1 f2 f3' -> (num, (f1, f2, f3))"""
-    head, *tail = line.split()  # ['key:', 'v1', 'v2' , ...]
-    if head[-1] != ":":
-        raise ValueError(f"{line} does not have valid key format")
-    key = int(head[:-1])  # exclude last char
-    value = tuple(map(int, tail))
-    return key, value
-
-
-def compute_prime_factors(
-    numbers: Iterable[int], factor_util: str = "factor"
-) -> Optional[Generator]:
-    """Return generator. Keys m, Value prime factors.
-    Process out to factor"""
-
-    numbers = list(numbers)
-    if len(numbers) == 0:
-        return None
-
-    command_and_args = [factor_util, *map(str, numbers)]
-
-    try:
-        out = run(command_and_args, stdout=PIPE, check=True)  # nosec B603
-    except CalledProcessError as error:
-        # Was it a negative number on the input?
-        if any(number < 0 for number in numbers):
-            raise ValueError(
-                f"A negative number was found in the input: {numbers}"
-            ) from error
-        raise error
-
-    factor_lines = out.stdout.decode("ascii").strip().split("\n")
-
-    # We only want the value a.k.a. the primes factors
-    # A generator here does not save memory, but makes the parsing lazy
-    return (parse_factor_line(line)[1] for line in factor_lines)
-
-
 def set_gen_algebras_subparser(subparsers) -> None:
     """Register subparser to generate algebras"""
     parser = subparsers.add_parser(
@@ -199,7 +129,7 @@ def set_gen_algebras_subparser(subparsers) -> None:
         print("To run, factor utility is required.", file=stderr)
         sys_exit(1)
 
-    parser.set_defaults(fn=healg, factor_util=factor_util)
+    parser.set_defaults(fn=algebras, factor_util=factor_util)
 
 
 def phi(prime_factors: Iterable[int]) -> int:
@@ -212,17 +142,19 @@ def phi(prime_factors: Iterable[int]) -> int:
 def correct_for_d(p: int, d: int, m: int) -> Tuple[int, int]:
     """Returns the minimum value of d satisfiying p^d = 1 mod m.
     Computations for valid ms with a starting point of p^d can
-    sometimes lead to an erroneous d.
+    sometimes lead to an erroneous d (too large).
 
     This function expects that p is a prime number."""
     for e in range(1, d + 1):
         if (p**e) % m == 1:
-            break
+            return e, e != d
 
-    return e, e != d
+    raise ValueError(
+        f"exponent for p^e = 1 mod m, could not be found, (p, d, m) was ({p}, {d}, {m})"
+    )
 
 
-def healg(args):
+def algebras(args):
     """Given a prime p(s) and a required d(s) what algebras (p, d, m)
     are available?"""
 
