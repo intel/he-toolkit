@@ -1,0 +1,18 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[ipcl]]
+version = "2.0.0"
+name = "ipcl_v2.0.0"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
+fetch = "git clone https://github.com/intel/pailliercryptolib.git --branch %name%"
+pre-build = """cmake -S %init_fetch_dir%/pailliercryptolib -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DIPCL_TEST=OFF
+               -DIPCL_BENCHMARK=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_cmake = "install/share/cmake/ipcl-%version%"
