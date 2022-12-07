@@ -3,16 +3,21 @@
 
 """This module handles the usage of third party plugins"""
 
+from argparse import RawTextHelpFormatter
 from enum import Enum
-from pathlib import Path
 from shutil import rmtree, copytree
 from tarfile import is_tarfile, open as tar_open
 from typing import Dict, List
 from zipfile import is_zipfile, ZipFile
+from pathlib import Path
 from toml import loads as toml_loads
-from kit.utils.constants import PluginsConfig, PluginState
-from kit.utils.files import load_toml, dump_toml
-from kit.utils.subparsers import validate_input
+from kit.utils.constants import Constants, PluginsConfig, PluginState
+from kit.utils.subparsers import (
+    get_options_description,
+    get_plugin_arg_choices,
+    validate_input,
+)
+from kit.utils.files import list_dirs, load_toml, dump_toml, dash_to_underscore
 from kit.utils.tab_completion import plugins_enable_completer, plugins_disable_completer
 
 PluginSettings = Dict[str, str]
@@ -156,7 +161,7 @@ def move_plugin_data(
 ) -> None:
     """Move the plugin data to ~/.hekit/plugins"""
     if PluginType.DIR == plugin_type:
-        copytree(plugin_path, dest_path / plugin_name)
+        copytree(plugin_path, dest_path / dash_to_underscore(plugin_name))
     elif PluginType.TAR == plugin_type:
         with tar_open(plugin_path) as f:
             tar_items = [item for item in f.getmembers() if plugin_name in item.name]
@@ -167,46 +172,109 @@ def move_plugin_data(
             f.extractall(dest_path, zip_items)
 
 
+def remove_plugin_data(
+    plugin_name: str, dest_path: Path = PluginsConfig.ROOT_DIR
+) -> None:
+    """Remove a plugin folder if it exists"""
+    plugin_path = dest_path / dash_to_underscore(plugin_name)
+    if Path(plugin_path).exists():
+        rmtree(plugin_path)
+
+
+def are_plugin_args_correct(
+    plugin_name: str, is_plugin_present: bool, hekit_parsers_list: List[str]
+) -> bool:
+    """Verify that all plugin names are valid and unique"""
+    # Get plugin names
+    arg_choices_list = get_plugin_arg_choices(plugin_name)
+
+    # verify the argument parser was defined for the plugin
+    if len(arg_choices_list) == 0:
+        print(
+            f"{plugin_name} cannot be installed because its argument parser was not defined"
+        )
+        return False
+
+    for plugin_arg_choice in arg_choices_list:
+        # verify the prog name of the parser is equal to plugin name
+        if plugin_arg_choice != plugin_name:
+            print(
+                f"Invalid argument definition, found '{plugin_arg_choice}', expected '{plugin_name}'"
+            )
+            return False
+
+        # Verify argument is not a reserved word
+        if plugin_arg_choice in Constants.HEKIT_COMMANDS:
+            print(
+                f"Invalid argument definition, '{plugin_arg_choice}' is a reserved HE Toolkit command"
+            )
+            return False
+
+        # Verify it is not a new version and the argument is unique
+        if not is_plugin_present and plugin_arg_choice in hekit_parsers_list:
+            print(
+                f"Invalid argument definition, '{plugin_arg_choice}' is already used by another plugin"
+            )
+            return False
+
+    return True
+
+
 def install_plugin(args) -> None:
     """Install third party plugins"""
     config_dict = load_plugins_config_file()
     plugin_path = Path(args.plugin).resolve()
     plugin_type = get_plugin_type(plugin_path)
     plugin_settings_list = check_plugin_structure(plugin_path, plugin_type)
+    update_config = False
 
     for plugin_settings_dict in plugin_settings_list:
         plugin_name = plugin_settings_dict["name"]
         plugin_version = plugin_settings_dict["version"]
+        is_plugin_present = plugin_name in config_dict.keys()
+
         if args.force:
             # remove the present version
-            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
-        elif plugin_name in config_dict.keys():
-            # check the versions because the plugin is in the system
+            remove_plugin_data(plugin_name)
+        elif is_plugin_present:
+            # check the versions because the plugin is on the system
             config_version = config_dict[plugin_name]["version"]
             if config_version == plugin_version:
                 print(
-                    f"{plugin_name} version {plugin_version} is already installed in the system"
+                    f"{plugin_name} version {plugin_version} is already installed on the system"
                 )
                 continue
             # Installing a different version
             user_answer = input(
                 f"You are trying to install {plugin_name} version {plugin_version}.\n"
-                f"However the version {config_version} was found in the system.\n"
+                f"However the version {config_version} was found on the system.\n"
                 "Do you want to remove the present version and continue? (y/n) "
             )
             if user_answer not in ("y", "Y"):
                 continue
             # remove the present version
-            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+            remove_plugin_data(plugin_name)
 
         move_plugin_data(plugin_name, plugin_path, plugin_type)
+
+        # verify the plugin arguments
+        if not are_plugin_args_correct(
+            plugin_name, is_plugin_present, args.hekit_parsers_list
+        ):
+            remove_plugin_data(plugin_name)
+            continue
+
         config_dict[plugin_name] = {
             "version": plugin_version,
             "state": PluginState.ENABLE,
             "start": plugin_settings_dict["start"],
         }
-        update_plugins_config_file(config_dict)
+
+        update_config = True
         print(f"Plugin {plugin_name} was installed successfully")
+
+    if update_config:
+        update_plugins_config_file(config_dict)
 
 
 def remove_plugin(args) -> None:
@@ -222,7 +290,7 @@ def remove_plugin(args) -> None:
             return
 
         for plugin_name in config_dict.keys():
-            rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+            remove_plugin_data(plugin_name)
 
         config_dict.clear()
         print("All plugins were uninstalled successfully")
@@ -233,10 +301,10 @@ def remove_plugin(args) -> None:
             raise ValueError("A plugin name should be specified as argument")
 
         if plugin_name not in config_dict.keys():
-            print(f"Plugin {plugin_name} was not found in the system")
+            print(f"Plugin {plugin_name} was not found on the system")
             return
 
-        rmtree(PluginsConfig.ROOT_DIR / plugin_name)
+        remove_plugin_data(plugin_name)
         del config_dict[plugin_name]
         print(f"Plugin {plugin_name} was uninstalled successfully")
 
@@ -250,11 +318,11 @@ def update_plugin_state(args) -> None:
     plugin_state = args.state
 
     if plugin_name not in config_dict.keys():
-        print(f"Plugin {plugin_name} was not found in the system")
+        print(f"Plugin {plugin_name} was not found on the system")
         return
 
     if config_dict[plugin_name]["state"] == plugin_state:
-        print(f"Plugin {plugin_name} is already {plugin_state} in the system")
+        print(f"Plugin {plugin_name} is already {plugin_state} on the system")
         return
 
     config_dict[plugin_name]["state"] = plugin_state
@@ -284,22 +352,59 @@ def list_plugins(args) -> None:
         )
 
 
+def refresh_plugins(args) -> None:  # pylint: disable=unused-argument
+    """Synchronize the information regarding the plugins on the system"""
+
+    def get_plugin_settings():
+        root_dir = args.root_dir
+        for plugin_dir in list_dirs(root_dir):
+            plugin_path = root_dir / plugin_dir
+            # Verify TOML file exists
+            toml_file = plugin_path / "plugin.toml"
+            if not Path(toml_file).exists():
+                raise FileNotFoundError(f"plugin.toml not found in {plugin_path}")
+
+            plugin_settings_dict = load_toml(toml_file)["plugin"]
+            name, version, start = (
+                plugin_settings_dict["name"],
+                plugin_settings_dict["version"],
+                plugin_settings_dict["start"],
+            )
+
+            # Verify main python file exists
+            python_file = plugin_path / start
+            if not Path(python_file).exists():
+                raise FileNotFoundError(f"{start} not found in {plugin_path}")
+            yield name, version, start
+
+    config_dict = {
+        name: {"version": version, "state": PluginState.ENABLE, "start": start}
+        for name, version, start in get_plugin_settings()
+    }
+
+    update_plugins_config_file(config_dict)
+
+
 def set_plugin_subparser(subparsers) -> None:
     """Create the parser for the 'plugin' command"""
     parser_plugin = subparsers.add_parser(
-        "plugins", description="handle third party plugins"
+        "plugins",
+        description="handle third party plugins",
+        formatter_class=RawTextHelpFormatter,
     )
-    subparsers_plugin = parser_plugin.add_subparsers(help="sub-command help")
+    subparsers_plugin = parser_plugin.add_subparsers(metavar="sub-command")
 
     # list options
+    state_choices = ["all", PluginState.ENABLE, PluginState.DISABLE]
     parser_list = subparsers_plugin.add_parser(
         "list", description="print the list of all plugins"
     )
     parser_list.add_argument(
         "--state",
         default="all",
-        choices=["all", PluginState.ENABLE, PluginState.DISABLE],
-        help="filter the plugins by their state",
+        choices=state_choices,
+        help=f"filter the plugins by their state. Options are: {', '.join(state_choices)}",
+        metavar="STATE",
     )
     parser_list.set_defaults(fn=list_plugins)
 
@@ -310,12 +415,14 @@ def set_plugin_subparser(subparsers) -> None:
     parser_install.add_argument(
         "plugin",
         type=validate_input,
-        help="File with the plugin",
+        help="file with the plugin",
     )
     parser_install.add_argument(
         "--force", action="store_true", help="forces the installation process"
     )
-    parser_install.set_defaults(fn=install_plugin)
+    parser_install.set_defaults(
+        fn=install_plugin, hekit_parsers_list=subparsers.choices.keys()
+    )
 
     # remove options
     parser_remove = subparsers_plugin.add_parser(
@@ -331,7 +438,7 @@ def set_plugin_subparser(subparsers) -> None:
     parser_remove.add_argument(
         "--all",
         action="store_true",
-        help="Remove all plugins in the system",
+        help="Remove all plugins on the system",
     )
     parser_remove.set_defaults(fn=remove_plugin)
 
@@ -352,3 +459,15 @@ def set_plugin_subparser(subparsers) -> None:
         "plugin", type=validate_input, help="plugin name"
     ).completer = plugins_enable_completer
     parser_disable.set_defaults(fn=update_plugin_state, state=PluginState.DISABLE)
+
+    # refresh options
+    parser_list = subparsers_plugin.add_parser(
+        "refresh",
+        description="synchronize the information regarding the plugins on the system",
+    )
+    parser_list.set_defaults(fn=refresh_plugins, root_dir=PluginsConfig.ROOT_DIR)
+
+    # Get the name and description for each sub-command
+    subparsers_plugin.help = get_options_description(
+        subparsers_plugin.choices, width=10
+    )

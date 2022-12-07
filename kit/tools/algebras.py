@@ -7,50 +7,25 @@ import math
 import re
 import shutil
 from argparse import ArgumentTypeError
-from subprocess import CalledProcessError, run, PIPE  # nosec B404
-from sys import stdout, stderr, exit as sys_exit
+from sys import stderr, exit as sys_exit
 from itertools import chain, combinations
 from collections import Counter
 from pathlib import Path
+from typing import Callable, Generator, Iterable, List, Optional, Tuple
+from kit.utils.typing import PathType
 from kit.utils.files import create_default_workspace
+from kit.utils.primes import compute_prime_factors, write_primes
 
 
-def set_gen_primes_subparser(subparsers):
-    """Register subparser to generate primes"""
-
-    parser = subparsers.add_parser(
-        "gen-primes",
-        description="generate primes in range [n, m] where n, m are positive integers",
-    )
-    parser.add_argument("start", type=int, default=2, help="start number")
-    parser.add_argument("stop", type=int, default=100, help="stop number")
-    parser.set_defaults(fn=gen_primes)
-
-
-def gen_primes(args):
-    """Generates a list of primes from start to stop values inclusive"""
-    write_primes(args.start, args.stop)
-
-
-def write_primes(start: int, stop: int, outfile=stdout):
-    """Writes to outfile a list of primes from start to stop values inclusive"""
-    numbers = range(start, stop + 1)
-    primes = [
-        factors[0] for factors in compute_prime_factors(numbers) if len(factors) == 1
-    ]
-    print("\n".join(map(str, primes)), file=outfile)
-
-
-def powerset(iterable):
-    """Returns a generator.
-    Note that we do not return the empty set.
+def powerset(iterable: Iterable[int]) -> chain:
+    """Note that we do not return the empty set.
     https://docs.python.org/3/library/itertools.html"""
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
 
-def find_ms(ps, ds, factorize):
-    """Generator returns the p, gen for max m's for p^d"""
+def find_ms(ps: Iterable[int], ds: Iterable[int], factorize: Callable) -> Generator:
+    """Returns the p, gen for max m's for p^d"""
     prime_factors = factorize(p**d - 1 for p in ps for d in ds)
     if prime_factors:
         all_factors = tuple(powerset(primes) for primes in prime_factors)
@@ -60,7 +35,7 @@ def find_ms(ps, ds, factorize):
                 yield p, d, m_factors
 
 
-def str_to_range(s):
+def str_to_range(s: str) -> range:
     """Parse a string and return a Python range object.
     This function expects a positive integer."""
     if s.isdigit():
@@ -70,7 +45,10 @@ def str_to_range(s):
     regex = re.compile(r"^((\d+)\s*-\s*(\d+))$")
     match = None
     try:
-        match, start, end = regex.fullmatch(s).groups()
+        fullmatch = regex.fullmatch(s)
+        if fullmatch is None:
+            raise ArgumentTypeError(f"Wrong syntax for range given '{s}'.")
+        match, start, end = fullmatch.groups()
         if match is None:
             raise ArgumentTypeError(f"Unknown error. Range with match '{match}'")
         start, end = int(start), int(end)
@@ -85,7 +63,7 @@ def str_to_range(s):
         raise ArgumentTypeError(f"Wrong syntax for range given '{s}'.") from error
 
 
-def parse_range(string, filter_fn=None):
+def parse_range(string: str, filter_fn: Optional[Callable] = None) -> List[int]:
     """Returns sorted list"""
     ranges = (str_to_range(s) for s in string.replace(" ", "").split(","))
 
@@ -97,7 +75,7 @@ def parse_range(string, filter_fn=None):
     return sorted(unique_nums)
 
 
-def parse_range_for_primes(string):
+def parse_range_for_primes(string: str) -> List[int]:
     """Create a file with sorted primes"""
     default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
     try:
@@ -114,58 +92,20 @@ def parse_range_for_primes(string):
 class PrimesFromFile:
     """Process primes from a text file."""
 
-    def __init__(self, filename):
+    def __init__(self, filename: PathType) -> None:
         """Load file with primes."""
         with open(filename, encoding="utf-8") as f:
             self.primes = tuple(int(p) for p in f.readlines())
             self.max = self.primes[-1]
 
-    def is_prime(self, n):
-        """Return True if prime for numbers upto numbers in the file."""
+    def is_prime(self, n: int) -> bool:
+        """Return True if prime for numbers up to numbers in the file."""
         if n > self.max:
             raise ValueError(f"Cannot process number higher than {self.max}")
         return n in self.primes
 
 
-def parse_factor_line(line):
-    """'num: f1 f2 f3' -> (num, (f1, f2, f3))"""
-    split_line = line.split()  # ['key:', 'v1', 'v2' , ...]
-    key = split_line[0]
-    if key[-1] != ":":
-        raise ValueError(f"{line} does not have valid key format")
-    key = int(key[:-1])
-    value = tuple(int(num) for num in split_line[1:])
-    return key, value
-
-
-def compute_prime_factors(numbers, factor_util="factor"):
-    """Return generator. Keys m, Value prime factors.
-    Process out to factor"""
-
-    numbers = list(numbers)
-    if len(numbers) == 0:
-        return None
-
-    command_and_args = [factor_util, *map(str, numbers)]
-
-    try:
-        out = run(command_and_args, stdout=PIPE, check=True)  # nosec B603
-    except CalledProcessError as error:
-        # Was it a negative number on the input?
-        if any(number < 0 for number in numbers):
-            raise ValueError(
-                f"A negative number was found in the input: {numbers}"
-            ) from error
-        raise error
-
-    factor_lines = out.stdout.decode("ascii").strip().split("\n")
-
-    # We only want the value a.k.a. the primes factors
-    # A generator here does not save memory, but makes the parsing lazy
-    return (parse_factor_line(line)[1] for line in factor_lines)
-
-
-def set_gen_algebras_subparser(subparsers):
+def set_gen_algebras_subparser(subparsers) -> None:
     """Register subparser to generate algebras"""
     parser = subparsers.add_parser(
         "algebras", description="generate ZZ_p[x]/phi(X) algebras"
@@ -189,30 +129,32 @@ def set_gen_algebras_subparser(subparsers):
         print("To run, factor utility is required.", file=stderr)
         sys_exit(1)
 
-    parser.set_defaults(fn=healg, factor_util=factor_util)
+    parser.set_defaults(fn=algebras, factor_util=factor_util)
 
 
-def phi(prime_factors):
+def phi(prime_factors: Iterable[int]) -> int:
     """ "Euler's totient from prime factors.
     This function assumes that only primes are passed in."""
     c = Counter(prime_factors)
     return math.prod((p - 1) * p ** (k - 1) for p, k in c.items())
 
 
-def correct_for_d(p, d, m):
+def correct_for_d(p: int, d: int, m: int) -> Tuple[int, int]:
     """Returns the minimum value of d satisfiying p^d = 1 mod m.
     Computations for valid ms with a starting point of p^d can
-    sometimes lead to an erroneous d.
+    sometimes lead to an erroneous d (too large).
 
     This function expects that p is a prime number."""
     for e in range(1, d + 1):
         if (p**e) % m == 1:
-            break
+            return e, e != d
 
-    return e, e != d
+    raise ValueError(
+        f"exponent for p^e = 1 mod m, could not be found, (p, d, m) was ({p}, {d}, {m})"
+    )
 
 
-def healg(args):
+def algebras(args):
     """Given a prime p(s) and a required d(s) what algebras (p, d, m)
     are available?"""
 

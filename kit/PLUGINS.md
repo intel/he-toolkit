@@ -13,6 +13,7 @@ format as explained in section [Creating a new plugin](#creating-a-new-plugin).
      - [install](#install)
      - [remove](#remove)
      - [enable and disable](#enable-and-disable)
+     - [refresh](#refresh)
   - [Creating a new plugin](#creating-a-new-plugin)
      - [TOML file](#toml-file)
      - [Main python file](#main-python-file)
@@ -29,6 +30,7 @@ and usage of each sub-command.
 | remove | Remove an installed plugin. | hekit plugins remove [--all] [plugin-name]
 | disable | Disable an installed plugin. | hekit plugins disable plugin-name
 | enable | Enable an installed plugin. | hekit plugins enable plugin-name
+| refresh | Synchronize the information of the installed plugins. | hekit plugins refresh
 
 ### Usage
 
@@ -86,15 +88,26 @@ In order to enable a plugin again, run the command
 hekit plugins enable plugin-name
 ```
 
+#### refresh
+Execute the following command to synchronize the information in the
+plugin config file with the plugins located in `~/.hekit/plugins`
+```bash
+hekit plugins refresh
+```
+
 ## Creating a new plugin
 The simplest version of a plugin must include a main directory
-that contains a TOML file and at least one python file, as shown
+that contains a TOML file and at least one python file as shown
 in the following example
 ```
 my-plugin
+    |- __init__.py
     |- new-plugin.py
     |- plugin.toml
 ```
+
+Note that it is recommended to have an `__init__.py` file as the plugins are
+treated as python packages.
 
 For delivering a plugin in zip or tarball format, a common file
 packaging utility must be applied to the previous structure.
@@ -124,26 +137,27 @@ the following example template
 ```python
 def set_TBD_subparser(subparsers):
     """create the parser for the TDB plugin"""
-    parser_TBD = subparsers.add_parser("TBD", description="ADD-SUBPARSER-DESCRIPTION")
-    parser_TBD.add_argument(
-        "ARG1", description="ADD-ARG-DESCRIPTION"
-    )
-    parser_TBD.add_argument(
-        "ARG2", description="ADD-ARG-DESCRIPTION"
-    )
-    parser_TBD.set_defaults(fn=TBD_NEW_FUNCTIONALITY)
+    parser_TBD = subparsers.add_parser("my-plugin", description="ADD-SUBPARSER-DESCRIPTION")
+    parser_TBD.add_argument("ARG1", help="ADD-ARG-DESCRIPTION")
+    parser_TBD.add_argument("ARG2", help="ADD-ARG-DESCRIPTION")
+    parser_TBD.set_defaults(fn=ADD_NEW_FUNCTIONALITY)
 ```
 
-In the previous code, `TBD_NEW_FUNCTIONALITY` (parameter `fn` of `set_defaults`)
-is the function that implements the entry point of the plugin. Therefore, this
-function must use the plugin's arguments, for instance:
+In the previous code, the following conditions must be met:
+
+* The value of the first paramenter of `subparsers.add_parser` must be the
+same as the value of `name` defined in the TOML file.
+
+* `ADD_NEW_FUNCTIONALITY` (parameter `fn` of `set_defaults`) is the function
+that implements the entry point of the plugin. Therefore, this function
+must use the plugin's arguments, for instance:
 ```python
-def TBD_NEW_FUNCTIONALITY(args) -> None:
+def ADD_NEW_FUNCTIONALITY(args) -> None:
     """Executes new functionality"""
-    if(args.ARG1)
+    if(args.ARG1):
         # logic for ARG1
         ...
-    if(args.ARG2)
+    if(args.ARG2):
         # logic for ARG2
         ...
 ```

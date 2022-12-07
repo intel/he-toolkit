@@ -3,82 +3,64 @@
 
 import pytest
 from pathlib import Path
-from kit.commands.install import install_components, _stages, get_recipe_arg_dict
+from kit.commands.install import install_components, get_recipe_arg_dict
 
 
 def test_install_components_all_unskipped(mocker, args, unskipped_components):
-    """chain_run function is executed because skip is equal to False"""
-    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
+    """All components are installed because skip flag is equal to False"""
+    mock_component = mocker.patch(
+        "kit.utils.component_builder.components_to_build_from"
+    )
     mock_component.return_value = unskipped_components
-    mock_chain_run = mocker.patch("kit.commands.install.chain_run")
+    mock_print = mocker.patch("kit.utils.component_builder.print")
 
     install_components(args)
     mock_component.assert_called_once()
     mock_component.assert_called_with(
         args.recipe_file, args.config.repo_location, args.recipe_arg
     )
-    assert 3 == mock_chain_run.call_count
+    mock_print.assert_called_with(
+        "[HEKIT]", "component/instance:", "component_test/instance_test"
+    )
+    assert 3 == mock_print.call_count
 
 
 def test_install_components_all_skipped(mocker, args, skipped_components):
-    """chain_run function is not executed because skip is equal to True"""
-    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
+    """All components are skipped because skip flag is equal to True"""
+    mock_component = mocker.patch(
+        "kit.utils.component_builder.components_to_build_from"
+    )
     mock_component.return_value = skipped_components
-    mock_chain_run = mocker.patch("kit.commands.install.chain_run")
+    mock_print = mocker.patch("kit.utils.component_builder.print")
 
     install_components(args)
     mock_component.assert_called_once()
     mock_component.assert_called_with(
         args.recipe_file, args.config.repo_location, args.recipe_arg
     )
-    mock_chain_run.assert_not_called()
+    mock_print.assert_called_with(
+        "[HEKIT]", "Skipping component/instance:", "component_test/instance_test"
+    )
+    assert 6 == mock_print.call_count
 
 
 def test_install_components_one_unskipped(mocker, args, one_unskipped_component):
-    """chain_run function is executed once when skip is equal to False"""
-    mock_component = mocker.patch("kit.commands.install.components_to_build_from")
+    """Only two of three components are skipped when skip flag is equal to False"""
+    mock_component = mocker.patch(
+        "kit.utils.component_builder.components_to_build_from"
+    )
     mock_component.return_value = one_unskipped_component
-    mock_chain_run = mocker.patch("kit.commands.install.chain_run")
+    mock_print = mocker.patch("kit.utils.component_builder.print")
 
     install_components(args)
     mock_component.assert_called_once()
     mock_component.assert_called_with(
         args.recipe_file, args.config.repo_location, args.recipe_arg
     )
-    mock_chain_run.assert_called_once()
-
-
-def test_stages_fetch(mocker, unskipped_components):
-    comp = unskipped_components[0]
-    upto_stage = "fetch"
-
-    the_stages = _stages(upto_stage)
-    act_result = the_stages(comp)
-    assert next(act_result) == comp.setup
-    assert next(act_result) == comp.fetch
-
-
-def test_stages_build(mocker, unskipped_components):
-    comp = unskipped_components[1]
-    upto_stage = "build"
-
-    the_stages = _stages(upto_stage)
-    act_result = the_stages(comp)
-    assert next(act_result) == comp.setup
-    assert next(act_result) == comp.fetch
-    assert next(act_result) == comp.build
-
-
-def test_stages_install(mocker, unskipped_components):
-    comp = unskipped_components[2]
-    upto_stage = "install"
-
-    the_stages = _stages(upto_stage)
-    act_result = the_stages(comp)
-    assert next(act_result) == comp.setup
-    assert next(act_result) == comp.fetch
-    assert next(act_result) == comp.build
-    assert next(act_result) == comp.install
+    mock_print.assert_called_with(
+        "[HEKIT]", "Skipping component/instance:", "component_test/instance_test"
+    )
+    assert 5 == mock_print.call_count
 
 
 def test_get_recipe_arg_dict_correct_format():
