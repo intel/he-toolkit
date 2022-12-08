@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021 Intel Corporation
+// Copyright (C) 2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include <iostream>
@@ -20,7 +20,7 @@ int main() {
 
   // Here we initialize the client's SEAL context with desired poly modulus,
   // plain modulus, and database key length parameters.
-  if (interactive_init == "" || "Y") {
+  if (interactive_init == "" || interactive_init == "Y") {
     sq_client.initializeSealContext(std::pow(2, 13), 17);
   } else {
     sq_client.initializeSealContextInteractive();

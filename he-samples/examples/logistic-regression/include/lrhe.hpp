@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021 Intel Corporation
+// Copyright (C) 2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef HE_SAMPLES_EXAMPLES_LOGISTIC_REGRESSION_INCLUDE_LRHE_HPP_
@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "kernels/lrhe_kernel.hpp"
+#include "lrhe_kernel.hpp"
 
 namespace lrhe {
 class LRHE {
@@ -50,13 +50,13 @@ class LRHE {
   bool m_encrypt_model = true;
 
   std::unique_ptr<kernel::LRHEKernel> m_kernel;
-  bool m_isTrained;
+  bool m_isTrained = false;
 
-  size_t m_slot_count;
-  size_t m_batch_size;
+  size_t m_slot_count = 0;
+  size_t m_batch_size = 0;
   std::vector<double> m_weights;
-  double m_bias;
-  size_t m_n_weights;
+  double m_bias = 0.0;
+  size_t m_n_weights = 0;
   std::vector<seal::Ciphertext> m_ct_weights;
   seal::Ciphertext m_ct_bias;
   std::vector<seal::Plaintext> m_pt_weights;

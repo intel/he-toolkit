@@ -1,0 +1,14 @@
+# Recommended requirements
+-r requirements.txt
+
+# Testing
+pytest
+pytest-mock
+
+# Linting
+pylint
+bandit
+
+# Type analysis
+types-toml
+mypy

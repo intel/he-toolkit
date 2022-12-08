@@ -1,22 +1,19 @@
 # Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: he-toolkit
+name: Build and Test
 on:
   # By default this will run when the activity type is "opened", "synchronize",
   # or "reopened".
   pull_request:
     branches:
       - main
+  # Run when protected branches are pushed to, e.g. via merge
+  push:
+    branches:
+      - main
   # Manually run this workflow on any specified branch.
   workflow_dispatch:
-
-###################
-# Define env vars #
-###################
-env:
-  HEXL_VER: 1.2.1
-  HEXL_DIR: ${GITHUB_WORKSPACE}/hexl-install/lib/cmake/hexl-${HEXL_VER}
 
 ################
 # Ubuntu 20.04 #
@@ -25,94 +22,322 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Required for pre-commit
-      - run: pip3 install cpplint
+      - run: pip3 install bandit black cpplint docker mypy pydantic pylint pylint-pydantic types-toml
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
-      - uses: pre-commit/action@v2.0.2
+      - uses: pre-commit/action@v3.0.0
         with:
           extra_args: --all-files
 
-  build-and-test:
-    name: Build, test and run kernels
-    needs: [format]
+  test-hekit-bash:
+    name: Test hekit commands (bash)
     runs-on: ubuntu-20.04
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
     steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
+      - uses: actions/checkout@v3
+      - name: Setup
         run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REF
-          pwd
+          pip3 install docker pytest pytest-mock pytest-xdist toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Install GMP and NTL
-      - name: Install GMP and NTL
-        run: |
-          sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libntl-dev
+      - name: Run pytests
+        run: pytest tests/ -n 8 --dist loadgroup
 
-      # Build and install HEXL 1.2.1 for HElib
-      - name: Install HEXL (for HElib)
+      - name: hekit init
         run: |
-          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
-          cd hexl
-          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
-          cmake --build build -j
-          cmake --install build
+          export SHELL=/bin/bash
+          ./hekit init <<< y
+          source /home/runner/.bash_profile
+          cd .. && hekit -h
 
-      # Build toolkit
-      - name: Build the repository
+  test-hekit-zshell:
+    name: Test hekit commands (zshell)
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
-          cmake --build build --target all -j
+          pip3 install docker pytest pytest-mock pytest-xdist toml
+          sudo apt install zsh -y
+          touch ~/.zshrc
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Unit tests and examples
-      - name: Run the unit tests
-        run: ./build/sample-kernels/test/unit-test
-      - name: Run secure query example
+      - name: Run pytests
+        shell: zsh {0}
+        run: pytest tests/ -n 8 --dist loadgroup
+
+      - name: hekit init
+        shell: zsh {0}
         run: |
-          cd build/examples/secure-query
-          echo -n "Input: Arkansas, " && ./secure-query <<< $'\n\nArkansas\n' | grep "Little Rock"
-          echo -n "Input: New Mexico, " && ./secure-query <<< $'\n\nNew Mexico\n' | grep "Santa Fe"
-          echo -n "Input: California, " && ./secure-query <<< $'\n\nCalifornia\n' | grep "Sacramento"
-      - name: Run LR example
+          export SHELL=/bin/zsh
+          ./hekit --debug init <<< y
+          source /home/runner/.zshrc
+          cd .. && hekit -h
+
+  build-and-test-toolkit-palisade:
+    name: HEKit PALISADE | ${{ matrix.os }} ${{ matrix.c_compiler }} py${{ matrix.python-version }}
+    # Disable this job for now as it fails due to HEXL-PALISADE issue
+    # (fixed in HEXL 1.2.5 re-enable when we can update the HEXL version)
+    if: ${{ false }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
+          - c_compiler: clang-10
+            cxx_compiler: clang++-10
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
+          - c_compiler: gcc-10
+            cxx_compiler: g++-10
+          - c_compiler: gcc-11
+            cxx_compiler: g++-11
+        exclude:
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
+            c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
+          # clang-14 and gcc-11 default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            c_compiler: clang-10
+          - os: ubuntu-22.04
+            c_compiler: gcc-10
+          # python3.10 is default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            python-version: "3.8"
+          - os: ubuntu-22.04
+            python-version: "3.9"
+          # python3.8 is default on Ubuntu-20.04
+          - os: ubuntu-20.04
+            python-version: "3.10"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup
         run: |
-          cd build/examples/logistic-regression
-          ./lr_test --compare --data lrtest_large | grep "All match!"
+          pip3 install toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
+          echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
+
+      - name: Build and install PALISADE and sample kernels recipe
+        run: |
+          ./hekit --config default.config install .github/hekit-recipes/palisade.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "PALISADE_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/palisade/build" >> $GITHUB_ENV
+
+      - name: Run unit tests
+        run: ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
+
+  build-and-test-toolkit-helib:
+    name: HEKit HElib | ${{ matrix.os }} ${{ matrix.c_compiler }} py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
+          - c_compiler: clang-10
+            cxx_compiler: clang++-10
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
+          - c_compiler: gcc-10
+            cxx_compiler: g++-10
+          - c_compiler: gcc-11
+            cxx_compiler: g++-11
+        exclude:
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
+            c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
+          # clang-14 and gcc-11 default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            c_compiler: clang-10
+          - os: ubuntu-22.04
+            c_compiler: gcc-10
+          # python3.10 is default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            python-version: "3.8"
+          - os: ubuntu-22.04
+            python-version: "3.9"
+          # python3.8 is default on Ubuntu-20.04
+          - os: ubuntu-20.04
+            python-version: "3.10"
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup
+        run: |
+          pip3 install toml pydantic pytest
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
+          echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
+          echo "python-version=${{matrix.python-version}}" >> $GITHUB_ENV
+          python --version
+
+      - name: Build and install HElib and example recipe
+        run: |
+          ./hekit --config default.config install .github/hekit-recipes/helib.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "PSI_BUILD_DIR=$HOME/.hekit/components/examples/psi/build" >> $GITHUB_ENV
+
+      - name: Run PSI example
+        run: |
+          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
+
+      - name: Build PSI config tests
+        run: |
+          ./hekit --config default.config install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
+
+      - name: Run PSI config unit tests
+        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
+
+      - name: Run PSI config pytests
+        run: |
+          source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/tests/
+          pytest deployments/config_psi/scripts/tests/
+
+  build-and-test-toolkit-seal:
+    name: HEKit SEAL | ${{ matrix.os }} ${{ matrix.c_compiler }} py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          # pairing cc compiler with relevant cxx compiler
+          - c_compiler: clang-10
+            cxx_compiler: clang++-10
+          - c_compiler: clang-14
+            cxx_compiler: clang++-14
+          - c_compiler: gcc-10
+            cxx_compiler: g++-10
+          - c_compiler: gcc-11
+            cxx_compiler: g++-11
+        exclude:
+          # clang-14 and gcc-11 not supported on ubuntu-20.04
+          - os: ubuntu-20.04
+            c_compiler: clang-14
+          - os: ubuntu-20.04
+            c_compiler: gcc-11
+          # clang-14 and gcc-11 default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            c_compiler: clang-10
+          - os: ubuntu-22.04
+            c_compiler: gcc-10
+          # python3.10 is default on Ubuntu-22.04
+          - os: ubuntu-22.04
+            python-version: "3.8"
+          - os: ubuntu-22.04
+            python-version: "3.9"
+          # python3.8 is default on Ubuntu-20.04
+          - os: ubuntu-20.04
+            python-version: "3.10"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup
+        run: |
+          pip3 install toml
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
+          echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
+          echo "python-version=${{ matrix.python-version }}">> $GITHUB_ENV
+          python --version
+
+      - name: he-toolkit-seal-ubuntu-22
+        if: matrix.os == 'ubuntu-22.04' &&  matrix.c_compiler == 'clang-14'
+        run: |
+          sudo apt install libomp-dev
+
+      - name: Build and install SEAL, examples, and sample kernels recipe
+        run: |
+          ./hekit --config default.config install .github/hekit-recipes/seal.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config default.config list
+          echo "QUERY_BUILD_DIR=$HOME/.hekit/components/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HOME/.hekit/components/examples/logistic-regression/build" >> $GITHUB_ENV
+          echo "SEAL_KERNELS_BUILD_DIR=$HOME/.hekit/components/sample-kernels/seal/build" >> $GITHUB_ENV
+
+      - name: Run Secure Query example
+        run: |
+          cd ${QUERY_BUILD_DIR}
+          echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
+          echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
+          echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
+
+      - name: Run LR example
+        run: |
+          cd ${LR_BUILD_DIR}
+          ./lr_test --compare --data lrtest_large | grep "All match!"
+
+      - name: Run sample kernels unit test
+        run: ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
+
 
 ##############
 # IceLake CI #
@@ -120,101 +345,131 @@ jobs:
   format-icelake:
     name: Format (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     steps:
-      - uses: actions/checkout@v2
-        # Add local bin for cpplint
+      # Add local bin for cpplint
       - name: Setup
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - uses: actions/checkout@v3
       - name: pre-commit
         run: pre-commit run --all-files
 
-  build-and-test-icelake:
-    name: Build, test and run kernels (IceLake - Excl. HElib)
-    needs: [format-icelake]
+  test-hekit-icelake:
+    name: Test hekit commands (IceLake)
     runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
     defaults:
       run:
         shell: bash
-        working-directory: he-samples
     steps:
-      - uses: actions/checkout@v2
-      - name: Validate paths
-        run: |
-          whoami
-          echo $HOME
-          echo $GITHUB_WORKSPACE
-          echo "Testing from branch:"
-          echo $GITHUB_REF
-          pwd
+        # Add local bin for pytest
+      - name: Setup
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - uses: actions/checkout@v3
+      - name: Run pytests
+        run: pytest tests/ -n 8 --dist loadgroup
 
-      # Build toolkit (Excl. HElib)
-      - name: Build the repository
+  build-and-test-toolkit-icelake:
+    name: Build, test and run HE Toolkit (IceLake)
+    runs-on: [self-hosted, Linux, X64, ice-lake]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # Add local bin for pip modules and create temp workspace
+      - name: Setup
         run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_HELIB=OFF
-          cmake --build build --target all -j
+          temp_workspace="$(pwd)/../$(date +%s)"
+          mkdir $temp_workspace
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "TEMP_DIRECTORY=$temp_workspace" >> $GITHUB_ENV
+          echo "HE_WORKSPACE=$temp_workspace/.hekit/components" >> $GITHUB_ENV
+          echo "CONFIG_FILE=$temp_workspace/default.config" >> $GITHUB_ENV
 
-      # Unit tests and examples
-      - name: Run the unit tests
-        run: ./build/sample-kernels/test/unit-test
-      - name: Run secure query example
+      - uses: actions/checkout@v3
+
+      - name: Init hekit
+        run: echo "repo_location = \"$HE_WORKSPACE\"" > $CONFIG_FILE
+
+      - name: Build and install default recipe
         run: |
-          cd build/examples/secure-query
+          ./hekit --config $CONFIG_FILE install recipes/default.toml
+          ./hekit --config $CONFIG_FILE list
+
+      - name: Build examples
+        run: |
+          ./hekit --config $CONFIG_FILE build recipes/examples.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config $CONFIG_FILE list
+          echo "PSI_BUILD_DIR=$HE_WORKSPACE/examples/psi/build" >> $GITHUB_ENV
+          echo "QUERY_BUILD_DIR=$HE_WORKSPACE/examples/secure-query/build" >> $GITHUB_ENV
+          echo "LR_BUILD_DIR=$HE_WORKSPACE/examples/logistic-regression/build" >> $GITHUB_ENV
+
+      - name: Run PSI example
+        run: |
+          echo -e "apple\nBanana\ncat\nBa-Ra\nCalifornia" > client.set
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/fruits.set | grep -B 1 "apple"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/ancient_egyptian_gods.set | grep -B 1 "Ba-Ra"
+          ${PSI_BUILD_DIR}/psi client.set --server ${PSI_BUILD_DIR}/datasets/us_states.set | grep -B 1 "California"
+
+      - name: Run Secure Query example
+        run: |
+          cd ${QUERY_BUILD_DIR}
           echo -n "Input: Louisiana, " && ./secure-query <<< $'\n\nLouisiana\n' | grep "Baton Rouge"
           echo -n "Input: North Dakota, " && ./secure-query <<< $'\n\nNorth Dakota\n' | grep "Bismarck"
           echo -n "Input: Wyoming, " && ./secure-query <<< $'\n\nWyoming\n' | grep "Cheyenne"
+
       - name: Run LR example
         run: |
-          cd build/examples/logistic-regression
+          cd ${LR_BUILD_DIR}
           ./lr_test --compare --data lrtest_large | grep "All match!"
+
+      - name: Build PSI config tests
+        run: |
+          ./hekit --config $CONFIG_FILE install recipes/config-psi.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config $CONFIG_FILE list
+          echo "CONFIG_PSI_TEST_DIR=$HOME/.hekit/components/psi/configurable-psi/build" >> $GITHUB_ENV
+
+      - name: Run PSI config unit tests
+        run: ${CONFIG_PSI_TEST_DIR}/bin/unit-test
+
+      - name: Run PSI config pytests
+        run: |
+          source deployments/config_psi/setenv.sh
+          pytest deployments/config_psi/tests/
+          pytest deployments/config_psi/scripts/tests/
+
+      - name: Build sample kernels
+        run: |
+          ./hekit --config $CONFIG_FILE build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${GITHUB_WORKSPACE}"
+          ./hekit --config $CONFIG_FILE list
+          echo "SEAL_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/seal/build" >> $GITHUB_ENV
+          echo "PALISADE_KERNELS_BUILD_DIR=$HE_WORKSPACE/sample-kernels/palisade/build" >> $GITHUB_ENV
+
+      - name: Run sample kernels unit test
+        run: |
+          ${SEAL_KERNELS_BUILD_DIR}/test/unit-test
+          ${PALISADE_KERNELS_BUILD_DIR}/test/unit-test
 
       # PALISADE sample kernels
       - name: Run PALISADE sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${PALISADE_KERNELS_BUILD_DIR}/sample-kernels-palisade --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-palisade_${GITHUB_SHA}.json"
       - name: Archive PALISADE sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-palisade_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
       # SEAL sample kernels
       - name: Run SEAL sample kernels
-        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ./build/sample-kernels/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
+        run: KMP_WARNINGS=0 OMP_NUM_THREADS=5 ${SEAL_KERNELS_BUILD_DIR}/sample-kernels-seal --benchmark_out_format=json --benchmark_out="${GITHUB_JOB}_sample-kernels-seal_${GITHUB_SHA}.json"
       - name: Archive SEAL sample kernel results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
-          path: he-samples/${{github.job}}_sample-kernels-seal_${{github.sha}}.json
+          path: ${{github.job}}_sample-kernels-seal_${{github.sha}}.json
           retention-days: 90 # Maximum for free version
 
-  build-helib-icelake:
-    name: Build HElib with HEXL (Icelake)
-    needs: [format-icelake]
-    runs-on: [self-hosted, Linux, X64, ice-lake]
-    # Use environment protection (require review)
-    environment: intel_workflow
-    defaults:
-      run:
-        shell: bash
-        working-directory: he-samples
-    steps:
-      - uses: actions/checkout@v2
-
-      # Build and install HEXL
-      - name: Build and install HEXL
+      - name: Clean up hekit directory
+        if: always()
         run: |
-          git clone https://github.com/intel/hexl.git -b v${{ env.HEXL_VER }}
-          cd hexl
-          cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/hexl-install
-          cmake --build build -j
-          cmake --install build
-
-      # Build the toolkit with only HElib and HEXL
-      - name: Build HElib
-        run: |
-          cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_BUILD_TYPE=Release -DENABLE_SEAL=OFF -DENABLE_PALISADE=OFF -DENABLE_HELIB=ON -DENABLE_INTEL_HEXL=ON -DINTEL_HEXL_HINT_DIR=${{ env.HEXL_DIR }}
-          cmake --build build --target all -j
+          ./hekit --config $CONFIG_FILE remove --all -y
+          rm -rf $TEMP_DIRECTORY

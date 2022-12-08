@@ -1,0 +1,209 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import pytest
+from kit.utils.component_builder import (
+    chain_run,
+    run,
+    BuildError,
+    components_to_build_from,
+    ComponentBuilder,
+    stages,
+)
+
+
+def test_stages_fetch(mocker, unskipped_components):
+    comp = unskipped_components[0]
+    upto_stage = "fetch"
+
+    the_stages = stages(upto_stage, force=False)
+    act_result = the_stages(comp)
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+
+
+def test_stages_build(mocker, unskipped_components):
+    comp = unskipped_components[1]
+    upto_stage = "build"
+
+    the_stages = stages(upto_stage, force=False)
+    act_result = the_stages(comp)
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+    assert next(act_result) == comp.build
+
+
+def test_stages_install(mocker, unskipped_components):
+    comp = unskipped_components[2]
+    upto_stage = "install"
+
+    the_stages = stages(upto_stage, force=False)
+    act_result = the_stages(comp)
+    assert next(act_result) == comp.setup
+    assert next(act_result) == comp.fetch
+    assert next(act_result) == comp.build
+    assert next(act_result) == comp.install
+
+
+def test_chain_run_all_success(mocker, funcs_success):
+    try:
+        chain_run(funcs_success)
+        assert True
+    except Exception as exc:
+        assert False, f"'chain_run' raised an exception {exc}"
+
+
+def test_chain_run_all_failure(mocker, funcs_failure):
+    exp_error, funcs = funcs_failure
+    exp_value = f"Function '{funcs[0].__name__}' failed to execute external process"
+
+    with pytest.raises(BuildError) as exc_info:
+        chain_run(funcs)
+    assert exc_info.value.args[0] == exp_value
+    assert exc_info.value.error == exp_error
+
+
+def test_run_success(mocker, cmd_and_args, Popen_success):
+    exp_status, exp_code = Popen_success
+    mock_Popen = mocker.patch("kit.utils.component_builder.Popen")
+    mock_proc = mock_Popen.return_value.__enter__.return_value
+    mock_proc.returncode = exp_code
+
+    act_status, act_code = run(cmd_and_args)
+    assert act_status == exp_status
+    assert act_code == exp_code
+    mock_Popen.assert_called_once()
+
+
+def test_run_failure(mocker, cmd_and_args, Popen_failure):
+    exp_status, exp_code = Popen_failure
+    mock_Popen = mocker.patch("kit.utils.component_builder.Popen")
+    mock_proc = mock_Popen.return_value.__enter__.return_value
+    mock_proc.returncode = exp_code
+
+    act_status, act_code = run(cmd_and_args)
+    assert act_status == exp_status
+    assert act_code == exp_code
+    mock_Popen.assert_called_once()
+
+
+def test_run_without_arguments(mocker):
+    mock_Popen = mocker.patch("kit.utils.component_builder.Popen")
+
+    act_status, act_code = run("")
+    assert act_status == True
+    assert act_code == 0
+    mock_Popen.assert_not_called()
+
+
+def test_components_to_build_from_(mocker, specs_data):
+    exp_filename, exp_repo, exp_recipe_arg, exp_spec = specs_data
+    mock_Spec = mocker.patch("kit.utils.component_builder.Spec.from_toml_file")
+    mock_Spec.return_value = exp_spec
+    mock_ComponentBuilder = mocker.patch.object(ComponentBuilder, "__init__")
+    mock_ComponentBuilder.return_value = None
+
+    act_result = components_to_build_from(exp_filename, exp_repo, exp_recipe_arg)
+    for result in act_result:
+        assert type(result) == ComponentBuilder
+    assert mock_ComponentBuilder.call_count == 3
+    mock_Spec.assert_called_with(exp_filename, exp_repo, exp_recipe_arg)
+
+
+"""Utilities used by the tests"""
+
+
+@pytest.fixture
+def funcs_success():
+    def func_success():
+        return (True, 0)
+
+    return [func_success, func_success, func_success]
+
+
+@pytest.fixture
+def funcs_failure():
+    exp_error = 56
+
+    def func_failire():
+        return (False, exp_error)
+
+    return exp_error, [func_failire]
+
+
+@pytest.fixture
+def cmd_and_args():
+    return "git clone https://github.com/test/test.git --branch v1.1.1"
+
+
+@pytest.fixture
+def Popen_success():
+    return True, 0
+
+
+@pytest.fixture
+def Popen_failure():
+    return False, 1
+
+
+@pytest.fixture
+def specs_data():
+    filename = "hexl"
+    repo = "/home/test/components"
+    recipe_arg = {"version": "2.3.1"}
+
+    class Spec:
+        def __init__(self):
+            self.component = filename
+            self._instance_spec = {
+                "skip": False,
+                "version": "1.2.3",
+                "name": "1.2.3",
+                "fetch": "test",
+                "init_fetch_dir": "test",
+                "init_build_dir": "test",
+                "init_install_dir": "test",
+                "pre-build": "test",
+                "build": "test",
+                "install": "test",
+                "export_install_dir": "test",
+                "export_cmake": "test",
+            }
+            self.repo_location = repo
+
+    return filename, repo, recipe_arg, [Spec(), Spec(), Spec()]
+
+
+@pytest.fixture
+def unskipped_components():
+    return [MockComponent(False), MockComponent(False), MockComponent(False)]
+
+
+class MockComponent:
+    def __init__(self, skip):
+        self._skip = skip
+        self._result = (True, 0)
+
+    def skip(self):
+        return self._skip
+
+    def component_name(self):
+        return "component_test"
+
+    def instance_name(self):
+        return "instance_test"
+
+    def setup(self):
+        return self._result
+
+    def fetch(self):
+        return self._result
+
+    def build(self):
+        return self._result
+
+    def install(self):
+        return self._result
+
+    def reset_stage_info_file(self, stage):
+        pass

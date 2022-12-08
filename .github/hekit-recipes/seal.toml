@@ -1,0 +1,154 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[hexl]]
+skip = false
+version = "1.2.3"
+name = "v1.2.3"
+fetch = "git clone https://github.com/intel/hexl.git --branch v%version%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/hexl -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DHEXL_BENCHMARK=OFF
+               -DHEXL_TESTING=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/hexl-%version%"
+
+
+[[gsl]]
+skip = false
+version = "v3.1.0"
+name = "v3.1.0"
+fetch = "git clone https://github.com/microsoft/GSL.git --branch %version%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/GSL -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DGSL_TEST=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/share/cmake/Microsoft.GSL"
+
+
+[[zstd]]
+skip = false
+version = "v1.4.5"
+name = "v1.4.5"
+fetch = "git clone https://github.com/facebook/zstd.git --branch %version%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+pre-build = """cmake -S %init_fetch_dir%/zstd/build/cmake -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DZSTD_BUILD_PROGRAMS=OFF
+               -DZSTD_BUILD_SHARED=OFF
+               -DZSTD_BUILD_STATIC=ON
+               -DZSTD_BUILD_TESTS=OFF
+               -DZSTD_MULTITHREAD_SUPPORT=OFF"""
+build = "cmake --build %init_build_dir% -j"
+install = "cmake --install %init_install_dir%"
+export_install_dir = "install"
+export_cmake = "install/lib/cmake/zstd"
+
+
+[[seal]]
+skip = false
+version = "v3.7.2"
+name = "v3.7.2"
+root = "%name%"
+init_fetch_dir = "fetch"
+init_build_dir = "build"
+init_install_dir = "build"
+export_install_dir = "install"
+fetch = "git clone https://github.com/microsoft/SEAL.git --branch %version%"
+pre-build = """cmake -S %init_fetch_dir%/SEAL -B %init_build_dir%
+               -DCMAKE_INSTALL_PREFIX=%export_install_dir%
+               -DSEAL_BUILD_DEPS=OFF
+               -DSEAL_USE_INTEL_HEXL=ON
+               -DHEXL_DIR=$%hexl%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+install = "cmake --install %init_install_dir%"
+export_cmake = "install/lib/cmake/SEAL-3.7"
+# Dependencies
+hexl = "hexl/v1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"
+
+
+[[examples]]
+skip = false
+name = "logistic-regression"
+fetch = ""
+init_fetch_dir = ""
+src_dir = "!toolkit-path!/he-samples/examples/logistic-regression"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -DSEAL_DIR=$%seal%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+init_install_dir = ""
+install = ""
+# Dependencies
+seal = "seal/v3.7.2"
+hexl = "hexl/v1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"
+
+
+[[examples]]
+skip = false
+name = "secure-query"
+fetch = ""
+init_fetch_dir = ""
+src_dir = "!toolkit-path!/he-samples/examples/secure-query"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -DSEAL_DIR=$%seal%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+init_install_dir = ""
+install = ""
+# Dependencies
+seal = "seal/v3.7.2"
+hexl = "hexl/v1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"
+
+
+[[sample-kernels]]
+skip = false
+name = "seal"
+fetch = ""
+init_fetch_dir = ""
+src_dir = "!toolkit-path!/he-samples/sample-kernels"
+init_build_dir = "build"
+pre-build = """cmake -S %src_dir% -B %init_build_dir%
+               -DENABLE_SEAL=ON
+               -DSEAL_DIR=$%seal%/export_cmake$
+               -DMicrosoft.GSL_DIR=$%GSL%/export_cmake$
+               -Dzstd_DIR=$%zstd%/export_cmake$
+               -DHEXL_DIR=$%hexl%/export_cmake$"""
+build = "cmake --build %init_build_dir% -j"
+post-build = ""
+init_install_dir = ""
+install = ""
+# Dependencies
+seal = "seal/v3.7.2"
+hexl = "hexl/v1.2.3"
+GSL = "gsl/v3.1.0"
+zstd = "zstd/v1.4.5"

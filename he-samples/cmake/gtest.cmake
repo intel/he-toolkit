@@ -1,10 +1,16 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 include(ExternalProject)
 
+# If user has not specified an install path, override the default usr/local to
+# be the build directory of the original target.
+if (NOT ${CMAKE_INSTALL_PREFIX})
+  set (CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
 set(GTEST_GIT_REPO_URL https://github.com/google/googletest.git)
-set(GTEST_GIT_LABEL release-1.10.0)
+set(GTEST_GIT_LABEL release-1.12.1)
 set(GTEST_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 ExternalProject_Add(

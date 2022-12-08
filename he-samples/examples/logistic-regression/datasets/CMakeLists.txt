@@ -1,12 +1,12 @@
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2021 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 ##################################################
 ## Synthetic data generation for LR HE example
 ##################################################
 find_package(Python3 COMPONENTS Interpreter Development)
-if (Python3_VERSION LESS 3.5)
-  message(FATAL_ERROR "python3 >= 3.5 is required")
+if (Python3_VERSION VERSION_LESS 3.8)
+  message(FATAL_ERROR "python >= 3.8 is required")
 endif()
 
 find_program(VIRTUALENV virtualenv)

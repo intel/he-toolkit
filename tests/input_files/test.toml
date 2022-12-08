@@ -1,0 +1,10 @@
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+[[hexl]]
+skip = false
+version = "1.2.3"
+name = "1.2.3"
+fetch = "ls"
+build = "ls"
+install = "ls"

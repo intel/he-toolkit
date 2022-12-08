@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2020-2021 Intel Corporation
+# Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
@@ -23,8 +23,7 @@ EOF
 cat /etc/apt/apt.conf
 
 echo -e "\nTesting apt-get:"
-apt-get update \
-  && apt-get install -y build-essential wget
+apt-get update && apt-get install -y wget
 
 echo -e "\nTesting wget:"
 wget http://www.google.com
