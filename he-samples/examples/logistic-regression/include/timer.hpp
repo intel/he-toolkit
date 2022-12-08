@@ -15,14 +15,14 @@ namespace intel {
 
 namespace timer {
 // Get current time with chrono::high_resolution_clock
-std::chrono::system_clock::time_point now();
+std::chrono::steady_clock::time_point now();
 
 // Get delta time since start to end in seconds
-double delta(std::chrono::system_clock::time_point start,
-             std::chrono::system_clock::time_point end);
+double delta(std::chrono::steady_clock::time_point start,
+             std::chrono::steady_clock::time_point end);
 
 // Get delta time since start in seconds
-double delta(std::chrono::system_clock::time_point start);
+double delta(std::chrono::steady_clock::time_point start);
 
 }  // namespace timer
 }  // namespace intel
