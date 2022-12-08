@@ -98,7 +98,6 @@ pre-build = """cmake -S %src_dir% -B %init_build_dir%
                -DKAFKA_DIR=$%librdkafka%/export_install_dir$
                -DJSON_DIR=$%json%/export_fetch$/single_include
                -DENABLE_TESTS=ON
-               -DCMAKE_BUILD_TYPE=Debug
                -DGTest_DIR=$%gtest%/export_cmake$"""
 build = "cmake --build %init_build_dir% -j"
 # Dependencies
