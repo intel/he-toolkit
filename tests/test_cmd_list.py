@@ -7,7 +7,7 @@ from kit.commands.list_cmd import list_components, RepoProperties, _SEP_SPACES
 
 
 def test_get_repo_properties_max_width(mocker):
-    exp_comps = ["1234567", "123", "12345678"]
+    exp_comps = ["1234567", "123", "123456789"]
     exp_inst1 = ["123"]
     exp_inst2 = ["1", "1234567890123456"]
     exp_inst3 = ["123456"]
@@ -18,7 +18,7 @@ def test_get_repo_properties_max_width(mocker):
         exp_comps[1]: exp_inst2,
         exp_comps[2]: exp_inst3,
     }
-    exp_width_comp = 8 + _SEP_SPACES
+    exp_width_comp = 9 + _SEP_SPACES
     exp_width_inst = 16 + _SEP_SPACES
 
     act_props = RepoProperties("")
@@ -34,7 +34,7 @@ def test_get_repo_properties_without_instances(mocker):
     mock_list_dirs.side_effect = [exp_comps, exp_inst1]
     exp_repo_structure = {exp_comps[0]: exp_inst1}
     exp_width_comp = 20 + _SEP_SPACES
-    exp_width_inst = 0 + _SEP_SPACES
+    exp_width_inst = 8 + _SEP_SPACES
 
     act_props = RepoProperties("")
     assert act_props.structure == exp_repo_structure
@@ -48,8 +48,8 @@ def test_get_repo_properties_without_components(mocker):
     mock_list_dirs = mocker.patch("kit.commands.list_cmd.list_dirs")
     mock_list_dirs.side_effect = [exp_comps, exp_inst1]
     exp_repo_structure = {}
-    exp_width_comp = 0 + _SEP_SPACES
-    exp_width_inst = 0 + _SEP_SPACES
+    exp_width_comp = 9 + _SEP_SPACES
+    exp_width_inst = 8 + _SEP_SPACES
 
     act_props = RepoProperties("")
     assert act_props.structure == exp_repo_structure
@@ -65,7 +65,7 @@ def test_list_components_several_correct_items(
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=tree_directory)
     """load function returns success as status of the all the actions"""
     mock_load = mocker.patch(
-        "kit.commands.list_cmd.load", return_value=all_actions_success
+        "kit.commands.list_cmd.load_toml", return_value=all_actions_success
     )
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
@@ -82,7 +82,9 @@ def test_list_components_incorrect_fetch(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of fetch"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=fetch_failure)
+    mock_load = mocker.patch(
+        "kit.commands.list_cmd.load_toml", return_value=fetch_failure
+    )
     """print functions reports the failure for fetch"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -102,7 +104,9 @@ def test_list_components_incorrect_build(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of build"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=build_failure)
+    mock_load = mocker.patch(
+        "kit.commands.list_cmd.load_toml", return_value=build_failure
+    )
     """print functions reports the failure for build"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -122,7 +126,9 @@ def test_list_components_incorrect_install(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function returns failure as status of install"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", return_value=install_failure)
+    mock_load = mocker.patch(
+        "kit.commands.list_cmd.load_toml", return_value=install_failure
+    )
     """print functions reports the failure for install"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -141,7 +147,7 @@ def test_list_components_without_version(mocker, without_version_directory, args
     mock_walk = mocker.patch(
         "kit.utils.files.walk", side_effect=without_version_directory
     )
-    mock_load = mocker.patch("kit.commands.list_cmd.load")
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     list_components(args)
@@ -154,7 +160,7 @@ def test_list_components_without_libraries(mocker, args, without_lib_directory):
     """list_dirs function is called once but
     there are not libraries"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=without_lib_directory)
-    mock_load = mocker.patch("kit.commands.list_cmd.load")
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     list_components(args)
@@ -167,7 +173,7 @@ def test_list_components_StopIteration_exception(mocker, args):
     """list_dirs function triggers a StopIteration exception
     and returns an empty list"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=StopIteration)
-    mock_load = mocker.patch("kit.commands.list_cmd.load")
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml")
     mock_print = mocker.patch("kit.commands.list_cmd.print")
 
     list_components(args)
@@ -185,7 +191,7 @@ def test_list_components_FileNotFoundError_exception(
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """ load triggers an FileNotFoundError exception"""
     mock_load = mocker.patch(
-        "kit.commands.list_cmd.load", side_effect=FileNotFoundError
+        "kit.commands.list_cmd.load_toml", side_effect=FileNotFoundError
     )
     """print functions reports the exception"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
@@ -208,7 +214,7 @@ def test_list_components_KeyError_exception(
     it returns a library and then its version"""
     mock_walk = mocker.patch("kit.utils.files.walk", side_effect=lib_directory)
     """load function triggers a KeyError exception"""
-    mock_load = mocker.patch("kit.commands.list_cmd.load", side_effect=KeyError)
+    mock_load = mocker.patch("kit.commands.list_cmd.load_toml", side_effect=KeyError)
     """print functions reports the exception"""
     mock_print = mocker.patch("kit.commands.list_cmd.print")
     exp_lib, exp_version = name_version_lib
@@ -296,8 +302,13 @@ def install_failure():
 
 def get_width_and_header(comp_name, comp_inst, separation_spaces=_SEP_SPACES):
     width = 10
-    width_comp = len(comp_name) + separation_spaces
-    width_inst = len(comp_inst) + separation_spaces
+
+    width_comp = (
+        len(comp_name) if len(comp_name) > len("component") else len("component")
+    )
+    width_comp += separation_spaces
+    width_inst = len(comp_inst) if len(comp_inst) > len("instance") else len("instance")
+    width_inst += separation_spaces
     return width, f"{comp_name:{width_comp}} {comp_inst:{width_inst}}"
 
 

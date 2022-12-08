@@ -21,7 +21,7 @@ def sigmoid_poly3(x):
 
 # 4-degree polynomial representation of log(sigmoid(x)) function, effective in range of [-5, 5]
 def log_sig4(x):
-    return 0.000527 * x ** 4 - 0.0822 * x ** 2 + 0.5 * x - 0.78
+    return 0.000527 * x**4 - 0.0822 * x**2 + 0.5 * x - 0.78
 
 
 # Realign target to -1, 1 and calculate X@y'

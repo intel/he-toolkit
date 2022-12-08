@@ -27,7 +27,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (
-        f"{component}   {instance}   success                         "
+        f"{component}        {instance}      success                        "
         in act_result.stdout
     )
     assert not act_result.stderr
@@ -44,7 +44,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (
-        f"{component}   {instance}   success    success              "
+        f"{component}        {instance}      success    success              "
         in act_result.stdout
     )
     assert not act_result.stderr
@@ -61,7 +61,7 @@ def test_cmds_install_list_remove(tmp_path, hekit_path, input_files_path):
     cmd = f"{hekit_path} --config {config_file} list"
     act_result = execute_process(cmd)
     assert (
-        f"{component}   {instance}   success    success    success   "
+        f"{component}        {instance}      success    success    success   "
         in act_result.stdout
     )
     assert not act_result.stderr

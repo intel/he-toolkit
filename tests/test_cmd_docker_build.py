@@ -173,7 +173,7 @@ def test_setup_docker_clean(mocker):
 
     with pytest.raises(SystemExit) as exc_info:
         setup_docker(args)
-    mock_rmtree.assert_called_with(Path(args.hekit_root_dir) / "__staging__")
+    mock_rmtree.assert_called_with(Constants.HEKIT_ROOT_DIR / "__staging__")
     mock_print.assert_called_with("Staging area deleted")
     mock_print_preamble.assert_not_called()
     mock_DockerTools.assert_not_called()
@@ -244,7 +244,7 @@ def test_setup_docker_vscode(mocker):
 def test_setup_docker_build(mocker):
     args = MockArgs(clean=False, y=False, check_only=False, enable=None)
     doc_build = MockDockerTools()
-    ROOT = Path(args.hekit_root_dir)
+    ROOT = Constants.HEKIT_ROOT_DIR
     docker_filepaths = ROOT / "docker"
     staging_path = ROOT / "__staging__"
     toolkit_tar_gz = staging_path / "toolkit.tar.gz"
@@ -278,7 +278,6 @@ def test_setup_docker_build(mocker):
 
 class MockArgs:
     def __init__(self, clean, y, check_only, enable):
-        self.hekit_root_dir = "/home"
         self.clean = clean
         self.y = y
         self.check_only = check_only

@@ -53,7 +53,7 @@ class Dep:
 
 
 def version_string_to_tuple(ver_str: str) -> Tuple[int, ...]:
-    """version '10.11.12' -> (10, 11, 12) """
+    """version '10.11.12' -> (10, 11, 12)"""
     try:
         return tuple(int(i) for i in ver_str.split("."))
     except ValueError as e:
@@ -148,7 +148,7 @@ def check_dependencies(args) -> None:
 def set_check_dep_subparser(subparsers):
     """create the parser for the 'check-dependencies' command"""
     parser_check_dependencies = subparsers.add_parser(
-        "check-dependencies", description="check system dependencies"
+        "check-dependencies", description="checks system dependencies"
     )
     parser_check_dependencies.add_argument(
         "dependencies_file",

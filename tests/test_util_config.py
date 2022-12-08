@@ -41,19 +41,6 @@ def test_config_required_value_error(args):
     assert "Error while parsing config file" in str(exc_info.value)
 
 
-def test_config_required_symlink_error(args):
-    args.config = f"{args.tests_path}/input_files/default_symlink.config"
-
-    @config_required
-    def to_be_decorated(args):
-        pass
-
-    with pytest.raises(Exception) as exc_info:
-        to_be_decorated(args)
-
-    assert "The config file cannot be a symlink" in str(exc_info.value)
-
-
 """Utilities used by the tests"""
 
 

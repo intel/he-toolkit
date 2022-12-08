@@ -101,32 +101,34 @@ def create_basic_spec_file(tmp_path):
     project_path = "/home/project"
     filepath = (tmp_path / "basic.toml").resolve()
     with filepath.open("w") as f:
-        f.write("[[projects]]\n")
-        f.write(f'name = "{project_name}"\n')
-        f.write(f'src_dir = "{project_path}"\n')
-        f.write('pre-build = "cmake -S %src_dir% -B %init_build_dir% -DFLAG=TBD"\n')
-        f.write('build = "cmake --build %init_build_dir% -j"\n')
-        f.write("\n")  # Parser inserts this new line
+        f.write(
+            "[[projects]]\n"
+            f'name = "{project_name}"\n'
+            f'src_dir = "{project_path}"\n'
+            'pre-build = "cmake -S %src_dir% -B %init_build_dir% -DFLAG=TBD"\n'
+            'build = "cmake --build %init_build_dir% -j"\n'
+            "\n"  # Parser inserts this new line
+        )
 
     return project_name, project_path, filepath
 
 
 def create_tmp_file(filepath, project_name):
     with filepath.open("w") as f:
-        f.write(f"project({project_name} LANGUAGES CXX)\n\n")
-        f.write("cmake_minimum_required(VERSION 3.13 FATAL_ERROR)\n\n")
-        f.write("set(CMAKE_CXX_STANDARD 17)\n")
-        f.write("set(CMAKE_CXX_EXTENSIONS OFF)\n")
-        f.write("set(CMAKE_CXX_STANDARD_REQUIRED ON)\n\n")
-        f.write("#find_package(helib REQUIRED)\n")
-        f.write("#find_package(SEAL REQUIRED)\n\n")
-        f.write("file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)\n")
-        f.write(f"add_executable({project_name} ${{SRCS}})\n\n")
         f.write(
+            f"project({project_name} LANGUAGES CXX)\n\n"
+            "cmake_minimum_required(VERSION 3.13 FATAL_ERROR)\n\n"
+            "set(CMAKE_CXX_STANDARD 17)\n"
+            "set(CMAKE_CXX_EXTENSIONS OFF)\n"
+            "set(CMAKE_CXX_STANDARD_REQUIRED ON)\n\n"
+            "#find_package(helib REQUIRED)\n"
+            "#find_package(SEAL REQUIRED)\n\n"
+            "file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)\n"
+            f"add_executable({project_name} ${{SRCS}})\n\n"
             f"target_include_directories({project_name} PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/include)\n\n"
+            f"#target_link_libraries({project_name} PRIVATE helib)\n"
+            f"#target_link_libraries({project_name} PRIVATE SEAL::seal)\n"
         )
-        f.write(f"#target_link_libraries({project_name} PRIVATE helib)\n")
-        f.write(f"#target_link_libraries({project_name} PRIVATE SEAL::seal)\n")
 
 
 @pytest.fixture

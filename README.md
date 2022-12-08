@@ -1,6 +1,6 @@
 # Intel Homomorphic Encryption Toolkit
 
-[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg)](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml)
+[![Build and Test](https://github.com/intel/he-toolkit/actions/workflows/github-ci.yml/badge.svg?branch=main)](https://github.com/intel/he-toolkit)
 
 Intel Homomorphic Encryption (HE) Toolkit is Intel's primary platform for
 delivering innovation around HE with the aim of providing both the community
@@ -32,7 +32,9 @@ utilize the latest Intel hardware features.
     - [Secure Query](#secure-query)
     - [Logistic Regression](#logistic-regression)
     - [Private Set Intersection](#private-set-intersection)
+    - [New Examples](#new-examples)
   - [Known Issues](#known-issues)
+- [Third Party Plugins](#third-party-plugins)
 - [Contributing](#contributing)
   - [Adding a New Command](#adding-a-new-command)
   - [Troubleshooting](#troubleshooting)
@@ -129,8 +131,9 @@ the `hekit` command
 ```bash
 hekit docker-build
 ```
-See [here](docker) for a detailed description on the usage and components of
-this build.
+Additionally, the docker build can optionally be used via
+[VS Code Server](docker/README.md#using-vs-code-server). See [here](docker) for
+a detailed description on the usage and components of this build.
 
 ## System build
 Alternatively, one can build the toolkit's HE components using the following
@@ -222,6 +225,12 @@ it encrypts the client set and computes the intersection, returning all the
 encrypted elements that are common to both sets. See the
 [README](he-samples/examples/psi/README.md) for usage information.
 
+### New Examples
+Using the `hekit new` command users can create example projects of their own.
+These can be entirely new projects or projects based on one of the provided
+examples listed above. For more on the usage of the `hekit new` command see
+[here](kit/README.md#new).
+
 ## Known Issues
 * Running ```./hekit init --default-config``` produces the error
   ```ValueError: Unknown shell 'sh'```
@@ -234,6 +243,16 @@ encrypted elements that are common to both sets. See the
   PALISADE. This error seems independent of the HE Toolkit and is currently
   being investigated.
 
+* HE Toolkit `SEAL` examples currently do not work with `clang-12`
+  on `ubuntu 20.04` and is under investigation.
+
+* HE Toolkit `SEAL` examples currently do not work with `clang-12` and `clang-13`
+  on `ubuntu 22.04` and is under investigation.
+
+# Third Party Plugins
+Intel HE Toolkit provides the utilities to handle third party plugins that can
+be installed in the system to add new HE functionalities. See [PLUGINS](./kit/PLUGINS.md)
+for details about how to interact with them or create new plugins.
 
 # Contributing
 Intel HE Toolkit welcomes external contributions through pull requests to the
@@ -283,10 +302,10 @@ described the functionality of the new command.
       """create the parser for the 'ACTION' command"""
       parser_ACTION = subparsers.add_parser("ACTION", description="ADD-SUBPARSER-DESCRIPTION")
       parser_ACTION.add_argument(
-          "ARG1", description="ADD-ARG-DESCRIPTION"
+          "ARG1", help="ADD-ARG-DESCRIPTION"
       )
       parser_ACTION.add_argument(
-          "ARG2", description="ADD-ARG-DESCRIPTION"
+          "ARG2", help="ADD-ARG-DESCRIPTION"
       )
       parser_ACTION.set_defaults(fn=NEW_FUNCTIONALITY)
   ```
@@ -297,19 +316,17 @@ described the functionality of the new command.
   ```python
   def NEW_FUNCTIONALITY(args) -> None:
       """Executes new functionality"""
-      if(args.ARG1)
-          pass
-      elif(args.ARG2)
-          pass
+      if(args.ARG1):
+          # code goes here
+      elif(args.ARG2):
+          # code goes here
   ```
 
-* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
-  function `set_ACTION_subparser` and enable the options of the new
-  command.
+* `hekit` should automatically discover the function `set_ACTION_subparser` and
+  enable the options of the new command.
 
 * Generic utilities or helper functions that can be used for several commands
-  should be in [utils](kit/utils).
-
+  should be placed in [utils](kit/utils).
 
 ## Troubleshooting
 
@@ -330,6 +347,17 @@ described the functionality of the new command.
   Try adding ```export GPG_TTY=$(tty)``` to your shell initializer script such
   as `~/.bashrc`.
 
+* When writing recipe files, there is a known issue when chaining bash
+  commands such as
+  ```
+  pre-build = "cd .. && ls"
+  ```
+  where `hekit` does not know how to interpret the `&&` symbol. To resolve this
+  issue, wrap the commands in `bash -c 'command1 && command2 && ...'` to
+  produce
+  ```
+  pre-build = "bash -c 'cd .. && ls'"
+  ```
 
 # Contributors
 The Intel past and present contributors to this project, sorted by last name, are
