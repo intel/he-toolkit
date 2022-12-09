@@ -14,16 +14,16 @@ git clone https://github.com/intel/he-toolkit.git
 ```
 
 ### Step 2 Install the system dependencies for the toolkit
+Move into your `he-toolkit` directory.
+```bash
+cd he-toolkit
+```
+
+### Step 3: Initialize the `hekit` command
 Make sure your python >= 3.8 and that you have pip.
 
 ```bash
 pip install -r requirements.txt
-```
-
-### Step 3: Initialize the `hekit` command
-Move into your `he-toolkit` directory.
-```bash
-cd he-toolkit
 ```
 
 For a default initialization of the toolkit, you will be asked whether to
