@@ -12,6 +12,7 @@ from zipfile import is_zipfile, ZipFile
 from pathlib import Path
 from toml import loads as toml_loads
 from kit.utils.constants import Constants, PluginsConfig, PluginState
+from kit.utils.yes import is_yes
 from kit.utils.subparsers import (
     get_options_description,
     get_plugin_arg_choices,
@@ -250,7 +251,7 @@ def install_plugin(args) -> None:
                 f"However the version {config_version} was found on the system.\n"
                 "Do you want to remove the present version and continue? (y/n) "
             )
-            if user_answer not in ("y", "Y"):
+            if not is_yes(user_answer):
                 continue
             # remove the present version
             remove_plugin_data(plugin_name)
@@ -286,7 +287,7 @@ def remove_plugin(args) -> None:
         user_answer = input(
             "All plugins will be deleted. Do you want to continue? (y/n) "
         )
-        if user_answer not in ("y", "Y"):
+        if not is_yes(user_answer):
             return
 
         for plugin_name in config_dict.keys():

@@ -327,12 +327,11 @@ described the functionality of the new command.
           # code goes here
   ```
 
-* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
-  function `set_ACTION_subparser` and enable the options of the new
-  command.
+* `hekit` should automatically discover the function `set_ACTION_subparser` and
+  enable the options of the new command.
 
 * Generic utilities or helper functions that can be used for several commands
-  should be in [utils](kit/utils).
+  should be placed in [utils](kit/utils).
 
 ## Troubleshooting
 
