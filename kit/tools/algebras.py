@@ -24,7 +24,9 @@ def powerset(iterable: Iterable[int]) -> chain:
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
 
-def find_ms(ps: Iterable[int], ds: Iterable[int], factorize: Callable, m_max: int) -> Generator:
+def find_ms(
+    ps: Iterable[int], ds: Iterable[int], factorize: Callable, m_max: Optional[int]
+) -> Generator:
     """Returns the p, gen for max m's for p^d"""
     prime_factors = factorize((p**d - 1 for p in ps for d in ds), m_max)
     if prime_factors:
@@ -108,7 +110,9 @@ class PrimesFromFile:
         return n in self.primes
 
 
-def compute_prime_factors_by_part_lookup(numbers: Iterable[int], m_max) -> List[int]:
+def compute_prime_factors_by_part_lookup(
+    numbers: Iterable[int], m_max: Optional[int]
+) -> Generator:
 
     # Code duplication
     default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
@@ -121,6 +125,7 @@ def compute_prime_factors_by_part_lookup(numbers: Iterable[int], m_max) -> List[
         primes = PrimesFromFile(default_primes_filepath)
 
     numbers = list(numbers)
+    skip_normal = False
     for rem in numbers:
         p_factors = []
         for p in primes.primes:
@@ -152,7 +157,7 @@ def set_gen_algebras_subparser(subparsers) -> None:
     parser.add_argument(
         "-d", type=parse_range, default="1", help="number of coefficients in a slot"
     )
-    parser.add_argument("--m-max", type=int, help="max m")
+    parser.add_argument("--m-max", type=int, default=None, help="max m")
     parser.add_argument(
         "--part-lookup",
         action="store_true",
