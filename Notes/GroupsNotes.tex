@@ -1,0 +1,452 @@
+
+\documentclass[12pt]{article}
+% Standard ams packages
+\usepackage{amsmath, amssymb, amsthm, graphicx}
+
+% Edit margins
+\usepackage[letterpaper, margin=1in, left=0.8in]{geometry}
+\usepackage{tikz}
+% Resume enumeration after a break
+\usepackage{enumitem}
+
+\makeatletter
+\def\verbatim@nolig@list{\do\`\do\<\do\>\do\'\do\-}% no comma
+\makeatother
+%\pagenumbering{gobble}
+
+% Define macros
+\global\long\def\dom{\mathop\mathrm{dom}\nolimits}   % domain
+\global\long\def\Ker{\mathop\mathrm{Ker}\nolimits} % kernel
+\global\long\def\Im{\mathop\mathrm{Im}\nolimits} % image
+\global\long\def\C{\mathbb{C}}                       % complex
+\global\long\def\R{\mathbb{R}}                       % reals
+\global\long\def\Q{\mathbb{Q}}                       % rationals
+\global\long\def\Z{\mathbb{Z}}                       % integers
+\global\long\def\N{\mathbb{N}}                      % naturals
+
+\def\div{\, \big| \,} % divides
+\def\inv{^{-1}} % inverse
+\def\tr{\text{Trace}} % trace
+\def\GL{\text{GL}} % general linear
+\def\SL{\text{SL}} % special linear
+\def\char{\text{char}} % characteristic
+
+% Generator of a group
+\newcommand{\gen}[1]{\langle #1 \rangle}
+\renewcommand{\qedsymbol}{\(\blacksquare\)}
+
+\theoremstyle{plain}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{example}{Example}
+\newtheorem{observation}{Observation}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{axiom}{Axiom}
+\newtheorem{question}{Question}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+% Quick permutation group notation (3 elements)
+\newenvironment{permutation3}
+{
+\left(\begin{tabular}{ccc}
+}
+{
+\end{tabular}\right)
+}
+
+% Quick permutation group notation (4 elements)
+\newenvironment{permutation4}
+{
+\left(\begin{tabular}{cccc}
+}
+{
+\end{tabular}\right)
+}
+
+% Quick permutation group notation (5 elements)
+\newenvironment{permutation5}
+{
+\left(\begin{tabular}{ccccc}
+}
+{
+\end{tabular}\right)
+}
+
+% Quick permutation group notation (6 elements)
+\newenvironment{permutation6}
+{
+\left(\begin{tabular}{cccccc}
+}
+{
+\end{tabular}\right)
+}
+
+% Quick permutation group notation (7 elements)
+\newenvironment{permutation7}
+{
+\left(\begin{tabular}{ccccccc}
+}
+{
+\end{tabular}\right)
+}
+
+\title{Abstract Algebra I: Groups}
+\author{Bahattin Yildiz }
+\date{}
+
+\begin{document}
+
+\maketitle
+In this work, we will go over some of the basics of groups that are needed to understand rings and fields. 
+
+\section{Basic Definitions and Examples}
+Let us start with the definition of a group.
+\begin{definition}
+Let $G$ be a non-empty set equipped with a binary operation $*$ so that 
+\begin{enumerate}
+    \item $G$ is closed under $*$
+    \item $(a*b)*c=a*(b*c)$ for all $a,b,c \in G$
+    \item There exists $e\in G$ such that $a*e=e*a=a$ for all $a \in G$ (Identity)
+    \item For any $a\in G$, there exists $x\in G$ such that $a*x=x*a=e$ (Inverse Property).
+\end{enumerate}
+The pair $(G, *)$ is called a group. 
+\end{definition}
+
+\begin{remark}
+\begin{itemize}
+    \item We do not require $a*b=b*a$, however if in a group $G$, $a*b=b*a$ for all $a,b\in G$, then we will call $G$ an ``Abelian group". 
+    \item We will drop $*$ in most cases. Usually we will either denote the group operation by $.$ or by $+$ depending on the context. 
+    \item In most examples that we look at, the identity $e$ will be denoted by $1$ or $0$. 
+    \item The inverse of an element in a group is unique and hence we will denote it by $a^{-1}$ (in an additive group we will denote it by $-a$).
+\end{itemize}
+\end{remark}
+\begin{example}
+Here are some examples of groups:
+\begin{enumerate}
+    \item $\Z$(Integers), $\Q$(rationals), $\R$ (real numbers), $\C$ (Complex numbers) are all Abelian groups under addition.
+    \item $\Z$ is not a group under multiplication as many elements do not have inverses. ($2$ for example).
+    \item $\Q$ is not a group under multiplication since $0$ does not have any inverse.
+    \item $\Q^{\times} = \Q-\{0\}$ is a group under multiplication. Similarly $\R^{\times}$ and $\C^{\times}$ are also groups under multiplication
+    \item For a positive integer $n>1$, we let $\Z_n = \{0,1, \dots, n-1\}$ be the set of residue classes modulo $n$. $\Z_n$ is a group under addition modulo $n$. 
+    \item For a positive integer $n>1$, we let $\Z_n^{\times} = \{1\leq a \leq n-1|GCD(a,n)=1\}$ be the set of reduced residue classes modulo $n$. $\Z_n^{\times}$ is a group under multiplication modulo $n$. 
+    \item The set of $m\times n$ matrices over $\Z$ is an Abelian group under matrix addition. 
+    \item The set of polynomials with integer coefficients is a group under polynomial addition. 
+    \item $GL(n;\R) = \{A\in \R^{n\times n}|Det(A) \neq 0\}$, in other words, the set of invertible square matrices over $\R$ is a group under matrix multiplication. 
+    \item The set of all permutations of $\{1,2, \dots, n\}$ is a group under composition of permutations. We denote this group by $S_n$.  
+\end{enumerate}ov
+\end{example}
+
+\section{Subgroups}
+A subgroup $H$ of a group $G$ is a non-empty subset of $G$ that is a group under the same operation. A simple criterion for subgroups is given in the following theorem:
+\begin{theorem}$($ Subgroup Criterion$)$
+Let $G$ be a group and $H$ be a nonempty subset of $G$. $H$ is a subgroup of $G$ (notation: $H\leq G$) if and only if 
+$$ab^{-1} \in H, \:\: \forall a,b\in H. $$
+\end{theorem}
+\begin{example}
+Here are some examples of subgroups:
+\begin{enumerate}
+    \item $2\Z$, or the set of even integers is a subgroup of $\Z$.
+    \item $\{1,-1\}$ is a subgroup of $\R^{\times}$ under multiplication 
+    \item $\{1,-1, i, -i\}$ is a subgroup of $\C^{\times}$ under multiplication 
+    \item The set of all $n\times n$ matrices whose determinants is $1$ is a subgroup of $GL(n;R)$ that we saw above. 
+    \item The set of all polynomials whose constant terms is 0 is a subgroup of the group of all polynomials.
+    \item The set of all permutations $\sigma$ of $\{1,2, \dots, n\}$ such that $\sigma(1)=1$ is a subgroup of $S_n$.
+    \item If $G$ is any group and $g\in G$ is any element, the ``cyclic" subgroup generated by $g$ is defined as 
+    $$\langle g\rangle = \{g^n|n\in \Z\}.$$
+\end{enumerate}
+\end{example}
+\section{Group Homomorphisms}
+A homomorphism is a special type of a function that preserves the algebraic structure. This concept appears in many different algebraic structures. We will consider the group case here and later see the ring version as well. 
+
+Let $(G,.)$ and $(G',*)$ be two groups. A function $\varphi:G\rightarrow G'$ is called a (group) homomorphism if 
+$$\varphi(g_1g_2) = \varphi(g_1)*\varphi(g_2), \:\:\:\: \forall g_1, g_2 \in G.$$
+
+\begin{remark}
+This is where the concept of homomorphic encryption is coming from. So you can relate to somewhat homomorphic encryption here. Later we will see the ring homomorphism which will relate to fully homomorphic schemes. 
+\end{remark} 
+
+In general, if there is no danger of confusion, we will simply denote this concept by 
+$\varphi(g_1g_2) = \varphi(g_1)\varphi(g_2)$.
+
+Before moving on to some examples of homomorphisms, we would like to describe two special sets associated with homomorphisms.
+\begin{definition}
+Let $\varphi:G\rightarrow G'$ be a group homomorphism.
+The ``kernel" of $\varphi$ is defined as
+$$ker(\varphi) = \{g\in G|\varphi(g)=e'\},$$
+where $e'$ is the identity of $G'$.
+Similarly the ``range" is defined as 
+$$ran(\varphi) = \{\varphi(g)|g\in G\}.$$
+\end{definition}
+\begin{remark}
+Note that $ker(\varphi) \subseteq G$, while $ran(\varphi) \subseteq G'$. But they are not just subsets, they are both subgroups of their respective groups. 
+\end{remark}
+\begin{example}
+Here are some examples of maps that are homomorphisms as well as examples that are not homomorpshims together with kernel and ranges of the homomorphisms:
+\begin{enumerate}
+    \item $\varphi: \Z\rightarrow \Z$ given by $\varphi(m)=2m$
+ is a group homomorphism. 
+Notice that $ker(\varphi) = \{0\}$, while $ran(\varphi) = 2\Z$, i.e., the set of even integers. 
+
+ In general we can say $\varphi(m)=km$, where $k$ is any integer is also a homomorphism. 
+ 
+ \item $\varphi:\R^{\times} \rightarrow \R^{\times}$ given by $\varphi(x)=\frac{1}{x}$ or $\varphi(x)=x^3$ are examples of homomorphisms (Note that in this case the operation is multiplication). In both cases, the kernel is $\{1\}$, while the range is the full group, i.e., $\R^{\times}$  
+ \item $\varphi:(\Z,+) \rightarrow (\Z_n, \oplus)$ given by 
+ $\varphi(m) = (m)_n$, i.e., reduction modulo $n$ is a group homomorphism (Here $\oplus$ represents the modulo $n$ addition). 
+ 
+ $$ker(\varphi) = \{m\in \Z| m\equiv 0\pmod{n}\} = n\Z,$$
+ while $ran(\varphi) = \Z_n$. 
+ \item If $G$ is an Abelian group, then $\varphi:G\rightarrow G$ given by $\varphi(g)=g^n$ is a homomorphism.
+ \item However if $G$ is not Abelian, then $\varphi(g)=g^n$ might not be a homomorphism. To see an example, consider $GL(2;\R)$, namely the group of $2\times 2$ real matrices that are invertible. Let $\varphi(g)=g^2$. 
+ Consider 
+ $$ A=\begin{bmatrix}
+    1&0\\
+    2&3    \end{bmatrix}, \:\:\: B = \begin{bmatrix}
+    -1&2\\
+    0&1    \end{bmatrix}.$$
+    Then, we have 
+    $$A^2 = \begin{bmatrix}
+    1&0\\
+    8&9    \end{bmatrix}, \:\:\: B^2 = \begin{bmatrix}
+    1&0\\
+    0&1    \end{bmatrix}, \:\:\: AB = \begin{bmatrix}
+    -1&2\\
+    -2&5    \end{bmatrix}, \:\: A^2B^2 = \begin{bmatrix}
+    1&0\\
+    8&9    \end{bmatrix}, \:\:\: (AB)^2 = \begin{bmatrix}
+    -3&8\\
+    -8&21    \end{bmatrix}.$$
+    As we can see $$\varphi(AB) = (AB)^2 \neq A^2B^2 =\varphi(A)\varphi(B).$$
+\item Let $\R[x]$ denote the set of all polynomials with real coefficients. Define $\varphi:\R[x]\rightarrow \R$ by $\varphi(p(x)) = p(0)$, in other words, $\varphi$ takes a polynomial to its constant term. Then $\varphi$ is a homomorphism. 
+$$ker(\varphi) = \{p(x) \in R[x]|p(0)=0\} = x\R[x],$$
+that is polynomials with no constant terms. $\varphi$ is clearly onto, which means $ran(\varphi)=\R$. 
+
+In general, for an arbitrary $r\in \R$, we can let $\varphi(p(x)) = p(r)$. This would also be a homomorphism from $\R[x]$ to $\R$, called the ``evaluation homomorphism".  \item Here is an interesting example, where the operations could be very different. Consider the map 
+$$\varphi: \left( \R, +\right) \rightarrow  \left (\R_{>0}, \cdot \right )$$ given by 
+$\varphi(x)=2^x$. Since $2^{x+y} = 2^x\cdot 2^y$, this is a homomorphism. Moreover, $ker(\varphi) = \{0\}$ while $ran(\varphi) = \R_{>0}$
+  \end{enumerate}
+\end{example}
+ \begin{definition}
+ A homomorphism $\varphi:G\rightarrow G'$ is called an ``isomorphism" if it is one-to-one and onto. In the language of kernel and range we can say $\varphi$ is an ispomorphism if and only if $ker(\varphi)=\{e\}$ and $ran(\varphi)=G'$. 
+ If there is an isomorphism between $G$ and $G'$ we call the groups ``isomorphic" and we denote it by $G\simeq G'$.
+ \end{definition}
+ Isomorphic groups essentially have an identical structure and they are considered indistinguishable in Algebra. 
+ 
+ \begin{example}
+\begin{enumerate}
+    \item $(\Z, +) \simeq (2\Z, +)$ as the homomorphism $\varphi(m)=2m$ is in fact an isomorphism. 
+     \item $(\R, +) \simeq (\R_{>0},\cdot)$ since the homomorphism $\varphi(x) = 2^x$ is indeed an isomorphism. 
+\end{enumerate}
+ \end{example}
+\section{Cosets, Lagrange's Theorem}
+Let $G$ be a group and $H$ a subgroup of $G$. For $a\in G$, the set 
+$$aH = \{ah|h\in H\}$$
+is called a left coset of $H$ in $G$.
+\begin{theorem}
+For a group $G$ and a subgroup $H$ of $G$ we have 
+\begin{enumerate}
+    \item Cosets are equivalence classes under the equivalence relation $a\sim b$ if and only if $a^{-1}b \in H$. 
+    \item As equivalence classes, they partition the whole group into cosets. In other words, the group $G$ is a union of these left cosets and any two left cosets are either identical or disjoint. 
+    \item For two cosets $aH$ and $bH$, the map 
+    $$f:aH\rightarrow bH, \:\:\: f(x) = b(a^{-1}x)$$
+is a bijection (namely it is one-to-one and onto, or a perfect matching)
+\end{enumerate}
+\end{theorem}
+An important consequence of this is that when $G$ is finite, any two cosets have the same size. Since $G$ is a disjoint union of the cosets, we get the following theorem:
+\begin{theorem}$($Lagrange's Theorem $)$
+If $G$ is a finite group, and $H$ is any subgroup then we must have $|H| \: | \: |G|$. 
+\end{theorem}
+This gives us the set of all possible sizes for subgroups of a group. So that for example we know a group of size $10$ cannot have a subgroup of size $3$ or $4$.
+\begin{example}
+Let us see some examples of cosets:
+\begin{enumerate}
+    \item Let $\Z$ be the group and we take the subgroup to be $3\Z$. Then the set of all cosests is given by 
+    $3\Z, 1+3\Z, 2+3\Z$. Note that $3+3\Z$ is the same as $3\Z$ and $4+3\Z$ is the same as $1+3\Z$, etc. They partition the group of all integers as any integer must belong to one of these cosets. (Recall, the remainder upon dividing an integer by 3 is 0, 1 or 2. )
+    \item Let $G=\Z_{8}^{\times} = \{1,3,5,7\}$ and let $H = \{1,3\}$. Then there will be $2$ distinct cosets of $H$ in $G$ and they will be given by $H = \{1,3\}$ and $5H = \{5, 15\} \equiv \{5,7\} \pmod{8}$. Note that $3H = H$ and $7H=5H$. 
+ \end{enumerate}
+\end{example}
+
+\section{Order of Elements, Cyclic groups and Discrete Logarithm Problem}
+Consider a finite group $G$ and let $g$ be an element in $G$. If we consider the powers of $g$, that is 
+$\{1, g, g^2, g^3, \dots, \}$, we see that we obtain a subset of $G$ since $G$ is closed under the operation. 
+But since $G$ is finite, we cannot have all these powers go on indefinitely, at some point we will have $g^i=g^j$ for some integers $i>j\geq 0$. Multiplying both sides by $g^{-j}$, we obtain $g^{i-j}=1$. So, the conclusion is that a finite power of $g$ will be the identity. This leads to the following definition:
+\begin{definition}
+Let $G$ be a group and $g\in G$ be any element. The order $g$, denoted $ord(g)$ is the smallest positive integer $n$ such that $g^n=1$. In other words, $ord(g)=n$ if 
+\begin{enumerate}
+    \item $g^n=1$, and 
+    \item $g^h\neq 1$, if $1\leq h <n$.
+\end{enumerate}
+\end{definition}
+Before going on to some examples we will give some theoretical properties of order, most of which we had already seen in the Number Theory part, in the particular case of reduced residues modulo $n$.
+
+\begin{lemma}\label{1}
+If $ord(g) = n$, then $1, g, g^2, \dots, g^{n-1}$ are all distinct. 
+\end{lemma}
+
+\begin{corollary}
+Since $\{1,g, \dots, g^{n-1}\} \subseteq G$, this means that $ord(g)\leq |G|.$
+\end{corollary}
+
+\begin{lemma}
+If $ord(g)=n$, then $g^m=1$ if and only if $n|m$. 
+\end{lemma}
+
+Recall that if $g\in G$, then we can look at the cyclic group generated by $g$, that is $\langle g\rangle = \{g^k|k\in \Z\}$. But by Lemma \ref{1}, that means $|\langle g\rangle|  = ord(g)$. Since $\langle g \rangle$ is a subgroup of $G$, by Lagrange's theorem we have $|\langle g \rangle | \: | \: |G|$.
+
+This leads to the following useful result:
+\begin{theorem}
+If $G$ is a finite group and $g \in G$ is any element, then 
+$ord(g)| \: |G|$.
+\end{theorem}
+\begin{example}
+Let us see some examples:
+\begin{enumerate}
+    \item In any group $G$, $ord(g)=1$ if and only if $g=1$.
+    \item In $(\Z_6,\oplus)$, $ord (0)=1$, $ord(1)=ord(5)=6$, $ord(2)=ord(4)=3$ and $ord(3)=2$. 
+    \item In $\Z_{8}^{\times}$, $ord(1)=1$, $ord(3)=ord(5)=ord(7)=2$ since $3^2\equiv 5^2\equiv 7^2 \equiv 1 \pmod{8}$. 
+\end{enumerate}
+\end{example}
+
+\subsection{Cyclic Groups}
+\begin{definition}
+A group is called ``cyclic" if it is generated by a single element. In other words, $G$ is cyclic if there exists $g\in G$ such that 
+$$G = \langle g\rangle = \{g^n|n\in \Z\}.$$
+\end{definition}
+
+\begin{example}
+Let us see some examples of cyclic groups:
+\begin{enumerate}
+    \item $(\Z,+)$ is cyclic and is generated by $1$.
+    \item $(\Z_n, \oplus)$ is also cyclic and is generated by $1$.
+    \item $\Z_7^{\times} = \{1,2,3,4,5,6\}$ is cyclic and is generated by $3$ since 
+    $$\langle3\rangle = \{1,3,3^2, 3^3, 3^4, 3^5\} \equiv \{1,3,2,6,4,5\} \pmod{7}.$$
+    \item $\Z_8^{\times} = \{1,3,5,7\}$ is not a cyclic group since $3^2\equiv 5^2\equiv 7^2\equiv 1 \pmod{8}$. 
+\end{enumerate}
+\end{example} 
+\begin{remark}
+A finite group $G$ is cyclic if and only if there is an element $g\in G$ such that $ord(g)=|G|$. 
+\end{remark}
+
+Every cyclic group is Abelian and moreover, the converse of the Lagrange Theorem is true for all cyclic groups. Namely we have the following:
+\begin{theorem}
+If $G=\langle g\rangle$ is a cyclic group of order $n$, then $G$ has a subgroup of size $d$ for every $d|n$. 
+\end{theorem}
+The subgroup of order $d$ can be generated simply by $g^{\frac{n}{d}}$. 
+
+As we saw above $\Z_{7}^{\times}$ is cyclic while $\Z_8^{\times}$ is not cylic. This is related to an important theorem about primitive elements modulo $n$ that we saw in the Number Theory section. In particular, we see that $\Z_n^{\times}$ is cyclic if and only if there is a primitive element modulo $n$. Thus we have the following theorem:
+\begin{theorem}
+$\Z_n^{\times}$ is a cyclic group if and only if $n=2, 4, p^k$ or $2p^k$ where $p$ is an odd prime.  
+\end{theorem}
+
+\subsection{The Discrete Logarithm Problem and the Diffie-Helman Key-exchange}
+Cyclic groups play a crucial role in many cryptographic applications. One of the prominent such examples is the discrete logarithm problem which was the basis of public key cryptography. The main set up of the problem can be described as follows:
+\\
+Let $G$ be a cyclic group generated by some $g$ (Usually $G$ is taken to be $\Z_p^{\times}$, where $p$ is a large prime). 
+The discrete logarithm of an element $h\in G$ is $m\in \Z_+$ such that $g^m=h$. The discrete logarithm problem is the problem of determining $m$ from the knowledge of $g$ and $h$. 
+
+\bigskip
+\noindent
+{\bf The Diffie-Helman Key Exchange}\\
+In the Diffie-Helman key exchange, Alice and Bob have access to the generator $g$ of a cyclic group $G$. They each have their private keys, which will be denoted by $a$ and $b$, respectively. The idea is to secure a common key for Alice and Bob that they can use as a session key. So, Alice sends $g^a$ to Bob, while Bob sends $g^b$ to Alice. Alice then uses her key on $g^b$, namely she calculates 
+$(g^b)^a$, while Bob uses his key on $g^a$, namely he calculates $(g^a)^b$. Of course we have 
+$$(g^b)^a=g^{ba} = g^{ab}=(g^a)^b.$$
+Thus Alice and Bob have secured a common key without danger from the eavesdropper thanks to the difficulty of the Discrete Logarithm Problem.  
+
+\begin{example}
+Let us see a toy example. Consider the cyclic group 
+$$\Z_{10529}^{\times} = \{1, 2, \dots, 10528\}. $$
+It turns out that $17$ is a primitive element modulo $10529$, so the group is generated by $17$.
+
+Alice chooses $656$ as her secret key and Bob chooses $1879$ as his secret key. To achieve a common session key, Alice sends $17^{656} \equiv 7272 \pmod{10529}$ to Bob, while Bob sends $17^{1879} \equiv 3205 \pmod {10529}$ to Alice. Alice then computes $3205^{656} \equiv 1639 \pmod{10529}$, while Bob computes $7272^{1879} \equiv 1639 \pmod{10529}$. They both get the same secure number that they can use to achieve a secure session key. 
+\end{example}
+\section{Normal subgroups, Factor Groups and Isomorphism Theorems}
+Factor groups are a way to generate new groups from existing groups. For this we go back to the concept of a coset. Recall that for a group $G$ and a subgroup $H$ of $G$, a left coset of $H$ is a set that is formed by $gH = \{gh|h\in H\}$. These cosets partition the whole group and $H = eH$ itself is one of the cosets. The idea of a factor group is to give the set of these cosets a group structure. The set of cosets is denoted by $G/H$, namely we have
+$$G/H = \{gH|g\in G\}.$$
+To turn $G/H$ into a group we need to define an operation. The natural choice for an operation would be to use the inherent operation coming from $G$. Indeed, we can do that provided $H$ is a special type of subgroup, called a ``normal subgroup". Since we are mainly concerned with Abelian groups, we should note that in Abelian groups all subgroups are normal and hence we can simply go ahead and define the operation on $G/H$ for Abelian groups:
+\\
+$(aH)(bH) = (ab)H$. 
+
+The following picture shows the partitioning of $G$ into the cosets:
+
+\bigskip
+
+\begin{tikzpicture}
+\tikzstyle{point2}=[ball color=yellow, circle, draw=black, inner sep=0.3cm]
+ 
+    \node[rectangle,draw,  minimum width = 2cm, 
+    minimum height = 2cm] (r1) at (0,0) {$H$};
+    
+
+ \node[rectangle,draw,  minimum width = 2cm, 
+    minimum height = 2cm] (r2) at (4,0) {$aH$};
+
+
+\filldraw[black] (6,0) circle (2pt);
+ 
+\filldraw[black] (8,0) circle (2pt); 
+
+\filldraw[black] (10,0) circle (2pt);
+ \node[rectangle,draw,  minimum width = 2cm, 
+    minimum height = 2cm] (rk) at (12,0) {$bH$};
+
+
+\node (X) at (6,4) [point2] {$G$};
+\draw (X)--(r1);
+\draw (X)--(r2);
+\draw (X)--(rk);
+\end{tikzpicture}
+
+\begin{example}
+Consider $G = \Z$ and let $H=3Z$. Then $G/H = \{3\Z, 1+3\Z, 2+3\Z\}$. The operations then can be described as 
+$$(1+3\Z)+(2+3\Z) = 3+3\Z = 3\Z, \:\:\:\: (1+3\Z)+(1+3\Z) = 2+3\Z, \dots$$
+Notice that the coset $3\Z$ acts as the identity element. It is not hard to see that $G/H$ acts very similar to $(\Z_3, \oplus)$. This is not a coincidence as we will see from the 1st isomorphism theorem. 
+
+The following picture is analogous to the one above:
+
+\bigskip
+
+\begin{tikzpicture}
+\tikzstyle{point2}=[ball color=yellow, circle, draw=black, inner sep=0.3cm]
+ 
+    \node[rectangle,draw,  minimum width = 2cm, 
+    minimum height = 2cm] (r1) at (0,0) {$3\Z$};
+    
+
+ \node[rectangle,draw,  minimum width = 2cm, 
+    minimum height = 2cm] (r2) at (6,0) {$1+3\Z$};
+
+ \node[rectangle,draw,  minimum width = 2cm, 
+    minimum height = 2cm] (rk) at (12,0) {$2+3\Z$};
+
+
+\node (X) at (6,4) [point2] {$\Z$};
+\draw (X)--(r1);
+\draw (X)--(r2);
+\draw (X)--(rk);
+\end{tikzpicture}
+
+
+\end{example}
+\begin{theorem}
+If $G$ is Abelian, and $H$ is a subgroup, $G/H$ is an Abelian group under the above-defined operation between the cosets. Moreover, the trivial coset $H$ is the identity of $G/H$. 
+\end{theorem}
+The first isomorphism theorem formalizes our observation of how $\Z/3\Z$ acts like $\Z_3$:
+\begin{theorem}$($1st Isomorphism Theorem $)$
+Let $\varphi: G\rightarrow G'$ be a homomorphism. Then we have 
+$$G/ker(\varphi) \simeq ran(\varphi).$$
+\end{theorem}
+
+\begin{example}
+\begin{enumerate}
+    \item To formalize our previous observation, consider the homomorphism $\varphi:(\Z,+) \rightarrow (\Z_3, \oplus)$ given by $\varphi(m) = (m)_3$. Then $ker(\phi) = 3\Z$, that is all multiples of $3$ while $ran(\phi) = \Z_3$. Thus from the theorem we can say 
+    $$\Z/3\Z \simeq \Z_3.$$
+    \item Consider $\varphi:\R[x]\rightarrow \R$ given by $\varphi(p(x)) = p(0)$. As we saw above, $ker(\varphi) = x\R[x]$, while $ran(\varphi)=\R$. Thus by the theorem we have 
+    $$\R[x]/(x\R[x]) \simeq \R.$$ We can interpret this isomorphism as ``killing" the $x$ term when we factor, thus leaving us with only the constant terms. 
+\end{enumerate}
+\end{example}
+\end{document} 
