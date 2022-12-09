@@ -37,7 +37,7 @@ whether to modify your shell configuration file which you may wish to do yoursel
 ### Step 1 Sanity check
 Check that `docker` is on your system. 
 
-Moreover, check that you are in the `docker` group. You can use the `id` to check. The
+Moreover, check that you are in the `docker` group. You can use the `id` command to check. The
 `docker` group should appear as one of your groups.
 
 
@@ -47,20 +47,16 @@ For an IDE experience, we recommend building the VS Code enabled docker containe
 hekit docker-build --enable vscode
 ```
 
+### Step 3 Run your container
+
+
 ## Run an HE example program
 
-### Step 1: Running an example
-Example programs can be run using the appropriate command. For instance,
-run_lr_example : will run the Logistic Regression example program.
-run_query_example: This will run a Secure Query example allowing users to query
-on a database of the 50 U.S. States.
-run_sample_kernels_palisade: This will run several HE sample kernels in
-PALISADE including Matrix Multiplication and Logistic Regression
-run_psi_example: users to perform a set intersection between a user-defined
-"client set" and a "server set.
+### Step 1 View available compiled example programs
 
-## Create a new project
-The command `new` can be used to create a new project.
+Through your browser, go to the terminal pane in VS Code and type,
 ```bash
-hekit new example
+welcome
 ```
+
+A list of example programs will appear that can be run from the command line.
