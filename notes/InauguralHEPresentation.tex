@@ -1,7 +1,7 @@
 \documentclass[ %handout, % for handouts %%% 12pt,handout,
 usenames,dvipsnames,
 aspectratio=169,11pt]{beamer}
-  
+
 \usepackage[ruled, linesnumbered]{algorithm2e}
 
 \usepackage{tcolorbox}
@@ -30,7 +30,7 @@ aspectratio=169,11pt]{beamer}
 %\usepackage[hyperref]{xcolor}
 
 
-\let\oldcite=\cite                                                              
+\let\oldcite=\cite
 \renewcommand{\cite}[1]{\textcolor[rgb]{.7,.7,.7}{\oldcite{#1}}}
 
 
@@ -135,13 +135,13 @@ aspectratio=169,11pt]{beamer}
 %  allcolors=.,
 %  urlcolor=ProcessBlue,
 %}
-%\hypersetup{colorlinks = true, 
+%\hypersetup{colorlinks = true,
 %%            linkcolor = red,
  %           urlcolor=ProcessBlue,
  %           citecolor = green,
  %           anchorcolor = blue}
-            
-%\usepackage{bibunits}  
+
+%\usepackage{bibunits}
 %\setbeamertemplate{bibliography item}{[\theenumiv]}
 %\defaultbibliography{IoT,CPS}
 %\defaultbibliographystyle{IEEEtran}
@@ -213,14 +213,14 @@ HE: An Introduction to What/Why/How}
 
 \section{Acknowledgement}
 \begin{frame}{Acknowledgement}
-With contributions from 
+With contributions from
 \begin{itemize}
 \item Flavio Bergamaschi
 \item Hamish Hunt
 \item Jack Crawford
 \item Tabitha Ogilvie
 \end{itemize}
-    
+
 \end{frame}
 
 \section{Introduction}
@@ -273,7 +273,7 @@ With contributions from
   %      \draw[-mytriangle,line width=\LineWidth,\X,rotate=120*(\Y-1)]
    %          (120:\Radius) arc (120:5:\Radius);
    % }
-   
+
     %% Text on arrows:
     \foreach \X/\reverse [count=\Y] in {Transmission/true, Rest(Storage)/true,Computation/false} {
         \path[rotate=120*(\Y-1),decorate,decoration={text along path,text={|\Large\bfseries|\X},
@@ -294,14 +294,14 @@ With contributions from
 \begin{center}
 \begin{tikzpicture}
 
-\node[rectangle,draw,  minimum width = 1.6cm, 
+\node[rectangle,draw,  minimum width = 1.6cm,
     minimum height = 1.6cm, fill=teal, text width=1.4 cm] (r1) at (0,0) {Business Logic};
-    
- \node[rectangle,draw,  minimum width = 1.6cm, 
+
+ \node[rectangle,draw,  minimum width = 1.6cm,
     minimum height = 1.6cm, fill=magenta, text width=1.6 cm] (r2) at (4,0) {Encryption Decryption};
- \node[rectangle,draw,  minimum width = 1.6cm, 
+ \node[rectangle,draw,  minimum width = 1.6cm,
     minimum height = 1.6cm, fill=magenta, text width=1.6 cm] (r3) at (8,0) {Encryption Decryption};
-\node[rectangle,draw,  minimum width = 1.6cm, 
+\node[rectangle,draw,  minimum width = 1.6cm,
     minimum height = 1.6cm, fill=teal, text width=1.4 cm] (r4) at (12,0) {Business Logic};
 \draw[stealth-stealth, line width=1mm] (r1)--(r2);
 \draw[stealth-stealth, line width=1.2mm] (r2)--node [above, text width=1 cm] {Comm. Channel} (r3);
@@ -316,9 +316,9 @@ With contributions from
 \bigskip
 \begin{center}
 \begin{tikzpicture}
- \node[rectangle,draw, fill=magenta, minimum width = 1.6cm, 
+ \node[rectangle,draw, fill=magenta, minimum width = 1.6cm,
     minimum height = 1.6cm, text width=1.5 cm] (q1) at (4,-4) {Business Logic};
- \node[rectangle,draw, fill=magenta, minimum width = 1.6cm, 
+ \node[rectangle,draw, fill=magenta, minimum width = 1.6cm,
     minimum height = 1.6cm, text width=1.5 cm] (q2) at (8,-4) {Business Logic};
 \draw[stealth-stealth, line width=1.2mm] (q1)--node [above, text width=1 cm] {Comm. Channel} (q2);
 \end{tikzpicture}
@@ -328,31 +328,31 @@ With contributions from
 
 \begin{frame}{The New Paradigm: Inter- and intra-organization collaboration}
     \begin{tikzpicture}
-    \node[rectangle,draw, fill=white, minimum width = 5cm, 
+    \node[rectangle,draw, fill=white, minimum width = 5cm,
     minimum height = 5cm] (q1) at (0,0){};
-    \node[rectangle,draw, fill=white, minimum width = 5cm, 
+    \node[rectangle,draw, fill=white, minimum width = 5cm,
     minimum height = 5cm] (q2) at (10,0){};
     \node [below] (P1) at (q1.south) {Organization A};
     \node [below] (P2) at (q2.south) {Organization B};
-    \node[rectangle,draw, fill=red, minimum width = 1cm, 
+    \node[rectangle,draw, fill=red, minimum width = 1cm,
     minimum height = 1cm] (r1) at (-1.2,0){Team 1};
-    \node[rectangle,draw, fill=red, minimum width = 1cm, 
+    \node[rectangle,draw, fill=red, minimum width = 1cm,
     minimum height = 1cm] (r2) at (1.2,1.2){Team 2};
-    \node[rectangle,draw, fill=red, minimum width = 1cm, 
+    \node[rectangle,draw, fill=red, minimum width = 1cm,
     minimum height = 1cm] (r3) at (1.2,-1.2){Team 3};
-    
-    \node[rectangle,draw, fill=ForestGreen, minimum width = 1cm, 
+
+    \node[rectangle,draw, fill=ForestGreen, minimum width = 1cm,
     minimum height = 1cm] (s1) at (11.2,0){Team 1};
-    \node[rectangle,draw, fill=ForestGreen, minimum width = 1cm, 
+    \node[rectangle,draw, fill=ForestGreen, minimum width = 1cm,
     minimum height = 1cm] (s2) at (8.8,1.2){Team 2};
-    \node[rectangle,draw, fill=ForestGreen, minimum width = 1cm, 
+    \node[rectangle,draw, fill=ForestGreen, minimum width = 1cm,
     minimum height = 1cm] (s3) at (8.8,-1.2){Team 3};
-    
+
     \draw[stealth-stealth, color=black, line width=1.2mm] (s2)--(s3);
     \draw[stealth-stealth, color=black, line width=1.2mm] (s1)--(s2);
     \draw[stealth-stealth, color=black, line width=1.2mm] (s1)--(s3);
-    
- 
+
+
     \draw[stealth-stealth, color=black, line width=1.2mm] (r2)--(r3);
     \draw[stealth-stealth, color=black, line width=1.2mm] (r1)--(r2);
     \draw[stealth-stealth, color=black, line width=1.2mm] (r1)--(r3);
@@ -373,7 +373,7 @@ With contributions from
     \item $\Z=\{\dots, -2,-1,0,1,2,\dots \}$: Set of integers
     \item $\R$: Set of real numbers
     \item $\Z_q$: Set of residue classes modulo $q$
-    \item $\Z_q=\{0,1,\dots,q-1\}$. 
+    \item $\Z_q=\{0,1,\dots,q-1\}$.
     \item $\Z[x]$: Set of polynomials with integer coefficients.
     \item $\Z[x]=\{a_0+a_1x+\dots +a_nx^n| \: n\geq 0, a_i\in \Z\}.$
     \end{stepitemize}
@@ -385,7 +385,7 @@ With contributions from
     \item We can add and multiply modulo 5
     \item Different properties with each operation
     \item Operation tables:
-\end{stepitemize}    
+\end{stepitemize}
 \end{frame}
 
 \begin{frame}{Operation Tables}
@@ -395,14 +395,14 @@ With contributions from
 $\oplus$  & $0$ & $1$ & $2$ & $3$& $4$\\
 \hline
 $0$ & $0$ & $1$ & $2$ & $3$& $4$ \\
-\hline 
+\hline
 $1$ & $1$ & $2$ & $3$ & $4$ & $0$ \\
 \hline
 $2$& $2$ & $3$ &$4$ & $0$ & $1$\\
 \hline
 $3$& $3$ & $4$ &$0$ & $1$ & $2$\\
-\hline 
-$4$& $4$ & $0$ & $1$ & $2$ & $3$ 
+\hline
+$4$& $4$ & $0$ & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
@@ -411,14 +411,14 @@ $4$& $4$ & $0$ & $1$ & $2$ & $3$
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & $0$ & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &$0$ & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & $0$ & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & $0$ & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
@@ -428,14 +428,14 @@ $4$& {\color{blue}$4$} & $0$ & $1$ & $2$ & $3$
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
@@ -448,33 +448,33 @@ $4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$ & $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & $1$ & $2$ & $3$& $4$\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
-\hline 
+\hline
 $1$ & $0$ & $1$ & $2$ & $3$ & $4$ \\
 \hline
 $2$& $0$ & $2$ &$4$ & $1$ & $3$\\
 \hline
 $3$& $0$ & $3$ &$1$ & $4$ & $2$\\
-\hline 
-$4$& $0$ & $4$ & $3$ & $2$ & $1$ 
+\hline
+$4$& $0$ & $4$ & $3$ & $2$ & $1$
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
@@ -489,33 +489,33 @@ $4$& $0$ & $4$ & $3$ & $2$ & $1$
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & {\color{blue}$1$} & $2$ & $3$& $4$\\
 \hline
 $0$ & $0$ & {\color{blue}$0$} & $0$ & $0$& $0$ \\
-\hline 
+\hline
 {\color{blue} $1$} & {\color{blue}$0$} & {\color{blue}$1$} & {\color{blue}$2$} & {\color{blue}$3$} & {\color{blue}$4$} \\
 \hline
 $2$& $0$ & {\color{blue}$2$} &$4$ & $1$ & $3$\\
 \hline
 $3$& $0$ & {\color{blue}$3$} &$1$ & $4$ & $2$\\
-\hline 
-$4$& $0$ & {\color{blue}$4$} & $3$ & $2$ & $1$ 
+\hline
+$4$& $0$ & {\color{blue}$4$} & $3$ & $2$ & $1$
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
@@ -530,33 +530,33 @@ $4$& $0$ & {\color{blue}$4$} & $3$ & $2$ & $1$
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & {\color{red}$1$} & {\color{red} $2$} & {\color{red}$3$}& {\color{red}$4$}\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
-\hline 
+\hline
 {\color{red} $1$} & $0$ & {\color{red}$1$} & {\color{red}$2$} & {\color{red}$3$} & {\color{red}$4$} \\
 \hline
 {\color{red}$2$}& $0$ & {\color{red}$2$} &{\color{red}$4$} & {\color{red}$1$} & {\color{red} $3$}\\
 \hline
 {\color{red} $3$}& $0$ & {\color{red}$3$} &{\color{red}$1$} & {\color{red}$4$} & {\color{red}$2$}\\
-\hline 
-{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$} 
+\hline
+{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$}
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
@@ -571,39 +571,39 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & {\color{red}$1$} & {\color{red} $2$} & {\color{red}$3$}& {\color{red}$4$}\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
-\hline 
+\hline
 {\color{red} $1$} & $0$ & {\color{red}$1$} & {\color{red}$2$} & {\color{red}$3$} & {\color{red}$4$} \\
 \hline
 {\color{red}$2$}& $0$ & {\color{red}$2$} &{\color{red}$4$} & {\color{red}$1$} & {\color{red} $3$}\\
 \hline
 {\color{red} $3$}& $0$ & {\color{red}$3$} &{\color{red}$1$} & {\color{red}$4$} & {\color{red}$2$}\\
-\hline 
-{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$} 
+\hline
+{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$}
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
     \end{column}
 \end{columns}
-\bigskip 
+\bigskip
  \item $(\Z_5,\oplus)$ called a ``group", with $0 \rightarrow$ identity.
    }
 
@@ -615,41 +615,41 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & {\color{red}$1$} & {\color{red} $2$} & {\color{red}$3$}& {\color{red}$4$}\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
-\hline 
+\hline
 {\color{red} $1$} & $0$ & {\color{red}$1$} & {\color{red}$2$} & {\color{red}$3$} & {\color{red}$4$} \\
 \hline
 {\color{red}$2$}& $0$ & {\color{red}$2$} &{\color{red}$4$} & {\color{red}$1$} & {\color{red} $3$}\\
 \hline
 {\color{red} $3$}& $0$ & {\color{red}$3$} &{\color{red}$1$} & {\color{red}$4$} & {\color{red}$2$}\\
-\hline 
-{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$} 
+\hline
+{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$}
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
     \end{column}
 \end{columns}
-\bigskip 
+\bigskip
  \item $(\Z_5,\oplus)$ called a ``group", with $0 \rightarrow$ identity.
-   \item $(\Z_5, \oplus, \odot)$ called a ``ring" 
+   \item $(\Z_5, \oplus, \odot)$ called a ``ring"
    }
 
 \only<9>{
@@ -660,41 +660,41 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & {\color{red}$1$} & {\color{red} $2$} & {\color{red}$3$}& {\color{red}$4$}\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
-\hline 
+\hline
 {\color{red} $1$} & $0$ & {\color{red}$1$} & {\color{red}$2$} & {\color{red}$3$} & {\color{red}$4$} \\
 \hline
 {\color{red}$2$}& $0$ & {\color{red}$2$} &{\color{red}$4$} & {\color{red}$1$} & {\color{red} $3$}\\
 \hline
 {\color{red} $3$}& $0$ & {\color{red}$3$} &{\color{red}$1$} & {\color{red}$4$} & {\color{red}$2$}\\
-\hline 
-{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$} 
+\hline
+{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$}
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
     \end{column}
 \end{columns}
-\bigskip 
+\bigskip
  \item $(\Z_5,\oplus)$ called a ``group", with $0 \rightarrow$ identity.
-   \item $(\Z_5, \oplus, \odot)$ called a ``ring" 
+   \item $(\Z_5, \oplus, \odot)$ called a ``ring"
    \item $0 \rightarrow$ additive identity, while $1\rightarrow$ multiplicative identity
     }
 
@@ -706,44 +706,44 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
 $\oplus$  & {\color{blue}$0$} & $1$ & $2$ & $3$& $4$\\
 \hline
 {\color{blue} $0$} & {\color{blue}$0$} & {\color{blue} $1$} & {\color{blue}$2$} & {\color{blue}$3$}& {\color{blue} $4$} \\
-\hline 
+\hline
 $1$ & {\color{blue}$1$} & $2$ & $3$ & $4$ & {\color{red}$0$} \\
 \hline
 $2$& {\color{blue}$2$} & $3$ &$4$ & {\color{red}$0$} & $1$\\
 \hline
 $3$& {\color{blue}$3$} & $4$ &{\color{red}$0$} & $1$ & $2$\\
-\hline 
-$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$ 
+\hline
+$4$& {\color{blue}$4$} & {\color{red}$0$} & $1$ & $2$ & $3$
 \end{tabular}
 \caption{Addition table for $\Z_5$}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c|c}
 $\odot$  & $0$ & {\color{red}$1$} & {\color{red} $2$} & {\color{red}$3$}& {\color{red}$4$}\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
-\hline 
+\hline
 {\color{red} $1$} & $0$ & {\color{red}$1$} & {\color{red}$2$} & {\color{red}$3$} & {\color{red}$4$} \\
 \hline
 {\color{red}$2$}& $0$ & {\color{red}$2$} &{\color{red}$4$} & {\color{red}$1$} & {\color{red} $3$}\\
 \hline
 {\color{red} $3$}& $0$ & {\color{red}$3$} &{\color{red}$1$} & {\color{red}$4$} & {\color{red}$2$}\\
-\hline 
-{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$} 
+\hline
+{\color{red}$4$}& $0$ & {\color{red}$4$} & {\color{red}$3$} & {\color{red}$2$} & {\color{red}$1$}
 \end{tabular}
 \caption{Multiplication table for $\Z_5$}
 \end{table}
     \end{column}
 \end{columns}
-\bigskip 
+\bigskip
  \item $(\Z_5,\oplus)$ called a ``group", with $0 \rightarrow$ identity.
-   \item $(\Z_5, \oplus, \odot)$ called a ``ring" 
+   \item $(\Z_5, \oplus, \odot)$ called a ``ring"
    \item $0 \rightarrow$ additive identity, while $1\rightarrow$ multiplicative identity
-    \item Since $(\{1,2,3,4\},\odot)$ is a group, $\Z_5$ also called a ``field". 
- 
+    \item Since $(\{1,2,3,4\},\odot)$ is a group, $\Z_5$ also called a ``field".
+
   }
 
 \end{itemize}
@@ -758,9 +758,9 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
     \item First, $x^2+1=0 \pmod{x^2+1}$
     \item So $x^2=-1 \pmod{x^2+1}$
     \item So what would $x^3+x^2+2x+1$ be?
-    \item Replace $x^2$ by $-1$ and so $x^3$ by $-x$, get $x^3+x^2+2x+1 = x \pmod{x^2+1}$. 
+    \item Replace $x^2$ by $-1$ and so $x^3$ by $-x$, get $x^3+x^2+2x+1 = x \pmod{x^2+1}$.
     \item Think ``long division".
-    \item It is clear that 
+    \item It is clear that
     $\Z[x]/(x^2+1) = \{ax+b|a, b\in \Z\}$
     \end{stepitemize}
 \end{frame}
@@ -769,28 +769,28 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
     \begin{stepitemize}
 \item Similarly $\R[x]/(x^2+1) = \{ax+b| a,b\in \R\}$.
 \item First, $(ax+b)+(cx+d)={\color{cyan}(a+c)x+(b+d)}$
-    \item Next, 
+    \item Next,
     $$(ax+b)(cx+d) = acx^2+adx+bcx+bd = {\color{magenta}(ad+bc)x+(bd-ac)}.$$
     \item Looks familiar?
     \item If $ai+b$ and $ci+d$ are complex numbers then
     $$(ai+b)+(ci+d) = {\color{cyan}(a+c)i+(b+d)}$$
-    and 
+    and
    $$ (ai+b)(ci+d) = {\color{magenta}(ad+bc)i+(bd-ac)}.$$
-\item This shows $\C \simeq \R[x]/(x^2+1)$. 
+\item This shows $\C \simeq \R[x]/(x^2+1)$.
     \end{stepitemize}
 \end{frame}
 
 \begin{frame}{Rings in HE}
 \begin{stepitemize}
-\item Recall the ring $\Z_p=\{0,1,2, \dots, p-1\}$. 
+\item Recall the ring $\Z_p=\{0,1,2, \dots, p-1\}$.
     \item Most operations in some of the HE schemes(such as BGV, BFV) happen in rings $\Z_p[x]/(f(x))$.
     \item Here is the addition and multiplication table of $\Z_2[x]/(x^2+1)$.
-    \item Has $4$ elements ($ax+b$, with $a,b=0$ or $1$.) 
-    
+    \item Has $4$ elements ($ax+b$, with $a,b=0$ or $1$.)
+
     \bigskip
     \item []
     \bigskip
-    
+
     \begin{columns}
         \begin{column}{0.5\textwidth}
      \begin{table}
@@ -798,23 +798,23 @@ $0$ & $0$ & $0$ & $0$ & $0$& $0$ \\
 $\oplus$  & $0$ & $1$ & $x$ & $1+x$\\
 \hline
 $0$ & $0$ & $1$ & $x$ & $1+x$ \\
-\hline 
+\hline
 $1$ & $1$ & $0$ & $1+x$ & $x$ \\
 \hline
 $x$& $x$ & $1+x$ &$0$ & $1$\\
 \hline
-$1+x$& $1+x$ & $x$ &$1$ & $0$ 
+$1+x$& $1+x$ & $x$ &$1$ & $0$
 \end{tabular}
 \end{table}
     \end{column}
-    
+
         \begin{column}{0.4\textwidth}
     \begin{table}
             \begin{tabular}{ c| c | c |c|c}
 $\odot$  & $0$ & $1$ & $x$ & $1+x$\\
 \hline
 $0$ & $0$ & $0$ & $0$ & $0$ \\
-\hline 
+\hline
 $1$ & $0$ & $1$ & $x$ & $1+x$ \\
 \hline
 $x$& $0$ & $x$ &$1$ & $1+x$\\
@@ -824,7 +824,7 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
 \end{table}
     \end{column}
 \end{columns}
-    
+
 \end{stepitemize}
 \end{frame}
 
@@ -834,7 +834,7 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
     \item A tool that simplifies modulo operations
     \item Is invertible.
     \item Gives rise to ``slots"
-    \item The main idea: arithmetic modulo $105$ same as arithmetic modulo $3, 5$ and $7$.  
+    \item The main idea: arithmetic modulo $105$ same as arithmetic modulo $3, 5$ and $7$.
     \item $239 \equiv 29 \pmod{105}$, $383 \equiv 68 \pmod{105}$.
     \item Represent modulo {\color{teal} $3$}, {\color{magenta} $5$} and {\color{orange} $7$}:
 
@@ -842,18 +842,18 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
 
     \begin{tikzpicture}
 \tikzstyle{point2}=[circle, draw=red, fill=blue, inner sep=0.05cm]
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (r1) at (0,0) {$2$};
- \node[rectangle,draw,  fill= magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill= magenta, minimum width = 1cm,
     minimum height = 1cm] (r2) at (2.5,0) {$4$};
- \node[rectangle,draw, fill= orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill= orange, minimum width = 1cm,
     minimum height = 1cm] (r3) at (5,0) {$1$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (q1) at (7.5,0) {$2$};
- \node[rectangle,draw,  fill=magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 1cm,
     minimum height = 1cm] (q2) at (10,0) {$3$};
- \node[rectangle,draw, fill=orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 1cm,
     minimum height = 1cm] (q3) at (12.5,0) {$5$};
 
 
@@ -868,64 +868,64 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
 \draw (Y)--(q3);
 \end{tikzpicture}
 
-    
+
 \end{stepitemize}
-    
+
 \end{frame}
 
 \begin{frame}{Operating on Slots}
 \begin{stepitemize}
-    \item To calculate $239+383$ and $239\cdot 383$ modulo $105$. 
+    \item To calculate $239+383$ and $239\cdot 383$ modulo $105$.
     \item Just do this on slots, component-wise:
-    
+
     \bigskip
-    
+
         \begin{tikzpicture}
 \tikzstyle{point2}=[ circle, draw=red, fill=blue, inner sep=0.05cm]
- 
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (r1) at (0,0) {$2$};
- \node[rectangle,draw,  fill= magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill= magenta, minimum width = 1cm,
     minimum height = 1cm] (r2) at (1.5,0) {$4$};
- \node[rectangle,draw, fill= orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill= orange, minimum width = 1cm,
     minimum height = 1cm] (r3) at (3,0) {$1$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (q1) at (0,-2) {$2$};
- \node[rectangle,draw,  fill=magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 1cm,
     minimum height = 1cm] (q2) at (1.5,-2) {$3$};
- \node[rectangle,draw, fill=orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 1cm,
     minimum height = 1cm] (q3) at (3,-2) {$5$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (s1) at (0,-4) {$1$};
- \node[rectangle,draw,  fill=magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 1cm,
     minimum height = 1cm] (s2) at (1.5,-4) {$2$};
- \node[rectangle,draw, fill=orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 1cm,
     minimum height = 1cm] (s3) at (3,-4) {$6$};
 
 \node (X) at (1.5,-1) [point2] {$+$};
 \node (Y) at (1.5,-3) [point2] {$\verteq$};
 
-  \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+  \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (t1) at (9,0) {$2$};
- \node[rectangle,draw,  fill= magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill= magenta, minimum width = 1cm,
     minimum height = 1cm] (t2) at (10.5,0) {$4$};
- \node[rectangle,draw, fill= orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill= orange, minimum width = 1cm,
     minimum height = 1cm] (t3) at (12,0) {$1$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (u1) at (9,-2) {$2$};
- \node[rectangle,draw,  fill=magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 1cm,
     minimum height = 1cm] (u2) at (10.5,-2) {$3$};
- \node[rectangle,draw, fill=orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 1cm,
     minimum height = 1cm] (u3) at (12,-2) {$5$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 1cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 1cm,
     minimum height = 1cm] (v1) at (9,-4) {$1$};
- \node[rectangle,draw,  fill=magenta, minimum width = 1cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 1cm,
     minimum height = 1cm] (v2) at (10.5,-4) {$2$};
- \node[rectangle,draw, fill=orange, minimum width = 1cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 1cm,
     minimum height = 1cm] (v3) at (12,-4) {$5$};
 
 \node (Z) at (10.5,-1) [point2] {$\bullet$};
@@ -938,15 +938,15 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
 
 \begin{frame}{Correctness of the results}
 \begin{stepitemize}
-    \item Apply the CRT algorithm to the slots we get 
+    \item Apply the CRT algorithm to the slots we get
     \item $239+383 \equiv 97 \pmod{105} \:\:\:\: \checkmark$
     \item $239\cdot 383 \equiv 82\pmod{105} \:\:\:\: \checkmark$
 \end{stepitemize}
-    
+
 \end{frame}
 \begin{frame}{CRT and Slots for Polynomials}
 \begin{stepitemize}
-    \item CRT and slots work for polynomials as well. 
+    \item CRT and slots work for polynomials as well.
     \item This allows for simpler operations in HE.
 \end{stepitemize}
 \end{frame}
@@ -965,11 +965,11 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
     \item The $m$th cyclotomic polynomial $\Phi_m(x)$
     \item Degree $\phi(m)$ (Euler's Totient Function).
     \item $x^n-1 = \prod_{\ell|n}\Phi_{\ell}(x)$.
-    \item $\Phi_1(x)=x-1$ 
-    \\ $\Phi_2(x)=x+1$, 
+    \item $\Phi_1(x)=x-1$
+    \\ $\Phi_2(x)=x+1$,
     \\ $\Phi_3(x)=x^2+x+1$, \\
     $\Phi_4(x)= x^2+1$, etc.
-    \item If $p$ prime with $p^d\equiv 1\pmod{m}$ and $d$ is the smallest such integer then 
+    \item If $p$ prime with $p^d\equiv 1\pmod{m}$ and $d$ is the smallest such integer then
     $$\Phi_m(x) = f_1(x)f_2(x) \dots f_n(x) \pmod{p}.$$
     \item Each $f_i(x)$ of degree $d$ and $n=\phi(m)/d$.
     \item $f_i(x)$ are all irreducible and coprime.
@@ -979,11 +979,11 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
 
 \begin{frame}{Example of CRT for polynomials}
     \begin{stepitemize}
-    \item Let $m=12$ 
+    \item Let $m=12$
     \item So $\Phi_{12}(x)=x^4-x^2+1$.
     \item Take $p=61$. ( $61\equiv 1\pmod{12}$.)
     \item $x^4-x^2+1 = (x+21)(x+29)(x+32)(x+40) \pmod{61}.$
-    \item So we are working in $\Z_{61}[x]$. 
+    \item So we are working in $\Z_{61}[x]$.
 %    \item $f(x)$ modulo lin. polynomial is easy.
     \item $f(x) \equiv f(-a) \pmod{x+a}$.
     \end{stepitemize}
@@ -991,7 +991,7 @@ $1+x$& $0$ & $1+x$ &$1+x$ & $0$
 
 \begin{frame}{The Slots and operations}
   \begin{stepitemize}
-\item The slots for 
+\item The slots for
 \begin{align*} f(x)&=x^3+23x^2-12x+2 \\
 g(x)&=x^3-11x^2+x-24
 \end{align*}
@@ -1000,24 +1000,24 @@ g(x)&=x^3-11x^2+x-24
 \begin{center}
     \begin{tikzpicture}
 \tikzstyle{point2}=[circle, fill=red, draw=red, inner sep=0.05cm]
- 
-    \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+
+    \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (r1) at (0,0) {$38$};
- \node[rectangle,draw,  fill= magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill= magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (r2) at (1.8,0) {$1$};
- \node[rectangle,draw, fill= orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill= orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (r3) at (3.6,0) {$15$};
-\node[rectangle,draw, fill= gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill= gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (r4) at (5.4,0) {$0$};
 
 
-    \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (q1) at (7.6,0) {$56$};
- \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (q2) at (9.4,0) {$40$};
- \node[rectangle,draw, fill=orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (q3) at (11.2,0) {$15$};
-\node[rectangle,draw, fill=gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill=gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (q4) at (13,0) {$15$};
 
 
@@ -1041,65 +1041,65 @@ g(x)&=x^3-11x^2+x-24
     \begin{stepitemize}
     \item Can add and multiply $f(x)$ and $g(x)$ in $\Z_{61}[x]/(x^4-x^2+1)$.
     \item Component-wise on slots:
-    
+
     \bigskip
-    
+
         \begin{tikzpicture}
     \tikzstyle{point2}=[circle, fill=blue, draw=red, inner sep=0.05cm]
-    \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (r1) at (0,0) {$38$};
- \node[rectangle,draw,  fill= magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill= magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (r2) at (1.2,0) {$1$};
- \node[rectangle,draw, fill= orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill= orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (r3) at (2.4,0) {$15$};
-\node[rectangle,draw, fill= gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill= gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (r4) at (3.6,0) {$0$};
 
-        \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+        \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (q1) at (0,-2) {$56$};
- \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (q2) at (1.2,-2) {$40$};
- \node[rectangle,draw, fill=orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (q3) at (2.4,-2) {$15$};
-\node[rectangle,draw, fill=gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill=gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (q4) at (3.6,-2) {$15$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (s1) at (0,-4) {$33$};
- \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (s2) at (1.2,-4) {$41$};
- \node[rectangle,draw, fill=orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (s3) at (2.4,-4) {$30$};
-\node[rectangle,draw, fill=gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill=gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (s4) at (3.6,-4) {$15$};
 \node (X) at (1.8,-1) [point2] {$+$};
 \node (Y) at (1.8,-3) [point2] {$\verteq$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (v1) at (8,0) {$38$};
- \node[rectangle,draw,  fill= magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill= magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (v2) at (9.2,0) {$1$};
- \node[rectangle,draw, fill= orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill= orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (v3) at (10.4,0) {$15$};
-\node[rectangle,draw, fill= gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill= gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (v4) at (11.6,0) {$0$};
 
-        \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+        \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (t1) at (8,-2) {$56$};
- \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (t2) at (9.2,-2) {$40$};
- \node[rectangle,draw, fill=orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (t3) at (10.4,-2) {$15$};
-\node[rectangle,draw, fill=gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill=gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (t4) at (11.6,-2) {$15$};
 
-    \node[rectangle,draw, fill=teal, minimum width = 0.8cm, 
+    \node[rectangle,draw, fill=teal, minimum width = 0.8cm,
     minimum height = 0.8cm] (u1) at (8,-4) {$54$};
- \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm, 
+ \node[rectangle,draw,  fill=magenta, minimum width = 0.8cm,
     minimum height = 0.8cm] (u2) at (9.2,-4) {$40$};
- \node[rectangle,draw, fill=orange, minimum width = 0.8cm, 
+ \node[rectangle,draw, fill=orange, minimum width = 0.8cm,
     minimum height = 0.8cm] (u3) at (10.4,-4) {$42$};
-\node[rectangle,draw, fill=gray, minimum width = 0.8cm, 
+\node[rectangle,draw, fill=gray, minimum width = 0.8cm,
     minimum height = 0.8cm] (u4) at (11.6,-4) {$0$};
 \node (Z) at (9.8,-1) [point2] {$\bullet$};
 \node (W) at (9.8,-3) [point2] {$\verteq$};
@@ -1111,7 +1111,7 @@ g(x)&=x^3-11x^2+x-24
 
 
 \end{tikzpicture}
-    
+
     \end{stepitemize}
 \end{frame}
 
@@ -1119,55 +1119,55 @@ g(x)&=x^3-11x^2+x-24
 
 \begin{frame}{The LWE Problem (Oded Regev, 2005)}
 \begin{stepitemize}
-\item $y=x\cdot s$, 
-\item $x$ and $y$ known, $s$ unknown. 
+\item $y=x\cdot s$,
+\item $x$ and $y$ known, $s$ unknown.
 \item Trivial to solve.
 \item But now add an error
 \item $y=x\cdot s+e$
-\item Hard to solve. 
+\item Hard to solve.
 \item RLWE is the ring version
 \item Operations done over polynomials.
 \end{stepitemize}
-    
+
 \end{frame}
 
 \begin{frame}{RLWE plaintext and ciphertext}
 \begin{stepitemize}
 \item Plaintext and ciphertext in HE from the RLWE scheme
-\item $\Phi_m(x)\rightarrow $ cyclotomic, 
+\item $\Phi_m(x)\rightarrow $ cyclotomic,
 \item $\Z_p[x]/(\Phi_m(x))\rightarrow$ plaintext space
 \item $\Z_q[x]/(\Phi_m(x))\rightarrow $ ciphertext space
 \item Secret key $\rightarrow$ the pair $sk=(1, \mathfrak{s})$.
-\item For public key, choose polynomials $c_0^*$ and $c_1^*$ such that 
+\item For public key, choose polynomials $c_0^*$ and $c_1^*$ such that
 $c_0^*=pe^*-c_1^*\mathfrak{s}$ and then $pk=(c_0^*, c_1^*)$.
 \item To encrypt $a$,
 $$E(a) = (c_0,c_1) = r(c_0^*,c_1^*)+p(e_0,e_1)+(a,0).$$
-\item So 
+\item So
 $$c_0 = rc_0^*+pe_0+a$$
 $$c_1 = rc_1^*+pe_1.$$
-\end{stepitemize}    
+\end{stepitemize}
 \end{frame}
 
 \begin{frame}{Decryption}
     \begin{stepitemize}
     \item To decrypt, inner product the ciphertext with the secret key,
     \item So $\langle (c_0,c_1),(1, \mathfrak{s})\rangle = c_0+c_1\mathfrak{s} = p(re^*+e_0+\mathfrak{s}e_1)+a$
-    \item This is $a$ modulo $p$. 
+    \item This is $a$ modulo $p$.
     \end{stepitemize}
 \end{frame}
 
 \begin{frame}{Addition}
     \begin{stepitemize}
-    \item Two ciphertexts $E(a)$ and $E(b)$ corresponding to plaintexts $a$ and $b$: 
+    \item Two ciphertexts $E(a)$ and $E(b)$ corresponding to plaintexts $a$ and $b$:
     \item $E(a) = (c_{0,a},c_{1,a}) = r_a(c_0^*,c_1^*)+p(e_{0,a},e_{1,a})+({\color{cyan}a},0).$
     \item $E(b) = (c_{0,b},c_{1,b}) = r_b(c_0^*,c_1^*)+p(e_{0,b},e_{1,b})+({\color{magenta}b},0).$
-    \item Then we have 
+    \item Then we have
     $$E(a)+E(b) = (r_a+r_b)(c_0^*, c_1^*)+p(e_{0,a}+e_{0,b}, e_{1,a}+e_{1,b})+({\color{cyan}a}+{\color{magenta}b},0).$$
     \item Take the inner product with $(1,\mathfrak{s})$:
     \begin{align*}
-        \langle E(a)+E(b), (1, \mathfrak{s})\rangle &= p[(r_a+r_b)e^*+e_{0,a}+e_{0,b}+\mathfrak{s}(e_{1,a}+e_{1,b})]+{\color{cyan}a}+{\color{magenta}b}.  
+        \langle E(a)+E(b), (1, \mathfrak{s})\rangle &= p[(r_a+r_b)e^*+e_{0,a}+e_{0,b}+\mathfrak{s}(e_{1,a}+e_{1,b})]+{\color{cyan}a}+{\color{magenta}b}.
     \end{align*}
-    
+
     \end{stepitemize}
 \end{frame}
 
@@ -1177,7 +1177,7 @@ $$c_1 = rc_1^*+pe_1.$$
     %\begin{stepitemize}
     %\item Privacy preserving database look up.
     %\item For example: countries and capitals
-    %\item $(k,v)$-database where the keys $k$ are unique. 
+    %\item $(k,v)$-database where the keys $k$ are unique.
     %\item[]
     %\begin{center}
     %\includegraphics[scale=.38]{KV-1.jpg}
@@ -1186,19 +1186,19 @@ $$c_1 = rc_1^*+pe_1.$$
 
 \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=magenta, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=magenta, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$k_1$};
- \node[rectangle,draw,  fill= orange, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= orange, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (0,-2) {$k_2$};
- \node[rectangle,draw, fill= teal, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (0,-4) {$k_3$};   
+ \node[rectangle,draw, fill= teal, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (0,-4) {$k_3$};
 
-\node[rectangle,draw, fill=gray, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=gray, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (4,0) {$v_1$};
- \node[rectangle,draw,  fill= gray, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= gray, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (4,-2) {$v_2$};
- \node[rectangle,draw, fill= gray, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (4,-4) {$v_3$};   
+ \node[rectangle,draw, fill= gray, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (4,-4) {$v_3$};
 \end{tikzpicture}
 \end{center}
 
@@ -1207,9 +1207,9 @@ $$c_1 = rc_1^*+pe_1.$$
 \begin{frame}{Secure Query}
 %\begin{stepitemize}
 %\item Fora query $k_q$, want to securely compare it with each $k_i$
-%\item Ideally want a mask with $1\rightarrow $ match, $0\rightarrow$ no match. 
+%\item Ideally want a mask with $1\rightarrow $ match, $0\rightarrow$ no match.
 %\item will work nicely since keys are unique.
-%\item[] 
+%\item[]
 %\begin{center}
  %   \includegraphics[scale=.35]{KV-2.jpg}
 %\end{center}
@@ -1217,26 +1217,26 @@ $$c_1 = rc_1^*+pe_1.$$
 
 \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=cyan, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=cyan, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$k_q$};
- \node[rectangle,draw,  fill= cyan, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= cyan, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (0,-2) {$k_q$};
- \node[rectangle,draw, fill= cyan, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (0,-4) {$k_q$};   
+ \node[rectangle,draw, fill= cyan, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (0,-4) {$k_q$};
 
-\node[rectangle,draw, fill=magenta, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=magenta, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (4,0) {$k_1$};
- \node[rectangle,draw,  fill= orange, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= orange, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (4,-2) {$k_2$};
- \node[rectangle,draw, fill= teal, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (4,-4) {$k_3$};  
+ \node[rectangle,draw, fill= teal, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (4,-4) {$k_3$};
 
-\node[rectangle,draw, fill=blue, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=blue, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (8,0) {$0$};
- \node[rectangle,draw,  fill= blue, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= blue, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (8,-2) {$0$};
- \node[rectangle,draw, fill= blue, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (8,-4) {$1$};  
+ \node[rectangle,draw, fill= blue, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (8,-4) {$1$};
 
 \node [above, text width=2 cm] at (8.5,1) {mask};
 \tikzstyle{point2}=[circle, fill=red, draw=red, inner sep=0.05cm]
@@ -1251,9 +1251,9 @@ $$c_1 = rc_1^*+pe_1.$$
 \begin{frame}{Key-Value Extraction}
    % \begin{stepitemize}
    % \item If we had the mask, just multiply across the values of the database entry-wise.
-    
+
    % \bigskip
-    %\item[] 
+    %\item[]
 %\begin{center}
  %   \includegraphics[scale=.38]{KV-3.jpg}
 %\end{center}
@@ -1261,26 +1261,26 @@ $$c_1 = rc_1^*+pe_1.$$
 
 \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=blue, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=blue, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$0$};
- \node[rectangle,draw,  fill= blue, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= blue, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (0,-2) {$0$};
- \node[rectangle,draw, fill= blue, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (0,-4) {$1$};   
+ \node[rectangle,draw, fill= blue, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (0,-4) {$1$};
 
-\node[rectangle,draw, fill=gray, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=gray, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (4,0) {$v_1$};
- \node[rectangle,draw,  fill= gray, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= gray, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (4,-2) {$v_2$};
- \node[rectangle,draw, fill= gray, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (4,-4) {$v_3$};  
+ \node[rectangle,draw, fill= gray, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (4,-4) {$v_3$};
 
-\node[rectangle,draw, fill=olive, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=olive, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (8,0) {$0$};
- \node[rectangle,draw,  fill= olive, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= olive, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (8,-2) {$0$};
- \node[rectangle,draw, fill= olive, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (8,-4) {$v_3$};  
+ \node[rectangle,draw, fill= olive, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (8,-4) {$v_3$};
 
 \node [above, text width=2 cm] at (0.5,1) {mask};
 \tikzstyle{point2}=[circle, fill=red, draw=red, inner sep=0.05cm]
@@ -1296,8 +1296,8 @@ $$c_1 = rc_1^*+pe_1.$$
 %\begin{stepitemize}
 %\item So how do we homomorphically get such a mask?
  %   \item First, calculate differences
-  %  \item $0\rightarrow$ match, a non-zero value otherwise. 
-   % 
+  %  \item $0\rightarrow$ match, a non-zero value otherwise.
+   %
    % \bigskip
    % \item[]
    % \begin{center}
@@ -1307,26 +1307,26 @@ $$c_1 = rc_1^*+pe_1.$$
 
 \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=cyan, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=cyan, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$k_q$};
- \node[rectangle,draw,  fill= cyan, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= cyan, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (0,-2) {$k_q$};
- \node[rectangle,draw, fill= cyan, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (0,-4) {$k_q$};   
+ \node[rectangle,draw, fill= cyan, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (0,-4) {$k_q$};
 
-\node[rectangle,draw, fill=magenta, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=magenta, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (4,0) {$k_1$};
- \node[rectangle,draw,  fill= orange, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= orange, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (4,-2) {$k_2$};
- \node[rectangle,draw, fill= teal, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (4,-4) {$k_3$};  
+ \node[rectangle,draw, fill= teal, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (4,-4) {$k_3$};
 
-\node[rectangle,draw, fill=blue, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=blue, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (8,0) {$\Delta_1$};
- \node[rectangle,draw,  fill= blue, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= blue, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (8,-2) {$\Delta_2$};
- \node[rectangle,draw, fill= blue, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (8,-4) {$\Delta_3$};  
+ \node[rectangle,draw, fill= blue, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (8,-4) {$\Delta_3$};
 
 \tikzstyle{point2}=[circle, fill=red, draw=red, inner sep=0.05cm]
 
@@ -1368,19 +1368,19 @@ $$1-FLT(x) = \left \{ \begin{array}{ll}
 
 \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=blue, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=blue, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$\Delta_1$};
- \node[rectangle,draw,  fill= blue, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= blue, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (0,-2) {$\Delta_2$};
- \node[rectangle,draw, fill= blue, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (0,-4) {$\Delta_3$};   
+ \node[rectangle,draw, fill= blue, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (0,-4) {$\Delta_3$};
 
-\node[rectangle,draw, fill=blue, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=blue, minimum width = 2.5cm,
     minimum height = 2cm] (q1) at (8,0) {$E(0)$};
- \node[rectangle,draw,  fill= blue, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= blue, minimum width = 2.5cm,
     minimum height = 2cm] (q2) at (8,-2) {$E(0)$};
- \node[rectangle,draw, fill= blue, minimum width = 2.5cm, 
-    minimum height = 2cm] (q3) at (8,-4) {$E(1)$};  
+ \node[rectangle,draw, fill= blue, minimum width = 2.5cm,
+    minimum height = 2cm] (q3) at (8,-4) {$E(1)$};
 
 \draw[-stealth, color=orange, line width=1.5mm] (r2)--node [above] {1-FLT}(q2);
 \end{tikzpicture}
@@ -1398,26 +1398,26 @@ $$1-FLT(x) = \left \{ \begin{array}{ll}
 %\end{stepitemize}
  \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=blue, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=blue, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$E(0)$};
- \node[rectangle,draw,  fill= blue, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= blue, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (0,-2) {$E(0)$};
- \node[rectangle,draw, fill= blue, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (0,-4) {$E(1)$};   
+ \node[rectangle,draw, fill= blue, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (0,-4) {$E(1)$};
 
-\node[rectangle,draw, fill=gray, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=gray, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (4,0) {$v_1$};
- \node[rectangle,draw,  fill= gray, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= gray, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (4,-2) {$v_2$};
- \node[rectangle,draw, fill= gray, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (4,-4) {$v_3$};  
+ \node[rectangle,draw, fill= gray, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (4,-4) {$v_3$};
 
-\node[rectangle,draw, fill=olive, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=olive, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (8,0) {$E(0)$};
- \node[rectangle,draw,  fill= olive, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= olive, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (8,-2) {$E(0)$};
- \node[rectangle,draw, fill= olive, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (8,-4) {$E(v_3)$};  
+ \node[rectangle,draw, fill= olive, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (8,-4) {$E(v_3)$};
 
 \node [above, text width=2 cm] at (0.5,1) {mask};
 \tikzstyle{point2}=[circle, fill=red, draw=red, inner sep=0.05cm]
@@ -1426,13 +1426,13 @@ $$1-FLT(x) = \left \{ \begin{array}{ll}
 \node (Y) at (6,-2) [point2] {$=$};
 \end{tikzpicture}
 \end{center}
-   
+
 \end{frame}
 \begin{frame}{Key-value aggregation}
 %\begin{stepitemize}
- %   \item Keys unique, at most one match per query. 
-  % \item So aggregate all into a single ciphertext. 
-   % 
+ %   \item Keys unique, at most one match per query.
+  % \item So aggregate all into a single ciphertext.
+   %
    % \item []
 %     \begin{center}
  %   \includegraphics[scale=.38]{KV-8.jpg}
@@ -1440,14 +1440,14 @@ $$1-FLT(x) = \left \{ \begin{array}{ll}
 %\end{stepitemize}
 \begin{center}
 \begin{tikzpicture}
-\node[rectangle,draw, fill=olive, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=olive, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (0,0) {$E(0)$};
-\node[rectangle,draw, fill=olive, minimum width = 2.5cm, 
+\node[rectangle,draw, fill=olive, minimum width = 2.5cm,
     minimum height = 2cm] (r1) at (3.5,0) {$E(0)$};
- \node[rectangle,draw,  fill= olive, minimum width = 2.5cm, 
+ \node[rectangle,draw,  fill= olive, minimum width = 2.5cm,
     minimum height = 2cm] (r2) at (7,0) {$E(v_3)$};
- \node[rectangle,draw, fill= ForestGreen, minimum width = 2.5cm, 
-    minimum height = 2cm] (r3) at (10.5,0) {$E(v_3)$};  
+ \node[rectangle,draw, fill= ForestGreen, minimum width = 2.5cm,
+    minimum height = 2cm] (r3) at (10.5,0) {$E(v_3)$};
 
 \tikzstyle{point2}=[circle, fill=red, draw=red, inner sep=0.05cm]
 
@@ -1455,7 +1455,7 @@ $$1-FLT(x) = \left \{ \begin{array}{ll}
 \node (X) at (5.2,0) [point2] {$+$};
 \node (Y) at (8.8,0) [point2] {$=$};
 \end{tikzpicture}
-\end{center}    
+\end{center}
 \end{frame}
 
 \begin{frame}
