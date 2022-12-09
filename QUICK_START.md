@@ -19,13 +19,12 @@ Move into your `he-toolkit` directory.
 cd he-toolkit
 ```
 
-### Step 3: Initialize the `hekit` command
 Make sure your python >= 3.8 and that you have pip.
-
 ```bash
 pip install -r requirements.txt
 ```
 
+### Step 3: Initialize the `hekit` command
 For a default initialization of the toolkit, you will be asked whether to
 modify your shell configuration file which you may wish to do yourself instead.
 ```bash
