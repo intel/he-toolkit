@@ -14,7 +14,6 @@ assignees: ''
 | Git                        |                 |
 | CMake                      |                 |
 | Compiler (GCC, Clang, etc.)|                 |
-| GLIBC (ldd)                |                 |
 | Python                     |                 |
 | Doxygen                    |                 |
 | HE Toolkit                 |                 |
