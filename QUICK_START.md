@@ -49,7 +49,7 @@ hekit docker-build --enable vscode
 ### Step 3 Run your container
 To run the container run
 ```bash
-docker run -d -[ <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:2.0.0
+docker run -d -p <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:2.0.0
 ```
 Note if you do not specify an IP address, it will default to `localhost`
 (0.0.0.0).
@@ -68,10 +68,14 @@ your container.
 ## Run an HE example program
 
 ### Step 1 View available compiled example programs
-
 Through your browser, go to the terminal pane in VS Code and type,
+```bash
+source ~/he-toolkit/docker/runners.sh
+```
+This will provide access a list of example programs that can be run from the
+command line.
+
+To view the list of programs run
 ```bash
 welcome_message
 ```
-
-A list of example programs will appear that can be run from the command line.
