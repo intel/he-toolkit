@@ -72,7 +72,7 @@ Through your browser, go to the terminal pane in VS Code and type,
 ```bash
 source ~/he-toolkit/docker/runners.sh
 ```
-This will provide access a list of example programs that can be run from the
+This will provide access to a list of example programs that can be run from the
 command line.
 
 To view the list of programs run
