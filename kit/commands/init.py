@@ -10,6 +10,7 @@ from filecmp import cmp as same_files
 from typing import Tuple
 from kit.utils.constants import Constants
 from kit.utils.files import create_default_workspace, dump_toml, file_exists
+from kit.utils.yes import is_yes
 
 
 class Tags:
@@ -166,7 +167,7 @@ def init_hekit(args) -> None:
         "NOTE: a backup file will be created before updating it.\n"
         "Do you want to continue with this action? (y/n) "
     )
-    if user_answer not in ("y", "Y"):
+    if not is_yes(user_answer):
         print(
             "Please execute the following actions manually:\n"
             f"1. Open the file {rc_path} in an editor\n"
