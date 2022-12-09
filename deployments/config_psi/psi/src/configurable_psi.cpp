@@ -91,14 +91,21 @@ void writeDataToRecord(DataRecord& out_record, const std::string& filename) {
 // Perform a database lookup given query data, HEQL query and database.
 template <typename QueryTxt, typename DbTxt>
 void databaseLookup(sharedContext& contextp, const helib::PubKey& pk,
-                    const helib::QueryType& query,
+                    const helib::QueryType& query, DataRecord& query_record,
                     const helib::Database<DbTxt>& database,
                     CmdLineOpts& cmdLineOpts) {
   // Read in the query data
   std::cout << "Reading query data from file '" << cmdLineOpts.queryFilePath
             << "' ...";
-  // queryConn.read(pointer to query data?);
-  auto query_data = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath, pk);
+  std::string s(query_record.data(), query_record.size());
+  helib::Matrix<QueryTxt> query_data(QueryTxt{pk});
+  if (cmdLineOpts.queryConnType == Type::KAFKA) {
+    // TODO(JC) this may create unneccesary copies
+    query_data = readQueryFromStream<QueryTxt>(
+        make_stream_dispenser<std::stringstream>(s), pk);
+  } else {
+    query_data = readQueryFromFile<QueryTxt>(cmdLineOpts.queryFilePath, pk);
+  }
   std::cout << "Done.\n";
 
   // Perform query lookup
@@ -231,28 +238,39 @@ int main(int argc, char* argv[]) {
     auto start = std::chrono::high_resolution_clock::now();
 
     std::cout << "Configuring query...";
-    // Assume data to disk
-    update_opts_input(cmdLineOpts, *query_record_ptr);
     // Reading the heql
-    const auto query = helib::pseudoParserFromFile(cmdLineOpts.tableFilePath);
+    std::unique_ptr<const helib::QueryType> query_ptr;
+    if (cmdLineOpts.queryConnType == Type::FILESYS) {
+      // Assume data to disk
+      update_opts_input(cmdLineOpts, *query_record_ptr);
+      query_ptr = std::make_unique<helib::QueryType>(
+          helib::pseudoParserFromFile(cmdLineOpts.tableFilePath));
+    } else {
+      query_ptr = std::make_unique<helib::QueryType>(
+          helib::pseudoParser(query_record_ptr->metadata("heql")));
+    }
     std::cout << "Done.\n";
 
     // Process query
     if (cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
       std::cout << "Executing ptxt-to-ptxt comparison\n";
-      databaseLookup<QueryPtxt, DbPtxt>(contextp, *pkp, query, *ptxt_db_ptr,
+      databaseLookup<QueryPtxt, DbPtxt>(contextp, *pkp, *query_ptr,
+                                        *query_record_ptr, *ptxt_db_ptr,
                                         cmdLineOpts);
     } else if (cmdLineOpts.ptxtQuery && !cmdLineOpts.ptxtDB) {
       std::cout << "Executing ptxt-to-ctxt comparison\n";
-      databaseLookup<QueryPtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
+      databaseLookup<QueryPtxt, DbCtxt>(contextp, *pkp, *query_ptr,
+                                        *query_record_ptr, *ctxt_db_ptr,
                                         cmdLineOpts);
     } else if (!cmdLineOpts.ptxtQuery && cmdLineOpts.ptxtDB) {
       std::cout << "Executing ctxt-to-ptxt comparison\n";
-      databaseLookup<QueryCtxt, DbPtxt>(contextp, *pkp, query, *ptxt_db_ptr,
+      databaseLookup<QueryCtxt, DbPtxt>(contextp, *pkp, *query_ptr,
+                                        *query_record_ptr, *ptxt_db_ptr,
                                         cmdLineOpts);
     } else {
       std::cout << "Executing ctxt-to-ctxt comparison\n";
-      databaseLookup<QueryCtxt, DbCtxt>(contextp, *pkp, query, *ctxt_db_ptr,
+      databaseLookup<QueryCtxt, DbCtxt>(contextp, *pkp, *query_ptr,
+                                        *query_record_ptr, *ctxt_db_ptr,
                                         cmdLineOpts);
     }
 

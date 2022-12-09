@@ -27,7 +27,7 @@ install = "make install"
 
 
 [[helib]]
-version = "master"
+version = "streamio"
 name = "psi-io"
 root = "%name%"
 export_install_dir = "install"

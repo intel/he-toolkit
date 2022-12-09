@@ -98,8 +98,10 @@ class KafkaRecord : public DataRecord {
  public:
   KafkaRecord(const Metadata& metadata) : metadata_(metadata) {}
 
-  // Not implementing this for now
-  void read(char* data, size_t size) override {}
+  void read(char* data, size_t size) override {
+    data = buffer_.data();
+    size = buffer_.size();
+  }
 
   void write(char* data, size_t size) override {
     buffer_ = std::vector<char>{data, data + size};
