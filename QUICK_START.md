@@ -7,20 +7,32 @@ augment the toolkit via plugins.
 
 ## HE toolkit installation
 
-### Step 1:
-Install the system dependencies for the toolkit: python >= 3.8, pip, git are met.
-
-pre-commit tools for development, file can install dependencies with:
-```bash
-pip install -r <requirements-file>
-```
-
-### Step 2: Initialize hekit command using
+### Step 1 Clone the repo
+Make sure you have `git` on your system.
 ```bash
 git clone https://github.com/intel/he-toolkit.git
+```
+
+### Step 2 Install the system dependencies for the toolkit 
+Make sure your python >= 3.8 and that you have pip.
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 3: Initialize hekit command using
+Move into your `he-toolkit` directory.
+```bash
 cd he-toolkit
+```
+
+For a default initialization of the toolkit. Note that you will be asked
+whether to modify your shell configuration file which you may wish to do yourself instead.
+```bash
 ./hekit init --default-config
 ```
+
+
 ## Running the docker build
 
 ### Step 1:
