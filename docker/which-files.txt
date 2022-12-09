@@ -20,6 +20,7 @@ CODEOWNERS
 CODE_OF_CONDUCT.md
 CPPLINT.cfg
 LICENSE
+QUICK_START.md
 README.md
 default.config
 deployments/README.md

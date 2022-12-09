@@ -20,6 +20,7 @@ utilize the latest Intel hardware features.
 
 - [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
   - [Contents](#contents)
+  - [Quick Start](#quick-start)
   - [Dependencies](#dependencies)
   - [Setup](#setup)
   - [The hekit command](#the-hekit-command)
@@ -40,6 +41,10 @@ utilize the latest Intel hardware features.
   - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
 
+## Quick Start
+
+Want to get up and running quickly with Intel HE toolkit? Then follow our
+[Quick Start guide](QUICK_START.md).
 
 ## Dependencies
 Intel HE toolkit has been tested on Ubuntu 20.04
