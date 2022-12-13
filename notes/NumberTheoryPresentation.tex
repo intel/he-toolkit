@@ -1023,9 +1023,9 @@ $a^{k\phi(m)+1} \equiv a \pmod{m}$ by Euler's Congruence.
 
  \node[fill=ForestGreen, text=white,rectangle,draw,  minimum width = 2.5cm,
     minimum height = 3cm] (r2) at (8,0) {Bob};
-\draw[-latex,bend left, SkyBlue] (r1) edge node[above]{$a^e = 1,370,523$}(r2);
-\draw[-latex] (r2) -- node[above]{$(a^e)^d = 132,116$}(r1);
-\draw[-latex,bend right, orange]  (r1) edge node[below]{$((a^e)^d)^{e^{-1}} = 589,661$}(r2);
+\draw[->,bend left, SkyBlue] (r1) edge node[above]{$a^e = 1,370,523$}(r2);
+\draw[->] (r2) -- node[above]{$(a^e)^d = 132,116$}(r1);
+\draw[->,bend right, orange]  (r1) edge node[below]{$((a^e)^d)^{e^{-1}} = 589,661$}(r2);
 \end{tikzpicture}
 \end{center}
 \item Finally Bob calculates $589661^{519683}$ modulo $2,127,429$ and finds $1023$, which is the original number.
