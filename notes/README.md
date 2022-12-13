@@ -11,9 +11,9 @@ They include LATEX notes on,
 - "Advanced Topics"
 They also include presentations about some of these topics.
 
-To build the latex files we recommend using `latex-mk` program.
+To build the latex files we recommend using `latexmk` program.
+Note, not to be confused with `latex-mk`.
 
 ```bash
-latex-mk [--pdflatex] <latex-file>
+latexmk -pdf -shell-escape
 ```
-the `--pdflatex` is if you want a PDF file instead of a DVI file.
