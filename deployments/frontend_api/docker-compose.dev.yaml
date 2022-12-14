@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - ./:/usr/src/app/
+      - type: bind
+        source: /home/{USER}/storage_1/storage_data
+        target: /home/shared/storage_data
+      - type: bind
+        source: /home/{USER}/storage_1/storage_keys
+        target: /home/shared/storage_keys
+    ports:
+      - 5000:5000
+    env_file:
+      - ./deployment/dev/.env.dev
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14-alpine
+    volumes:
+      - type: bind
+        source: /home/{USER}/storage_1/postgres_data
+        target: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file:
+      - ./deployment/dev/.env.dev.db
+
+  fetcher:
+    build:
+      context: ./fetcher
+      dockerfile: ./Dockerfile
+    command: dotenv -f './deployment/dev/.env.dev' run python3 __init__.py
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: /home/{USER}/storage_1/storage_data
+        target: /home/shared/storage_data
+    env_file:
+      - ./deployment/dev/.env.dev
+    depends_on:
+      - database
+      - app
+
+volumes:
+  postgres_data:
+    external: true
+  storage_data:
+    external: true

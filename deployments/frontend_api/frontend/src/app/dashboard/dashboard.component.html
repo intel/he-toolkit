@@ -1,0 +1,63 @@
+<div class="row">
+    <div class="col">
+
+        <h1>Dashboard</h1>
+        <p>Hi {{username}}!</p>
+
+        <h3 class="underline">Create a job</h3>
+
+        <div class="mb-3">
+            <label for="inputFile" class="form-label">Select a query file</label>
+            <input class="form-control" type="file" id="inputFile" (change)="onFileChange($event)"
+                accept=".csv,text/csv" #inputFile>
+        </div>
+        <button type="submit" class="btn btn-primary" (click)="uploadFile()">Submit</button>
+
+        <hr>
+
+        <h3 class="underline">Existing jobs</h3>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">JobId</th>
+                    <th scope="col">UserId</th>
+                    <th scope="col">OrgId</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Encode time(s)</th>
+                    <th scope="col">Encrypt time(s)</th>
+                    <th scope="col">PSI time(s)</th>
+                    <th scope="col">Decrypt time(s)</th>
+                    <th scope="col">Decode time(s)</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let job of jobs">
+                    <td>{{job.job_id}}</td>
+                    <td>{{job.user_id}}</td>
+                    <td>{{job.org_id}}</td>
+                    <td>{{job.status}}</td>
+
+                    <td>{{job.encode | slice:0:8}}</td>
+                    <td>{{job.encrypt | slice:0:8}}</td>
+                    <td>{{job.psi | slice:0:8}}</td>
+                    <td>{{job.decrypt | slice:0:8}}</td>
+                    <td>{{job.decode | slice:0:8}}</td>
+
+                    <td>
+                        <button *ngIf="job.status === 'DONE'" type="button" class="btn btn-warning"
+                            (click)="decryptJob(job.job_id)">DECRYPT</button>
+                        <button *ngIf=" job.status === 'DECRYPTED'" type="button" class="btn btn-success"
+                            (click)="downloadJobResult(job.job_id)">Download</button>
+                        <span *ngIf="job.status === 'PENDING' || job.status === 'QUEUED'"></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+
+    </div>
+</div>
