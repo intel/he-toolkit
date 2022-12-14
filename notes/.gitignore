@@ -1,0 +1,9 @@
+*.aux
+*.dvi
+*.log
+*.pdf
+*.snm
+*.nav
+*.vrb
+*.bbl
+_minted-*
