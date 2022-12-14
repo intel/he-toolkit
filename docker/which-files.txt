@@ -218,5 +218,6 @@ third-party/hello_world_plugin/start.py
 third-party/openfhe_plugin/__init__.py
 third-party/openfhe_plugin/configurator.py
 third-party/openfhe_plugin/plugin.toml
+third-party/openfhe_plugin/recipes/default.toml
 third-party/openfhe_plugin/start.py
 tools/README.md
