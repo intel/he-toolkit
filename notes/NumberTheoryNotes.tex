@@ -1001,17 +1001,10 @@ $$a^n \equiv a^d \pmod{m}.$$
 \section{Cryptographic Applications of Euler's Congruence: 3-Pass Protocol and RSA}
 We will talk about two main applications, which mainly use congruences, and in particular Euler's Congruence:
 \subsection{The 3-Pass Protocol}
-Supopose Alice and Bob are living far away from each other and Alice wants to send a secret tucked in safely in a locked box to Bob. The problem is only Alice has the key to the lock, and she CANNOT send the key to Bob because then Eve the eavesdropper will intercept the key and will be able to access the secret? The 3-pass protocol allows this transfer to happen without sending any keys around. Here is a very suggestive picture of a box, that might help you come up with a solution:
-
+Supopose Alice and Bob are living far away from each other and Alice wants to send a secret tucked in safely in a locked box to Bob. The problem is only Alice has the key to the lock, and she CANNOT send the key to Bob because then Eve the eavesdropper will intercept the key and will be able to access the secret? The 3-pass protocol allows this transfer to happen without sending any keys around. For a physical solution, you can think about a box with multiple locks on it.
 \bigskip
 \noindent
-\begin{center}
-    \includegraphics[scale=.35]{Z10BLufo5oy.pdf}
-\end{center}
-
-\bigskip
-\noindent
-So let us talk about the physical solution: The solution entails Bob and Alice putting their own locks onto the box and then open their locks sequentially so that at each transfer the box will have some lock on it and there is no need for the key transfer.
+So let us talk about the physical solution in detail: The solution entails Bob and Alice putting their own locks onto the box and then open their locks sequentially so that at each transfer the box will have some lock on it and there is no need for the key transfer.
 
 \bigskip
 \noindent
