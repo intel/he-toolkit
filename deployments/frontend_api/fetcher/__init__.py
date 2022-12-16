@@ -23,7 +23,6 @@ admin_client = AdminClient({"bootstrap.servers": environ["KAFKA_CLUSTER_HOST"]})
 
 
 RUNNING = True
-START_TIME = None
 engine = create_engine(
     f"postgresql+psycopg2://{environ['SQLALCHEMY_DATABASE_URI']}",
     echo=False,
@@ -79,11 +78,10 @@ def consume_loop(
             elif message.error():
                 raise KafkaException(message.error())
             else:
-                f = open(
+                with open(
                     f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_output", "wb"
-                )
-                f.write(bytes(message.value()))
-                f.close()
+                ) as f:
+                    f.write(bytes(message.value()))
 
                 print(message.headers()[0])
                 _, value = message.headers()[0]
@@ -108,8 +106,6 @@ def loop(job: Job) -> None:
         topic_exists = check_topic(topic)
         time.sleep(0.5)
 
-    global START_TIME
-    START_TIME = time.time()
     consume_loop(consumer, [topic], job.user_id, job.job_id)
 
 

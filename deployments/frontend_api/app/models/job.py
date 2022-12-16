@@ -2,10 +2,10 @@
 import time
 
 from app.models.db import db
-from app.models.user import User
 
 
 def generate_job_id() -> str:
+    """Return the Job ID"""
     return str(int(time.time()))
 
 
@@ -30,6 +30,7 @@ class Job(db.Model):
     decode = db.Column(db.String())
 
     def serialize(self):
+        """Return class attributes"""
         return {
             "id": self.id,
             "user_id": self.user_id,

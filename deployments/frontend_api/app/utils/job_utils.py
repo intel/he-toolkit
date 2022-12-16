@@ -5,17 +5,15 @@ from os import environ, mkdir, path
 def save_user_request(user_id: str, job_id: str, input_data: bytes) -> None:
     """Write user query to filesystem"""
     user_query = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_query.csv"
-    f_user_query = open(user_query, "wb")
-    f_user_query.write(input_data)
-    f_user_query.close()
+    with open(user_query, "wb") as f:
+        f.write(input_data)
 
 
 def load_heql() -> bytes:
     """Load HEQL"""
     heql_table = f"{environ['KEYS_PATH']}query.heql"
-    f_heql_table = open(heql_table, "r")
-    heql = f_heql_table.read()
-    f_heql_table.close()
+    with open(heql_table, "r", encoding="UTF-8") as f:
+        heql = f.read()
 
     return heql
 
@@ -23,9 +21,8 @@ def load_heql() -> bytes:
 def load_payload(user_id: str, job_id: str) -> bytes:
     """Load query cypher text on payload"""
     query_ctxt = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_query.ctxt"
-    f_query = open(query_ctxt, "rb")
-    payload = f_query.read()
-    f_query.close()
+    with open(query_ctxt, "rb", encoding="UTF-8") as f:
+        payload = f.read()
 
     return payload
 
