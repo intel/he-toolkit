@@ -60,13 +60,14 @@ def create_app():
 
 
 def validate_context():
-    if Path.exists("./test_data/test.params") == False:
+    """Validate and creates the context"""
+    if Path.exists("./test_data/test.params") is False:
         raise Exception("params file is missing!")
 
-    if Path.exists("./test_data/test_config.toml") == False:
+    if Path.exists("./test_data/test_config.toml") is False:
         raise Exception("config.toml file is missing!")
 
-    if (Path.exists("./test.pk") == False) or (Path.exists("./test.sk") == False):
+    if (Path.exists("./test.pk") is False) or (Path.exists("./test.sk") is False):
         print("Creating context")
         subprocess.run(
             [
@@ -76,12 +77,17 @@ def validate_context():
                 "test",
                 "--frob-skm",
                 "--info-file",
-            ]
+            ],
+            check=True,
         )
 
-    if Path.exists("./test_data/test_db.ptxt") == False:
+    if Path.exists("./test_data/test_db.ptxt") is False:
         print("Encoding database")
-        with open("./test_data/test_db.ptxt", "w") as f:
+        with open(
+            "./test_data/test_db.ptxt",
+            "w",
+            encoding="utf-8",
+        ) as f:
             subprocess.run(
                 [
                     environ["HEKIT_ENCODE_PATH"],
@@ -90,10 +96,11 @@ def validate_context():
                     "./test_data/test_config.toml",
                     "./test_data/test_db",
                 ],
+                check=True,
                 stdout=f,
             )
 
-    if Path.exists("./test_data/test_db.ctxt") == False:
+    if Path.exists("./test_data/test_db.ctxt") is False:
         print("Encrypting database")
         subprocess.run(
             [
@@ -102,5 +109,6 @@ def validate_context():
                 "./test_data/test_db.ptxt",
                 "-o",
                 "./test_data/test_db.ctxt",
-            ]
+            ],
+            check=True,
         )

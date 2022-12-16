@@ -1,10 +1,14 @@
+"""Define a Config class for the environment settings"""
+
 # https://flask.palletsprojects.com/en/2.2.x/config/
 from os import environ, path
 
 basedir = path.abspath(path.dirname(__file__))
 
 
-class Config(object):
+class Config:
+    """Defne environment settings"""
+
     FLASK_DEBUG = environ["FLASK_DEBUG"]
     SQLALCHEMY_DATABASE_URI = environ["SQLALCHEMY_DATABASE_URI"]
     SQLALCHEMY_TRACK_MODIFICATIONS = False

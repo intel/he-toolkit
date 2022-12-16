@@ -23,7 +23,7 @@ admin_client = AdminClient({"bootstrap.servers": environ["KAFKA_CLUSTER_HOST"]})
 
 
 RUNNING = True
-start_time = None
+START_TIME = None
 engine = create_engine(
     f"postgresql+psycopg2://{environ['SQLALCHEMY_DATABASE_URI']}",
     echo=False,
@@ -40,6 +40,7 @@ def check_topic(topic: str) -> bool:
 
 
 def update_job_status(job_id: str, status: str):
+    """Update the status of a Job"""
     stmt = update(Job).where(Job.job_id == job_id).values(status=status)
 
     session.execute(stmt)
@@ -48,6 +49,7 @@ def update_job_status(job_id: str, status: str):
 
 
 def update_job_psi_time(job_id: str, psi_time: str):
+    """Update the psi time of a Job"""
     stmt = update(Job).where(Job.job_id == job_id).values(psi=psi_time)
 
     session.execute(stmt)
@@ -84,7 +86,7 @@ def consume_loop(
                 f.close()
 
                 print(message.headers()[0])
-                header, value = message.headers()[0]
+                _, value = message.headers()[0]
                 update_job_psi_time(job_id, value.decode("UTF-8"))
 
                 update_job_status(job_id, "DONE")
@@ -106,13 +108,13 @@ def loop(job: Job) -> None:
         topic_exists = check_topic(topic)
         time.sleep(0.5)
 
-    global start_time
-    start_time = time.time()
+    global START_TIME
+    START_TIME = time.time()
     consume_loop(consumer, [topic], job.user_id, job.job_id)
 
 
 def populate_queue(limit: int) -> List[str]:
-
+    """Return the Jobs in QUEUED state"""
     queue = []
     stmt = select(Job).where(Job.status.in_(["PENDING"])).limit(limit)
 

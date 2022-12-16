@@ -8,6 +8,7 @@ cli = FlaskGroup(create_app)
 
 @cli.command("create_db")
 def create_db():
+    """Creates the database"""
     # Use for clean start
     # db.drop_all()
     db.create_all()

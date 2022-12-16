@@ -29,6 +29,7 @@ class Job(Base):
     decode = Column(String())
 
     def serialize(self):
+        """Return the class attributes"""
         return {
             "id": self.id,
             "user_id": self.user_id,

@@ -11,7 +11,11 @@ def encode(user_id: str, job_id: str) -> str:
     query_ptxt = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_query.ptxt"
 
     start_time = time.time()
-    with open(query_ptxt, "w") as file_descriptor:
+    with open(
+        query_ptxt,
+        "w",
+        encoding="utf-8",
+    ) as file_descriptor:
         subprocess.run(
             [environ["HEKIT_ENCODE_PATH"], "--config", config_toml, query],
             stdout=file_descriptor,

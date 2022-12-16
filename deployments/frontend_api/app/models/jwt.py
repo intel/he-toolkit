@@ -1,7 +1,7 @@
+"""Define flask and flask_jwt  helpers"""
+
 from flask import redirect, url_for
-
 from flask_jwt_extended import JWTManager
-
 from app.models.user import User
 
 jwt = JWTManager()
@@ -12,6 +12,7 @@ jwt = JWTManager()
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
+    """Returns the user ID"""
     return user.id
 
 
@@ -21,10 +22,12 @@ def user_identity_lookup(user):
 # if the user has been deleted from the database).
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
+    """Loads a user from your database"""    
     identity = jwt_data["sub"]
     return User.query.filter_by(id=identity).one_or_none()
 
 
 @jwt.unauthorized_loader
 def custom_unauthorized_response(callback):
+    """Handles an unauthorized response"""
     return redirect(url_for("auth.login"))
