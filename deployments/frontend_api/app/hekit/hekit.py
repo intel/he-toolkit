@@ -1,5 +1,5 @@
 """Hekit"""
-import subprocess
+from subprocess import run  # nosec B404
 import time
 from os import environ
 
@@ -16,7 +16,7 @@ def encode(user_id: str, job_id: str) -> str:
         "w",
         encoding="utf-8",
     ) as file_descriptor:
-        subprocess.run(
+        run(  # nosec B603
             [environ["HEKIT_ENCODE_PATH"], "--config", config_toml, query],
             stdout=file_descriptor,
             check=True,
@@ -32,7 +32,7 @@ def encrypt(user_id: str, job_id: str) -> str:
     query_ctxt = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_query.ctxt"
 
     start_time = time.time()
-    subprocess.run(
+    run(  # nosec B603
         [environ["HEKIT_ENCRYPT_PATH"], public_key, query_ptxt, "-o", query_ctxt],
         check=True,
     )
@@ -50,7 +50,7 @@ def decode(user_id: str, job_id: str):
 
     start_time = time.time()
     with open(final, "wb") as file_descriptor:
-        subprocess.run(
+        run(  # nosec B603
             [environ["HEKIT_DECODE_PATH"], "--config", config_toml, result_file],
             stdout=file_descriptor,
             check=True,
@@ -67,7 +67,7 @@ def decrypt(user_id: str, job_id: str) -> str:
     )
     output = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_output"
     start_time = time.time()
-    subprocess.run(
+    run(  # nosec B603
         [environ["HEKIT_DECRYPT_PATH"], "-o", result_file, secret_key, output],
         check=True,
     )

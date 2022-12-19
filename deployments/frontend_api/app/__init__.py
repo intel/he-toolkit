@@ -1,6 +1,6 @@
 """API Module."""
 from os import makedirs, environ
-import subprocess
+from subprocess import run  # nosec B404
 from pathlib import Path
 
 from flask import Flask
@@ -69,7 +69,7 @@ def validate_context():
 
     if (Path.exists("./test.pk") is False) or (Path.exists("./test.sk") is False):
         print("Creating context")
-        subprocess.run(
+        run(  # nosec B603
             [
                 environ["HEKIT_CREATE_CONTEXT_PATH"],
                 "./test_data/test.params",
@@ -88,7 +88,7 @@ def validate_context():
             "w",
             encoding="utf-8",
         ) as f:
-            subprocess.run(
+            run(  # nosec B603
                 [
                     environ["HEKIT_ENCODE_PATH"],
                     "--server",
@@ -102,7 +102,7 @@ def validate_context():
 
     if Path.exists("./test_data/test_db.ctxt") is False:
         print("Encrypting database")
-        subprocess.run(
+        run(  # nosec B603
             [
                 environ["HEKIT_ENCRYPT_PATH"],
                 "test.pk",
