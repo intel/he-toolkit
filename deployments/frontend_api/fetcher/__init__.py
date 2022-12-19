@@ -122,8 +122,9 @@ def populate_queue(limit: int) -> List[str]:
     return queue
 
 
-if __name__ == "__main__":
-    config = Config()
+def main() -> None:
+    """Fetcher Program"""
+    Config()
 
     QUEUE_MAX_SIZE = 2
     queue = populate_queue(QUEUE_MAX_SIZE)
@@ -139,3 +140,7 @@ if __name__ == "__main__":
             ctx = mp.get_context("spawn")
             p = ctx.Process(target=loop, args=(queue.pop(),))
             p.start()
+
+
+if __name__ == "__main__":
+    main()
