@@ -107,7 +107,7 @@ def test_write_spec_to_toml_file(create_basic_spec_file, tmp_path):
 
 def test_dependency_substitutions_are_expanded(tmp_path):
     """Dependency substitutions cross component boundaries"""
-    # Create a depedency
+    # Create a dependency
     dep = {"hexl": [{"name": "bob", "export_thing": "someinfo"}]}
     rloc = tmp_path.resolve()
     # component / instance
@@ -115,7 +115,7 @@ def test_dependency_substitutions_are_expanded(tmp_path):
     # Creates missing directories
     dep_loc.mkdir(parents=True)
     dep_spec = Spec.from_instance_spec("hexl", dep["hexl"][0], rloc, recipe_arg_dict={})
-    # Write depedency spec to file
+    # Write dependency spec to file
     dep_spec.to_toml_file((dep_loc / "hekit.spec").resolve())
 
     expected = {

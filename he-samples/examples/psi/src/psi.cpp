@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
               << std::endl;
     return EXIT_FAILURE;
   } catch (const std::exception& e) {
-    std::cerr << "\nExit due to unkown exception thrown:\n\t" << e.what()
+    std::cerr << "\nExit due to unknown exception thrown:\n\t" << e.what()
               << std::endl;
     return EXIT_FAILURE;
   }

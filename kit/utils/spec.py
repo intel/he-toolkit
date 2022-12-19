@@ -118,7 +118,7 @@ def get_dependencies(instances_list: List) -> List[str]:
             if not symbols:
                 return
 
-            # Assume dependecies are define as:
+            # Assume dependencies are define as:
             # component/instance
             dependency_list.extend(d[k].split("/")[0] for _, k in symbols)
 
