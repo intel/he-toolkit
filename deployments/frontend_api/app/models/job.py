@@ -31,7 +31,7 @@ class Job(db.Model):
 
     def serialize(self):
         """Return class attributes"""
-        return {
+        return {  # pylint: disable=duplicate-code
             "id": self.id,
             "user_id": self.user_id,
             "org_id": self.org_id,
