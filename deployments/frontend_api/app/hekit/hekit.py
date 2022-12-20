@@ -4,7 +4,7 @@ import time
 from os import environ
 
 
-def encode(user_id: str, job_id: str) -> str:
+def encode(user_id: str, job_id: str) -> float:
     """Encode"""
     config_toml = f"{environ['KEYS_PATH']}config.toml"
     query = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_query.csv"
@@ -25,7 +25,7 @@ def encode(user_id: str, job_id: str) -> str:
     return time.time() - start_time
 
 
-def encrypt(user_id: str, job_id: str) -> str:
+def encrypt(user_id: str, job_id: str) -> float:
     """Encrypt"""
     public_key = f"{environ['KEYS_PATH']}key.pk"
     query_ptxt = f"{environ['STORAGE_PATH']}{user_id}/{job_id}/{job_id}_query.ptxt"
@@ -59,7 +59,7 @@ def decode(user_id: str, job_id: str):
     return time.time() - start_time
 
 
-def decrypt(user_id: str, job_id: str) -> str:
+def decrypt(user_id: str, job_id: str) -> float:
     """Decrypt"""
     secret_key = f"{environ['KEYS_PATH']}key.sk"
     result_file = (

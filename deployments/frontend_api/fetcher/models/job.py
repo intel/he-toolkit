@@ -8,7 +8,7 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 
-class Job(Base):
+class Job(Base):  # type: ignore
     """Job Model"""
 
     __tablename__ = "jobs"

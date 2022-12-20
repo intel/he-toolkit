@@ -9,7 +9,7 @@ def save_user_request(user_id: str, job_id: str, input_data: bytes) -> None:
         f.write(input_data)
 
 
-def load_heql() -> bytes:
+def load_heql() -> str:
     """Load HEQL"""
     heql_table = f"{environ['KEYS_PATH']}query.heql"
     with open(heql_table, "r", encoding="UTF-8") as f:
