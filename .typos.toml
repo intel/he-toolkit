@@ -9,3 +9,6 @@ parms = "parms"
 # typos cannot ignore specified files when used with pre-commit
 # Ancient Egyption God
 Ba = "Ba"
+
+[files]
+extend-exclude = ["deployments/frontend_api/frontend/package-lock.json", "notes/*.tex"]

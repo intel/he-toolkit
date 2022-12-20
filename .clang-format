@@ -1,9 +1,12 @@
 # Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
+---
 BasedOnStyle: Google
+---
 Language: Cpp
 DerivePointerAlignment: false
 PointerAlignment: Left
 # Let cpplint enforce header order
 SortIncludes: false
+---
+Language: JavaScript

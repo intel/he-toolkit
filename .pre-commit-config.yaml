@@ -11,10 +11,12 @@ repos:
         - id: mixed-line-ending
         - id: check-byte-order-marker
         - id: check-yaml
+          args: [--allow-multiple-documents]
     - repo: https://github.com/crate-ci/typos
-      rev: v1.1.9
+      rev: v1.8.1
       hooks:
         - id: typos
+          pass_filenames: false
     - repo: local
       hooks:
         - id: clang-format
@@ -83,6 +85,8 @@ repos:
           language: script
           pass_filenames: false
           args:
+            - --namespace-packages
+            - --explicit-package-bases
             - deployments
         - id: mypy-kit
           name: mypy-kit
