@@ -1,9 +1,12 @@
 *.aux
+*.bbl
 *.dvi
+*.fls
+*.fdb_latexmk
 *.log
+*.nav
 *.pdf
 *.snm
-*.nav
+*.toc
 *.vrb
-*.bbl
 _minted-*

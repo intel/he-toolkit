@@ -1,0 +1,948 @@
+\documentclass[ %handout, % for handouts %%% 12pt,handout,
+ 10pt, xcolor={dvipsnames,svgnames,x11names,hyperref},
+   hyperref={colorlinks=true,citecolor=green,linkcolor=DarkRed,urlcolor=ProcessBlue,anchorcolor=blue}
+  ]{beamer}
+\usepackage[ruled, linesnumbered]{algorithm2e}
+
+\usepackage{tcolorbox}
+ \tcbuselibrary{skins,raster}
+\usepackage{outlines}
+\usepackage{multirow}
+\usepackage{babel}
+\usepackage{blindtext}
+\usepackage{verbatim}
+\usepackage{minted}
+\usepackage{tabularx}
+
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
+\usepgfplotslibrary{statistics}
+
+\setbeamertemplate{navigation symbols}{}
+
+ \usepackage{relsize}
+
+\usepackage{bookmark}
+
+%\usepackage[hyperref]{xcolor}
+
+
+\let\oldcite=\cite
+\renewcommand{\cite}[1]{\textcolor[rgb]{.7,.7,.7}{\oldcite{#1}}}
+
+
+\mode<presentation> {
+
+% The Beamer class comes with a number of default slide themes
+% which change the colors and layouts of slides. Below this is a list
+% of all the themes, uncomment each in turn to see what they look like.
+
+%\usetheme{default}
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{Dresden}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+% As well as themes, the Beamer class has a number of color themes
+% for any slide theme. Uncomment each of these in turn to see how it
+% changes the colors of your current slide theme.
+
+%\usecolortheme{albatross}
+%\usecolortheme{beaver}
+%\usecolortheme{beetle}
+%\usecolortheme{crane}
+\usecolortheme{dolphin}
+%\usecolortheme{dove}
+%\usecolortheme{fly}
+%\usecolortheme{lily}
+%\usecolortheme{orchid}
+%\usecolortheme{rose}
+%\usecolortheme{seagull}
+%\usecolortheme{seahorse}
+%\usecolortheme{whale}
+%\usecolortheme{wolverine}
+
+%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+
+%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\setbeamercolor{alerted text}{fg=red}
+
+
+\usepackage[absolute,overlay]{textpos}
+\usepackage{graphicx}
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{forest}
+ \usepackage{tikz}
+ \usetikzlibrary{shapes.geometric}
+\usepackage{rotating}
+\usepackage[]{wrapfig}
+\usetikzlibrary{arrows,shapes}
+\usetikzlibrary{trees,matrix}
+\usepackage{multirow}
+\usepackage{dirtree}
+%\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.85}
+\newcommand\x{.11}
+\graphicspath{ {Images/} }
+\usepackage{mathrsfs}
+%\usepackage[symbol]{footmisc}
+
+%\usepackage{xcolor}
+%\hypersetup{
+%  colorlinks,
+%  allcolors=.,
+%  urlcolor=ProcessBlue,
+%}
+%\hypersetup{colorlinks = true,
+%%            linkcolor = red,
+ %           urlcolor=ProcessBlue,
+ %           citecolor = green,
+ %           anchorcolor = blue}
+
+%\usepackage{bibunits}
+%\setbeamertemplate{bibliography item}{[\theenumiv]}
+%\defaultbibliography{IoT,CPS}
+%\defaultbibliographystyle{IEEEtran}
+
+\usepackage[numbers]{natbib}
+\usepackage{bibunits}
+
+%If by "animated" you mean creating overlays, then a straight application of Daniel's visible on key would solve the problem.
+%Step 1. Put the following in the preamble:
+\tikzset{
+    invisible/.style={opacity=0,text opacity=0},
+    visible on/.style={alt=#1{}{invisible}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+}
+\forestset{
+  visible on/.style={
+    %for children={
+      /tikz/visible on={#1},
+      edge={/tikz/visible on={#1}}
+   % }
+  }
+}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsubsection]
+  \end{frame}
+}
+
+% \logo{\raisebox{-0.5cm}{\includegraphics[width=1cm]{naulogo.png}}\hspace*{0.5cm}}
+
+\newenvironment{stepitemize}{\begin{itemize}[<+->]}{\end{itemize} }
+
+\newcommand{\myblue}{\only{\color{blue}}}
+\newcommand{\mygreen}{\only{\color{green}}}
+\newcommand{\myyellow}{\only{\color{yellow}}}
+\newcommand{\myorange}{\only{\color{orange}}}
+\newcommand{\myred}{\only{\color{red}}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\RR}{\mbox{\msbm R}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Rs}{\mathcal{R}}
+\newcommand{\Hs}{\mathbb{H}}
+
+\begin{document}
+
+\title[Rings and Fields Fundamentals]{
+Rings and Fields Fundamentals for Homomorphic Encryption}
+\author{Bahattin Yildiz}
+\institute[DBIO-Glade]{DBIO-Glade}
+\date[September]{September 2022}
+\maketitle
+
+\section{Introduction}
+
+\begin{frame}{Why Rings and Fields?}
+\begin{stepitemize}
+    \item Addition and multiplication are the necessary operations in FHE.
+    \item Groups have only one operation
+    \item Rings and fields are equipped with the two operations
+    \item Many well-known sets that appear in the HE are rings
+    \item $\Z$, $\Q$, $\R$, $\C$, $\Z_q$, $\Z_p$, $\Z[x]$, $\Z_p[x]$, $\Z[x]/(f(x))$, $\Z_p[x]/(f(x))$ are all rings.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Ring Definition}
+\begin{stepitemize}
+\item Let us start with the definition of a ring:
+\begin{definition}
+A nonempty set $R$ that is equipped with two binary operations (genericaly called ``addition" and ``multiplication") $+$ and $\cdot$ is called a {\bf ring} if ot satisfies the following conditions:
+\begin{enumerate}
+    \item $(R,+)$ is an Abelian group
+ \item $R$ is closed under multiplication, that is $a\cdot b \in R$ whenever $a,b\in R$
+ \item Multiplication in $R$ is associative, that is $(ab)c=a(bc)$.
+ \item The multiplication operation is distributive over addition. More precisely, $a(b+c)=ab+ac$ whenever $a, b, c \in R$.
+\end{enumerate}
+\end{definition}
+\end{stepitemize}
+
+\end{frame}
+
+\begin{frame}{Some remarks}
+    \begin{stepitemize}
+    \item Since $(R,+)$ is an Abelian group, it has an identity, which we will denote by $0_R$ or just simply by $0$.
+    \item A ring need not have a multiplicative identity. If there is a multiplicative identity, the ring is called a ``ring with identity".
+    \item The identity is denoted by $1_R$ or just $1$.
+    \item The multiplication does not have to be commutative: \item i.e., we do not need to have $ab=ba$ for all $a,b \in R$.
+    \item If this condition holds for all elements in $R$, then the ring is called a ``commutative ring".
+    \item We will mostly deal with ``nice" rings, that is we will mostly be dealing with commutative rings with identity.
+    \end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+\item $\Z$ is a commutative ring with identity with respect to the usual addition and multiplication operations.
+    \item Similarly $\Q$, $\R$ and $\C$ are commutative rings with identity.
+    \item For $n>1$, the set $\Z_n=\{0,1, \dots, n-1\}$ is a commutative ring with idnetity with respect to addition and multiplication modulo $n$.
+    \item $2\Z$, the set of even integers is a commutative ring without identity.
+    \item $\R^{n\times n}$, the set of $n\times n$ matrices over the real numbers is a non-commutative ring with identity. The additive identity in this case is the $0$ matrix whereas the multiplicative identity is $I_n$, the identity matrix.
+    \item Let $\R[x]$ be the set of polynomials over $\R$. Then $\R[x]$ is a commutative ring with identity with respect to polynomial addition and polynomial multiplication. The multiplicative identity is the constant polynomial $1$, whereas the additive identity is just the zero polynomial.
+    \item The set of polynomials of degree $\leq n$ is not a ring, while it is an Abelian group under addition. The reason is because this set is not closed under polynomial multiplication.
+    \item Similar to the previous case, we can talk about
+    $\Z[x]$ and $\Z_m[x]$ are also commutative rings with identity.
+\end{stepitemize}
+
+\end{frame}
+\section{Zero Divisors and Units}
+\begin{frame}{Zero Divisors and Units}
+    \begin{stepitemize}
+    \item A ring can have zero divisors, i.e., elements $a,b \neq 0$ such that $ab=0$.
+    \item For example in $\Z_6$, we have $2\cdot 3=0$ while both $2$ and $3$ are non-zero in the ring.
+    \item However we cannot find such elements in $\Z$ or in $\Z_7$.
+    \item  An element $a\neq 0$ is said to be a ``zero divisor" if $ab=0$ for some $b\neq 0$ in $R$.
+    \item
+    A commutative ring $R$ with identity is called an ``integral domain" if it has no zero divisors.
+    \item Equivalently $R$ is an integral domain if $ab=0$ in $R$ leads to $a=0$ or $b=0$.
+    \item {\bf (Cancellation Property)} If $R$ is an integral domain, then $ab=ac$ implies $a=0$ or $b=c$.
+    \item The cancellation would not work in a non-integral domain as for example in $\Z_6$ we have $2\cdot 2=2\cdot 5$, but $2\neq 5$ in $\Z_6$.
+    \end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+\item $\Z$, $\Q$, $\R$, $\C$ and $\Z_p$:$p$ prime
+ are all examples of integral domains.
+ \item If $n$ is composite then $\Z_n$ is not an integral domain because then by definition we can find $1<a,b<n$ such that $a\cdot b=n$ so we would have $ab=0$ in $\Z_n$, whereas $a, b\neq 0$.
+\end{stepitemize}
+
+\end{frame}
+\begin{frame}{Units}
+\begin{stepitemize}
+\item An element $a\in R$ is said to be a ``unit" if there exits $b\in R$ such that $ab=1$.
+\item So,  just like a zero divisor is a divisor of $0$, a unit is a divisor of $1$.
+\item In $\Z$, $1$ and $-1$ are the only units.
+    \item In $\Z_6$, $5$ is a unit since $5\cdot 5 =1$ in $\Z_6$. $2$ is not a unit since $2a$ will alwyas be $0,2$ or $4$ modulo $6$.
+    \item Recalling the Number Theory part, we see that $a\in \Z_n$ is a unit if and only $GCD(a,b)=1$.
+    \item Thus in $\Z_p$, where $p$ is prime, every non-zero element is a unit.
+    \item In $\Q$, $\R$ and in $\C$, every non-zero element is a unit.
+\end{stepitemize}
+    \end{frame}
+\begin{frame}{}
+    \begin{stepitemize}
+    \item Just like the case of zero divisors, we have a special classification for rings based on the concept if units:
+\item A commutative ring $R$ with identity is called a ``field" if every non-zero element is a unit.
+\item
+$\R, \Q, \C$, $\Z_p:p$ prime are all fields while $\Z$, and $\Z_n:n$ composite are not fields.
+\item When $p$ is prime, the field $\Z_p$ is usually called a ``prime field". It is a basic example of a ``finite field". \item There are many extensions of $\Z_p$, all called finite fields that have sizes $p^m$, where $p$ is a prime.
+
+\item Since units cannot be zero divisors any field is automatically an integral domain but the converse is not true in general.
+\item For example, $\Z$ is an integral domain that is not a field.
+\item However, in the case of finite rings, the two concepts coincide, that is any finite integral domain is a field.
+    \end{stepitemize}
+\end{frame}
+
+\section{Subrings and Ideals}
+\begin{frame}{Subrings and Ideals}
+\begin{stepitemize}
+\item Let $R$ be a commutative ring with identity, and $S\subseteq R$ be a nonempty subset.
+\item $S$ is called a ``subring" of $R$ if it is a ring under the same operations.
+\item Equivalently, $S\subseteq R$ is a subring if
+$$a-b\in S, \:\:\: ab\in S, \:\:\:\:\:\:\forall a,b\in S.$$
+\item An ideal is a more restrictive concept although similar to subrings.
+\item A subset $I$ of $R$ is called an ``ideal" if
+\begin{enumerate}
+    \item $a-b\in I$ for all $a,b \in I$, and
+    \item $ar \in I$ for all $a \in I$ and $r \in R$.
+\end{enumerate}
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+    \begin{stepitemize}
+    \item $\{0\}$ and $R$ are ideals, which are labeled as ``trivial" ideals.
+    \item $m\Z$ is an deal of $\Z$.
+    \item $\Z$ is a subring of $\Q$, but it is not an ideal of $\Q$ since $2\cdot \frac{1}{3} \not \in \Z$.
+    \item The set $I = \{p(x) \in \R[x]|p(0)=0\}$ is an ideal of $\R[x]$.
+    \item This is basically the set of polynomials with zero constant terms.
+    \item However the set $\{p(x)\in \R[x]|p(0)=1\}$ is not an ideal, nor in fact is it a subring. Since $p(0)-q(0)=0$ and not $1$.
+    \item The set $I = \{p(x) \in \Z[x] | p(0) \:\:\textrm{is} \:\:\textrm{even}\}$ is an ideal of $\Z[x]$.
+    \item More generally the set of polynomials whose constant terms are divisible by a prime $p$ is also an ideal.
+    \item $\{0,2,4,6\}$ is an ideal of $\Z_8$.
+    \end{stepitemize}
+\end{frame}
+
+\begin{frame}{Ideals of Fields}
+    \begin{stepitemize}
+    \item If an ideal $I$ contains $1$ then it must contain $1\cdot r$ for all $r\in R$ and hence we must have $I=R$.
+    \item This is also true if $I$ contains a unit (since a unit times an element of $R$ is 1).
+    \item This tells us that a field does not have any non-trivial ideals.
+    \item In other words $\{0\}$ and $R$ are the only ideals of a field $R$.
+    \end{stepitemize}
+\end{frame}
+\begin{frame}{Principal Ideals}
+\begin{stepitemize}
+\item For an element $a$ in a commutative ring with identity, we let
+$(a) = \{ar|r\in R\}$.
+\item Clearly $(a)$ is an ideal, which is called a ``principal ideal".
+\item In some rings all ideals are principal.
+\item $\Z, \Z_n$ are examples of such rings.
+\end{stepitemize}
+\end{frame}
+
+\section{Ring Homomorphisms}
+\begin{frame}{Ring Homomorphisms}
+    \begin{stepitemize}
+    \item A ring homomorphism is a map between rings that preserves the ring structure.
+    \item More precisely we have:
+\begin{definition}
+Let $R$ and $R'$ be two rings. A function $\varphi:R\rightarrow R'$ is called a (ring) homomorphism if
+$$\varphi(g_1+g_2) = \varphi(g_1)+\varphi(g_2), \:\:\:\:\textrm{and}\:\:\: \varphi(g_1g_2) = \varphi(g_1)\varphi(g_2) \:\:\: \forall g_1, g_2 \in G.$$
+\end{definition}
+\end{stepitemize}
+\end{frame}
+
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+\item For any ring $R$, the map $\varphi:R \rightarrow R$ given by $\varphi(r)=0$ as well as the map $\phi:R \rightarrow R$ given by $\phi(r)=r$ are ring homomorphisms. These are also called ``trivial homomorphisms".
+    \item It is not difficult to show that there is no non-trivial ring homomorphism from $\Z$ to $\Z$.
+    \item For example $\phi(m)=2m$ is not a ring homomorphism since it is additive but not multiplicative.
+    \item Similarly $\phi(m)=m^2$ is also not a ring homomorphism since it is multiplicative but not additive.
+    \item $\phi:\Z \rightarrow \Z_n$ given by $\varphi(m)=(m)_n$ is a ring homomorphism since modulo reduction is both additive and multiplicative.
+    \item $\phi:\R[x]\rightarrow \R$ given by $\phi(p(x)) = p(\alpha)$ for some $\alpha \in \R$ is a ring homomorphism also called the ``evaluation homomorphism".
+   \item The RSA encryption is essentially a map from $\Z_n$ to $\Z_n$ that takes an element(message) $m$ to $m^e$ modulo $n$.
+   \item This is clearly a multiplicative function but it is not additive, which means it is not a ring homomorphism.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Kernel and Range}
+\begin{stepitemize}
+\item Just as in the case of group homomorphisms, we can talk about the kernel and the range of a homomorphism:
+\item Let $\varphi:R\rightarrow R'$ be a ring homomorpshim. \item $ker(\varphi) = \{r\in R|\varphi(r)=0\}.$
+\item $ran(\varphi) = \{\varphi(r)|r\in R\}.$
+\item The kernel of a ring homomorphism is an ideal of $R$, whereas the range is a subring of $R'$.
+\item For example, for $\phi:\Z \rightarrow \Z_n$ given by $\varphi(m)=(m)_n$, we have $ker(\varphi) = n\Z = (n)$, while $ran(\varphi) = \Z_n$.
+\item For $\varphi:\R[x]\rightarrow \R$ given by $\varphi(p(x))=p(0)$, the kernel is all polynomialis with $0$ constant term, while the range is all of $\R$.
+\end{stepitemize}
+\end{frame}
+
+\section{Ring Isomorphism}
+\begin{frame}{Ring Isomorphism}
+    \begin{stepitemize}
+    \item A ring homomorphism $\varphi:R\rightarrow S$ is called an ``isomorphism" if it is one-to-one and onto.
+    \item In the language of kernel and range we can say $\varphi$ is an ispomorphism if and only if $ker(\varphi)=\{0\}$ and $ran(\varphi)=S$
+    \item If there is an isomorphism between $R$ and $S$ we call the rings ``isomorphic" and we denote it by $R\simeq S$.
+    \item An isomorphism from $R$ onto itself is also called an ``automorphism".
+    \item Note that an automorphism basically permutes the elements of a ring.
+    \item However, not every permutation would be an automorphism.
+    \item An automorphism is a permutation with structure.
+    \end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+ \item For any ring $R$, the identity map $\phi:R\rightarrow R$ given by $\phi(r)=r$ is a ring isomorphism, or an automorphism.
+    \item As we saw before, the identity function is the only automorphism of $\Z$.
+    \item Consider $\varphi:\C \rightarrow \C$ by $\varphi(a+bi)=a-bi$,
+    \item So, $\varphi$ is the complex conjugation operation.
+    \item It is both additive and multiplicative and hence is a ring homomorphism.
+    \item Moreover, it is one-to-one and onto since $a-bi=c-di$ implies $a=c$ and $b=d$ and $\varphi(a-bi)=a+bi$.
+    \item Thus $\varphi$ is an automorphism of $\C$.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{CRT for Rings}
+\begin{stepitemize}
+\item Consider $\varphi:\Z_{12}\rightarrow \Z_{3}\times \Z_{4}$, where $\Z_3\times \Z_4$ is the ring with respect to component-wise addition and multiplication modulo $3$ and $4$ respectively.
+\item Such rings are called ``product rings".
+\item Define $\varphi(m) = (m_3, m_4)$, where $m_3$ and $m_4$ represent the reduction modulo $3$ and modulo $4$, respectively.
+\item Since modulo reduction is both multiplicative and additive, this is clearly a ring homomorphism.
+\item By CRT, for any $a \in \Z_3$ and $b\in \Z_4$, there is a unique solution to  $x\equiv a \pmod{3}$ and $x\equiv b\pmod{4}$ in $\Z_{12}$.
+\item Thus this map is one-to-one and it is also onto.
+\item Hence $\varphi$ is an isomorphism.
+\end{stepitemize}
+\end{frame}
+
+\section{Quotient Rings, Isomorphism Theorems}
+
+\begin{frame}{Quotient Ring}
+\begin{stepitemize}
+    \item For a ring $R$ and an ideal $I$ of $R$, we consider the set of additive cosets:
+$$R/I = \{a+I|a\in R.\}$$
+\item Recall that $(R/I,+)$ is an Abelian group, where we consider the addition in cosets as: $(a+I)+(b+I) = (a+b)+I$.
+\item To turn $R/I$ into a ring, we need to introduce the multiplication as well.
+\item Define $(a+I)(b+I)=ab+I$.
+\item This operation would not be well defined if $I$ were a subring but not an ideal.
+\item With these, $R/I$ turns into a ring with the additive identity being $0+I$ or $I$ and the multiplicative identity being $1+I$.
+\item All other properties of a ring are satisfied as well. This is called a ``quotient ring".
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Example}
+\begin{stepitemize}
+    \item Let $R=\Z$ and $I=3\Z$.
+    \item Then as before, we have
+    $$R/I = \{3\Z, 1+3\Z, 2+3\Z\},$$
+\item but now this set has the additional operation of multiplication defined on it by
+    $$(1+3\Z)(2+3\Z)=2+3\Z, \:\:\:\: (2+3\Z)(2+3\Z) = 4+3\Z=1+3\Z, ...$$
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Isomorphism Theorems}
+\begin{stepitemize}
+    \item Consider The function $\phi:\Z/3\Z\rightarrow \Z_3$ given by $\phi(a+3\Z)=a$, which is an isomorphism.
+    \item Let us look at the operation tables
+
+\begin{columns}
+        \begin{column}{0.4\textwidth}
+     \begin{table}
+\begin{tabular}{ c| c | c | c}
++ & {\color{blue}$0+3\Z$} & {\color{red} $1+3\Z$} & {\color{teal} $2+3\Z$} \\
+\hline
+{\color{blue} $0+3\Z$} & {\color{blue} $0+3\Z$} & {\color{red} $1+3\Z$} & {\color{teal} $2+3\Z$}  \\
+\hline
+{\color{red} $1+3\Z$} & {\color{red} $1+3\Z$} & {\color{teal} $2+3\Z$} & {\color{blue} $0+3\Z$}  \\
+\hline
+{\color{teal} $2+3\Z$} & {\color{teal} $2+3\Z$} & {\color{blue} $0+3\Z$} & {\color{red} $1+3\Z$} \\
+\hline
+\end{tabular}
+\end{table}
+    \end{column}
+
+        \begin{column}{0.4\textwidth}
+    \begin{table}
+\begin{tabular}{ c| c | c | c}
++ & {\color{blue} $0$} & {\color{red} $1$} & {\color{teal} $2$} \\
+\hline
+{\color{blue} $0$} & {\color{blue} $0$} & {\color{red} $1$} & {\color{teal} $2$}  \\
+\hline
+{\color{red} $1$} & {\color{red} $1$} & {\color{teal}$2$} & {\color{blue} $0$}  \\
+\hline
+{\color{teal} $2$} & {\color{teal} $2$} & {\color{blue} $0$} & {\color{red} $1$} \\
+\hline
+\end{tabular}
+\end{table}
+    \end{column}
+\end{columns}
+
+\item[]
+\begin{columns}
+        \begin{column}{0.4\textwidth}
+     \begin{table}
+\begin{tabular}{ c| c | c | c}
+$\cdot$  & {\color{blue} $0+3\Z$} & {\color{red} $1+3\Z$} & {\color{teal}$2+3\Z$} \\
+\hline
+{\color{blue} $0+3\Z$} & {\color{blue} $0+3\Z$} & {\color{blue} $0+3\Z$} & {\color{blue} $0+3\Z$}  \\
+\hline
+{\color{red} $1+3\Z$} & {\color{blue}$0+3\Z$} & {\color{red} $1+3\Z$} & {\color{teal}$2+3\Z$}  \\
+\hline
+{\color{teal} $2+3\Z$} & {\color{blue} $0+3\Z$} & {\color{teal}$2+3\Z$} & {\color{red} $1+3\Z$} \\
+\hline
+\end{tabular}
+\end{table}
+    \end{column}
+
+        \begin{column}{0.4\textwidth}
+    \begin{table}
+\begin{tabular}{ c| c | c | c}
+$\cdot$ & {\color{blue} $0$}& {\color{red} $1$} & {\color{teal} $2$} \\
+\hline
+{\color{blue} $0$} & {\color{blue}$0$} & {\color{blue}$0$} & {\color{blue}$0$}  \\
+\hline
+{\color{red} $1$} & {\color{blue} $0$} & {\color{red} $1$} & {\color{teal} $2$}  \\
+\hline
+{\color{teal} $2$} & {\color{blue} $0$} & {\color{teal} $2$} & {\color{red} $1$} \\
+\hline
+\end{tabular}
+\end{table}
+    \end{column}
+\end{columns}
+
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{1st Isomorphism Theorem}
+    \begin{stepitemize}
+        \item The isomorphism theorems will formalize this phenomenon:
+\begin{theorem}$($ 1st Isomorphism Theorem for Rings $)$
+Let $\varphi: R\rightarrow S$ be a homomorphism. Then we have
+$$R/ker(\varphi) \simeq ran(\varphi).$$
+In particular, if $\varphi$ is onto, then
+$$R/ker(\varphi) \simeq S. $$
+\end{theorem}
+    \end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+    \begin{stepitemize}
+        \item We can formalize the above isomorphism by considering the ring homomorphism $\varphi:\Z\rightarrow \Z_3$ given by $\varphi(m) = (m)_3$, which is onto and has kernel $3\Z$.
+        \item Thus by 1st isomorphism theorem we have
+    $$\Z/3\Z \simeq \Z_3.$$
+    \item Consider $\phi:\Z[x]\rightarrow \Z$ given by $\phi(p(x)) = p(0)$.
+    \item Then $\phi$ is a ring homomorphism that is onto and the kernel is given by
+    $$ker(\phi) = \{p(x) \in \Z[x]|p(0)=0\} = x\Z[x] = (x).$$
+    \item Hence by 1st isomorphism theorem we have
+    $$\Z[x]/(x) \simeq \Z.$$
+\item This isomorpshism can also be interpreted as follows.
+\item Taking $\Z[x]/(x)$ amounts to reducing polynomials modulo $x$, or ``killing" the $x$-terms, as a result of which we are left with constants, or the ring $\Z$ itself.
+    \end{stepitemize}
+\end{frame}
+\begin{frame}{Another Example}
+\begin{stepitemize}
+    \item Now let us define a similar homomorphism as the previous one with one slight modification:
+$$\phi:\Z[x]\rightarrow \Z_2, \:\:\:\: \phi(x) = (\phi(0))_2,$$
+\item that is we reduce $p(0)$ modulo $2$.
+\item Similar to the previous case, $\phi$ is a homomorphism that is onto.
+\item Kernel consists of all polynomials whose constant terms are even, which is an ideal that is generated by $(x,2)$.
+\item One way to see this is to reach the image, we need to ``kill" the $x$-term as well as $2$, to get a $0$ or $1$ in the end.
+\item Using the first isomorphism theorem now we have the following isomorphism of rings:
+    $$\Z[x]/(x,2) \simeq \Z_2.$$
+\end{stepitemize}
+\end{frame}
+\section{Maximal Ideals}
+\begin{frame}{Maximal Ideals}
+    \begin{stepitemize}
+        \item Let $R$ be a commutative ring with identity and let $M$ be a proper ideal (i.e., $M \neq R$).
+        \item $M$ is called a ``maximal ideal" if for an ideal $I$, $M\subseteq I$ implies $I=M$ or $I=R$.
+\item So there can be no non-trivial ideal between $I$ and $R$.
+\item  $M$ is a maximal ideal if and only if $(x,M)=R$ for every $x\not \in M$.
+\item Here $(x,M)$ represents the ideal obtained by ``attaching" $x$ to $M$, that is
+$$(x,M) = \{rx+m|r\in R, m\in M\}.$$
+\item Let $R$ be a commutative ring with identity. An ideal $M$ or $R$ is maximal if and only if $R/M$ is a field.
+\item So, in a sense maximal ideals can help us construct fields.
+\item We will see this later in the advanced topics where we will observe how this is used in BGV.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+    \item In $\Z$ the ideals $(p)$, where $p$ is a prime are all maximal. This can also be seen by the isomorphism theorems:
+    $$\Z/(p)\simeq \Z_p,$$
+    which are all fields when $p$ is prime.
+    \item In $\Z$, the ideal $(4)$ is not maximal for example as
+    $$(4) \subsetneq (2) \subsetneq \Z.$$
+    \item If $F$ is a field, then the only ideals of $F$ are $0$ and $F$ itself.
+    \item This implies that the zero ideal $\{0\}$ is a maximal ideal in $F$.
+    \item In fact we can say that a ring $F$ is a field if and only if the zero ideal is maximal in $F$.
+    \item Thus, in $\Z_p, \Q, \R, \C$, the only maximal ideal is $\{0\}$.
+\end{stepitemize}
+\end{frame}
+\begin{frame}{More Examples}
+\begin{stepitemize}
+    \item The ideal $(x)$ is not maximal in $\Z[x]$ since (as we saw in the previous section) $\Z[x]/(x)\simeq \Z$, which is not a field.
+    \item Another way to see this is to notice that
+    $$(x) \subsetneq (x,2) \subsetneq \Z[x].$$
+    \item However, $(x)$ is maximal in $\R[x]$ as by the same reason, $\R[x]/(x)\simeq \R$, which is a field.
+    \item $(x)$ is maximal in $\Q[x]$ and $\C[x]$ as well.
+    \item Since (as we saw before) $\Z[x]/(2,x) \simeq \Z_2$ is a field, we can say that $(2,x)$ is a maximal ideal of $\Z[x]$.
+    \item Similarly $(p,x)$ is a maximal ideal of $\Z[x]$ for all primes $p$.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Even more examples}
+\begin{stepitemize}
+        \item $2\Z_4$ is a maximal ideal of $\Z_4$.
+        \item Generally, maximal ideals of $\Z_n$ are generated by $p$, where $p$ is a prime divisor of $n$.
+        \item In general, all ideals of $\Z_n$ are generated by positive divisors of $n$,
+        \item while the maximal ideals are generated by the prime divisors.
+    \item If $p$ is a prime number, then $\Z_{p^n}$ has only one maximal ideal given by $(p) = p\Z_{p^n}$.
+    \item Such rings that have a unique maximal ideal are called ``local rings".
+\end{stepitemize}
+\end{frame}
+\section{Fields:A General Overview}
+\begin{frame}{Overview of Fields}
+\begin{stepitemize}
+    \item a field $F$ has two operations: $+$ and $\cdot$ with the following properties:
+\begin{enumerate}
+    \item $a+b\in F$ and $a\cdot b \in F$ for all $a,b\in F$
+    \item $a+b=b+a, ab=ba$ for all $a,b\in F$
+    \item $a+(b+c)=(a+b)+c$ and $a(bc) = (ab)c$ for all $a,b,c \in F$
+    \item $a(b+c)=ab+ac$, for all $a,b,c \in F$
+    \item $0\in F$ such that $0+a=a$ for all $a\in F$
+    \item $1\in F$ such that $1\cdot a=a$ for all $a\in F$
+    \item For all $a\in F$, $-a \in F$ such that $a+(-a)=0$
+    \item For all $a \in F$, there exists $a^{-1}\in F$ such that $a\cdot a^{-1}=1$.
+\end{enumerate}
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Observation and examples}
+\begin{stepitemize}
+    \item If  $F$ is a field then $F^{\times} = F-\{0\}$ is a group under $\cdot$ operation.
+\item As we saw before, $\Z_p:$ $p$ prime, $\Q, \R, \C$ are all fields.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Another Example}
+\begin{stepitemize}
+    \item Let $R = \Z_2[\omega]$, where $\omega^2=\omega+1$. \item We first note that in $\Z_2$, $1$ and $-1$ are the same.
+    \item Since $\omega^2=\omega+1$, the ring $\Z_2[w]$ consists of four elements:
+    $$\Z_2[\omega] = \{0, 1, \omega, 1+\omega\}.$$
+    \item We can actually write the addition and multiplication table to get a more clear picture:
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+     \begin{table}
+\begin{tabular}{ c| c | c |c|c}
+$+$  & $0$ & $1$ & $\omega$ & $1+\omega$ \\
+\hline
+$0$ & $0$ & $1$ & $\omega$ & $1+\omega$  \\
+\hline
+$1$ & $1$ & $0$ & $1+\omega$ & $\omega$  \\
+\hline
+$\omega$ & $\omega$ & $1+\omega$ & $0$ & $1$ \\
+\hline
+$1+\omega$ & $1+\omega$& $\omega$ & $1$&$0$\\
+\end{tabular}
+\end{table}
+    \end{column}
+
+        \begin{column}{0.4\textwidth}
+    \begin{table}
+\begin{tabular}{ c| c | c |c|c}
+$\cdot$  & $0$ & $1$ & $\omega$ & $1+\omega$ \\
+\hline
+$0$ & $0$ & $0$ & $0$ & $0$  \\
+\hline
+$1$ & $0$ & $1$ & $\omega$ & $1+\omega$  \\
+\hline
+$\omega$ & $0$ & $\omega$ & $1+\omega$ & $1$ \\
+\hline
+$1+\omega$ & $0$& $1+\omega$ & $1$&$\omega$\\
+\end{tabular}
+\end{table}
+    \end{column}
+\end{columns}
+\item As can be seen, every non-zero element has an inverse with respect to multiplication.
+\item This means that $\Z_2[w]$ is a field of size $4$
+    \end{stepitemize}
+    \end{frame}
+
+\begin{frame}{Characteristic of a Field}
+    \begin{stepitemize}
+        \item In the example $\Z_2[\omega]$, we have $\omega+\omega=0$.
+        \item In fact for any element $x \in \Z_2[\omega]$, we have $x+x=0$.
+        \item This is related to the concept of the ``characteristic" of a field.
+        \item The ``characteristic" of $R$, denoted $char(R)$ is the order of $1$ in the additive group $(R,+)$ if the order is finite.
+        \item If not, then characteristic is $0$.
+\item In other words, the characteristic is the smallest positive integer $n$ such that $n1 =0$.
+\item If such a positive integer does not exist, then we say that the characteristic is $0$.
+    \end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+   \item $char(\Z_n)=n$ for all $n\geq 2$.
+    \item $char(\Z), char(\Q), char(\R), char(\C)$ are all $0$.
+   \item $char(\Z_2\times \Z_2) = 2$
+    \item In general $char(\Z_m\times \Z_n) = LCM(m,n)$.
+\item If $F$ is a field, then $char(F)=0$ or is prime.
+\end{stepitemize}
+\end{frame}
+
+\section{Field Automorphisms}
+\begin{frame}{Field Automorphisms}
+\begin{stepitemize}
+\item A field automorphism is an isomorphism $\phi:F\rightarrow F$.
+\item Such an automorphism satisfies the following properties:
+\begin{enumerate}
+    \item $\phi(0)=0$
+    \item $\phi(1)=1$
+    \item $\phi(nx)=n\phi(x)$, for all $x\in F$ and positive integers $n$.
+    \item $\phi(x^n)=\phi(x)^n$ for all $x\in F$ and integers $n$.
+    \item If $F$ is a finite field, then $\phi$ will actually be a permutation.
+
+\end{enumerate}
+\item We already saw some examples of automorphisms, such as $\phi:\C\rightarrow \C$ given by $\phi(a+bi)=a-bi$, i.e., the conjugation operation
+\item and the trivial automorphism of $\phi(x)=x$ which works for any field.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{A new Example}
+\begin{stepitemize}
+    \item Let $\phi:\Z_2[\omega]\rightarrow \Z_2[\omega]$ be given by $\phi(x)=x^2$.
+    \item We will demonstrate that this is a field automorphism.
+
+\item The first step is to prove that it is a homomorphism. \item The square function is already multiplicative.
+\item To prove that it is additive, we just use the fact that the characteristic is $2$, and hence we have
+$$\phi(x+y) = (x+y)^2=x^2+2xy+y^2=x^2+y^2 = \phi(x)+\phi(y)$$
+\item since $2xy=0$ in $\Z_2[\omega]$.
+\item Thus $\phi$ is a homomorphism.
+\item To see that it is a bijection, we just need to look at $\phi(\{0,1,\omega, 1+\omega\}) = \{0,1, 1+\omega, \omega\}$.
+
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Freshman's Dream}
+\begin{stepitemize}
+    \item We can generalize the previous example by introducing the well-known ``Freshman's Dream" theorem:
+\begin{theorem}$($ Freshman's Dream $)$
+If $F$ is a field of characteristic $p$, then
+$$(a+b)^p = a^p+b^p,  \:\:\:\forall a,b \in F.$$
+\end{theorem}
+\item Just by applying the theorem several times, and observing that $(a+b)^{p^2} = ((a+b)^p)^p$, we get the following corollary:
+\begin{corollary}
+If $F$ is a field of characteristic $p$, then
+$$(a+b)^{p^k}= a^{p^k}+b^{p^k},  \:\:\:\forall a,b \in F, k\geq 0.$$
+\end{corollary}
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Frobenius Automorphism}
+    \begin{stepitemize}
+    \item The above corollary leads to an important class of automorphisms for fields of characteristic $p$,
+    \item i.e., the class of Frobenius automorphisms.
+    \item In particular, for such a field, we have
+$$\sigma_k:F\rightarrow F, \:\:\:\sigma_k(a)=a^{p^k}$$ is an automorphism.
+\item Later on, in Galois Field Theory, we will see that in certain cases, these will be all the automorphisms.
+\end{stepitemize}
+\end{frame}
+
+\section{Polynomial Rings}
+\begin{frame}{Polynomial Rings}
+\begin{stepitemize}
+\item Polynomials are central in many of the applications of HE.
+\item We first give a general definition of a polynomial and we will mostly focus on polynomials over special rings.
+\item Let $R$ be a commutative ring with identity. The polynomial ring over $R$, denoted by $R[x]$ is given by the set
+$$\{a_0+a_1x+\dots +a_nx^n| \: a_i\in R, n\geq 0.\}$$
+\item If $p(x)=a_0+a_1x+\dots +a_nx^n$ and $q(x)=b_0+b_1x+\dots+b_mx^m$ where, without loss of generality, we assume $m\geq n$, then we have
+$$p(x)+q(x) = (a_0+b_0)+(a_1+b_1)x+\dots +(a_n+b_n)x^n+b_{n+1}x^{n+1}+\dots +b_mx^m$$
+\item and $p(x)q(x) = \sum c_kx^k,$
+where $c_k = \sum_{i+j=k}a_ib_j$.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Division in Polynomials}
+\begin{stepitemize}
+\item We can define division algorithm for polynomials just as we can for integers.
+\item However, there is one important difference when we do this.
+\item
+If we let $p(x)=x^2+1$ and $q(x)=2x$, then we cannot divide $p(x)$ by $q(x)$ in $\Z[x]$.
+\item However we can divide $p(x)$ by $q(x)$ in $\Q[x]$:
+$$x^2+1 = (2x)(\frac{x}{2})+1,$$ so that the quotient is $x/2$ and the remainder is $1$.
+\item What makes a difference here is that $\Q$ is a field but $\Z$ is not.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{}
+\begin{stepitemize}
+\item Let $F$ be a field and $a(x), b(x) \in F[x]$ be two polynomials.
+\item Then there exists polynomials $q(x)$ and $r(x)$ in $F[x]$ such that
+$$a(x) = b(x)q(x)+r(x), \:\:\: r(x)=0, \:\:\textrm{or}\:\: deg(r)<deg(b).$$
+\item This makes the polynomials ring over field to be a special ring, which is called ``Euclidean Domain".
+\item One of the deep implications is that such a ring is a Principal Ideal Domain(PID), namely every ideal is generated by a single element.
+\item But can we not really divide polynomials in $\Z[x]$?
+\item Yes we can in certain cases
+\item For example, if $b(x)$ is a monic polynomial, that is if the leading coefficient of $b(x)$ is $1$, then we can always divide $a(x)$ by $b(x)$ in $\Z[x]$.
+\end{stepitemize}
+\end{frame}
+
+\section{Irreducible Polynomials}
+\begin{frame}{Irreducible polynomials}
+\begin{stepitemize}
+\item $\Z$ vs $\Z[x]$
+\item ``primes" in $\Z$ vs ? in $\Z[x]$
+\item Primes in $\Z$ are actually ``irreducible"
+\item i.e. they cannot be written as a product of smaller numbers.
+\item We can define the same for polynomials
+\item Irreducible in $\Z[x]$ and irreducible in $\Q[x]$ maybe different
+\item For example $4x+6$ is not irreducible in $\Z[x]$ but it is in $\Q[x]$.
+\item {\bf Gauss' Lemma:} For $p(x)=a_o+a_1x+\dots a_nx^n \in \Z[x]$, if
+$GCD(a_0, a_1, \dots, a_n)=1$, then $p(x)$ is irreducible in $\Z[x]$ if and only if it is irreducible in $\Q[x]$.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Why irreducible polynomials?}
+\begin{stepitemize}
+    \item Why irreducible polynomials?
+    \item {\bf Theorem:} If $F$ is a field then $p(x)\in F[x]$ is irreducible if and only if $(p(x))$ is a maximal ideal. \item So irreducible polynomials lead to maximal ideals
+    \item and maximal ideals lead to new fields.
+    \item Very useful in constructing finite fields, especially.
+    \item The same polynomial can have different irreducibility depending on the coefficients
+    \item $x^2+1$ is irreducible in $\Z[x], \Q[x]$ but it is not in $\Z_2[x]$ since then it is just the same as $(x+1)^2$.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+    \item {\bf Theorem:} Let $p(x)\in F[x]$ be a polynomial of degree $2$ or $3$. Then $p(x)$ is irreducible if and only of $p(x)$ does not have any roots in $F$.
+\item does not work for higher degrees
+\item For example $(x^2+1)^2$ is reducible, but has no roots in $\Q$.
+$p(x)=x^2+x+1$ is irreducible in $\Z_2[x]$ since $p(0)=p(1)=1$, which means $p$ has no roots in $\Z_2$.
+    \item Both $p(x)=x^3+x+1$ and $q(x)=x^3+x^2+1$ are irreducible in $\Z_2[x]$ since $p(1)=p(0)=q(0)=q(1)=1$ and so they do not have roots in $\Z_2$.
+    \item $p(x)=x^2+x+1$ is reducible in $\Z_3[x]$, since $p(1)=0$. In fact it is not hard to see that in $\Z_3[x]$:
+    $$x^2+x+1 = x^2-2x+1 = (x-1)^2.$$
+    \item On the other hand, $q(x)=x^2+1$ is irreducible in $\Z_3[x]$ since $q(0)=1, q(1)=q(2)=2$.
+\end{stepitemize}
+\end{frame}
+
+\section{Finite Fields: Constructions, Examples}
+\begin{frame}{Prime Fields}
+\begin{stepitemize}
+    \item Fields constructed from other fields
+    \item there is a concept of ``base fields"
+    \item A prime finite field is defined to be $\Z_p = \{0, 1,\dots, p-1\}$ for some prime number $p$.
+    \item Let $F$ be a finite field of characteristic $p$
+    \item Then $1\in F$, $2=1+1\in F$, $\dots$, $p-1=1+1+\dots +1 \in F$
+    \item So $\Z_p\subseteq F$.
+    \item Moreover, $F$ is a vector space over $\Z_p$.
+    \item If its dimension is $k$ then we have $|F| = p^k$.
+    \item So all finite fields have prime power size.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Constructing Finite Fields}
+\begin{stepitemize}
+    \item To construct a finite field of size $p^n$ we take an irreducible polynomial of degree $n$ over $\Z_p$
+    \item Such an irreducible always exists.
+    \item Then $\Z_p[x]/(f(x))$ is a finite field of size $p^n$
+    \item What are the elements of $\Z_p[x]/(f(x))$?
+    \item If $f(x)= x^n+a_{n-1}x^{n-1}+\dots+a_1x+a_0$, then
+    \item $1, x, \dots, x^{n-1} \in \Z_p[x]/(x^n)$
+    \item $x^n=-a_{n-1}x^{n-1}-\dots-a_1x-a_0$
+    \item So $\{1, x, x^2, \dots, x^{n-1}\}$ forms a basis for $\Z_p[x]/(f(x))$.
+    \item Every polynomial in $\Z_p[x]/(f(x))$ is of degree at most $n-1$.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Examples}
+\begin{stepitemize}
+\item The example we saw above, namely $\{0,1,\omega, 1+\omega\}$ is just $\Z_2[x]/(x^2+x+1)$.
+    \item Now let us construct a finite field of size $8$.
+    \item $x^3+x+1$ is irreducible over $\Z_2$.
+    \item So we can construct a finite field of size $8$ by letting $F= \Z_2[x]/(x^3+x+1)$.
+
+    \item So, letting $\omega = x+(x^3+x+1)$, we see that $\omega^3=\omega+1$ and thus we have
+    $$F = \{0,1, \omega, \omega ^2, 1+\omega, 1+\omega^2, \omega+\omega^2, 1+\omega+\omega^2\}.$$
+    \item How do we add and mutliply?
+    \item Addition is done just like in a vector space. \item However, when multiplying, we need to remember that in this field $\omega^3=\omega+1$, $\omega^4=\omega^2+\omega$, $\omega^5 = \omega^3+\omega^2= \omega^2+\omega+1$, etc.
+\end{stepitemize}
+\end{frame}
+
+\begin{frame}{Addition Table of $\Z_2[x]/(x^2+x+1)$}
+
+\begin{table}[]
+\tiny{
+\begin{tabular}{ p{8mm}|p{8mm}|p{8mm} |p{8mm}|p{8mm}|p{8mm}|p{8mm}|p{8mm}|p{8mm}}
+$+$  & $0$ & $1$ & $\omega$ & $\omega^2$ & $1+\omega$ & $1+\omega^2$ & $\omega+\omega^2$ & $1+\omega+\omega^2$ \\
+\hline
+$0$ &$0$ & $1$ & $\omega$ & $\omega^2$ & $1+\omega$ & $1+\omega^2$ & $\omega+\omega^2$ & $1+\omega+\omega^2$   \\
+\hline
+$1$ & $1$ & $0$ & $1+\omega$ & $1+\omega^2$ & $\omega$ & $\omega^2$ & $1+\omega+\omega^2$ & $\omega+\omega^2$  \\
+\hline
+$\omega$ & $\omega$ & $1+\omega$ & $0$ & $\omega+\omega^2$  & $1$ & $1+\omega+\omega^2$ & $\omega^2$ & $1+\omega^2$\\
+\hline
+$\omega^2$ & $\omega^2$& $1+\omega^2$ & $\omega+\omega^2$&$0$ & $1+\omega+\omega^2$ &$1$& $\omega$ & $ 1+\omega$\\
+\hline
+$1+\omega$ & $1+\omega$& $\omega$ & $1$&$1+\omega+\omega^2$ & $0$ &$\omega+\omega^2$& $1+\omega^2$ & $\omega^2$\\
+\hline
+$1+\omega^2$ & $1+\omega^2$& $\omega^2$&$1+\omega+\omega^2$ & $1$&$\omega+\omega^2$ &$0$& $1+\omega$ & $\omega$\\
+\hline
+$\omega+\omega^2$ & $\omega+\omega^2$&$1+\omega+\omega^2$& $\omega^2$&$\omega$ & $1+\omega^2$&$1+\omega$ &$0$& $1$\\
+\hline
+$1+\omega+\omega^2$ & $1+\omega+\omega^2$&$\omega+\omega^2$& $1+\omega^2$&$1+\omega$ & $\omega^2$&$\omega$ &$1$& $0$\\
+
+\end{tabular}
+}
+\end{table}
+\end{frame}
+
+\begin{frame}{Multiplication Table of $\Z_2[x]/(x^2+x+1)$}
+\begin{table}[H]
+\tiny{
+\begin{tabular}{ p{8mm}|p{8mm}|p{8mm} |p{8mm}|p{8mm}|p{8mm}|p{8mm}|p{8mm}|p{8mm}}
+$\cdot$  & $0$ & $1$ & $\omega$ & $\omega^2$ & $1+\omega$ & $1+\omega^2$ & $\omega+\omega^2$ & $1+\omega+\omega^2$ \\
+\hline
+$0$ &$0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$   \\
+\hline
+$1$ & $0$ & $1$ & $\omega$ & $\omega^2$ & $1+\omega$ & $1+\omega^2$ & $\omega+\omega^2$ & $1+\omega+\omega^2$ \\
+\hline
+$\omega$ & $0$ & $\omega$ & $\omega^2$ & $1+\omega$  & $\omega+\omega^2$ & $1$ & $1+\omega+\omega^2$ & $1+\omega^2$\\ \hline
+$\omega^2$ & $0$ & $\omega^2$ & $1+\omega$&$\omega+\omega^2$ & $1+\omega+\omega^2$ &$\omega$& $1+\omega^2$ & $1$\\
+\hline
+$1+\omega$ & $0$& $1+\omega$ & $\omega+\omega^2$&$1+\omega+\omega^2$ & $1+\omega^2$ &$\omega^2$& $1$ & $\omega$\\
+\hline
+$1+\omega^2$ & $0$& $1+\omega^2$&$1$ & $\omega$&$\omega^2$ &$1+\omega+\omega^2$& $1+\omega$ & $\omega+\omega^2$\\
+\hline
+$\omega+\omega^2$ & $0$&$\omega+\omega^2$& $1+\omega+\omega^2$&$1+\omega^2$ & $1$&$1+\omega$ &$\omega$& $\omega^2$\\
+\hline
+$1+\omega+\omega^2$ & $0$&$1+\omega+\omega^2$& $1+\omega^2$&$1$ & $\omega$&$\omega+\omega^2$ &$\omega^2$& $1+\omega$\\
+\end{tabular}
+}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Another Example}
+    \begin{stepitemize}
+    \item We can construct a field $F$ of size $9$ by letting
+$$F = \Z_3[x]/(x^2+1) = \{a+b\omega|a, b\in \Z_3, \:\omega^2=-1\}.$$
+
+\item The multiplication and addition will work very much like they would in the case of complex numbers,
+\item the only difference is that the operations between integers is done modulo $3$:
+\item
+$(a+b\omega)+(c+d\omega) = (a+c)+(b+d)\omega,$
+\item $(a+b\omega)\cdot(c+d\omega)=(ac-bd)+(ad+bc)\omega.$
+
+    \end{stepitemize}
+\end{frame}
+\begin{frame}
+\centerline{ \color{blue} \bf{\large THANK YOU!!!}}
+
+\end{frame}
+
+\end{document}
