@@ -12,28 +12,22 @@ build = "cmake --build %init_build_dir% -j"
 install = "cmake --install %init_install_dir%"
 export_cmake = "install/lib/cmake/hexl-%version%"
 
+[[openfhe_hexl]]
+version = "main"
+name = "main"
+fetch = "git clone https://github.com/openfheorg/openfhe-hexl.git --branch %version%"
 
 [[openFHE]]
 version = "v0.9.2"
 name = "v0.9.2"
 export_install_dir = "install"
+openfhe_dir = "%init_fetch_dir%/openfhe-development"
+openfhe_hex_dir="$%openfhe_hexl%/init_fetch_dir$/openfhe-hexl"
 fetch = "git clone https://github.com/openfheorg/openfhe-development.git --branch %version%"
-pre-build = """cmake -S %init_fetch_dir%/openfhe-development -B %init_build_dir%
-               -DCMAKE_INSTALL_PREFIX=%export_install_dir%"""
-build = "cmake --build %init_build_dir% -j"
-install = "cmake --install %init_install_dir%"
-
-
-[[openfhe-hexl]]
-version = "v0.9.2"
-name = "v0.9.2"
-export_install_dir = "install"
-pre-fetch = "git clone https://github.com/openfheorg/openfhe-hexl.git --branch main"
-fetch = "git clone https://github.com/openfheorg/openfhe-development.git --branch %version%"
-post-fetch = """bash -c 'cp -r %init_fetch_dir%/openfhe-hexl/src %init_fetch_dir%/openfhe-development &&
-                cp -r %init_fetch_dir%/openfhe-hexl/benchmark %init_fetch_dir%/openfhe-development &&
-                cp -r %init_fetch_dir%/openfhe-hexl/third-party %init_fetch_dir%/openfhe-development'"""
-pre-build = """cmake -S %init_fetch_dir%/openfhe-development -B %init_build_dir%
+post-fetch = """bash -c 'cp -r %openfhe_hex_dir%/src %openfhe_dir% &&
+                cp -r %openfhe_hex_dir%/benchmark %openfhe_dir% &&
+                cp -r %openfhe_hex_dir%/third-party %openfhe_dir%'"""
+pre-build = """cmake -S %openfhe_dir% -B %init_build_dir%
                -DCMAKE_INSTALL_PREFIX=%export_install_dir%
                -DINTEL_HEXL_PREBUILT=ON
                -DWITH_INTEL_HEXL=ON
@@ -43,3 +37,4 @@ build = "cmake --build %init_build_dir% -j"
 install = "cmake --install %init_install_dir%"
 # Dependencies
 hexl = "hexl/1.2.5"
+openfhe_hexl = "openfhe_hexl/main"
