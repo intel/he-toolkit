@@ -13,13 +13,13 @@ install = "cmake --install %init_install_dir%"
 export_cmake = "install/lib/cmake/hexl-%version%"
 
 [[openfhe_hexl]]
-version = "main"
-name = "main"
+version = "!openfhe_hexl_version!"
+name = "!openfhe_hexl_version!"
 fetch = "git clone https://github.com/openfheorg/openfhe-hexl.git --branch %version%"
 
 [[openFHE]]
-version = "v0.9.2"
-name = "v0.9.2"
+version = "!openfhe_dev_version!"
+name = "!openfhe_dev_version!"
 export_install_dir = "install"
 openfhe_dir = "%init_fetch_dir%/openfhe-development"
 openfhe_hex_dir="$%openfhe_hexl%/init_fetch_dir$/openfhe-hexl"

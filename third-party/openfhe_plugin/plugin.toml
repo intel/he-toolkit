@@ -1,4 +1,4 @@
 [plugin]
 name = "openfhe"
 version = "1.0.0"
-start = "start.py"
+start = "openFHE_handler.py"

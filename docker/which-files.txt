@@ -216,7 +216,9 @@ third-party/hello_world_plugin/hello.py
 third-party/hello_world_plugin/plugin.toml
 third-party/hello_world_plugin/start.py
 third-party/openfhe_plugin/__init__.py
+third-party/openfhe_plugin/config.toml
 third-party/openfhe_plugin/configurator.py
+third-party/openfhe_plugin/openFHE_handler.py
 third-party/openfhe_plugin/plugin.toml
 third-party/openfhe_plugin/recipes/openfhe-hexl.toml
 third-party/openfhe_plugin/recipes/openfhe.toml
