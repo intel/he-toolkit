@@ -21,24 +21,24 @@ ENV http_proxy=$http_proxy   \
     ftp_proxy=$ftp_proxy     \
     no_proxy=$no_proxy
 
-RUN apt update && \
-    apt -y dist-upgrade && \
-    apt install -y apt-utils                      \
+RUN apt update
+RUN apt -y dist-upgrade
+RUN apt install -y apt-utils                      \
                    autoconf                       \
                    autotools-dev                  \
                    libicu-dev                     \
                    libbz2-dev                     \
-                   nettools                       \
+                   net-tools                       \
                    libcap2                        \
                    graphviz                       \
                    graphviz-dev                   \
                    connect-proxy                  \
                    python-is-python3              \
-                   pyhon3-pip                     \
+                   python3-pip                     \
                    python3-dev                    \
                    python3-venv                   \
                    python3-pydantic               \
-                   python-networkx                \
+                   python3-networkx                \
                    python3-matplotlib             \
                    python3-pandas                 \
                    python3-numpy                  \
@@ -93,12 +93,15 @@ RUN apt update && \
                    ca-certificates                \
                    curl                           \
                    gnupg                          \
-                   valgrind                    && \
-    apt autoremove -y && \
-    apt autoclean -y  && \
-    rm -rf /var/lib/apt/lists/*
+                   valgrind
+
+    RUN apt autoremove -y && \
+        apt autoclean -y  && \
+        rm -rf /var/lib/apt/lists/*
 
 RUN ["pip", "install", "toml", "argcomplete"]
+# Update alternatives clean up cpp configuration
+RUN update-alternatives --remove-all cpp
 # Update alternatives for GCC-12
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12   \
       --slave /usr/bin/g++ g++ /usr/bin/g++-12                          \
@@ -121,6 +124,8 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11   \
       --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-11        \
       --slave /usr/bin/gcc-nm gcc-nm /usr/bin/gcc-nm-11                 \
       --slave /usr/bin/lto-dump lto-dump /usr/bin/lto-dump-11
+# Set GCC-11 as default
+RUN update-alternatives --set gcc /usr/bin/gcc-11
 # Upadte alternatives for CLANG-14
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 14                 \
       --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14                                  \
@@ -132,7 +137,9 @@ RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 15     
       --slave /usr/bin/clang++ clang++ /usr/bin/clang++-15                                \
       --slave /usr/bin/clang-format clang-format /usr/bin/clang-format-15                 \
       --slave /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-15                          \
-      --slave /usr/bin/clang-format-diff clang-format-diff /usr/bin/clang-format-diff-15  \
+      --slave /usr/bin/clang-format-diff clang-format-diff /usr/bin/clang-format-diff-15
+# Set CLANG-14 as default
+RUN update-alternatives --set clang /usr/bin/clang-14
 # Set timezone to UTC \
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
