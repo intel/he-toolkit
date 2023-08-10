@@ -113,7 +113,7 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12   \
       --slave /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-12        \
       --slave /usr/bin/gcc-nm gcc-nm /usr/bin/gcc-nm-12                 \
       --slave /usr/bin/lto-dump lto-dump /usr/bin/lto-dump-12
-# Update alternatives gor GCC-11
+# Update alternatives for GCC-11
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11   \
       --slave /usr/bin/g++ g++ /usr/bin/g++-11                          \
       --slave /usr/bin/gcov gcov /usr/bin/gcov-11                       \
