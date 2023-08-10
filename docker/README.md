@@ -71,7 +71,7 @@ container.
   processor with at least Intel AVX512DQ support.  For best performance, it is
   recommended to use processors supporting AVX512-IFMA52.
 - The docker build has been tested on,
-  - Ubuntu 20.04;
+  - Ubuntu 22.04;
   - MacOS Catalina (10.15.7).
 
 #### Running the Docker Build on MacOS
