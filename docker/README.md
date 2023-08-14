@@ -10,6 +10,7 @@
       - [Running the Docker Build on MacOS](#running-the-docker-build-on-macos)
     - [Steps](#steps)
     - [Using VS Code Server](#using-vs-code-server)
+    - [Using Custom Dockerfiles](#using-custom-dockerfiles)
   - [Running the Examples](#running-the-examples)
     - [Docker Controls](#docker-controls)
       - [Commands used inside the Docker Container](#commands-used-inside-the-docker-container)
@@ -174,6 +175,27 @@ For more information on the `hekit` command see [here](../kit/README.md).
 To run these pre-built projects use the provided runner commands described in
 the following section [Running the Examples](#running-the-examples).
 
+### Using Custom Dockerfiles
+The `--enable` flag described above has been extended to accept custom features
+via user-defined Dockerfiles. In order to use this feature edit the file
+[dockerfiles.toml](dockerfiles.toml) and add your feature in the form
+```
+feature-name = "absolute-path-to-dockerfile"
+```
+This will add your custom feature to the allowed list of features which `hekit
+docker-build` can use. To use your new feature run
+```bash
+hekit docker-build --enable feature-name
+```
+
+Multiple features/dockerfiles can be listed using a comma separated list
+```bash
+hekit docker-build --enable feature-one,feature-two,feature-three
+```
+
+The toolkit will build the images in the order that they appear in the list,
+i.e. `feature-three` will be built on `feature-two` which will be built on
+`feature-one`.
 
 ## Running the Examples
 After a successful install and build of the docker container, the user should
