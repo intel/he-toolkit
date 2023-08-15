@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+from os import path as os_path
 from pathlib import Path
 from kit.utils.docker_tools import DockerException
 from kit.utils.constants import Constants
@@ -165,7 +166,7 @@ def test_create_tar_gz_file_File_Exists(mocker):
 
 
 def test_setup_docker_clean(mocker):
-    args = MockArgs(clean=True, y=True, check_only=True, enable="vscode")
+    args = MockArgs(clean=True, y=True, check_only=True, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
     mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
@@ -181,7 +182,7 @@ def test_setup_docker_clean(mocker):
 
 
 def test_setup_docker_docker_error(mocker):
-    args = MockArgs(clean=False, y=True, check_only=True, enable="vscode")
+    args = MockArgs(clean=False, y=True, check_only=True, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
     mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
@@ -197,7 +198,7 @@ def test_setup_docker_docker_error(mocker):
 
 
 def test_setup_docker_check_only(mocker):
-    args = MockArgs(clean=False, y=False, check_only=True, enable="vscode")
+    args = MockArgs(clean=False, y=False, check_only=True, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
     doc_build = MockDockerTools()
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
@@ -215,7 +216,7 @@ def test_setup_docker_check_only(mocker):
 
 
 def test_setup_docker_vscode(mocker):
-    args = MockArgs(clean=False, y=False, check_only=False, enable="vscode")
+    args = MockArgs(clean=False, y=False, check_only=False, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
     doc_build = MockDockerTools()
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")

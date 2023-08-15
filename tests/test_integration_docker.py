@@ -3,7 +3,7 @@
 
 import pytest
 from pathlib import Path
-from os import getcwd, chdir
+from os import getcwd, chdir, path as os_path
 from getpass import getuser
 
 from kit.hekit import main
@@ -32,7 +32,7 @@ def test_docker_build_check_build(mocker):
 
 
 def test_docker_build_check_enable(mocker, restore_pwd):
-    args = MockArgs(check_only=False, clean=False, enable="vscode")
+    args = MockArgs(check_only=False, clean=False, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
     mockers = Mockers(mocker)
     mockers.mock_parse_cmdline.return_value = args, ""
 
