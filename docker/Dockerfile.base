@@ -25,15 +25,6 @@ RUN apt update
 RUN apt -y dist-upgrade
 RUN apt install -y apt-utils                      \
                    autoconf                       \
-                   autotools-dev                  \
-                   libicu-dev                     \
-                   libbz2-dev                     \
-                   net-tools                      \
-                   libcap2                        \
-                   connect-proxy                  \
-                   python-is-python3              \
-                   python3-pip                    \
-                   python3-dev                    \
                    build-essential                \
                    byobu                          \
                    clang-14                       \
@@ -43,13 +34,6 @@ RUN apt install -y apt-utils                      \
                    cmake                          \
                    curl                           \
                    file                           \
-                   tree                           \
-                   xterm                          \
-                   cpuinfo                        \
-                   smbclient                      \
-                   silversearcher-ag              \
-                   zlib1g                         \
-                   zlib1g-dev                     \
                    git                            \
                    htop                           \
                    jq                             \
@@ -60,6 +44,9 @@ RUN apt install -y apt-utils                      \
                    man                            \
                    --no-install-recommends tzdata \
                    patchelf                       \
+                   python-is-python3              \
+                   python3-pip                    \
+                   python3-dev                    \
                    software-properties-common     \
                    sudo                           \
                    unzip                          \
@@ -67,11 +54,7 @@ RUN apt install -y apt-utils                      \
                    virtualenv                     \
                    wget                           \
                    xz-utils                       \
-                   tmux                           \
-                   glances                        \
-                   cpufrequtils                   \
-                   ca-certificates                \
-                   gnupg
+                   tmux                           
 # Clean up
 RUN apt autoremove -y && \
     apt autoclean -y  && \
