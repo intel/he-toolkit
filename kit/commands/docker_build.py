@@ -212,7 +212,7 @@ def get_docker_features(keys: str) -> Dict[str, str]:
     tobj = toml.load(Constants.HEKIT_ROOT_DIR / "docker/dockerfiles.toml")
     key_list = list(map(str.strip, keys.split(",")))
     not_found = set(key_list) - set(tobj.keys())
-    if len(not_found) == 0:
+    if len(not_found) > 0:
         keystr = ", ".join(not_found)
         raise ValueError(
             f"Input key(s) `{keystr}` not found in accepted list of keys in `dockerfiles.toml`"
