@@ -16,12 +16,12 @@ on:
   workflow_dispatch:
 
 ################
-# Ubuntu 20.04 #
+# Ubuntu 22.04 #
 ################
 jobs:
   format:
     name: Format
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       # Required for pre-commit
@@ -35,7 +35,7 @@ jobs:
 
   test-hekit-bash:
     name: Test hekit commands (bash)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
@@ -58,7 +58,7 @@ jobs:
 
   test-hekit-zshell:
     name: Test hekit commands (zshell)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
@@ -94,25 +94,16 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        python-version: ["3.10"]
+        c_compiler: [clang-14, gcc-10]
+        os: [ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - os: ubuntu-22.04
             c_compiler: clang-10
@@ -123,9 +114,6 @@ jobs:
             python-version: "3.8"
           - os: ubuntu-22.04
             python-version: "3.9"
-          # python3.8 is default on Ubuntu-20.04
-          - os: ubuntu-20.04
-            python-version: "3.10"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -167,25 +155,16 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        python-version: ["3.10"]
+        c_compiler: [clang-14, gcc-11]
+        os: [ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - os: ubuntu-22.04
             c_compiler: clang-10
@@ -196,9 +175,6 @@ jobs:
             python-version: "3.8"
           - os: ubuntu-22.04
             python-version: "3.9"
-          # python3.8 is default on Ubuntu-20.04
-          - os: ubuntu-20.04
-            python-version: "3.10"
 
     steps:
       - uses: actions/checkout@v3
@@ -252,25 +228,16 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        python-version: ["3.10"]
+        c_compiler: [clang-14, gcc-11]
+        os: [ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
           - c_compiler: gcc-11
             cxx_compiler: g++-11
         exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
           # clang-14 and gcc-11 default on Ubuntu-22.04
           - os: ubuntu-22.04
             c_compiler: clang-10
@@ -281,9 +248,6 @@ jobs:
             python-version: "3.8"
           - os: ubuntu-22.04
             python-version: "3.9"
-          # python3.8 is default on Ubuntu-20.04
-          - os: ubuntu-20.04
-            python-version: "3.10"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
