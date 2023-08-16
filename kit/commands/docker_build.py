@@ -166,7 +166,7 @@ def setup_docker(args):
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
     files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
-    if args.enable is not None and "vscode" in args.enable:
+    if isinstance(args.enable, dict) and "vscode" in args.enable:
         files_to_copy.append("Dockerfile.vscode")
     copyfiles(files_to_copy, src_dir=docker_filepaths, dst_dir=staging_path)
 
@@ -201,7 +201,7 @@ def setup_docker(args):
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
-    if args.enable is not None and "vscode" in args.enable:
+    if isinstance(args.enable, dict) and "vscode" in args.enable:
         print(f"docker run -d -p <ip addr>:<port>:8888 {Constants.vscode_label}")
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
