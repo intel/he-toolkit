@@ -3,6 +3,7 @@
 
 """This module sets up a docker container with the required libraries for executing FHE applications"""
 
+from argparse import ArgumentTypeError
 from re import search
 from sys import stderr, exit as sys_exit
 from os import getuid, getgid, environ, chdir as change_directory_to, path as os_path
@@ -214,7 +215,7 @@ def get_docker_features(keys: str) -> Dict[str, str]:
     not_found = set(key_list) - set(tobj.keys())
     if len(not_found) > 0:
         keystr = ", ".join(not_found)
-        raise ValueError(
+        raise ArgumentTypeError(
             f"Input key(s) `{keystr}` not found in accepted list of keys in `dockerfiles.toml`"
         )
     return {key: os_path.expandvars(tobj[key]) for key in key_list}
