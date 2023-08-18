@@ -14,7 +14,6 @@ from kit.commands.install import install_components
 
 
 def test_debug_mode(tmp_path, hekit_path):
-
     config_file = create_config_file(tmp_path)
     madeup_filename = "MadeUpFileName"
     cmd = f"{hekit_path} --config {config_file} --debug install {madeup_filename}"
