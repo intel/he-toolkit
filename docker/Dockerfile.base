@@ -76,7 +76,7 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11   \
       --slave /usr/bin/lto-dump lto-dump /usr/bin/lto-dump-11
 # Set GCC-11 as default
 RUN update-alternatives --set gcc /usr/bin/gcc-11
-# Upadte alternatives for CLANG-14
+# Update alternatives for CLANG-14
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 14                 \
       --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14                                  \
       --slave /usr/bin/clang-format clang-format /usr/bin/clang-format-14                   \
