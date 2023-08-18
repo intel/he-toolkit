@@ -36,8 +36,8 @@ export_install_dir = "install"
 
 [[helib]]
 skip = false
-version = "v2.2.2"
-name = "v2.2.2"
+version = "v2.3.0"
+name = "v2.3.0"
 root = "%name%"
 init_fetch_dir = "fetch"
 init_build_dir = "build"
