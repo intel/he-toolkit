@@ -1,0 +1,1 @@
+disable=SC2269 # Disable SC2269 (info): This variable is assigned to itself, so the assignment does nothing.
