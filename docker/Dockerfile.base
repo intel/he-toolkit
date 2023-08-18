@@ -54,7 +54,7 @@ RUN apt install -y apt-utils                      \
                    virtualenv                     \
                    wget                           \
                    xz-utils                       \
-                   tmux                           
+                   tmux
 # Clean up
 RUN apt autoremove -y && \
     apt autoclean -y  && \
