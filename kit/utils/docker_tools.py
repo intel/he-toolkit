@@ -31,9 +31,9 @@ def check_build(func):
             elif "aux" in response.keys() and "ID" in response["aux"]:
                 yield response["aux"]["ID"]
             elif "error" in response.keys():
-                raise DockerBuildError("Docker build failed", response)
+                raise DockerBuildError(f"Docker build failed {response}", response)
             else:
-                raise DockerBuildError("Unrecognized stream property", response)
+                raise DockerBuildError(f"Unrecognized stream property {response}", response)
 
     return inner
 

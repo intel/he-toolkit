@@ -192,13 +192,15 @@ def setup_docker(args):
     )
 
     if isinstance(args.enable, dict):
+        prev = ""
         for feature, path in args.enable.items():
             print(f"BUILDING {feature.upper()} DOCKERFILE ...")
             docker_tools.try_build_new_image(
                 dockerfile=path,
                 tag=f"{Constants.custom_label}{feature}:{Constants.version}",
-                buildargs=buildargs,
+                buildargs={**buildargs, "CUSTOM_FROM": f"{Constants.custom_label}{prev}:{Constants.version}"},
             )
+            prev = feature
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
