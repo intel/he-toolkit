@@ -15,7 +15,11 @@ class DockerBuildError(Exception):
 
     def __init__(self, message, error):
         super().__init__(message)
+        self.message = message
         self.error = error
+
+    def __repr__(self):
+        return f"DockerBuildError({self.message}, {self.error})"
 
 
 def check_build(func):
@@ -31,9 +35,9 @@ def check_build(func):
             elif "aux" in response.keys() and "ID" in response["aux"]:
                 yield response["aux"]["ID"]
             elif "error" in response.keys():
-                raise DockerBuildError(f"Docker build failed {response}", response)
+                raise DockerBuildError("Docker build failed", response)
             else:
-                raise DockerBuildError(f"Unrecognized stream property {response}", response)
+                raise DockerBuildError("Unrecognized stream property", response)
 
     return inner
 
