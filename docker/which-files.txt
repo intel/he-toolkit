@@ -15,6 +15,7 @@
 .gitignore
 .pre-commit-config.yaml
 .pylintrc
+.shellcheckrc
 .typos.toml
 CODEOWNERS
 CODE_OF_CONDUCT.md
