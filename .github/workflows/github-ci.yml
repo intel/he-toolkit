@@ -344,6 +344,8 @@ jobs:
 ##############
   format-icelake:
     name: Format (IceLake)
+    # Disable this job for now and until a self-hosted icelake becomes available
+    if: ${{ false }}
     runs-on: [self-hosted, Linux, X64, ice-lake]
     steps:
       # Add local bin for cpplint
@@ -355,6 +357,8 @@ jobs:
 
   test-hekit-icelake:
     name: Test hekit commands (IceLake)
+    # Disable this job for now and until a self-hosted icelake becomes available
+    if: ${{ false }}
     runs-on: [self-hosted, Linux, X64, ice-lake]
     defaults:
       run:
@@ -369,6 +373,8 @@ jobs:
 
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
+    # Disable this job for now and until a self-hosted icelake becomes available
+    if: ${{ false }}
     runs-on: [self-hosted, Linux, X64, ice-lake]
     defaults:
       run:
