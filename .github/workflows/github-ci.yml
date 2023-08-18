@@ -103,17 +103,6 @@ jobs:
             cxx_compiler: clang++-14
           - c_compiler: gcc-11
             cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-14
-          - os: ubuntu-22.04
-            c_compiler: gcc-11
-          # python3.10 is default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            python-version: "3.8"
-          - os: ubuntu-22.04
-            python-version: "3.9"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -164,18 +153,6 @@ jobs:
             cxx_compiler: clang++-14
           - c_compiler: gcc-11
             cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-14
-          - os: ubuntu-22.04
-            c_compiler: gcc-11
-          # python3.10 is default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            python-version: "3.8"
-          - os: ubuntu-22.04
-            python-version: "3.9"
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -237,17 +214,6 @@ jobs:
             cxx_compiler: clang++-14
           - c_compiler: gcc-11
             cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-14
-          - os: ubuntu-22.04
-            c_compiler: gcc-11
-          # python3.10 is default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            python-version: "3.8"
-          - os: ubuntu-22.04
-            python-version: "3.9"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
