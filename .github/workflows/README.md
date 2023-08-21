@@ -11,4 +11,3 @@ Check the [github-ci.yml](./github-ci.yml) for the versions of the tooling used.
 |:------------:|:-----:|:-----:|
 | **clang-14** |  Pass |  Pass |
 |  **gcc-11**  |  Pass |  Pass |
-
