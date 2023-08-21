@@ -2,4 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Default codeowner for all files
-* @intel/he-toolkit-maintain
+# * @intel/he-toolkit-maintain
+* @faberga @kylanerace @jobottle @hamishun @jlhcrawford @skmono @bahattin56
+
