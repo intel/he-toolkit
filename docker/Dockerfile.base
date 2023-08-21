@@ -1,7 +1,9 @@
 # Copyright (C) 2020 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-FROM ubuntu:20.04
+ARG CUSTOM_FROM
+
+FROM $CUSTOM_FROM
 
 LABEL maintainer="HE Toolkit https://github.com/intel/he-toolkit"
 

@@ -124,7 +124,6 @@ def create_tar_gz_file(
                 # then continue
 
 
-# TODO Break this function up
 def setup_docker(args):
     """Build the docker for the toolkit"""
     ROOT = Constants.HEKIT_ROOT_DIR
@@ -180,38 +179,34 @@ def setup_docker(args):
         f"WARNING: Setting UID/GID of docker user to '{buildargs['UID']}/{buildargs['GID']}'"
     )
 
-    print("BUILDING BASE DOCKERFILE ...")
-    docker_tools.try_build_new_image(
-        dockerfile="Dockerfile.base", tag=Constants.base_label, buildargs=buildargs
-    )
-
-    print("BUILDING TOOLKIT DOCKERFILE ...")
-    docker_tools.try_build_new_image(
-        dockerfile="Dockerfile.toolkit",
-        tag=Constants.toolkit_label,
-        buildargs=buildargs,
-    )
+    features = {
+        "base": f"{docker_filepaths}/Dockerfile.base",
+        "toolkit": f"{docker_filepaths}/Dockerfile.toolkit",
+    }
 
     if isinstance(args.enable, dict):
-        prev = Constants.toolkit_label
-        for feature, path in args.enable.items():
-            print("BUILDING", feature.upper(), "DOCKERFILE ...")
-            current = Constants.custom_label % feature
-            print("BUILDING", current, "FROM", prev)
-            docker_tools.try_build_new_image(
-                dockerfile=path,
-                tag=current,
-                buildargs={**buildargs, "CUSTOM_FROM": prev},
-            )
-            prev = current
+        features.update(args.enable)
+
+    prev = "ubuntu:20.04"
+    for feature, path in features.items():
+        print("BUILDING", feature.upper(), "DOCKERFILE ...")
+        current = Constants.custom_label % feature
+        print("BUILDING", current, "FROM", prev)
+        buildargs["CUSTOM_FROM"] = prev
+        docker_tools.try_build_new_image(
+            dockerfile=path,
+            tag=current,
+            buildargs=buildargs,
+        )
+        prev = current
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
     if isinstance(args.enable, dict) and "vscode" in args.enable:
-        print(f"docker run -d -p <ip addr>:<port>:8888 {Constants.vscode_label}")
+        print("docker run -d -p <ip addr>:<port>:8888", Constants.vscode_label)
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
-        print(f"docker run -it {Constants.toolkit_label}")
+        print("docker run -it", Constants.toolkit_label)
 
 
 def get_docker_features(keys: str) -> Dict[str, str]:
