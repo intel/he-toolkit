@@ -10,7 +10,7 @@ from os import getuid, getgid, environ, chdir as change_directory_to, path as os
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable
 
 import toml
 
@@ -124,6 +124,7 @@ def create_tar_gz_file(
                 # then continue
 
 
+# TODO Break this function up
 def setup_docker(args):
     """Build the docker for the toolkit"""
     ROOT = Constants.HEKIT_ROOT_DIR
@@ -196,7 +197,7 @@ def setup_docker(args):
         for feature, path in args.enable.items():
             print("BUILDING", feature.upper(), "DOCKERFILE ...")
             current = Constants.custom_label % feature
-            print("BUILDING" current, "FROM", prev)
+            print("BUILDING", current, "FROM", prev)
             docker_tools.try_build_new_image(
                 dockerfile=path,
                 tag=current,
@@ -214,6 +215,9 @@ def setup_docker(args):
 
 
 def get_docker_features(keys: str) -> Dict[str, str]:
+    """Transform string of comma seperated features to enable into a dict with
+    the keys as feature strings and values as locoations of the necessary
+    Dockerfile"""
     tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
     key_list = list(map(str.strip, keys.split(",")))
     not_found = set(key_list) - set(tobj.keys())
