@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Required for pre-commit
-      - run: pip3 install bandit black cpplint docker mypy pydantic==2 pylint pylint-pydantic types-toml
+      - run: pip3 install bandit black cpplint docker mypy pydantic==1.10.4 pylint pylint-pydantic types-toml
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
@@ -168,7 +168,7 @@ jobs:
 
       - name: Setup
         run: |
-          pip3 install toml pydantic==2 pytest
+          pip3 install toml pydantic==1.10.4 pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
