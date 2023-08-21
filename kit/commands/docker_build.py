@@ -192,15 +192,17 @@ def setup_docker(args):
     )
 
     if isinstance(args.enable, dict):
-        prev = ""
+        prev = Constants.toolkit_label
         for feature, path in args.enable.items():
-            print(f"BUILDING {feature.upper()} DOCKERFILE ...")
+            print("BUILDING", feature.upper(), "DOCKERFILE ...")
+            current = Constants.custom_label % feature
+            print("BUILDING" current, "FROM", prev)
             docker_tools.try_build_new_image(
                 dockerfile=path,
-                tag=f"{Constants.custom_label}{feature}:{Constants.version}",
-                buildargs={**buildargs, "CUSTOM_FROM": f"{Constants.custom_label}{prev}:{Constants.version}"},
+                tag=current,
+                buildargs={**buildargs, "CUSTOM_FROM": prev},
             )
-            prev = feature
+            prev = current
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
@@ -212,7 +214,7 @@ def setup_docker(args):
 
 
 def get_docker_features(keys: str) -> Dict[str, str]:
-    tobj = toml.load(Constants.HEKIT_ROOT_DIR / "docker/dockerfiles.toml")
+    tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
     key_list = list(map(str.strip, keys.split(",")))
     not_found = set(key_list) - set(tobj.keys())
     if len(not_found) > 0:
