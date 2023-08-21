@@ -50,8 +50,7 @@ def create_cmake_template(project_name: str, cmake_path: Path) -> None:
 
     # Write the cmake file
     with cmake_path.open("w") as cmake_file:
-        for line in lines:
-            cmake_file.write(line)
+        cmake_file.writelines(lines)
 
 
 def modify_cmake_file(project_name: str, cmake_path: Path) -> None:

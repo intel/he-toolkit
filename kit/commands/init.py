@@ -47,8 +47,7 @@ def remove_from_rc(path: Path) -> None:
             line for i, line in enumerate(lines) if not start_index <= i <= end_index
         )
         with path.open("w") as f:
-            for line in lines_to_write:
-                f.write(line)
+            f.writelines(lines_to_write)
     elif start_tag_count > 1 or end_tag_count > 1:
         raise ValueError("More than one each of hekit tags")
     else:
@@ -66,8 +65,7 @@ def append_to_rc(path: Path, content: str) -> None:
     # newline to end as courtesy to space our code
     lines = ["\n", content, "\n"]
     with path.open("a") as rc_file:
-        for line in lines:
-            rc_file.write(line)
+        rc_file.writelines(lines)
 
 
 def select_rc_file(*potential_files: str) -> Path:
