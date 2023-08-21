@@ -166,11 +166,6 @@ def setup_docker(args):
     archived_files = docker_filepaths / "which-files.txt"
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
-    files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
-    if isinstance(args.enable, dict) and "vscode" in args.enable:
-        files_to_copy.append("Dockerfile.vscode")
-    copyfiles(files_to_copy, src_dir=docker_filepaths, dst_dir=staging_path)
-
     change_directory_to(staging_path)
 
     buildargs = create_buildargs(environment, args.id)
@@ -187,7 +182,7 @@ def setup_docker(args):
     if isinstance(args.enable, dict):
         features.update(args.enable)
 
-    prev = "ubuntu:20.04"
+    prev = "ubuntu:22.04"
     for feature, path in features.items():
         print("BUILDING", feature.upper(), "DOCKERFILE ...")
         current = Constants.custom_label % feature

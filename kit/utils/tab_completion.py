@@ -18,7 +18,7 @@ try:
     from argcomplete import autocomplete
 except ImportError as e:
 
-    def autocomplete(arg):  # pylint: disable=unused-argument
+    def autocomplete(arg):  # type: ignore[misc] # pylint: disable=unused-argument
         """Continue with the execution"""
 
 
