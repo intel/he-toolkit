@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Required for pre-commit
-      - run: pip3 install bandit black cpplint docker mypy pydantic==2 pylint pylint-pydantic types-toml
+      - run: pip3 install bandit black cpplint docker mypy==0.991 pydantic==2 pylint pylint-pydantic types-toml
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
