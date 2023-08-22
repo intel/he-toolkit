@@ -166,7 +166,12 @@ def test_create_tar_gz_file_File_Exists(mocker):
 
 
 def test_setup_docker_clean(mocker):
-    args = MockArgs(clean=True, y=True, check_only=True, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
+    args = MockArgs(
+        clean=True,
+        y=True,
+        check_only=True,
+        enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")},
+    )
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
     mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
@@ -182,7 +187,12 @@ def test_setup_docker_clean(mocker):
 
 
 def test_setup_docker_docker_error(mocker):
-    args = MockArgs(clean=False, y=True, check_only=True, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
+    args = MockArgs(
+        clean=False,
+        y=True,
+        check_only=True,
+        enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")},
+    )
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
     mock_print_preamble = mocker.patch("kit.commands.docker_build.print_preamble")
@@ -198,7 +208,12 @@ def test_setup_docker_docker_error(mocker):
 
 
 def test_setup_docker_check_only(mocker):
-    args = MockArgs(clean=False, y=False, check_only=True, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
+    args = MockArgs(
+        clean=False,
+        y=False,
+        check_only=True,
+        enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")},
+    )
     doc_build = MockDockerTools()
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
@@ -216,7 +231,12 @@ def test_setup_docker_check_only(mocker):
 
 
 def test_setup_docker_vscode(mocker):
-    args = MockArgs(clean=False, y=False, check_only=False, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
+    args = MockArgs(
+        clean=False,
+        y=False,
+        check_only=False,
+        enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")},
+    )
     doc_build = MockDockerTools()
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
@@ -234,9 +254,8 @@ def test_setup_docker_vscode(mocker):
     mock_DockerTools.assert_called()
     mock_mkdir.assert_called()
     mock_create_tar_gz.assert_called()
-    mock_copyfiles.assert_called()
     mock_change_dir.assert_called()
-    mock_print.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
+    mock_print.assert_any_call("BUILDING", "VSCODE", "DOCKERFILE ...")
     mock_print.assert_any_call(
         "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
     )
@@ -267,9 +286,6 @@ def test_setup_docker_build(mocker):
     mock_DockerTools.assert_called()
     mock_mkdir.assert_called()
     mock_create_tar_gz.assert_called_with(toolkit_tar_gz, archived_files, ROOT)
-    mock_copyfiles.assert_called_with(
-        files_to_copy, src_dir=docker_filepaths, dst_dir=staging_path
-    )
     mock_change_dir.assert_called_with(staging_path)
     mock_print.assert_any_call("Run container with")
 

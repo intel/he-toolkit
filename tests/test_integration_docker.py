@@ -22,28 +22,30 @@ def test_docker_build_check_build(mocker):
 
     main()
     assert 1 == mockers.mock_create_tar_gz.call_count
-    assert 1 == mockers.mock_copyfiles.call_count
     assert 1 == mockers.mock_change_dir.call_count
     assert 1 == mockers.mock_mkdir.call_count
-    mockers.mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
-    mockers.mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
-    mockers.mock_print_build.assert_any_call(f"docker run -it {derived_label}")
+    mockers.mock_print_build.assert_any_call("BUILDING", "BASE", "DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING", "TOOLKIT", "DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("docker run -it", derived_label)
     mockers.mock_print_tools.assert_any_call(mockers.client.value.replace('"', ""))
 
 
 def test_docker_build_check_enable(mocker, restore_pwd):
-    args = MockArgs(check_only=False, clean=False, enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")})
+    args = MockArgs(
+        check_only=False,
+        clean=False,
+        enable={"vscode": os_path.expandvars("$HEKIT_PATH/docker/Dockerfile.vscode")},
+    )
     mockers = Mockers(mocker)
     mockers.mock_parse_cmdline.return_value = args, ""
 
     main()
     assert 1 == mockers.mock_create_tar_gz.call_count
-    assert 1 == mockers.mock_copyfiles.call_count
     assert 1 == mockers.mock_change_dir.call_count
     assert 1 == mockers.mock_mkdir.call_count
-    mockers.mock_print_build.assert_any_call("BUILDING BASE DOCKERFILE ...")
-    mockers.mock_print_build.assert_any_call("BUILDING TOOLKIT DOCKERFILE ...")
-    mockers.mock_print_build.assert_any_call("BUILDING VSCODE DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING", "BASE", "DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING", "TOOLKIT", "DOCKERFILE ...")
+    mockers.mock_print_build.assert_any_call("BUILDING", "VSCODE", "DOCKERFILE ...")
     mockers.mock_print_build.assert_any_call(
         "Then to open vscode navigate to <ip addr>:<port> in your chosen browser"
     )
@@ -58,7 +60,6 @@ def test_docker_build_check_only(mocker, restore_pwd):
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert 0 == mockers.mock_create_tar_gz.call_count
-    assert 0 == mockers.mock_copyfiles.call_count
     assert 0 == mockers.mock_change_dir.call_count
     assert 0 == mockers.mock_mkdir.call_count
     mockers.mock_print_build.assert_any_call("CHECKING IN-DOCKER CONNECTIVITY ...")
@@ -77,7 +78,6 @@ def test_docker_build_clean(mocker, restore_pwd):
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert 0 == mockers.mock_create_tar_gz.call_count
-    assert 0 == mockers.mock_copyfiles.call_count
     assert 0 == mockers.mock_change_dir.call_count
     assert 0 == mockers.mock_mkdir.call_count
     mockers.mock_print_build.assert_any_call("Staging area deleted")
@@ -114,7 +114,6 @@ class Mockers:
         self.mock_create_tar_gz = mocker.patch(
             "kit.commands.docker_build.create_tar_gz_file"
         )
-        self.mock_copyfiles = mocker.patch("kit.commands.docker_build.copyfiles")
         self.mock_change_dir = mocker.patch(
             "kit.commands.docker_build.change_directory_to"
         )
