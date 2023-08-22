@@ -153,6 +153,9 @@ class Images:
     def list(self, name):
         return self.image_list
 
+    def pull(self, name):
+        return [name] + self.image_list
+
 
 class Container:
     class Container_return:

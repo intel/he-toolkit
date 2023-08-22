@@ -99,7 +99,9 @@ class DockerTools:
     def try_build_new_image(self, dockerfile: str, tag: str, buildargs):
         """Builds an image if it does not exist"""
         if not self.image_exists(tag):
-            if not self.image_exists(buildargs["CUSTOM_FROM"]):
+            if "CUSTOM_FROM" in buildargs and not self.image_exists(
+                buildargs["CUSTOM_FROM"]
+            ):
                 self.pull_base_image(buildargs["CUSTOM_FROM"])
             response = self.build_image(dockerfile, tag, buildargs)
             for out in response:
