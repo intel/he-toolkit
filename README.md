@@ -80,7 +80,7 @@ additionally install the following system dependencies,
 ```
 m4
 patchelf
-cmake >= 3.13
+cmake >= 3.22
 g++ == 11.x or clang == 14.x
 pthread
 virtualenv (optional if building the Logistic Regression Example)
