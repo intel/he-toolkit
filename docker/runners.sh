@@ -8,7 +8,7 @@ HEKIT_SAMPLE_KERNELS="$HEKIT_DIR/sample-kernels"
 __run_cmd() {
   (
     set -e
-    eval "$*"
+    eval "$@"
   )
 }
 
@@ -16,12 +16,12 @@ run_lr_example() {
   (
     set -e
     cd "$HEKIT_EXAMPLES/logistic-regression/build"
-    OMP_NUM_THREADS="$(nproc)" ./lr_test "$*"
+    OMP_NUM_THREADS="$(nproc)" ./lr_test "$@"
   )
 }
 
 run_psi_example() {
-  __run_cmd "$HEKIT_EXAMPLES"/psi/build/psi --server "$HEKIT_EXAMPLES"/psi/build/datasets/fruits.set "$*"
+  __run_cmd "$HEKIT_EXAMPLES"/psi/build/psi --server "$HEKIT_EXAMPLES"/psi/build/datasets/fruits.set "$@"
 }
 
 run_query_example() {
