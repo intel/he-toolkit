@@ -85,7 +85,7 @@ g++ == 11.x or clang == 14.x
 pthread
 virtualenv (optional if building the Logistic Regression Example)
 autoconf   (optional if using PALISADE)
-gmp 1.5.x  (optional if using HElib)
+gmp == 1.5.x  (optional if using HElib)
 ```
 
 ## Setup
