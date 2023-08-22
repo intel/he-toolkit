@@ -10,7 +10,7 @@ from os import getuid, getgid, environ, chdir as change_directory_to, path as os
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 
 import toml
 
@@ -219,6 +219,12 @@ def get_docker_features(keys: str) -> Dict[str, str]:
     return {key: os_path.expandvars(tobj[key]) for key in key_list}
 
 
+def get_feature_names() -> List[str]:
+    """Read `dockerfiles.toml` and return a list of the keys"""
+    tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
+    return tobj.keys()
+
+
 def set_docker_subparser(subparsers):
     """create the parser for the 'docker-build' command"""
     parser_docker_build = subparsers.add_parser(
@@ -235,6 +241,7 @@ def set_docker_subparser(subparsers):
     parser_docker_build.add_argument(
         "--enable",
         type=get_docker_features,
+        choices=get_feature_names(),
         help="add/enable extra features in docker build of toolkit",
     )
     parser_docker_build.add_argument(
