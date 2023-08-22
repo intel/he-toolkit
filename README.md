@@ -81,7 +81,7 @@ additionally install the following system dependencies,
 m4
 patchelf
 cmake >= 3.13
-g++ = 11.x or clang = 14.x
+g++ == 11.x or clang == 14.x
 pthread
 virtualenv (optional if building the Logistic Regression Example)
 autoconf   (optional if using PALISADE)
