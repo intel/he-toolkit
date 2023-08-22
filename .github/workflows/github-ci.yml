@@ -16,16 +16,16 @@ on:
   workflow_dispatch:
 
 ################
-# Ubuntu 20.04 #
+# Ubuntu 22.04 #
 ################
 jobs:
   format:
     name: Format
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       # Required for pre-commit
-      - run: pip3 install bandit black cpplint docker mypy pydantic pylint pylint-pydantic types-toml
+      - run: pip3 install bandit black cpplint docker mypy pydantic==1.10.4 pylint pylint-pydantic types-toml
       - run: sudo snap install shfmt
       - run: sudo apt install shellcheck
       # NOTE: This is deprecated in favor of pre-commit.ci
@@ -35,7 +35,7 @@ jobs:
 
   test-hekit-bash:
     name: Test hekit commands (bash)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
@@ -58,7 +58,7 @@ jobs:
 
   test-hekit-zshell:
     name: Test hekit commands (zshell)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
@@ -94,38 +94,18 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        # python3.10 is default on Ubuntu-22.04
+        python-version: ["3.10"]
+        c_compiler: [clang-14, gcc-11]
+        os: [ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
+          # clang-14 and gcc-11 default on Ubuntu-22.04
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
           - c_compiler: gcc-11
             cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-10
-          - os: ubuntu-22.04
-            c_compiler: gcc-10
-          # python3.10 is default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            python-version: "3.8"
-          - os: ubuntu-22.04
-            python-version: "3.9"
-          # python3.8 is default on Ubuntu-20.04
-          - os: ubuntu-20.04
-            python-version: "3.10"
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -167,38 +147,17 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        # python3.10 is default on Ubuntu-22.04
+        python-version: ["3.10"]
+        c_compiler: [clang-14, gcc-11]
+        os: [ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
+          # clang-14 and gcc-11 default on Ubuntu-22.04
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
           - c_compiler: gcc-11
             cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-10
-          - os: ubuntu-22.04
-            c_compiler: gcc-10
-          # python3.10 is default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            python-version: "3.8"
-          - os: ubuntu-22.04
-            python-version: "3.9"
-          # python3.8 is default on Ubuntu-20.04
-          - os: ubuntu-20.04
-            python-version: "3.10"
 
     steps:
       - uses: actions/checkout@v3
@@ -209,7 +168,7 @@ jobs:
 
       - name: Setup
         run: |
-          pip3 install toml pydantic pytest
+          pip3 install toml pydantic==1.10.4 pytest
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "CC=${{matrix.c_compiler}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx_compiler}}" >> $GITHUB_ENV
@@ -252,38 +211,17 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        c_compiler: [clang-10, clang-14, gcc-10, gcc-11]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        # python3.10 is default on Ubuntu-22.04
+        python-version: ["3.10"]
+        c_compiler: [clang-14, gcc-11]
+        os: [ubuntu-22.04]
         include:
           # pairing cc compiler with relevant cxx compiler
-          - c_compiler: clang-10
-            cxx_compiler: clang++-10
+          # clang-14 and gcc-11 default on Ubuntu-22.04
           - c_compiler: clang-14
             cxx_compiler: clang++-14
-          - c_compiler: gcc-10
-            cxx_compiler: g++-10
           - c_compiler: gcc-11
             cxx_compiler: g++-11
-        exclude:
-          # clang-14 and gcc-11 not supported on ubuntu-20.04
-          - os: ubuntu-20.04
-            c_compiler: clang-14
-          - os: ubuntu-20.04
-            c_compiler: gcc-11
-          # clang-14 and gcc-11 default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            c_compiler: clang-10
-          - os: ubuntu-22.04
-            c_compiler: gcc-10
-          # python3.10 is default on Ubuntu-22.04
-          - os: ubuntu-22.04
-            python-version: "3.8"
-          - os: ubuntu-22.04
-            python-version: "3.9"
-          # python3.8 is default on Ubuntu-20.04
-          - os: ubuntu-20.04
-            python-version: "3.10"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -344,6 +282,8 @@ jobs:
 ##############
   format-icelake:
     name: Format (IceLake)
+    # Disable this job for now and until a self-hosted icelake becomes available
+    if: ${{ false }}
     runs-on: [self-hosted, Linux, X64, ice-lake]
     steps:
       # Add local bin for cpplint
@@ -355,6 +295,8 @@ jobs:
 
   test-hekit-icelake:
     name: Test hekit commands (IceLake)
+    # Disable this job for now and until a self-hosted icelake becomes available
+    if: ${{ false }}
     runs-on: [self-hosted, Linux, X64, ice-lake]
     defaults:
       run:
@@ -369,6 +311,8 @@ jobs:
 
   build-and-test-toolkit-icelake:
     name: Build, test and run HE Toolkit (IceLake)
+    # Disable this job for now and until a self-hosted icelake becomes available
+    if: ${{ false }}
     runs-on: [self-hosted, Linux, X64, ice-lake]
     defaults:
       run:

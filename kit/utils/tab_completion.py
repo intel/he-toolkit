@@ -18,7 +18,7 @@ try:
     from argcomplete import autocomplete
 except ImportError as e:
 
-    def autocomplete(arg):  # pylint: disable=unused-argument
+    def autocomplete(arg):  # type: ignore[misc]  # pylint: disable=unused-argument
         """Continue with the execution"""
 
 
@@ -50,7 +50,6 @@ def get_plugins_by_state(
 ) -> List[str]:
     """Return a list of plugins with a specific state"""
     try:
-
         plugin_dict = load_toml(source_file)[PluginsConfig.KEY]
         return [k for k, v in plugin_dict.items() if v["state"] == state]
 
