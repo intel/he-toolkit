@@ -1,0 +1,2 @@
+disable=SC2269 # Disable SC2269 (info): This variable is assigned to itself, so the assignment does nothing.
+disable=SC2294 (warning): eval negates the benefit of arrays. Drop eval to preserve whitespace/symbols (or eval as string).
