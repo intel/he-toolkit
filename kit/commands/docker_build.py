@@ -222,7 +222,7 @@ def get_docker_features(keys: str) -> Dict[str, str]:
 def get_feature_names() -> List[str]:
     """Read `dockerfiles.toml` and return a list of the keys"""
     tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
-    return tobj.keys()
+    return list(tobj.keys())
 
 
 def set_docker_subparser(subparsers):
