@@ -92,9 +92,15 @@ class DockerTools:
             command="/bin/bash /script",
         )
 
+    def pull_base_image(self, tag: str):
+        """Pull base image using `docker pull`"""
+        self.client.images.pull(tag)
+
     def try_build_new_image(self, dockerfile: str, tag: str, buildargs):
         """Builds an image if it does not exist"""
         if not self.image_exists(tag):
+            if not self.image_exists(buildargs["CUSTOM_FROM"]):
+                self.pull_base_image(buildargs["CUSTOM_FROM"])
             response = self.build_image(dockerfile, tag, buildargs)
             for out in response:
                 print(out)
