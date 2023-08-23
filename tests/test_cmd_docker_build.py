@@ -309,3 +309,6 @@ class MockDockerTools:
 
     def try_build_new_image(self, dockerfile, tag, buildargs):
         return True
+
+    def pull_base_image(self, tag):
+        return None
