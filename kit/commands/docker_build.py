@@ -4,13 +4,13 @@
 """This module sets up a docker container with the required libraries for executing FHE applications"""
 
 from argparse import ArgumentTypeError
-from re import search
+from re import compile as regex
 from sys import stderr, exit as sys_exit
 from os import getuid, getgid, environ, chdir as change_directory_to, path as os_path
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable
 
 import toml
 
@@ -104,9 +104,12 @@ http_proxy and https_proxy are set.
 
 def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
     """Filter out comment lines and empty lines"""
-    for filename in file_list:
-        if not search(r"^\s*#|^\s*$", filename):
-            yield filename.rstrip()
+    comments_or_empty = regex(r"^\s*#|^\s*$")
+    return (
+        filename.rstrip()
+        for filename in file_list
+        if not comments_or_empty.search(filename)
+    )
 
 
 def create_tar_gz_file(
@@ -183,6 +186,9 @@ def setup_docker(args):
         features.update(args.enable)
 
     prev = "ubuntu:22.04"
+    # Must make sure we have a platform image
+    docker_tools.pull_base_image(prev)
+
     for feature, path in features.items():
         print("BUILDING", feature.upper(), "DOCKERFILE ...")
         current = Constants.custom_label % feature
@@ -219,10 +225,10 @@ def get_docker_features(keys: str) -> Dict[str, str]:
     return {key: os_path.expandvars(tobj[key]) for key in key_list}
 
 
-def get_feature_names() -> List[str]:
+def get_feature_names() -> tuple[str, ...]:
     """Read `dockerfiles.toml` and return a list of the keys"""
     tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
-    return list(tobj.keys())
+    return tuple(tobj.keys())
 
 
 def set_docker_subparser(subparsers):
@@ -241,8 +247,7 @@ def set_docker_subparser(subparsers):
     parser_docker_build.add_argument(
         "--enable",
         type=get_docker_features,
-        choices=get_feature_names(),
-        help="add/enable extra features in docker build of toolkit",
+        help=f"add/enable extra features in docker build of toolkit, choose from {get_feature_names()}",
     )
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"
