@@ -52,6 +52,7 @@ docker/Dockerfile.toolkit
 docker/Dockerfile.vscode
 docker/README.md
 docker/basic-docker-test.sh
+docker/dockerfiles.toml
 docker/ide-config/settings.json
 docker/runners.sh
 docker/which-files.txt

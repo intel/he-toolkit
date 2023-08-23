@@ -3,13 +3,17 @@
 
 """This module sets up a docker container with the required libraries for executing FHE applications"""
 
-from re import search
+from argparse import ArgumentTypeError
+from re import compile as regex
 from sys import stderr, exit as sys_exit
-from os import getuid, getgid, environ, chdir as change_directory_to
+from os import getuid, getgid, environ, chdir as change_directory_to, path as os_path
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
 from typing import Dict, Iterable
+
+import toml
+
 from kit.utils.archive import archive_and_compress
 from kit.utils.constants import Constants
 from kit.utils.typing import PathType
@@ -100,9 +104,12 @@ http_proxy and https_proxy are set.
 
 def filter_file_list(file_list: Iterable[str]) -> Iterable[str]:
     """Filter out comment lines and empty lines"""
-    for filename in file_list:
-        if not search(r"^\s*#|^\s*$", filename):
-            yield filename.rstrip()
+    comments_or_empty = regex(r"^\s*#|^\s*$")
+    return (
+        filename.rstrip()
+        for filename in file_list
+        if not comments_or_empty.search(filename)
+    )
 
 
 def create_tar_gz_file(
@@ -162,11 +169,6 @@ def setup_docker(args):
     archived_files = docker_filepaths / "which-files.txt"
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
-    files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
-    if args.enable == "vscode":
-        files_to_copy.append("Dockerfile.vscode")
-    copyfiles(files_to_copy, src_dir=docker_filepaths, dst_dir=staging_path)
-
     change_directory_to(staging_path)
 
     buildargs = create_buildargs(environment, args.id)
@@ -175,33 +177,59 @@ def setup_docker(args):
         f"WARNING: Setting UID/GID of docker user to '{buildargs['UID']}/{buildargs['GID']}'"
     )
 
-    print("BUILDING BASE DOCKERFILE ...")
-    docker_tools.try_build_new_image(
-        dockerfile="Dockerfile.base", tag=Constants.base_label, buildargs=buildargs
-    )
+    features = {
+        "base": f"{docker_filepaths}/Dockerfile.base",
+        "toolkit": f"{docker_filepaths}/Dockerfile.toolkit",
+    }
 
-    print("BUILDING TOOLKIT DOCKERFILE ...")
-    docker_tools.try_build_new_image(
-        dockerfile="Dockerfile.toolkit",
-        tag=Constants.toolkit_label,
-        buildargs=buildargs,
-    )
+    if isinstance(args.enable, dict):
+        features.update(args.enable)
 
-    if args.enable == "vscode":
-        print("BUILDING VSCODE DOCKERFILE ...")
+    prev = "ubuntu:22.04"
+    # Must make sure we have a platform image
+    if not docker_tools.image_exists(prev):
+        docker_tools.pull_base_image(prev)
+
+    for feature, path in features.items():
+        print("BUILDING", feature.upper(), "DOCKERFILE ...")
+        current = Constants.custom_label % feature
+        print("BUILDING", current, "FROM", prev)
+        buildargs["CUSTOM_FROM"] = prev
         docker_tools.try_build_new_image(
-            dockerfile="Dockerfile.vscode",
-            tag=Constants.vscode_label,
+            dockerfile=path,
+            tag=current,
             buildargs=buildargs,
         )
+        prev = current
 
     print("RUN DOCKER CONTAINER ...")
     print("Run container with")
-    if args.enable == "vscode":
-        print(f"docker run -d -p <ip addr>:<port>:8888 {Constants.vscode_label}")
+    if isinstance(args.enable, dict) and "vscode" in args.enable:
+        print("docker run -d -p <ip addr>:<port>:8888", Constants.vscode_label)
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
-        print(f"docker run -it {Constants.toolkit_label}")
+        print("docker run -it", Constants.toolkit_label)
+
+
+def get_docker_features(keys: str) -> Dict[str, str]:
+    """Transform string of comma seperated features to enable into a dict with
+    the keys as feature strings and values as locoations of the necessary
+    Dockerfile"""
+    tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
+    key_list = list(map(str.strip, keys.split(",")))
+    not_found = set(key_list) - set(tobj.keys())
+    if len(not_found) > 0:
+        keystr = ", ".join(not_found)
+        raise ArgumentTypeError(
+            f"Input key(s) `{keystr}` not found in accepted list of keys in `dockerfiles.toml`"
+        )
+    return {key: os_path.expandvars(tobj[key]) for key in key_list}
+
+
+def get_feature_names() -> tuple[str, ...]:
+    """Read `dockerfiles.toml` and return a list of the keys"""
+    tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
+    return tuple(tobj.keys())
 
 
 def set_docker_subparser(subparsers):
@@ -213,16 +241,14 @@ def set_docker_subparser(subparsers):
     parser_docker_build.add_argument(
         "--clean", action="store_true", help="delete staging"
     )
-    # FIXME should this be its own subcommand?
+    # TODO Maybe should be its own subcommand?
     parser_docker_build.add_argument(
         "--check-only", action="store_true", help="only run container for proxy checks"
     )
-    # In future change to accept several strings
     parser_docker_build.add_argument(
         "--enable",
-        type=str,
-        choices=["vscode"],
-        help="add/enable extra features in docker build of toolkit",
+        type=get_docker_features,
+        help=f"add/enable extra features in docker build of toolkit, choose from {get_feature_names()}",
     )
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"

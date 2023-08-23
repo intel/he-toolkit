@@ -1,0 +1,6 @@
+# List of feature names with associated path to the relevant dockerfile.
+# Add to this list to enable building of custom dockerfiles via
+#   `hekit docker-build --enable <custom-feature>`
+# NOTE: Paths must be absolute
+
+vscode = "${HEKITPATH}/docker/Dockerfile.vscode"

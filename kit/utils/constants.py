@@ -18,6 +18,7 @@ class Constants:  # pylint: disable=too-many-instance-attributes
     base_label: str = f"{user}/ubuntu_he_base:{version}"
     toolkit_label: str = f"{user}/ubuntu_he_toolkit:{version}"
     vscode_label: str = f"{user}/ubuntu_he_vscode:{version}"
+    custom_label: str = f"{user}/ubuntu_he_%s:{version}"
 
     # cmake properties
     cmake_min_version: str = "3.13"
@@ -25,6 +26,9 @@ class Constants:  # pylint: disable=too-many-instance-attributes
 
     # Root directory
     HEKIT_ROOT_DIR: Path = Path(__file__).resolve().parent.parent.parent
+
+    # Docker directory
+    HEKIT_DOCKER_DIR: Path = Path(__file__).resolve().parent.parent.parent / "docker"
 
     # hekit core commands
     HEKIT_COMMANDS = {
