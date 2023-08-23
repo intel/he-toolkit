@@ -187,7 +187,7 @@ def setup_docker(args):
 
     prev = "ubuntu:22.04"
     # Must make sure we have a platform image
-    if docker_tools.image_exists(prev):
+    if not docker_tools.image_exists(prev):
         docker_tools.pull_base_image(prev)
 
     for feature, path in features.items():

@@ -312,3 +312,6 @@ class MockDockerTools:
 
     def pull_base_image(self, tag):
         return None
+
+    def image_exists(self, image_name):
+        return True
