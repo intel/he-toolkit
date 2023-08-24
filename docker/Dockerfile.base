@@ -30,6 +30,7 @@ RUN apt update && \
                    build-essential                \
                    byobu                          \
                    clang-14                       \
+                   clang-format-14                \
                    cmake                          \
                    curl                           \
                    file                           \
