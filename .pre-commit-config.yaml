@@ -12,7 +12,7 @@ repos:
         - id: check-byte-order-marker
         - id: check-yaml
     - repo: https://github.com/crate-ci/typos
-      rev: v1.1.9
+      rev: v1.16.8
       hooks:
         - id: typos
     - repo: local
