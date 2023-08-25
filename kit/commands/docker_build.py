@@ -185,7 +185,7 @@ def setup_docker(args):
     if isinstance(args.enable, dict):
         features.update(args.enable)
 
-    prev = "ubuntu:22.04"
+    prev = args.platform
     # Must make sure we have a platform image
     if not docker_tools.image_exists(prev):
         docker_tools.pull_base_image(prev)
@@ -249,6 +249,12 @@ def set_docker_subparser(subparsers):
         "--enable",
         type=get_docker_features,
         help=f"add/enable extra features in docker build of toolkit, choose from {get_feature_names()}",
+    )
+    parser_docker_build.add_argument(
+        "--platform",
+        type=str,
+        default="ubuntu:22.04",
+        help="pass different platform to build on",
     )
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"
