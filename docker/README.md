@@ -73,7 +73,6 @@ container.
   recommended to use processors supporting AVX512-IFMA52.
 - The docker build has been tested on,
   - Ubuntu 22.04;
-  - MacOS Catalina (10.15.7).
 
 #### Running the Docker Build on MacOS
 In order to successfully run the docker build on MacOS you may be required to
@@ -105,7 +104,7 @@ installation then you can install Docker directly from the official
 [instructions](https://docs.docker.com/engine/install/ubuntu/) to install on
 Ubuntu.
 
-**Note on macOS:** If running the docker build on Mac OSX, the UID and GID of
+**Note on MacOS:** If running the docker build on Mac OSX, the UID and GID of
 the user created in the docker container will both be set to 1000 by default.
 To override this value the user can simply pass in the desired UID/GID as
 follows
