@@ -211,7 +211,7 @@ Rings and Fields Fundamentals for Homomorphic Encryption}
 \begin{stepitemize}
 \item Let us start with the definition of a ring:
 \begin{definition}
-A nonempty set $R$ that is equipped with two binary operations (genericaly called ``addition" and ``multiplication") $+$ and $\cdot$ is called a {\bf ring} if ot satisfies the following conditions:
+A nonempty set $R$ that is equipped with two binary operations (genericaly called ``addition" and ``multiplication") $+$ and $\cdot$ is called a {\bf ring} if it satisfies the following conditions:
 \begin{enumerate}
     \item $(R,+)$ is an Abelian group
  \item $R$ is closed under multiplication, that is $a\cdot b \in R$ whenever $a,b\in R$
@@ -276,7 +276,7 @@ A nonempty set $R$ that is equipped with two binary operations (genericaly calle
 \item An element $a\in R$ is said to be a ``unit" if there exits $b\in R$ such that $ab=1$.
 \item So,  just like a zero divisor is a divisor of $0$, a unit is a divisor of $1$.
 \item In $\Z$, $1$ and $-1$ are the only units.
-    \item In $\Z_6$, $5$ is a unit since $5\cdot 5 =1$ in $\Z_6$. $2$ is not a unit since $2a$ will alwyas be $0,2$ or $4$ modulo $6$.
+    \item In $\Z_6$, $5$ is a unit since $5\cdot 5 =1$ in $\Z_6$. $2$ is not a unit since $2a$ will always be $0,2$ or $4$ modulo $6$.
     \item Recalling the Number Theory part, we see that $a\in \Z_n$ is a unit if and only $GCD(a,b)=1$.
     \item Thus in $\Z_p$, where $p$ is prime, every non-zero element is a unit.
     \item In $\Q$, $\R$ and in $\C$, every non-zero element is a unit.
@@ -868,7 +868,7 @@ $p(x)=x^2+x+1$ is irreducible in $\Z_2[x]$ since $p(0)=p(1)=1$, which means $p$ 
 
     \item So, letting $\omega = x+(x^3+x+1)$, we see that $\omega^3=\omega+1$ and thus we have
     $$F = \{0,1, \omega, \omega ^2, 1+\omega, 1+\omega^2, \omega+\omega^2, 1+\omega+\omega^2\}.$$
-    \item How do we add and mutliply?
+    \item How do we add and multiply?
     \item Addition is done just like in a vector space. \item However, when multiplying, we need to remember that in this field $\omega^3=\omega+1$, $\omega^4=\omega^2+\omega$, $\omega^5 = \omega^3+\omega^2= \omega^2+\omega+1$, etc.
 \end{stepitemize}
 \end{frame}

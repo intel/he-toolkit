@@ -145,7 +145,7 @@ def set_TBD_subparser(subparsers):
 
 In the previous code, the following conditions must be met:
 
-* The value of the first paramenter of `subparsers.add_parser` must be the
+* The value of the first parameter of `subparsers.add_parser` must be the
 same as the value of `name` defined in the TOML file.
 
 * `ADD_NEW_FUNCTIONALITY` (parameter `fn` of `set_defaults`) is the function

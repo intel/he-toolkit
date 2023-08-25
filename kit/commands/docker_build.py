@@ -212,7 +212,7 @@ def setup_docker(args):
 
 
 def get_docker_features(keys: str) -> Dict[str, str]:
-    """Transform string of comma seperated features to enable into a dict with
+    """Transform string of comma separated features to enable into a dict with
     the keys as feature strings and values as locoations of the necessary
     Dockerfile"""
     tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
