@@ -254,7 +254,7 @@ def set_docker_subparser(subparsers):
         "--platform",
         type=str,
         default="ubuntu:22.04",
-        help="pass different platform to build on",
+        help="pass different platform to build on (default: '%(default)s')",
     )
     parser_docker_build.add_argument(
         "-y", action="store_false", help="say yes to prompts"
