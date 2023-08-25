@@ -9,7 +9,7 @@ repos:
         - id: end-of-file-fixer
         - id: check-merge-conflict
         - id: mixed-line-ending
-        - id: check-byte-order-marker
+        - id: fix-byte-order-marker
         - id: check-yaml
     - repo: https://github.com/crate-ci/typos
       rev: v1.16.8
