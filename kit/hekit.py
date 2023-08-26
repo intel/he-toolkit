@@ -39,7 +39,10 @@ def parse_cmdline() -> Tuple:
         "--debug", action="store_true", help="if exception occurs print out stacktrace"
     )
     parser.add_argument(
-        "--version", action="store_true", help="display Intel HE toolkit version"
+        "--version",
+        action="version",
+        version=f"Intel HE Toolkit version {Constants.version}",
+        help="display Intel HE toolkit version",
     )
     parser.add_argument(
         "--config",
@@ -64,10 +67,6 @@ def parse_cmdline() -> Tuple:
 def main() -> None:
     """Starting point for program execution"""
     args, print_help = parse_cmdline()
-
-    if args.version is True:
-        print(f"Intel HE Toolkit version {Constants.version}")
-        sys_exit(0)
 
     if args.fn is None:
         print("hekit requires a command", file=stderr)
