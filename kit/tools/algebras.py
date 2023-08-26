@@ -11,7 +11,7 @@ from sys import stderr, exit as sys_exit
 from itertools import chain, combinations
 from collections import Counter
 from pathlib import Path
-from typing import Callable, Generator, Iterable, List, Optional, Tuple
+from typing import Callable, Generator, Iterable, Optional
 from kit.utils.typing import PathType
 from kit.utils.files import create_default_workspace
 from kit.utils.primes import compute_prime_factors, write_primes
@@ -63,7 +63,7 @@ def str_to_range(s: str) -> range:
         raise ArgumentTypeError(f"Wrong syntax for range given '{s}'.") from error
 
 
-def parse_range(string: str, filter_fn: Optional[Callable] = None) -> List[int]:
+def parse_range(string: str, filter_fn: Optional[Callable] = None) -> list[int]:
     """Returns sorted list"""
     ranges = (str_to_range(s) for s in string.replace(" ", "").split(","))
 
@@ -75,7 +75,7 @@ def parse_range(string: str, filter_fn: Optional[Callable] = None) -> List[int]:
     return sorted(unique_nums)
 
 
-def parse_range_for_primes(string: str) -> List[int]:
+def parse_range_for_primes(string: str) -> list[int]:
     """Create a file with sorted primes"""
     default_primes_filepath = Path("~/.hekit/primes.txt").expanduser()
     try:
@@ -139,7 +139,7 @@ def phi(prime_factors: Iterable[int]) -> int:
     return math.prod((p - 1) * p ** (k - 1) for p, k in c.items())
 
 
-def correct_for_d(p: int, d: int, m: int) -> Tuple[int, int]:
+def correct_for_d(p: int, d: int, m: int) -> tuple[int, int]:
     """Returns the minimum value of d satisfiying p^d = 1 mod m.
     Computations for valid ms with a starting point of p^d can
     sometimes lead to an erroneous d (too large).

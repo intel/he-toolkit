@@ -10,7 +10,7 @@ from os import getuid, getgid, environ, chdir as change_directory_to, path as os
 from pathlib import Path
 from shutil import copyfile, rmtree
 from platform import system as os_name
-from typing import Dict, Iterable
+from typing import Iterable
 
 import toml
 
@@ -42,7 +42,7 @@ def copyfiles(files: Iterable[PathType], src_dir: PathType, dst_dir: PathType) -
         copyfile(src_dir / filename, dst_dir / filename)
 
 
-def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
+def create_buildargs(environment: dict[str, str], ID: int) -> dict[str, str]:
     """Returns a dictionary of build arguments"""
     if ID:
         USERID, GROUPID = ID, ID
@@ -66,7 +66,7 @@ def create_buildargs(environment: Dict[str, str], ID: int) -> Dict[str, str]:
 
 def create_environment():
     """Returns a dictionary of environment variables"""
-    environment: Dict[str, str] = {
+    environment: dict[str, str] = {
         "http_proxy": environ.get("http_proxy", ""),
         "https_proxy": environ.get("https_proxy", ""),
         "socks_proxy": environ.get("socks_proxy", ""),
@@ -211,9 +211,9 @@ def setup_docker(args):
         print("docker run -it", Constants.toolkit_label)
 
 
-def get_docker_features(keys: str) -> Dict[str, str]:
+def get_docker_features(keys: str) -> dict[str, str]:
     """Transform string of comma separated features to enable into a dict with
-    the keys as feature strings and values as locoations of the necessary
+    the keys as feature strings and values as locations of the necessary
     Dockerfile"""
     tobj = toml.load(Constants.HEKIT_DOCKER_DIR / "dockerfiles.toml")
     key_list = list(map(str.strip, keys.split(",")))
