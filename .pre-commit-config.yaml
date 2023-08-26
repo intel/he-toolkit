@@ -3,16 +3,16 @@
 
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v2.5.0
+      rev: v4.4.0
       hooks:
         - id: trailing-whitespace
         - id: end-of-file-fixer
         - id: check-merge-conflict
         - id: mixed-line-ending
-        - id: check-byte-order-marker
+        - id: fix-byte-order-marker
         - id: check-yaml
     - repo: https://github.com/crate-ci/typos
-      rev: v1.1.9
+      rev: v1.16.8
       hooks:
         - id: typos
     - repo: local

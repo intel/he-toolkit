@@ -107,7 +107,7 @@ Recall that a fully homomorphic encryption scheme supports two main operations, 
 \section{Rings: Definition and Examples}
 Let us start with the definition of a ring:
 \begin{definition}
-A nonempty set $R$ that is equipped with two binary operations (genericaly called ``addition" and ``multiplication") $+$ and $\cdot$ is called a {\bf ring} if ot satisfies the following conditions:
+A nonempty set $R$ that is equipped with two binary operations (genericaly called ``addition" and ``multiplication") $+$ and $\cdot$ is called a {\bf ring} if it satisfies the following conditions:
 \begin{enumerate}
     \item $(R,+)$ is an Abelian group
  \item $R$ is closed under multiplication, that is $a\cdot b \in R$ whenever $a,b\in R$
@@ -166,7 +166,7 @@ So,  just like a zero divisor is a divisor of $0$, a unit is a divisor of $1$.
 \begin{example}
 \begin{enumerate}
     \item In $\Z$, $1$ and $-1$ are the only units.
-    \item In $\Z_6$, $5$ is a unit since $5\cdot 5 =1$ in $\Z_6$. $2$ is not a unit since $2a$ will alwyas be $0,2$ or $4$ modulo $6$.
+    \item In $\Z_6$, $5$ is a unit since $5\cdot 5 =1$ in $\Z_6$. $2$ is not a unit since $2a$ will always be $0,2$ or $4$ modulo $6$.
     \item Recalling the Number Theory part, we see that $a\in \Z_n$ is a unit if and only $GCD(a,b)=1$.
     \item Thus in $\Z_p$, where $p$ is prime, every non-zero element is a unit.
     \item In $\Q$, $\R$ and in $\C$, every non-zero element is a unit.
@@ -277,7 +277,7 @@ A ring homomorphism $\varphi:R\rightarrow S$ is called an ``isomorphism" if it i
     \item As we saw before, the identity function is the only automorphism of $\Z$.
     \item Let us define $\varphi:\C \rightarrow \C$ by $\varphi(a+bi)=a-bi$, that is $\varphi$ is the complex conjugation operation. It is easy to see that complex conjugation is both additive and multiplicative and hence is a ring homomorphism. Moreover, it is one-to-one and onto since $a-bi=c-di$ implies $a=c$ and $b=d$ and $\varphi(a-bi)=a+bi$. Thus $\varphi$ is an automorphism of $\C$.
     \item This next example will illustrate how the Chinese Remainder Theorem gives rise to an isomorphism of rings:
-    Consider the fuction $\varphi:\Z_{12}\rightarrow \Z_{3}\times \Z_{4}$, where we consider $\Z_3\times \Z_4$ to be a ring with respect to component-wise addition and multiplication modulo 3 and 4 respectively. Such rings are called ``product rings".
+    Consider the function $\varphi:\Z_{12}\rightarrow \Z_{3}\times \Z_{4}$, where we consider $\Z_3\times \Z_4$ to be a ring with respect to component-wise addition and multiplication modulo 3 and 4 respectively. Such rings are called ``product rings".
     We define $\varphi$ by $\varphi(m) = (m_3, m_4)$, where $m_3$ and $m_4$ represent the reduction modulo $3$ and modulo $4$, respectively.
 
     Since modulo reduction is both multiplicative and additive, this is clearly a ring homomorphism. By Chinese Remainder Theorem, for any $a \in \Z_3$ and $b\in \Z_4$, there is a unique solution to  $x\equiv a \pmod{3}$ and $x\equiv b\pmod{4}$ in $\Z_{12}$. Thus this map is one-to-one and it is also onto. Hence $\varphi$ is an isomorphism.
@@ -591,7 +591,7 @@ $GCD(a_0, a_1, \dots, a_n)=1$, then $p(x)$ is irreducible in $\Z[x]$ if and only
 \end{theorem}
 The reason why this theorem is important is because of the following results:
 \begin{theorem}\label{irmax}
-If $F$ is a field then $F[x]$ has the Euclidean division algorithm and hence is a Principle Ideal Domain (PID). Morevoer, $p(x)\in F[x]$ is irreducible if and only if $(p(x))$ is a maximal ideal.
+If $F$ is a field then $F[x]$ has the Euclidean division algorithm and hence is a Principle Ideal Domain (PID). Moreover, $p(x)\in F[x]$ is irreducible if and only if $(p(x))$ is a maximal ideal.
 \end{theorem}
 So, having irreducible polynomials will help us generate maximal ideals.
 \begin{remark}
@@ -599,7 +599,7 @@ The previous theorem is not true when $F$ is not a field. For example, in $\Z[x]
 \end{remark}
 
 \begin{observation}
-Irreducibility depends on the coefficent ring. For example, the polynomial $p(x)=x^2+1$ is irreducible in $\Z[x]$ as well as in $\Q[x]$. However, it is reducible in $\Z_2[x]$ as
+Irreducibility depends on the coefficient ring. For example, the polynomial $p(x)=x^2+1$ is irreducible in $\Z[x]$ as well as in $\Q[x]$. However, it is reducible in $\Z_2[x]$ as
 $$x^2+1=(x+1)^2$$
 in $\Z_2[x]$.
 \end{observation}
@@ -674,7 +674,7 @@ Let us consider several such examples:
     \item The example we saw above, namely $\{0,1,\omega, 1+\omega\}$ is just $\Z_2[x]/(x^2+x+1)$.
     \item Now let us construct a finite field of size $8$. As we saw in the previous section, $x^3+x+1$ is irreducible over $\Z_2$. So we can construct a finite field of size $8$ by letting $F= \Z_2[x]/(x^3+x+1)$.
     So, letting $\omega = x+(x^3+x+1)$, we see that $\omega^3=\omega+1$ and thus we have
-    $$F = \{0,1, \omega, \omega ^2, 1+\omega, 1+\omega^2, \omega+\omega^2, 1+\omega+\omega^2\}.$$ So how do we add and mutliply? Addition is done just like in a vector space. However, when multiplying, we need to remember that in this field $\omega^3=\omega+1$, $\omega^4=\omega^2+\omega$, $\omega^5 = \omega^3+\omega^2= \omega^2+\omega+1$, etc.  In fact let us write the addition and multiplication tables:
+    $$F = \{0,1, \omega, \omega ^2, 1+\omega, 1+\omega^2, \omega+\omega^2, 1+\omega+\omega^2\}.$$ So how do we add and multiply? Addition is done just like in a vector space. However, when multiplying, we need to remember that in this field $\omega^3=\omega+1$, $\omega^4=\omega^2+\omega$, $\omega^5 = \omega^3+\omega^2= \omega^2+\omega+1$, etc.  In fact let us write the addition and multiplication tables:
 
 
 \begin{table}[H]

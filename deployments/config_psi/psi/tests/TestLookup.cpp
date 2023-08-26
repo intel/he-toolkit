@@ -414,7 +414,7 @@ TEST(TestLookup, throwsWhenQueryBuilderExpectsMoreColumnsThanAvailable) {
   EXPECT_THROW(qb.build(db.columns()), helib::OutOfRangeError);
 }
 
-TEST(TestLookup, thowsWhenQueryHasMoreThanOneRow) {
+TEST(TestLookup, throwsWhenQueryHasMoreThanOneRow) {
   // clang-format off
   helib::Context context = helib::ContextBuilder<helib::BGV>()
                                .m(24)

@@ -100,6 +100,7 @@ class MockArgs:
         self.version = False
         self.debug = False
         self.y = True
+        self.platform = True
 
 
 class Mockers:

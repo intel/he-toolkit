@@ -359,7 +359,7 @@ So $GCD(92,28)=4$. To find the coefficients $x, y$ in the Extended algorithm, we
 \end{example}
 
 \bigskip
-The algorithm can be used to prove the following observation aboout GCDs:
+The algorithm can be used to prove the following observation about GCDs:
 \begin{theorem}\label{factorout}
 If $k\in \N$ and $a, b$ are positive integers, then $(ka, kb) = k(a,b)$.
 \end{theorem}
@@ -717,7 +717,7 @@ We first cancel $3$, which leads to $3x\equiv 7 \pmod{10}$. Multiplying both sid
 \hrule
 \section{The Chinese Remainder Theorem}
 Chinese Remainder Theorem is about solving a system of linear congruences. We will see the theorem, some examples and an information security application of it.
-\begin{theorem} $($Chinese Remainder Thoerem: CRT $)$ \label{CRT} Ler $n_1, n_2, \dots, n_k$ be positive integers $>1$ so that $(n_i,n_j)=1$ for all $i, j$ with $i\neq j$. Then the system of congruence
+\begin{theorem} $($Chinese Remainder Theorem: CRT $)$ \label{CRT} Ler $n_1, n_2, \dots, n_k$ be positive integers $>1$ so that $(n_i,n_j)=1$ for all $i, j$ with $i\neq j$. Then the system of congruence
 \begin{align*}
     x &\equiv a_1 \pmod{n_1} \\
     x &\equiv a_2 \pmod{n_2} \\
@@ -1068,7 +1068,7 @@ We should remember that in any context that we are talking about $ord_n(a)$, we 
 \end{remark}
 Let us look at an example of finding the order in the light of the previous theorem:
 \begin{example}
-To find $ord_{18}(5)$ for example, using the previous thoerem, we know that $ord_{18}(5)|\phi(18)=6$. So we just need to check $5^2, 5^3$ modulo $18$. $5^2=25 \equiv 7 \pmod{18}$ and so $5^3 \equiv 35 \equiv 17 \pmod{18}$. This shows that $ord_{18}(5)\neq 1, 2$ or $3$, so we must have $ord_{18}(5)=6$.
+To find $ord_{18}(5)$ for example, using the previous theorem, we know that $ord_{18}(5)|\phi(18)=6$. So we just need to check $5^2, 5^3$ modulo $18$. $5^2=25 \equiv 7 \pmod{18}$ and so $5^3 \equiv 35 \equiv 17 \pmod{18}$. This shows that $ord_{18}(5)\neq 1, 2$ or $3$, so we must have $ord_{18}(5)=6$.
 \end{example}
 
 \bigskip

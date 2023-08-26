@@ -45,7 +45,7 @@ each command.
 | check-dependencies | Checks system dependencies. | hekit check-dependencies dependencies-file
 | new | Create a new project. | hekit new [--directory DIRECTORY] [--based-on {logistic-regression,psi,secure-query}] name|
 | plugins | Handle third party plugins. See [Plugins](./PLUGINS.md). | hekit plugins {list,install,remove,enable,disable}
-| docker-build | Builds the HE Toolkit Docker container. See [Docker Build](../docker/README.md). | hekit docker-build [--id ID] [--clean] [--check-only] [--enable {vscode}]
+| docker-build | Builds the HE Toolkit Docker container. See [Docker Build](../docker/README.md). | hekit docker-build [--id ID] [--clean] [--check-only] [--enable {vscode,...}] [--platform PLATFORM]
 | gen-primes | Generates primes in range [n, m] where n, m are positive integers. See [Tools](./tools/README.md). | hekit gen-primes start stop
 | algebras  | Generates ZZ_p[x]/phi(X) algebras. . See [Tools](./tools/README.md). | hekit algebras [-p P] [-d D] [--no-corrected] [--no-header]
 

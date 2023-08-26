@@ -72,8 +72,7 @@ container.
   processor with at least Intel AVX512DQ support.  For best performance, it is
   recommended to use processors supporting AVX512-IFMA52.
 - The docker build has been tested on,
-  - Ubuntu 20.04;
-  - MacOS Catalina (10.15.7).
+  - Ubuntu 22.04;
 
 #### Running the Docker Build on MacOS
 In order to successfully run the docker build on MacOS you may be required to
@@ -105,7 +104,7 @@ installation then you can install Docker directly from the official
 [instructions](https://docs.docker.com/engine/install/ubuntu/) to install on
 Ubuntu.
 
-**Note on macOS:** If running the docker build on Mac OSX, the UID and GID of
+**Note on MacOS:** If running the docker build on Mac OSX, the UID and GID of
 the user created in the docker container will both be set to 1000 by default.
 To override this value the user can simply pass in the desired UID/GID as
 follows
@@ -133,11 +132,11 @@ Code configuration.
 
 Once this step is successfully completed the program shall output
 ```bash
-Successfully tagged <username>/ubuntu_he_vscode:2.0.0
+Successfully tagged <username>/ubuntu_he_vscode:<hekit-version>
 
 RUN DOCKER CONTAINER ...
 Run container with
-docker run -d -p <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:2.0.0
+docker run -d -p <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:<hekit-version>
 Then to open vscode navigate to <ip addr>:<port> in your chosen browser
 ```
 
@@ -196,6 +195,16 @@ hekit docker-build --enable feature-one,feature-two,feature-three
 The toolkit will build the images in the order that they appear in the list,
 i.e. `feature-three` will be built on `feature-two` which will be built on
 `feature-one`.
+
+### Using custom base platform
+When building a docker image, `hekit` uses by default a version of Ubuntu as a
+base image that it fetches from dockerhub if it does not exist locally. This
+can be overridden as follows
+```bash
+hekit docker-build --platform <base-platform-image>
+```
+Note that this is at the user's own risk as the Dockerfiles have only been
+created with the default in mind.
 
 ## Running the Examples
 After a successful install and build of the docker container, the user should
