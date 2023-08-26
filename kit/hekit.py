@@ -10,7 +10,6 @@ import sys
 from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser, RawTextHelpFormatter
-from typing import Tuple
 
 from kit.utils.subparsers import (
     get_options_description,
@@ -20,12 +19,15 @@ from kit.utils.subparsers import (
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
-if sys.version_info < (3, 8):
-    print("Intel HE Toolkit requires Python version 3.8 or above", file=sys.stderr)
+if sys.version_info < Constants.python_version_tuple:
+    print(
+        f"Intel HE Toolkit requires Python version {Constants.python_version_string} or above",
+        file=sys.stderr,
+    )
     sys_exit(1)
 
 
-def parse_cmdline() -> Tuple:
+def parse_cmdline() -> tuple:
     """Parse commandline commands"""
 
     # create the top-level parser
