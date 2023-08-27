@@ -5,7 +5,6 @@
 
 from pathlib import Path
 from itertools import chain
-from typing import Dict, List
 
 from kit.utils.files import list_dirs, load_toml
 from kit.utils.config import config_required
@@ -45,12 +44,12 @@ class RepoProperties:
         return max(map(len, iterable), default=0)
 
     @property
-    def structure(self) -> Dict[str, List[str]]:
+    def structure(self) -> dict[str, list[str]]:
         """Return a dictionary with the structure of the repo"""
         return self._repo_structure
 
     @staticmethod
-    def _repo_struct(path: PathType) -> Dict[str, List[str]]:
+    def _repo_struct(path: PathType) -> dict[str, list[str]]:
         """Return a dictionary with sorted keys as components and values as
         sorted list of instances"""
         path = Path(path)

@@ -7,13 +7,13 @@ from __future__ import annotations
 
 from re import findall
 from dataclasses import dataclass
-from typing import Dict, List
+
 from kit.utils.files import dump_toml, load_toml
 from kit.utils.tsort import tsort
 from kit.utils.typing import PathType
 
 
-RecipeArgDict = Dict[str, str]
+RecipeArgDict = dict[str, str]
 
 
 def read_spec(component: str, instance: str, repo_location: PathType):
@@ -106,10 +106,10 @@ def fill_self_ref_string_dict(d: dict, repo_path: PathType) -> dict:
     return {k: fill_dep_str(fill_str(v)) for k, v in d.items()}
 
 
-def get_dependencies(instances_list: List) -> List[str]:
+def get_dependencies(instances_list: list) -> list[str]:
     """Returns a list of dependencies defined
     and used in the recipe file"""
-    dependency_list: List[str] = []
+    dependency_list: list[str] = []
 
     def fill_dependencies_list(s: str, d: dict) -> None:
         """s can be a string or a list of strings"""
@@ -133,7 +133,7 @@ def get_dependencies(instances_list: List) -> List[str]:
     return dependency_list
 
 
-def fill_rloc_paths(d: dict, repo_location: PathType) -> dict:
+def fill_rloc_paths(d: dict[str, str], repo_location: PathType) -> dict[str, str]:
     """Create absolute path for the top-level attribs that begin
     with 'init_' or '_export_' by prepending repo location"""
     for k, v in d.items():
@@ -200,12 +200,13 @@ class Spec:
             # Some dependencies for the components of the current toml file
             # could be defined in a separated toml file. Therefore, SW
             # will only install the components in the current toml file
-            # TODO: Add else case to check that dependency is already installed
-            if component in toml_specs:
-                for instance_spec in toml_specs[component]:
-                    yield cls.from_instance_spec(
-                        component, instance_spec, rloc, recipe_arg_dict
-                    )
+            # TODO: Add case to check that dependency is already installed
+            if component not in toml_specs:
+                continue
+            for instance_spec in toml_specs[component]:
+                yield cls.from_instance_spec(
+                    component, instance_spec, rloc, recipe_arg_dict
+                )
 
     @staticmethod
     def _expand_instance(
