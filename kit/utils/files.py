@@ -62,7 +62,7 @@ def load_toml(file_name: PathType) -> TomlDict:
 
     # Note: Path.resolve() cannot be used before checking Path.is_symlink()
     if file_path.is_symlink():
-        raise TypeError(f"The file '{file_path.name}' cannot be a symlink")
+        raise TypeError(f"File {file_path.name} cannot be a symlink")
 
     return load(file_path)
 
