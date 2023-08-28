@@ -54,8 +54,8 @@ docker/README.md
 docker/basic-docker-test.sh
 docker/dockerfiles.toml
 docker/ide-config/settings.json
+docker/repo-inventory.txt
 docker/runners.sh
-docker/which-files.txt
 he-samples/cmake/gbenchmark.cmake
 he-samples/cmake/gflags.cmake
 he-samples/cmake/gtest.cmake

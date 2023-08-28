@@ -52,7 +52,7 @@ The `docker` directory of Intel HE toolkit contains:
   components.
 - ***Dockerfile.vscode***: Dockerfile recipe which builds a docker image
   derived from toolkit image that enables vscode server.
-- ***which-files.txt***: This is an inclusive listing of the toolkit to be
+- ***repo-inventory.txt***: This is an inclusive listing of the toolkit to be
   copied into the docker image.
 - ***ide-config***: Directory contains configurations for vscode IDE.
 

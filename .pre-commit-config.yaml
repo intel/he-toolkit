@@ -59,19 +59,19 @@ repos:
           entry: black
           language: system
           files: \.py$
-        - id: which-files
-          name: which-files
+        - id: repo-inventory
+          name: repo-inventory
           entry: .github/scripts/check-repo-contents-file.sh
           language: script
           # Always run because other renamed, modified, or deleted files need to
           # be reflected in the contents file.
           always_run: true
-          # This forces only docker/which-files.txt to be considered and passed
+          # This forces only docker/repo-inventory.txt to be considered and passed
           # in the an arg. Not having at least 'files' defined can lead to
           # overwrite of other files.
           pass_filenames: false
-          files: docker/which-files.txt
-          args: [docker/which-files.txt]
+          files: docker/repo-inventory.txt
+          args: [docker/repo-inventory.txt]
         - id: bandit
           name: bandit
           entry: .github/scripts/run-bandit.sh

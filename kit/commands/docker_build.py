@@ -166,7 +166,7 @@ def setup_docker(args):
     staging_path.mkdir(exist_ok=True)
 
     toolkit_tar_gz = staging_path / "toolkit.tar.gz"
-    archived_files = docker_filepaths / "which-files.txt"
+    archived_files = docker_filepaths / "repo-inventory.txt"
     create_tar_gz_file(toolkit_tar_gz, archived_files, ROOT)
 
     change_directory_to(staging_path)
