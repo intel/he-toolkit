@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from re import findall
 from dataclasses import dataclass
 
@@ -16,9 +17,9 @@ from kit.utils.typing import PathType
 RecipeArgDict = dict[str, str]
 
 
-def read_spec(component: str, instance: str, repo_location: PathType):
+def read_spec(component: str, instance: str, repo_location: PathType) -> str:
     """Return hekit.spec file as a dict"""
-    path = f"{repo_location}/{component}/{instance}/hekit.spec"
+    path = Path(repo_location) / component / instance / "hekit.spec"
     spec = load_toml(path)
     # There should only be one instance
     return spec[component][0]
@@ -28,7 +29,7 @@ def fill_user_string_dict(d: dict, recipe_arg_dict: RecipeArgDict) -> dict:
     """Returns a dict with str values written by the user.
     NB. Only works for flat str value dict."""
 
-    def fill_user_str(s: str) -> str:
+    def fill_user_str(s: str | list) -> str | list:
         """s can be a string or a list of strings"""
         if isinstance(s, str):
             symbols = findall(r"(!(.*?)!)", s)
@@ -137,7 +138,7 @@ def fill_rloc_paths(d: dict[str, str], repo_location: PathType) -> dict[str, str
     """Create absolute path for the top-level attribs that begin
     with 'init_' or '_export_' by prepending repo location"""
     for k, v in d.items():
-        if k.startswith("init_") or k.startswith("export_"):
+        if k.startswith(("init_", "export_")):
             d[k] = f"{repo_location}/{v}"
     return d
 
