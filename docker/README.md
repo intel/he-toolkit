@@ -116,7 +116,7 @@ After the image has been successfully built, the below message will be
 displayed
 ```bash
 Run container with
-docker run -it <username>/ubuntu_he_toolkit:2.0.0
+docker run -it <username>/ubuntu_he_toolkit:<hekit-version>
 ```
 Executing this command shall start the container using `bash`.
 

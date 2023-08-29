@@ -300,7 +300,6 @@ class MockArgs:
         self.check_only = check_only
         self.enable = enable
         self.id = 1
-        self.version = "2.0.0"
         self.platform = "ubuntu:22.04"
 
 
