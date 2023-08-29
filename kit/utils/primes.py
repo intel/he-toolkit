@@ -5,10 +5,10 @@
 
 from sys import stdout
 from subprocess import CalledProcessError, run, PIPE  # nosec B404
-from typing import Generator, Iterable, Tuple
+from typing import Generator, Iterable
 
 
-def parse_factor_line(line: str) -> Tuple[int, Tuple[int, ...]]:
+def parse_factor_line(line: str) -> tuple[int, tuple[int, ...]]:
     """'num: f1 f2 f3' -> (num, (f1, f2, f3))"""
     head, *tail = line.split()  # ['key:', 'v1', 'v2' , ...]
     if head[-1] != ":":

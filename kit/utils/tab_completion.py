@@ -4,7 +4,7 @@
 """This module provides tab completion if the dependencies are installed"""
 
 from pathlib import Path
-from typing import List
+
 from kit.utils.constants import PluginsConfig, PluginState
 from kit.utils.config import load_config, load_toml
 from kit.utils.files import list_dirs
@@ -29,7 +29,7 @@ def enable_tab_completion(parser):
 
 def components_completer(
     prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
-) -> List[str]:
+) -> list[str]:
     """Returns the components that were installed with the hekit"""
     config = load_config(parsed_args.config)
     return list_dirs(config.repo_location)
@@ -37,7 +37,7 @@ def components_completer(
 
 def instances_completer(
     prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
-) -> List[str]:
+) -> list[str]:
     """Returns the instances of a component that
     was installed with the hekit"""
     config = load_config(parsed_args.config)
@@ -47,7 +47,7 @@ def instances_completer(
 
 def get_plugins_by_state(
     state: str, source_file: Path = PluginsConfig.FILE
-) -> List[str]:
+) -> list[str]:
     """Return a list of plugins with a specific state"""
     try:
         plugin_dict = load_toml(source_file)[PluginsConfig.KEY]
@@ -59,13 +59,13 @@ def get_plugins_by_state(
 
 def plugins_enable_completer(
     prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
-) -> List[str]:
+) -> list[str]:
     """Return a list of plugins that are enabled"""
     return get_plugins_by_state(PluginState.ENABLE)
 
 
 def plugins_disable_completer(
     prefix, parsed_args, **kwargs  # pylint: disable=unused-argument
-) -> List[str]:
+) -> list[str]:
     """Return a list of plugins that are disabled"""
     return get_plugins_by_state(PluginState.DISABLE)

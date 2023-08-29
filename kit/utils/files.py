@@ -4,13 +4,15 @@
 """This module provides functions to list files and directories."""
 
 from os import walk
-from typing import Any, Callable, Dict, List, Optional
 from enum import Enum
 from pathlib import Path
+from typing import Any, Callable, Optional
+
 from toml import load, dump
+
 from kit.utils.typing import PathType
 
-TomlDict = Dict[str, Any]
+TomlDict = dict[str, Any]
 
 
 class FileType(Enum):
@@ -28,7 +30,7 @@ def file_exists(file: Path) -> bool:
 
 def files_in_dir(
     path: PathType, cond: Optional[Callable] = None, ftype: FileType = FileType.FILES
-) -> List[str]:
+) -> list[str]:
     """Returns a list of filenames in the directory given by path. Can be filtered by cond"""
     try:
         filenames = next(walk(path))[ftype.value]
@@ -39,7 +41,7 @@ def files_in_dir(
         return []
 
 
-def list_dirs(path: PathType) -> List[str]:
+def list_dirs(path: PathType) -> list[str]:
     """Return list of directories in path."""
     return files_in_dir(path, ftype=FileType.DIRS)
 
@@ -60,7 +62,7 @@ def load_toml(file_name: PathType) -> TomlDict:
 
     # Note: Path.resolve() cannot be used before checking Path.is_symlink()
     if file_path.is_symlink():
-        raise TypeError(f"The  file {file_path.name} cannot be a symlink")
+        raise TypeError(f"File {file_path.name} cannot be a symlink")
 
     return load(file_path)
 

@@ -3,7 +3,7 @@
 
 project(sample-kernels LANGUAGES CXX)
 
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 
 ## Use -std=c++17 as default.
 set(CMAKE_CXX_STANDARD 17)

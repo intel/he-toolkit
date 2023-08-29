@@ -15,7 +15,7 @@ cwd_test = getcwd()
 
 
 def test_docker_build_check_build(mocker):
-    derived_label = f"{getuser()}/ubuntu_he_toolkit:2.0.0"
+    derived_label = f"{getuser()}/ubuntu_he_toolkit:2.1.0"
     args = MockArgs(check_only=False, clean=False, enable=None)
     mockers = Mockers(mocker)
     mockers.mock_parse_cmdline.return_value = args, ""

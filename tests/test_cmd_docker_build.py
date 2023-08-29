@@ -268,7 +268,7 @@ def test_setup_docker_build(mocker):
     docker_filepaths = ROOT / "docker"
     staging_path = ROOT / "__staging__"
     toolkit_tar_gz = staging_path / "toolkit.tar.gz"
-    archived_files = docker_filepaths / "which-files.txt"
+    archived_files = docker_filepaths / "repo-inventory.txt"
     files_to_copy = ["Dockerfile.base", "Dockerfile.toolkit"]
     mock_rmtree = mocker.patch("kit.commands.docker_build.rmtree")
     mock_print = mocker.patch("kit.commands.docker_build.print")
@@ -300,7 +300,6 @@ class MockArgs:
         self.check_only = check_only
         self.enable = enable
         self.id = 1
-        self.version = "2.0.0"
         self.platform = "ubuntu:22.04"
 
 

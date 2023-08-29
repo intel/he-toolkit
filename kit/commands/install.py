@@ -4,7 +4,7 @@
 """This module fetches, builds, or installs the requested libraries"""
 
 from argparse import HelpFormatter
-from typing import Dict, Union
+
 from kit.utils.component_builder import install_components_from_recipe_file
 from kit.utils.subparsers import validate_input
 from kit.utils.config import config_required
@@ -22,7 +22,7 @@ def install_components(args):
     )
 
 
-def get_recipe_arg_dict(recipe_arg: str) -> Union[Dict[str, str], None]:
+def get_recipe_arg_dict(recipe_arg: str) -> dict[str, str] | None:
     """Returns a dictionary filled with recipe_arg values"""
 
     pairs = [pair.split("=") for pair in recipe_arg.replace(" ", "").split(",")]

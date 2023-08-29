@@ -19,8 +19,9 @@ Move into your `he-toolkit` directory.
 cd he-toolkit
 ```
 
-Make sure your python >= 3.8 and that you have pip.
+Make sure your python >= 3.10 and that you have pip.
 ```bash
+python --version
 pip install -r requirements.txt
 ```
 
@@ -49,7 +50,7 @@ hekit docker-build --enable vscode
 ### Step 3 Run your container
 To run the container run
 ```bash
-docker run -d -p <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:2.0.0
+docker run -d -p <ip addr>:<port>:8888 <username>/ubuntu_he_vscode:<hekit-version>
 ```
 Note if you do not specify an IP address, it will default to `localhost`
 (0.0.0.0).

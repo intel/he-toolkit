@@ -7,7 +7,7 @@ from os import environ as environment
 from pathlib import Path
 from shutil import copyfile
 from filecmp import cmp as same_files
-from typing import Tuple
+
 from kit.utils.constants import Constants
 from kit.utils.files import create_default_workspace, dump_toml, file_exists
 from kit.utils.yes import is_yes
@@ -78,7 +78,7 @@ def select_rc_file(*potential_files: str) -> Path:
     raise FileNotFoundError(f"None of the files '{potential_files}' exist")
 
 
-def get_shell_rc_file() -> Tuple[str, Path]:
+def get_shell_rc_file() -> tuple[str, Path]:
     """Return the correct shell and file to add shell commands"""
     active_shell_path = Path(environment["SHELL"]).name
 
