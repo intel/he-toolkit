@@ -6,15 +6,15 @@
 from argparse import ArgumentParser
 from pathlib import Path
 from sys import modules
-from typing import Dict, List
 from importlib import import_module
 from importlib.util import spec_from_file_location, module_from_spec
+
 from kit.utils.constants import Constants, PluginsConfig, PluginState
 from kit.utils.typing import PathType
 from kit.utils.files import files_in_dir, load_toml, dash_to_underscore
 
 
-ParserDict = Dict[str, ArgumentParser]
+ParserDict = dict[str, ArgumentParser]
 
 
 def register_subparser(subparsers) -> None:
@@ -41,7 +41,7 @@ def import_from_source_file(module_name, file_path):
 
 
 def get_subparsers_plugins(
-    plugin_config: Dict[str, str],
+    plugin_config: dict[str, str],
     plugin_root: PathType,
 ):
     """Import plugins in module_dirs, and discover and
@@ -63,7 +63,7 @@ def get_subparsers_plugins(
 def get_plugin_arg_choices(
     plugin_name: str,
     plugin_root: PathType = PluginsConfig.ROOT_DIR,
-) -> List[str]:
+) -> list[str]:
     """Return the choices (list of plugin names) of the argument parser"""
     try:
         # Read the TOML file to identify plugin's name and start
@@ -85,7 +85,7 @@ def get_plugin_arg_choices(
         return []
 
 
-def get_plugins_start_files(source_file: Path = PluginsConfig.FILE) -> Dict[str, str]:
+def get_plugins_start_files(source_file: Path = PluginsConfig.FILE) -> dict[str, str]:
     """Returns a dictionary with the start file of each plugin"""
     try:
         plugin_config = load_toml(source_file)[PluginsConfig.KEY]
@@ -98,7 +98,7 @@ def get_plugins_start_files(source_file: Path = PluginsConfig.FILE) -> Dict[str,
         return {}
 
 
-def get_subparsers_kit(module_dirs: List[str], kit_root: PathType):
+def get_subparsers_kit(module_dirs: list[str], kit_root: PathType):
     """Import cmds and tools in module_dirs, and discover and
     return a generator of set_.*_subparser functions"""
     for module_dir in module_dirs:

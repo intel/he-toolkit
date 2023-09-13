@@ -11,7 +11,7 @@ from shutil import which
 from enum import Enum, auto
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple, Iterable
+from typing import Iterable
 from sys import exit as sys_exit
 from kit.utils.subparsers import validate_input
 
@@ -30,7 +30,7 @@ class Dep:
 
     name: str
     operation: Op
-    version: Tuple[int, ...]
+    version: tuple[int, ...]
     ver_str: str
 
     @classmethod
@@ -52,7 +52,7 @@ class Dep:
         return cls(dep_str, Op.ANY, tuple(), "")
 
 
-def version_string_to_tuple(ver_str: str) -> Tuple[int, ...]:
+def version_string_to_tuple(ver_str: str) -> tuple[int, ...]:
     """version '10.11.12' -> (10, 11, 12)"""
     try:
         return tuple(int(i) for i in ver_str.split("."))
@@ -73,21 +73,19 @@ def parse_dependencies(dep_and_ver_str: str) -> Dep:
     return Dep.make_from_str(dep_and_ver_str.strip())
 
 
-def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
+def check_dependency(dep: Dep) -> None:
     """Check the dependency and print what was found."""
     if not which(dep.name):
+        msg = f"'{dep.name}' was not found"
         if dep.operation == Op.ANY:
-            print(f"'{dep.name}' was not found")
+            pass
         elif dep.operation == Op.EXACT:
-            print(
-                f"'{dep.name}' was not found, an exact '{dep.name} {dep.ver_str}' is required"
-            )
+            msg += f", an exact '{dep.name} {dep.ver_str}' is required"
         elif dep.operation == Op.MIN:
-            print(
-                f"'{dep.name}' was not found, a minimum '{dep.name} {dep.ver_str}' is required"
-            )
+            msg += f", a minimum '{dep.name} {dep.ver_str}' is required"
         else:
             raise ValueError("Unknown operation '{dep.operation}'")
+        print(msg)
         return
     # Now deal with when found
     if dep.operation == Op.ANY:
@@ -104,20 +102,12 @@ def check_dependency(dep: Dep) -> None:  # pylint: disable=too-many-branches
         if version_found:
             ver_str = version_found.group(0)
             version = version_string_to_tuple(ver_str)
-            if dep.operation == Op.EXACT:
-                if dep.version == version:
-                    print(f"'{dep.name} {ver_str}' found")
-                else:
-                    print(
-                        f"'{dep.name} {ver_str}' found, but exact version '{dep.ver_str}' is required"
-                    )
-            elif dep.operation == Op.MIN:
-                if dep.version <= version:
-                    print(f"'{dep.name} {ver_str}' found")
-                else:
-                    print(
-                        f"'{dep.name} {ver_str}' found, but minimum version '{dep.ver_str}' is required"
-                    )
+            msg = f"'{dep.name} {ver_str}' found"
+            if dep.operation == Op.EXACT and dep.version != version:
+                msg += f", but exact version '{dep.ver_str}' is required"
+            elif dep.operation == Op.MIN and dep.version > version:
+                msg += f", but minimum version '{dep.ver_str}' is required"
+            print(msg)
     except CalledProcessError:
         pass
 

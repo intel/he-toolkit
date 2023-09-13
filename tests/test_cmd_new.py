@@ -117,7 +117,7 @@ def create_tmp_file(filepath, project_name):
     with filepath.open("w") as f:
         f.write(
             f"project({project_name} LANGUAGES CXX)\n\n"
-            "cmake_minimum_required(VERSION 3.13 FATAL_ERROR)\n\n"
+            "cmake_minimum_required(VERSION 3.22 FATAL_ERROR)\n\n"
             "set(CMAKE_CXX_STANDARD 17)\n"
             "set(CMAKE_CXX_EXTENSIONS OFF)\n"
             "set(CMAKE_CXX_STANDARD_REQUIRED ON)\n\n"

@@ -15,7 +15,11 @@ class DockerBuildError(Exception):
 
     def __init__(self, message, error):
         super().__init__(message)
+        self.message = message
         self.error = error
+
+    def __repr__(self):
+        return f"DockerBuildError({self.message}, {self.error})"
 
 
 def check_build(func):
@@ -87,6 +91,10 @@ class DockerTools:
             image=image,
             command="/bin/bash /script",
         )
+
+    def pull_base_image(self, tag: str):
+        """Pull base image using `docker pull`"""
+        self.client.images.pull(tag)
 
     def try_build_new_image(self, dockerfile: str, tag: str, buildargs):
         """Builds an image if it does not exist"""

@@ -20,6 +20,7 @@ utilize the latest Intel hardware features.
 
 - [Intel Homomorphic Encryption Toolkit](#intel-homomorphic-encryption-toolkit)
   - [Contents](#contents)
+  - [Quick Start](#quick-start)
   - [Dependencies](#dependencies)
   - [Setup](#setup)
   - [The hekit command](#the-hekit-command)
@@ -40,13 +41,17 @@ utilize the latest Intel hardware features.
   - [Troubleshooting](#troubleshooting)
 - [Contributors](#contributors)
 
+## Quick Start
+
+Want to get up and running quickly with Intel HE toolkit? Then follow our
+[Quick Start guide](QUICK_START.md).
 
 ## Dependencies
-Intel HE toolkit has been tested on Ubuntu 20.04
+Intel HE toolkit has been tested on Ubuntu 22.04
 
 Must have system dependencies for the toolkit include,
 ```
-python >= 3.8
+python >= 3.10
 pip
 git
 ```
@@ -75,12 +80,12 @@ additionally install the following system dependencies,
 ```
 m4
 patchelf
-cmake >= 3.13
-g++ >= 10.0 or clang >= 10.0
+cmake >= 3.22
+g++ == 11.x or clang == 14.x
 pthread
 virtualenv (optional if building the Logistic Regression Example)
 autoconf   (optional if using PALISADE)
-gmp        (optional if using HElib)
+gmp == 1.5.x  (optional if using HElib)
 ```
 
 ## Setup
@@ -322,12 +327,11 @@ described the functionality of the new command.
           # code goes here
   ```
 
-* The file [hekit.py](kit/hekit.py) has the logic to automatically discover the
-  function `set_ACTION_subparser` and enable the options of the new
-  command.
+* `hekit` should automatically discover the function `set_ACTION_subparser` and
+  enable the options of the new command.
 
 * Generic utilities or helper functions that can be used for several commands
-  should be in [utils](kit/utils).
+  should be placed in [utils](kit/utils).
 
 ## Troubleshooting
 

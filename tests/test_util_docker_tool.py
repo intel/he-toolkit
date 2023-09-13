@@ -123,7 +123,7 @@ def test_try_build_new_image_build_skipped(mocker):
     mock_print = mocker.patch("kit.utils.docker_tools.print")
 
     act_docker = DockerTools()
-    act_docker.try_build_new_image([], "", "")
+    act_docker.try_build_new_image("", "", {})
     mock_print.assert_not_called()
 
 
@@ -139,7 +139,7 @@ def test_try_build_new_image_build_executed(mocker):
     mock_print = mocker.patch("kit.utils.docker_tools.print")
 
     act_docker = DockerTools()
-    act_docker.try_build_new_image([], "", "")
+    act_docker.try_build_new_image("", "", {})
     mock_print.assert_called_once_with(value.replace('"', ""))
 
 

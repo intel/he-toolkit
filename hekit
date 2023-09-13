@@ -2,4 +2,4 @@
 
 toolkit_root_dir="${HEKITPATH:-"."}"
 plugins_root_dir="$(realpath -q ~/.hekit/plugins)"
-PYTHONPATH="$toolkit_root_dir:$plugins_root_dir" python3 -m kit.hekit $@
+PYTHONPATH="$toolkit_root_dir:$plugins_root_dir" python3 -m kit.hekit "$@"

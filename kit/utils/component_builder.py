@@ -7,11 +7,27 @@ import shlex
 from os import chdir as change_directory_to
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT  # nosec B404
-from typing import Iterable, Callable, Union, List, Tuple, Dict
+from typing import Iterable, Callable
+
 from kit.utils.files import dump_toml, load_toml
 from kit.utils.spec import Spec
 
-RunOutput = Tuple[bool, int]
+RunOutput = tuple[bool, int]
+
+
+def install_components_from_recipe_file(
+    recipe_file: str, upto_stage: str, repo_location: str, force: bool, recipe_args
+) -> None:
+    """install components from a recipe file upto a given stage"""
+    if Path(recipe_file).is_symlink():
+        raise TypeError("The TOML file cannot be a symlink")
+
+    the_stages = stages(upto_stage, force)
+
+    components = components_to_build_from(recipe_file, repo_location, recipe_args)
+
+    for component in components:
+        chain_run(the_stages(component))
 
 
 def hekit_print(*args, box_msg="HEKIT", **kwargs) -> None:
@@ -71,7 +87,7 @@ def chain_run(funcs: Iterable[Callable]):
             )
 
 
-def run(cmd_and_args: Union[str, List[str]]) -> RunOutput:
+def run(cmd_and_args: str | list[str]) -> RunOutput:
     """Takes either a string or list of strings and runs as command."""
     if not cmd_and_args:
         return True, 0
@@ -93,7 +109,7 @@ def run(cmd_and_args: Union[str, List[str]]) -> RunOutput:
 
 
 def components_to_build_from(
-    filename: str, repo_location: str, recipe_arg_dict: Dict[str, str]
+    filename: str, repo_location: str, recipe_arg_dict: dict[str, str]
 ):
     """Returns a generator that yields a component to be built and/or installed"""
     specs = Spec.from_toml_file(filename, repo_location, recipe_arg_dict)

@@ -1,15 +1,13 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, List
-
 
 class HelloWorlds:
     """This class holds 'hello world' in different languages using the standard 2-letter codes for languages,
     https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
     """
 
-    _hello_worlds: Dict[str, str] = {
+    _hello_worlds: dict[str, str] = {
         "AF": "hello wêreld",  # Afrikaans
         "SQ": "përshendetje botë",  # Albanian
         "AR": "مرحبا بالعالم",  # Arabic
@@ -75,6 +73,6 @@ class HelloWorlds:
         print(msg)
 
     @classmethod
-    def get_available_languages(cls) -> List[str]:
+    def get_available_languages(cls) -> list[str]:
         """Returns as a list the available languages"""
         return sorted(cls._hello_worlds.keys())

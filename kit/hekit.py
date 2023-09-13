@@ -10,7 +10,6 @@ import sys
 from os import geteuid
 from sys import stderr, exit as sys_exit
 from argparse import ArgumentParser, RawTextHelpFormatter
-from typing import Tuple
 
 from kit.utils.subparsers import (
     get_options_description,
@@ -20,12 +19,15 @@ from kit.utils.subparsers import (
 from kit.utils.constants import Constants
 from kit.utils.tab_completion import enable_tab_completion
 
-if sys.version_info < (3, 8):
-    print("Intel HE Toolkit requires Python version 3.8 or above", file=sys.stderr)
+if sys.version_info < Constants.python_version_tuple:
+    print(
+        f"Intel HE Toolkit requires Python version {Constants.python_version_string} or above",
+        file=sys.stderr,
+    )
     sys_exit(1)
 
 
-def parse_cmdline() -> Tuple:
+def parse_cmdline() -> tuple:
     """Parse commandline commands"""
 
     # create the top-level parser
@@ -39,7 +41,10 @@ def parse_cmdline() -> Tuple:
         "--debug", action="store_true", help="if exception occurs print out stacktrace"
     )
     parser.add_argument(
-        "--version", action="store_true", help="display Intel HE toolkit version"
+        "--version",
+        action="version",
+        version=f"Intel HE Toolkit version {Constants.version}",
+        help="display Intel HE toolkit version",
     )
     parser.add_argument(
         "--config",
@@ -64,10 +69,6 @@ def parse_cmdline() -> Tuple:
 def main() -> None:
     """Starting point for program execution"""
     args, print_help = parse_cmdline()
-
-    if args.version is True:
-        print(f"Intel HE Toolkit version {Constants.version}")
-        sys_exit(0)
 
     if args.fn is None:
         print("hekit requires a command", file=stderr)
