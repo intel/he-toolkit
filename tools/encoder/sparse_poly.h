@@ -8,43 +8,55 @@
 #include <vector>
 
 namespace hekit::poly {
+
 class SparsePoly {
  public:
   SparsePoly() = default;
-  explicit SparsePoly(const std::map<long, long>& terms) : coeffs_(terms) {}
-  long coeff(long i) const { return coeffs_.count(i) ? coeffs_.at(i) : 0L; }
-  void coeff(long i, long value) { coeffs_[i] = value; }
-  long degree() const { return coeffs_.empty() ? 0L : coeffs_.rbegin()->first; }
+  explicit SparsePoly(const std::map<long, long>& terms) : m_coeffs(terms) {}
+  long coeff(long i) const { return m_coeffs.count(i) ? m_coeffs.at(i) : 0L; }
+  void coeff(long i, long value) { m_coeffs[i] = value; }
+  long degree() const {
+    return m_coeffs.empty() ? 0L : m_coeffs.rbegin()->first;
+  }
   long operator[](long i) const { return coeff(i); }
-  long& operator[](long i) { return coeffs_[i]; }
+  long& operator[](long i) { return m_coeffs[i]; }
 
   SparsePoly operator+(const SparsePoly& other) const {
     auto res = other;
-    for (const auto& [index, value] : coeffs_) {
-      res.coeffs_[index] += value;
+    for (const auto& [index, value] : m_coeffs) {
+      res.m_coeffs[index] += value;
     }
     return res;
   }
 
-  auto begin() noexcept { return coeffs_.begin(); }
-  const auto begin() const noexcept { return coeffs_.begin(); }
-  auto end() noexcept { return coeffs_.end(); }
-  const auto end() const noexcept { return coeffs_.end(); }
-  auto cbegin() const noexcept { return coeffs_.cbegin(); }
-  auto cend() const noexcept { return coeffs_.cend(); }
-  size_t size() const { return coeffs_.size(); }
+  SparsePoly operator*(const SparsePoly& other) const {
+    SparsePoly res{};
+    for (const auto& [index1, coeff1] : m_coeffs)
+      for (const auto& [index2, coeff2] : other.m_coeffs) {
+        res[index1 + index2] += coeff1 * coeff2;
+      }
+    return res;
+  }
+
+  auto begin() noexcept { return m_coeffs.begin(); }
+  const auto begin() const noexcept { return m_coeffs.begin(); }
+  auto end() noexcept { return m_coeffs.end(); }
+  const auto end() const noexcept { return m_coeffs.end(); }
+  auto cbegin() const noexcept { return m_coeffs.cbegin(); }
+  auto cend() const noexcept { return m_coeffs.cend(); }
+  size_t size() const { return m_coeffs.size(); }
 
   std::string toString() const {
     std::ostringstream oss;
-    for (const auto& [key, value] : coeffs_) {
+    for (const auto& [key, value] : m_coeffs) {
       oss << value << "x^" << key << ((key - degree()) ? " + " : "");
     }
     return oss.str();
   }
 
  private:
-  // indices and coeff
-  std::map<long, long> coeffs_;
+  // <index, coeff>
+  std::map<long, long> m_coeffs;
 };
 
 inline SparsePoly shift(const SparsePoly& poly, long i) {

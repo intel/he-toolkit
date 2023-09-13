@@ -13,13 +13,13 @@ namespace {
 
 using hekit::poly::SparsePoly;
 
-TEST(spare_poly, test_zero_poly) {
+TEST(sparse_poly, test_zero_poly) {
   const auto& poly = SparsePoly();
   EXPECT_EQ(poly.degree(), 0L);
   EXPECT_EQ(poly[0], 0.0);
 }
 
-TEST(spare_poly, test_assign_terms) {
+TEST(sparse_poly, test_assign_terms) {
   const auto& terms = std::map<long, long>({{2, 2}, {3, 1}, {5, 3}});
   const auto& poly = SparsePoly(terms);
   EXPECT_EQ(poly.degree(), 5L);
@@ -28,9 +28,33 @@ TEST(spare_poly, test_assign_terms) {
   }
 }
 
-TEST(spare_poly, test_to_string) {
+TEST(sparse_poly, test_to_string) {
   const auto& poly = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
   ASSERT_STREQ(poly.toString().c_str(), "2x^2 + 1x^3 + 3x^5");
+}
+
+TEST(sparse_poly, test_addition) {
+  const auto& p1 = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
+  const auto& p2 = SparsePoly({{2, 4}, {1, 1}});
+  auto sum = p1 + p2;
+  ASSERT_STREQ(sum.toString().c_str(), "1x^1 + 6x^2 + 1x^3 + 3x^5")
+      << "(" << p1.toString() << ") * (" << p2.toString() << ")";
+}
+
+TEST(sparse_poly, test_multiplication_one_term) {
+  const auto& p1 = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
+  const auto& p2 = SparsePoly(std::map<long, long>{{2, 4}});
+  auto prod = p1 * p2;
+  ASSERT_STREQ(prod.toString().c_str(), "8x^4 + 4x^5 + 12x^7")
+      << "(" << p1.toString() << ") * (" << p2.toString() << ")";
+}
+
+TEST(sparse_poly, test_multiplication) {
+  const auto& p1 = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
+  const auto& p2 = SparsePoly({{2, 4}, {1, 1}});
+  auto prod = p1 * p2;
+  ASSERT_STREQ(prod.toString().c_str(), "2x^3 + 9x^4 + 4x^5 + 3x^6 + 12x^7")
+      << "(" << p1.toString() << ") * (" << p2.toString() << ")";
 }
 
 }  // namespace
