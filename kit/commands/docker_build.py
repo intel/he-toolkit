@@ -208,7 +208,7 @@ def setup_docker(args):
         print("docker run -d -p <ip addr>:<port>:8888", Constants.vscode_label)
         print("Then to open vscode navigate to <ip addr>:<port> in your chosen browser")
     else:
-        print("docker run -it", Constants.toolkit_label)
+        print("docker run -it", prev)
 
 
 def get_docker_features(keys: str) -> dict[str, str]:
