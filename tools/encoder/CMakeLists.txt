@@ -24,7 +24,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-set(TEST_FILES tests/test_nibnaf_frac_addition.cpp tests/test_nibnaf.cpp tests/test_nibnaf_multi.cpp tests/test_sparse_poly.cpp tests/test_nibnaf_frac.cpp)
+#set(TEST_FILES tests/test_nibnaf_frac_addition.cpp tests/test_nibnaf.cpp tests/test_nibnaf_multi.cpp tests/test_sparse_poly.cpp tests/test_nibnaf_frac.cpp)
+set(TEST_FILES tests/test_sparse_poly.cpp tests/test_fractional.cpp)
 
 add_executable(tests ${TEST_FILES})
 

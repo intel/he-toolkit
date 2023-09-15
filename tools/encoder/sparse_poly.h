@@ -5,9 +5,10 @@
 
 #include <map>
 #include <string>
+#include <sstream>
 #include <vector>
 
-namespace hekit::poly {
+namespace hekit::coder {
 
 class SparsePoly {
  public:
@@ -68,4 +69,4 @@ inline SparsePoly shift(const SparsePoly& poly, long i) {
 }
 
 using SparseMultiPoly = std::vector<SparsePoly>;
-}  // namespace hekit::poly
+}  // namespace hekit::coder

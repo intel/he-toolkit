@@ -11,7 +11,7 @@
 
 namespace {
 
-using hekit::poly::SparsePoly;
+using hekit::coder::SparsePoly;
 
 TEST(sparse_poly, test_zero_poly) {
   const auto& poly = SparsePoly();
