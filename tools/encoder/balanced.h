@@ -31,7 +31,7 @@ template <typename PolyType>
 class BalancedEncodedPoly {
  public:
   BalancedEncodedPoly() = delete;
-  BalancedEncodedPoly(PolyType poly, long digit)
+  BalancedEncodedPoly(const PolyType& poly, long digit)
       : m_poly(poly), m_digit(digit) {}
 
   BalancedEncodedPoly operator+(const BalancedEncodedPoly& other) const {
@@ -64,6 +64,11 @@ class BalancedEncodedPoly {
 
 template <typename PolyType>
 class BalancedSlotsEncodedPoly {
+  BalancedSlotsEncodedPoly() = delete;
+  BalancedSlotsEncodedPoly(const PolyType& poly,
+                           const std::vector<long>& digits)
+      : m_poly(poly), m_digits(digits) {}
+
  public:
   BalancedSlotsEncodedPoly operator+(const BalancedSlotsEncodedPoly& other) {
     auto ans = other;
@@ -89,7 +94,8 @@ class BalancedSlotsEncodedPoly {
     return ans;
   }
 
-  PolyType poly() { return m_poly; }
+  PolyType poly() const { return m_poly; }
+  std::vector<long> digits() const { return m_digits; }
 
  private:
   PolyType m_poly;
