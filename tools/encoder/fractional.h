@@ -3,15 +3,14 @@
 
 #pragma once
 
+#include <cmath>
+#include <numeric>
+#include <utility>
+
 #include "coder.h"
 #include "sparse_poly.h"
 
-#include <cmath>
-#include <numeric>
-
 namespace hekit::coder {
-
-inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
 // PolyType could be anything that represents a polynomial
 // i.e. Ctxt, Ptxt, a user defined object that must have + and * ops defined

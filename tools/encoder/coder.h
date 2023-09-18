@@ -1,3 +1,6 @@
+// Copyright (C) 2023 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 namespace hekit::coder {
@@ -11,5 +14,8 @@ class Coder {
   // Pointless ctor is required for CTAD
   explicit Coder(const Scheme& params) {}
 };
+
+// TODO move to more appropriate header?
+inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
 }  // namespace hekit::coder

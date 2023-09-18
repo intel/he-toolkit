@@ -167,7 +167,7 @@ TEST_P(ParamsSingleNumFracAddition, testCompareOriginalToDecodedEncoded) {
   const auto& encoded1 = coder.encode(num1);
   const auto& encoded2 = coder.encode(num2);
   double decoded = coder.decode(encoded1 + encoded2);
-  ASSERT_NEAR(num1 + num2, decoded, params.epsil);
+  ASSERT_NEAR(num1 + num2, decoded, epsil);
 }
 
 INSTANTIATE_TEST_SUITE_P(variousParameters, ParamsSingleNumFracAddition,
