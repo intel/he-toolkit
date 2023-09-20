@@ -252,13 +252,6 @@ tools/encoder/CMakeLists.txt
 tools/encoder/balanced.h
 tools/encoder/coder.h
 tools/encoder/fractional.h
-tools/encoder/old/coder.h
-tools/encoder/old/nibnaf.h
-tools/encoder/old/tests/test_nibnaf.cpp
-tools/encoder/old/tests/test_nibnaf_balanced_addition.cpp
-tools/encoder/old/tests/test_nibnaf_frac.cpp
-tools/encoder/old/tests/test_nibnaf_frac_addition.cpp
-tools/encoder/old/tests/test_nibnaf_multi.cpp
 tools/encoder/sparse_poly.h
 tools/encoder/tests/test_balanced.cpp
 tools/encoder/tests/test_balanced_slots.cpp
