@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
-#include <string>
+#include <numeric>
 #include <sstream>
+#include <string>
 #include <vector>
 
 namespace hekit::coder {
@@ -68,5 +70,32 @@ inline SparsePoly shift(const SparsePoly& poly, long i) {
   return tem;
 }
 
-using SparseMultiPoly = std::vector<SparsePoly>;
+class SparseMultiPoly {
+ public:
+  SparseMultiPoly() = default;
+  explicit SparseMultiPoly(const std::vector<SparsePoly>& polys_in_slots)
+      : m_slots(polys_in_slots) {}
+
+  SparsePoly poly() const {
+    return std::accumulate(m_slots.begin(), m_slots.end(), SparsePoly{},
+                           std::multiplies<SparsePoly>{});
+  }
+
+  auto slots() const { return m_slots; }
+
+  SparseMultiPoly operator+(const SparseMultiPoly& other) const {
+    auto res = other;
+    // TODO impl
+    return res;
+  }
+
+  SparseMultiPoly operator*(const SparseMultiPoly& other) const {
+    SparseMultiPoly res{};
+    // TODO impl
+    return res;
+  }
+
+ private:
+  std::vector<SparsePoly> m_slots;
+};
 }  // namespace hekit::coder

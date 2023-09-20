@@ -74,7 +74,7 @@ class BalancedSlotsEncodedPoly {
     auto ans = other;
     std::transform(this->m_digits.cbegin(), this->m_digits.cend(),
                    other.m_digits.cbegin(), ans.m_digits.begin(),
-                   [](auto x, auto y) { return (x < y) ? x : y; });
+                   std::min<long>);
     // TODO
     //{
     //  ans.m_poly = this->m_poly + shift(other.m_poly, other.m_digits -
@@ -88,9 +88,9 @@ class BalancedSlotsEncodedPoly {
 
   BalancedSlotsEncodedPoly operator*(const BalancedSlotsEncodedPoly& other) {
     auto ans = other;
-    ans.m_poly = this->m_poly * other.m_poly;
-    std::transform(ans.m_digits.cbegin(), ans.m_digits.cend(),
-                   this->m_digits.cbegin(), ans.begin(), std::plus<>{});
+    //    ans.m_poly = this->m_poly * other.m_poly;
+    //    std::transform(ans.m_digits.cbegin(), ans.m_digits.cend(),
+    //                   this->m_digits.cbegin(), ans.begin(), std::plus<>{});
     return ans;
   }
 
@@ -173,12 +173,12 @@ class Coder<BalancedSlotsParams> {
       polys.push_back(laurentEncode(a, frac_exp));
       is.push_back(frac_exp);
     }
-    return BalancedSlotsEncodedPoly<SparseMultiPoly>{polys, is};
+    return BalancedSlotsEncodedPoly{SparseMultiPoly{polys}, is};
   }
 
   std::vector<double> decode(
       const BalancedSlotsEncodedPoly<SparseMultiPoly>& en) const {
-    const auto& polys = en.poly();
+    const auto& polys = en.poly().slots();
     std::vector<double> nums;
     nums.reserve(polys.size());
     for (int n = 0; n < polys.size(); ++n) {
