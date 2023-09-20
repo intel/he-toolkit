@@ -261,5 +261,6 @@ tools/encoder/old/tests/test_nibnaf_frac_addition.cpp
 tools/encoder/old/tests/test_nibnaf_multi.cpp
 tools/encoder/sparse_poly.h
 tools/encoder/tests/test_balanced.cpp
+tools/encoder/tests/test_balanced_slots.cpp
 tools/encoder/tests/test_fractional.cpp
 tools/encoder/tests/test_sparse_poly.cpp
