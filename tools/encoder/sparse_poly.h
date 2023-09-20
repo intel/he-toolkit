@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <algorithm>
 #include <functional>
+#include <iterator>
 #include <map>
 #include <numeric>
 #include <sstream>
@@ -84,15 +86,19 @@ class SparseMultiPoly {
   auto slots() const { return m_slots; }
 
   SparseMultiPoly operator+(const SparseMultiPoly& other) const {
-    auto res = other;
-    // TODO impl
-    return res;
+    std::vector<SparsePoly> res{};
+    res.reserve(m_slots.size());
+    std::transform(m_slots.begin(), m_slots.end(), other.m_slots.begin(),
+                   std::back_inserter(res), std::plus<SparsePoly>{});
+    return SparseMultiPoly{res};
   }
 
   SparseMultiPoly operator*(const SparseMultiPoly& other) const {
-    SparseMultiPoly res{};
-    // TODO impl
-    return res;
+    std::vector<SparsePoly> res{};
+    res.reserve(m_slots.size());
+    std::transform(m_slots.begin(), m_slots.end(), other.m_slots.begin(),
+                   std::back_inserter(res), std::multiplies<SparsePoly>{});
+    return SparseMultiPoly{res};
   }
 
  private:
