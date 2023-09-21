@@ -253,6 +253,7 @@ tools/encoder/balanced.h
 tools/encoder/coder.h
 tools/encoder/fractional.h
 tools/encoder/sparse_poly.h
+tools/encoder/tests/CMakeLists.txt
 tools/encoder/tests/test_balanced.cpp
 tools/encoder/tests/test_balanced_slots.cpp
 tools/encoder/tests/test_fractional.cpp
