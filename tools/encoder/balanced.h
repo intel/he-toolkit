@@ -71,26 +71,49 @@ class BalancedSlotsEncodedPoly {
       : m_poly(poly), m_digits(digits) {}
 
   BalancedSlotsEncodedPoly operator+(const BalancedSlotsEncodedPoly& other) {
-    auto ans = other;
-    std::transform(this->m_digits.cbegin(), this->m_digits.cend(),
-                   other.m_digits.cbegin(), ans.m_digits.begin(),
-                   std::min<long>);
-    // TODO
+    std::vector<long> select_digits;
+    select_digits.reserve(m_digits.size());
+    std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+                   select_digits.begin(), [](const long lhs, const long rhs) {
+                     return std::min(lhs, rhs);
+                   });
+
+    std::vector<long> select_mask;
+    select_mask.reserve(m_digits.size());
+    std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+                   std::back_inserter(select_mask), std::less<long>{});
+
+    std::vector<long> shift_digits;
+    shift_digits.reserve(m_digits.size());
+    std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+                   std::back_inserter(shift_digits),
+                   [](const auto& ldigit, const auto& rdigit) {
+                     return (ldigit < rdigit) ? rdigit - ldigit
+                                              : ldigit - rdigit;
+                   });
+
+    const auto [select_poly, complimentary_poly] =
+        select(m_poly, other.m_poly, select_mask);
+
+    return BalancedSlotsEncodedPoly{
+        select_poly + shift(complimentary_poly, shift_digits), select_digits};
+
+    // if (this->m_digit < other.m_digit) {
     //{
-    //  ans.m_poly = this->m_poly + shift(other.m_poly, other.m_digits -
-    //  this->m_digits);
-    //} else {
-    //  ans.m_poly = other.m_poly + shift(this->m_poly, this->m_digits -
-    //  other.m_digits);
-    //}
-    return ans;
+    //   ans.m_poly = this->m_poly + shift(other.m_poly, other.m_digits -
+    //   this->m_digits);
+    // } else {
+    //   ans.m_poly = other.m_poly + shift(this->m_poly, this->m_digits -
+    //   other.m_digits);
+    // }
   }
 
-  BalancedSlotsEncodedPoly operator*(const BalancedSlotsEncodedPoly& other) {
-    auto ans = other;
-    //    ans.m_poly = this->m_poly * other.m_poly;
-    //    std::transform(ans.m_digits.cbegin(), ans.m_digits.cend(),
-    //                   this->m_digits.cbegin(), ans.begin(), std::plus<>{});
+  BalancedSlotsEncodedPoly operator*(
+      const BalancedSlotsEncodedPoly& other) const {
+    auto ans = *this;
+    ans.m_poly = this->m_poly * other.m_poly;
+    std::transform(other.m_digits.cbegin(), other.m_digits.cend(),
+                   m_digits.cbegin(), ans.m_digits.begin(), std::plus<>{});
     return ans;
   }
 
@@ -157,7 +180,6 @@ class Coder<BalancedParams> {
   BalancedParams m_params;
 };
 
-// TODO Refacotor for multi values
 template <>
 class Coder<BalancedSlotsParams> {
  public:
@@ -197,7 +219,7 @@ class Coder<BalancedSlotsParams> {
   // TODO Refactor this a common code
   std::pair<SparsePoly, long> EncodeHelper(double num) const {
     const auto [rw, epsil] = m_params;
-    const double log_rw = std::log(m_params.rw);
+    const double log_rw = std::log(rw);
     SparsePoly a;
     long r;
     double t_minus_po;

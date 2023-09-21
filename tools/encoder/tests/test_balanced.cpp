@@ -130,7 +130,7 @@ struct TestParamsSingleNumBalanced {
 class ParamsSingleNumBalanced
     : public testing::TestWithParam<TestParamsSingleNumBalanced> {};
 
-TEST_P(ParamsSingleNumBalanced, testCompareOriginalToDecodedEncoded) {
+TEST_P(ParamsSingleNumBalanced, testBalancedAddition) {
   auto& [num1, num2, rw, epsil] = GetParam();
 
   BalancedParams params{rw, epsil};
@@ -140,6 +140,18 @@ TEST_P(ParamsSingleNumBalanced, testCompareOriginalToDecodedEncoded) {
   double decoded = coder.decode(encoded1 + encoded2);
 
   ASSERT_NEAR(num1 + num2, decoded, epsil);
+}
+
+TEST_P(ParamsSingleNumBalanced, testBalancedMultiplication) {
+  auto& [num1, num2, rw, epsil] = GetParam();
+
+  BalancedParams params{rw, epsil};
+  Coder coder(params);
+  const auto& encoded1 = coder.encode(num1);
+  const auto& encoded2 = coder.encode(num2);
+  double decoded = coder.decode(encoded1 * encoded2);
+
+  ASSERT_NEAR(num1 * num2, decoded, epsil);
 }
 
 double default_epsil = 1e-8;

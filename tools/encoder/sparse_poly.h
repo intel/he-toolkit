@@ -104,4 +104,16 @@ class SparseMultiPoly {
  private:
   std::vector<SparsePoly> m_slots;
 };
+
+inline SparseMultiPoly shift(const SparseMultiPoly& poly,
+                             const std::vector<long>& is) {
+  std::vector<SparsePoly> tem{};
+  tem.reserve(is.size());
+  const auto slots = poly.slots();
+  for (long i = 0; i < is.size(); ++i) {
+    tem.push_back(shift(slots[i], is[i]));
+  }
+  return SparseMultiPoly{tem};
+}
+
 }  // namespace hekit::coder
