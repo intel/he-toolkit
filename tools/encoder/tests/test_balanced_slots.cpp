@@ -39,7 +39,46 @@ INSTANTIATE_TEST_SUITE_P(
                       vec_double{21, 2.987, 5.678},
                       vec_double{0.000000001, 12345, 2345.987}));
 
-// TODO
-// Add ops tests
+struct TestBalancedSlotsArith {
+  double num1;
+  double num2;
+  double rw;
+  double epsil;
+};
+
+class BalancedSlotsArith
+    : public testing::TestWithParam<TestBalancedSlotsArith> {};
+
+TEST_P(BalancedSlotsArith, testBalancedSlotsAddition) {
+  auto& [num1, num2, rw, epsil] = GetParam();
+
+  BalancedSlotsParams params{rw, epsil};
+  Coder coder(params);
+  const auto& encoded1 = coder.encode({num1});
+  const auto& encoded2 = coder.encode({num2});
+  const auto decoded = coder.decode(encoded1 + encoded2);
+
+  EXPECT_NEAR(num1 + num2, decoded[0], epsil);
+}
+
+TEST_P(BalancedSlotsArith, testBalancedSlotsMultiplication) {
+  auto& [num1, num2, rw, epsil] = GetParam();
+
+  BalancedSlotsParams params{rw, epsil};
+  Coder coder(params);
+  const auto& encoded1 = coder.encode({num1});
+  const auto& encoded2 = coder.encode({num2});
+  const auto decoded = coder.decode(encoded1 * encoded2);
+
+  EXPECT_NEAR(num1 * num2, decoded[0], epsil);
+}
+
+double default_epsil = 1e-8;
+
+INSTANTIATE_TEST_SUITE_P(variousParameters, BalancedSlotsArith,
+                         ::testing::Values(
+                             /*integer*/
+                             TestBalancedSlotsArith{234.0, 241.0, 1.2,
+                                                    default_epsil}));
 
 }  // namespace

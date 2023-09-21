@@ -86,7 +86,7 @@ class Coder<FractionalParams> {
   // TODO Refactor this a common code
   std::pair<SparsePoly, long> EncodeHelper(double num) const {
     const auto [rw, epsil, _] = m_params;
-    const double log_rw = std::log(m_params.rw);
+    const double log_rw = std::log(rw);
     SparsePoly a;
     long r;
     double t_minus_po;

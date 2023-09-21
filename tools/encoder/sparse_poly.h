@@ -116,4 +116,21 @@ inline SparseMultiPoly shift(const SparseMultiPoly& poly,
   return SparseMultiPoly{tem};
 }
 
+inline auto select(const SparseMultiPoly& lpoly, const SparseMultiPoly& rpoly,
+                   const std::vector<long>& select_mask) {
+  // Given a mask for the slots output selected poly and its complimentary poly
+  std::vector<SparsePoly> selected;
+  selected.reserve(select_mask.size());
+  std::vector<SparsePoly> complimentary;
+  complimentary.reserve(select_mask.size());
+  const auto lslots = lpoly.slots();
+  const auto rslots = rpoly.slots();
+  for (long i = 0; i < select_mask.size(); ++i) {
+    selected.push_back(select_mask[i] ? lslots[i] : rslots[i]);
+    complimentary.push_back(select_mask[i] ? rslots[i] : lslots[i]);
+  }
+
+  return std::pair{SparseMultiPoly{selected}, SparseMultiPoly{complimentary}};
+}
+
 }  // namespace hekit::coder

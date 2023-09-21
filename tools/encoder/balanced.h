@@ -70,7 +70,8 @@ class BalancedSlotsEncodedPoly {
                            const std::vector<long>& digits)
       : m_poly(poly), m_digits(digits) {}
 
-  BalancedSlotsEncodedPoly operator+(const BalancedSlotsEncodedPoly& other) {
+  BalancedSlotsEncodedPoly operator+(
+      const BalancedSlotsEncodedPoly& other) const {
     std::vector<long> select_digits;
     select_digits.reserve(m_digits.size());
     std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
