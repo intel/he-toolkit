@@ -11,16 +11,19 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
-enable_testing()
+set(TEST_FILES
+  test_sparse_poly.cpp
+  test_fractional.cpp
+  test_balanced.cpp
+  test_balanced_slots.cpp
+)
 
-set(TEST_FILES test_sparse_poly.cpp test_fractional.cpp test_balanced.cpp test_balanced_slots.cpp)
-
-add_executable(tests ${TEST_FILES})
+add_executable(run_tests ${TEST_FILES})
 
 target_link_libraries(
-  tests
+  run_tests
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(tests)
+gtest_discover_tests(run_tests)
