@@ -201,11 +201,17 @@ class Coder<BalancedSlotsParams> {
 
   std::vector<double> decode(
       const BalancedSlotsEncodedPoly<SparseMultiPoly>& en) const {
-    const auto& polys = en.poly().slots();
+    const auto slots = en.poly().slots();
+    if (slots.size() != en.digits().size()) {
+      std::ostringstream msg;
+      msg << "Slots and digits sizes do not match: " << slots.size()
+          << " != " << en.digits().size();
+      throw std::logic_error(msg.str());
+    }
     std::vector<double> nums;
-    nums.reserve(polys.size());
-    for (int n = 0; n < polys.size(); ++n) {
-      const auto& poly = polys[n];
+    nums.reserve(slots.size());
+    for (int n = 0; n < slots.size(); ++n) {
+      const auto& poly = slots[n];
       auto laurentDecode = [rw = m_params.rw, i = en.digits().at(n)](
                                double init, const auto& pair) {
         return init + pair.second * std::pow(rw, pair.first + i);

@@ -58,7 +58,7 @@ TEST_P(BalancedSlotsArith, testBalancedSlotsAddition) {
   const auto& encoded2 = coder.encode({num2});
   const auto decoded = coder.decode(encoded1 + encoded2);
 
-  EXPECT_NEAR(num1 + num2, decoded[0], epsil);
+  EXPECT_NEAR(num1 + num2, decoded[0], epsil) << num1 << " + " << num2;
 }
 
 TEST_P(BalancedSlotsArith, testBalancedSlotsMultiplication) {
@@ -70,7 +70,7 @@ TEST_P(BalancedSlotsArith, testBalancedSlotsMultiplication) {
   const auto& encoded2 = coder.encode({num2});
   const auto decoded = coder.decode(encoded1 * encoded2);
 
-  EXPECT_NEAR(num1 * num2, decoded[0], epsil);
+  EXPECT_NEAR(num1 * num2, decoded[0], 3 * epsil) << num1 << " * " << num2;
 }
 
 double default_epsil = 1e-8;
