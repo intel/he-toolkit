@@ -74,10 +74,10 @@ class BalancedSlotsEncodedPoly {
       const BalancedSlotsEncodedPoly& other) const {
     std::vector<long> select_digits;
     select_digits.reserve(m_digits.size());
-    std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
-                   select_digits.begin(), [](const long lhs, const long rhs) {
-                     return std::min(lhs, rhs);
-                   });
+    std::transform(
+        m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+        std::back_inserter(select_digits),
+        [](const long lhs, const long rhs) { return std::min(lhs, rhs); });
 
     std::vector<long> select_mask;
     select_mask.reserve(m_digits.size());
