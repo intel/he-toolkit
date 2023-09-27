@@ -57,4 +57,22 @@ TEST(sparse_poly, test_multiplication) {
       << "(" << p1.toString() << ") * (" << p2.toString() << ")";
 }
 
+TEST(sparse_poly, test_is_laurent) {
+  const auto& poly = SparsePoly({{-2, 2}, {3, 1}, {5, 3}});
+  ASSERT_TRUE(poly.is_laurent());
+}
+
+TEST(sparse_poly, test_is_not_laurent) {
+  const auto& poly = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
+  ASSERT_FALSE(poly.is_laurent());
+}
+
+TEST(sparse_poly, test_expand) {
+  const auto& poly = SparsePoly({{2, 2}, {3, 1}, {5, 3}});
+  const auto expanded = poly.expand();
+  for (long i = 0; i < expanded.size(); ++i) {
+    EXPECT_EQ(expanded[i], poly.coeff(i));
+  }
+}
+
 }  // namespace

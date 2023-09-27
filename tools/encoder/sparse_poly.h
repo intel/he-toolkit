@@ -59,6 +59,23 @@ class SparsePoly {
     return oss.str();
   }
 
+  std::vector<long> expand() const {
+    if (is_laurent())
+      throw std::logic_error("Cannot expand a laurent polynomial");
+
+    std::vector<long> expanded(degree() + 1, 0L);
+    for (const auto [k, v] : m_coeffs) {
+      expanded[k] = v;
+    }
+
+    return expanded;
+  }
+
+  bool is_laurent() const {
+    return std::any_of(m_coeffs.cbegin(), m_coeffs.cend(),
+                       [](const auto& kv) { return kv.first < 0L; });
+  }
+
  private:
   // <index, coeff>
   std::map<long, long> m_coeffs;
