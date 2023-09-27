@@ -18,6 +18,12 @@ class SparsePoly {
  public:
   SparsePoly() = default;
   explicit SparsePoly(const std::map<long, long>& terms) : m_coeffs(terms) {}
+  explicit SparsePoly(const std::vector<long>& expanded_poly) {
+    for (long k = 0; k < expanded_poly.size(); ++k) {
+      const long v = expanded_poly[k];
+      if (v != 0L) m_coeffs[k] = v;
+    }
+  }
   long coeff(long i) const { return m_coeffs.count(i) ? m_coeffs.at(i) : 0L; }
   void coeff(long i, long value) { m_coeffs[i] = value; }
   long degree() const {

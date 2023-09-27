@@ -16,6 +16,7 @@ set(TEST_FILES
   test_fractional.cpp
   test_balanced.cpp
   test_balanced_slots.cpp
+  test_encrypt.cpp
 )
 
 add_executable(run_tests ${TEST_FILES})
@@ -23,6 +24,7 @@ add_executable(run_tests ${TEST_FILES})
 target_link_libraries(
   run_tests
   GTest::gtest_main
+  helib
 )
 
 include(GoogleTest)

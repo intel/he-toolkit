@@ -23,5 +23,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
     "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 
+# HElib as a dep
+find_package(helib REQUIRED)
+
 enable_testing()
 add_subdirectory(tests)
