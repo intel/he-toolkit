@@ -11,6 +11,7 @@ bandit
 cpplint
 
 # Type analysis
+pylint-pydantic
 types-toml
 mypy
 

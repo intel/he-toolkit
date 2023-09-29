@@ -11,6 +11,8 @@ repos:
         - id: mixed-line-ending
         - id: fix-byte-order-marker
         - id: check-yaml
+        - id: check-toml
+          exclude: tests/input_files/.*.toml
     - repo: https://github.com/crate-ci/typos
       rev: v1.16.8
       hooks:

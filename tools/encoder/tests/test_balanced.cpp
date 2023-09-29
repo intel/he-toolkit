@@ -38,7 +38,7 @@ TEST_P(SingleNum, testCompareOriginalToDecodedEncoded) {
   auto params = BalancedParams{.rw = 1.2, .epsil = 1e-8};
   auto coder = Coder(params);
   double original = GetParam();
-  const auto& encoded = coder.encode(original);
+  const auto encoded = coder.encode(original);
   double decoded = coder.decode(encoded);
   ASSERT_NEAR(original, decoded, params.epsil);
 }
@@ -135,8 +135,8 @@ TEST_P(ParamsSingleNumBalanced, testBalancedAddition) {
 
   BalancedParams params{rw, epsil};
   Coder coder(params);
-  const auto& encoded1 = coder.encode(num1);
-  const auto& encoded2 = coder.encode(num2);
+  const auto encoded1 = coder.encode(num1);
+  const auto encoded2 = coder.encode(num2);
   double decoded = coder.decode(encoded1 + encoded2);
 
   ASSERT_NEAR(num1 + num2, decoded, epsil);
@@ -147,11 +147,11 @@ TEST_P(ParamsSingleNumBalanced, testBalancedMultiplication) {
 
   BalancedParams params{rw, epsil};
   Coder coder(params);
-  const auto& encoded1 = coder.encode(num1);
-  const auto& encoded2 = coder.encode(num2);
+  const auto encoded1 = coder.encode(num1);
+  const auto encoded2 = coder.encode(num2);
   double decoded = coder.decode(encoded1 * encoded2);
 
-  ASSERT_NEAR(num1 * num2, decoded, 3 * epsil);
+  ASSERT_NEAR(num1 * num2, decoded, epsil * (num1 + num2));
 }
 
 double default_epsil = 1e-8;

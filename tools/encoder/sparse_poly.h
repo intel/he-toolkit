@@ -82,6 +82,10 @@ class SparsePoly {
                        [](const auto& kv) { return kv.first < 0L; });
   }
 
+  bool operator==(const SparsePoly& other) const {
+    return m_coeffs == other.m_coeffs;
+  }
+
  private:
   // <index, coeff>
   std::map<long, long> m_coeffs;
@@ -102,7 +106,7 @@ class SparseMultiPoly {
       : m_slots(polys_in_slots) {}
 
   SparsePoly poly() const {
-    return std::accumulate(m_slots.begin(), m_slots.end(), SparsePoly{},
+    return std::accumulate(m_slots.cbegin(), m_slots.cend(), SparsePoly{},
                            std::multiplies<SparsePoly>{});
   }
 
@@ -111,7 +115,7 @@ class SparseMultiPoly {
   SparseMultiPoly operator+(const SparseMultiPoly& other) const {
     std::vector<SparsePoly> res{};
     res.reserve(m_slots.size());
-    std::transform(m_slots.begin(), m_slots.end(), other.m_slots.begin(),
+    std::transform(m_slots.cbegin(), m_slots.cend(), other.m_slots.cbegin(),
                    std::back_inserter(res), std::plus<SparsePoly>{});
     return SparseMultiPoly{res};
   }
@@ -119,7 +123,7 @@ class SparseMultiPoly {
   SparseMultiPoly operator*(const SparseMultiPoly& other) const {
     std::vector<SparsePoly> res{};
     res.reserve(m_slots.size());
-    std::transform(m_slots.begin(), m_slots.end(), other.m_slots.begin(),
+    std::transform(m_slots.cbegin(), m_slots.cend(), other.m_slots.cbegin(),
                    std::back_inserter(res), std::multiplies<SparsePoly>{});
     return SparseMultiPoly{res};
   }
