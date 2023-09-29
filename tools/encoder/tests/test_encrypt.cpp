@@ -82,8 +82,10 @@ TEST_P(SingleNumEncrypted, testBalancedEncryptDecrypt) {
 
 TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
   // TODO Move out
+  //  47                  4096                73734                24576 6 47
+  //  500                 15000                 4000                  8
   auto context =
-      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
+      helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
   const helib::PubKey& pk = sk;
@@ -92,12 +94,15 @@ TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
   Coder coder(params);
   // TODO parametrize
   std::vector<double> original = {0.0, 2.2, 109.8, 453.756};
+  original.resize(sk.getContext().getNSlots());
 
   const auto encoded = coder.encode(original);
   const auto encrypted = encrypt(encoded, pk);
   const auto decrypted = decrypt(encrypted, sk);
 
-  ASSERT_EQ(encoded.poly(), decrypted.poly());
+  ASSERT_EQ(encoded.poly(), decrypted.poly())
+      << "Encoded Poly: " << encoded.poly().toString() << "\n"
+      << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
 
   const auto decoded = coder.decode(decrypted);
 

@@ -124,6 +124,14 @@ class SparseMultiPoly {
     return SparseMultiPoly{res};
   }
 
+  std::string toString() const {
+    std::ostringstream oss;
+    for (const auto& slot : m_slots) {
+      oss << slot.toString() << '\n';
+    }
+    return oss.str();
+  }
+
   bool operator==(const SparseMultiPoly& other) const {
     return m_slots == other.m_slots;
   }
