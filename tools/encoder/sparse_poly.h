@@ -105,12 +105,8 @@ class SparseMultiPoly {
   explicit SparseMultiPoly(const std::vector<SparsePoly>& polys_in_slots)
       : m_slots(polys_in_slots) {}
 
-  SparsePoly poly() const {
-    return std::accumulate(m_slots.cbegin(), m_slots.cend(), SparsePoly{},
-                           std::multiplies<SparsePoly>{});
-  }
-
-  auto slots() const { return m_slots; }
+  const auto& slots() const { return m_slots; }
+  auto& slots() { return m_slots; }
 
   SparseMultiPoly operator+(const SparseMultiPoly& other) const {
     std::vector<SparsePoly> res{};
@@ -126,6 +122,10 @@ class SparseMultiPoly {
     std::transform(m_slots.cbegin(), m_slots.cend(), other.m_slots.cbegin(),
                    std::back_inserter(res), std::multiplies<SparsePoly>{});
     return SparseMultiPoly{res};
+  }
+
+  bool operator==(const SparseMultiPoly& other) const {
+    return m_slots == other.m_slots;
   }
 
  private:

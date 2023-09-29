@@ -8,6 +8,7 @@
 namespace {
 
 using hekit::coder::BalancedParams;
+using hekit::coder::BalancedSlotsParams;
 using hekit::coder::Coder;
 using hekit::coder::FractionalParams;
 using hekit::coder::SparsePoly;
@@ -77,6 +78,31 @@ TEST_P(SingleNumEncrypted, testBalancedEncryptDecrypt) {
   double decoded = coder.decode(decrypted);
 
   ASSERT_NEAR(original, decoded, params.epsil);
+}
+
+TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
+  // TODO Move out
+  auto context =
+      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
+  helib::SecKey sk(context);
+  sk.GenSecKey();
+  const helib::PubKey& pk = sk;
+  //
+  const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
+  Coder coder(params);
+  // TODO parametrize
+  std::vector<double> original = {0.0, 2.2, 109.8, 453.756};
+
+  const auto encoded = coder.encode(original);
+  const auto encrypted = encrypt(encoded, pk);
+  const auto decrypted = decrypt(encrypted, sk);
+
+  ASSERT_EQ(encoded.poly(), decrypted.poly());
+
+  const auto decoded = coder.decode(decrypted);
+
+  for (long i = 0; i < original.size(); ++i)
+    ASSERT_NEAR(original[i], decoded[i], params.epsil);
 }
 
 INSTANTIATE_TEST_SUITE_P(variousSingleNumbers, SingleNumEncrypted,

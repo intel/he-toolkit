@@ -5,6 +5,7 @@
 
 #include <helib/helib.h>
 
+#include <algorithm>
 #include <vector>
 
 #include "balanced.h"
@@ -76,23 +77,38 @@ inline BalancedEncodedPoly<SparsePoly> decrypt(
 }
 
 inline BalancedSlotsEncodedPoly<helib::Ctxt> encrypt(
-    const BalancedSlotsEncodedPoly<SparsePoly>& encoded_poly,
+    const BalancedSlotsEncodedPoly<SparseMultiPoly>& encoded_poly,
     const helib::PubKey& pk) {
-  const auto poly = encoded_poly.poly().expand();
-  const auto view = pk.getContext().getView();
+  const std::vector polys = encoded_poly.poly().slots();
+  std::vector<NTL::ZZX> ntl_polys;
+  ntl_polys.reserve(pk.getContext().getNSlots());
+  std::transform(polys.cbegin(), polys.cend(), std::back_inserter(ntl_polys),
+                 SparsePolyToZZX);
   helib::Ctxt ctxt(pk);
-  view.encrypt(ctxt, pk, poly);
+  helib::PtxtArray ptxt(pk.getContext());
+  ptxt.load(ntl_polys);
+  ptxt.encrypt(ctxt);
   return BalancedSlotsEncodedPoly{ctxt, encoded_poly.digits()};
 }
 
-inline BalancedSlotsEncodedPoly<SparsePoly> decrypt(
+inline BalancedSlotsEncodedPoly<SparseMultiPoly> decrypt(
     const BalancedSlotsEncodedPoly<helib::Ctxt>& encoded_poly,
     const helib::SecKey& sk) {
-  const auto ctxt = encoded_poly.poly();
-  std::vector<long> poly;
-  const auto view = sk.getContext().getView();
-  view.decrypt(ctxt, sk, poly);
-  return BalancedSlotsEncodedPoly{SparsePoly{poly}, encoded_poly.digits()};
+  const helib::Ctxt ctxt = encoded_poly.poly();
+  std::vector<NTL::ZZX> polys;
+  helib::PtxtArray ptxt(sk.getContext());
+  ptxt.decrypt(ctxt, sk);
+  ptxt.store(polys);
+  SparseMultiPoly sparse_multi_poly;
+  sparse_multi_poly.slots().reserve(sk.getContext().getNSlots());
+  std::transform(polys.cbegin(), polys.cend(),
+                 std::back_inserter(sparse_multi_poly.slots()),
+                 [p = sk.getContext().getP()](const auto& poly) {
+                   auto new_poly = poly;
+                   correctCoeffRange(new_poly, p);
+                   return ZZXToSparsePoly(new_poly);
+                 });
+  return BalancedSlotsEncodedPoly{sparse_multi_poly, encoded_poly.digits()};
 }
 
 }  // namespace hekit::coder
