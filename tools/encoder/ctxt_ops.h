@@ -30,7 +30,7 @@ inline auto select(const helib::Ctxt& lpoly, const helib::Ctxt& rpoly,
   // Given a mask for the slots output selected poly and its complimentary poly
   std::vector<long> complimentary_mask(select_mask.size());
   std::for_each(complimentary_mask.begin(), complimentary_mask.end(),
-                [](auto& bit) { bit = !bit; });
+                [](auto& bit) { bit = (bit != 1); });
 
   const auto& context = lpoly.getContext();
   helib::PtxtArray selected_ptxt(context);
@@ -39,22 +39,21 @@ inline auto select(const helib::Ctxt& lpoly, const helib::Ctxt& rpoly,
   selected_ptxt.load(complimentary_mask);
 
   auto selected = (lpoly * selected_ptxt) + (rpoly * complimentary_ptxt);
-  auto complimentary = (lpoly * complimentary_ptxt) * (rpoly * selected_ptxt);
+  auto complimentary = (lpoly * complimentary_ptxt) + (rpoly * selected_ptxt);
   return std::pair{selected, complimentary};
 }
 
 inline helib::Ctxt shift(const helib::Ctxt& poly,
                          const std::vector<long>& digits) {
   std::vector<NTL::ZZX> shifts(digits.size());
-  for (long i = 0; digits.size(); ++i) {
+  for (long i = 0; i < digits.size(); ++i) {
     SetCoeff(shifts[i], digits[i]);
   }
 
   helib::PtxtArray ptxt(poly.getContext());
   ptxt.load(shifts);
-
   auto ctxt = poly;
-  ctxt += ptxt;
+  ctxt *= ptxt;
 
   return ctxt;
   //  SparsePoly tem{};

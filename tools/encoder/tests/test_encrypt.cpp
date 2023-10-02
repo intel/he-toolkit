@@ -174,6 +174,7 @@ TEST(EncryptedNums, testBalancedSlotsAdd) {
       helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
+  // addSome1DMatrices(sk);
   const helib::PubKey& pk = sk;
   //
   const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
