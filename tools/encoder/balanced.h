@@ -96,7 +96,7 @@ class BalancedSlotsEncodedPoly {
     const auto [select_poly, complimentary_poly] =
         select(m_poly, other.m_poly, select_mask);
 
-    return BalancedSlotsEncodedPoly{
+    return BalancedSlotsEncodedPoly<PolyType>{
         select_poly + shift(complimentary_poly, shift_digits), select_digits};
 
     // if (this->m_digit < other.m_digit) {

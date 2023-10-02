@@ -251,6 +251,7 @@ tools/README.md
 tools/encoder/CMakeLists.txt
 tools/encoder/balanced.h
 tools/encoder/coder.h
+tools/encoder/ctxt_ops.h
 tools/encoder/encrypt.h
 tools/encoder/fractional.h
 tools/encoder/sparse_poly.h
