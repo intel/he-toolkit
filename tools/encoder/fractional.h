@@ -20,15 +20,11 @@ class FractionalEncodedPoly {
   FractionalEncodedPoly() = default;
   explicit FractionalEncodedPoly(const Poly& poly) : m_poly(poly) {}
   FractionalEncodedPoly operator+(const FractionalEncodedPoly& other) const {
-    FractionalEncodedPoly sum;
-    sum.m_poly = this->m_poly + other.m_poly;
-    return sum;
+    return FractionalEncodedPoly{this->m_poly + other.m_poly};
   }
 
   FractionalEncodedPoly operator*(const FractionalEncodedPoly& other) const {
-    FractionalEncodedPoly prod;
-    prod.m_poly = this->m_poly * other.m_poly;
-    return prod;
+    return FractionalEncodedPoly{this->m_poly * other.m_poly};
   }
 
   Poly poly() const { return m_poly; }

@@ -110,8 +110,8 @@ TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
     ASSERT_NEAR(original[i], decoded[i], params.epsil);
 }
 
-inline std::vector<double> operator+(const std::vector<double>& nums1,
-                                     const std::vector<double>& nums2) {
+inline static std::vector<double> operator+(const std::vector<double>& nums1,
+                                            const std::vector<double>& nums2) {
   if (nums1.size() != nums2.size())
     throw std::logic_error("vectors do not have equal size");
   std::vector<double> ans;
@@ -121,8 +121,8 @@ inline std::vector<double> operator+(const std::vector<double>& nums1,
   return ans;
 }
 
-inline std::vector<double> operator*(const std::vector<double>& nums1,
-                                     const std::vector<double>& nums2) {
+inline static std::vector<double> operator*(const std::vector<double>& nums1,
+                                            const std::vector<double>& nums2) {
   if (nums1.size() != nums2.size())
     throw std::logic_error("vectors do not have equal size");
   std::vector<double> ans;
@@ -130,6 +130,121 @@ inline std::vector<double> operator*(const std::vector<double>& nums1,
   std::transform(nums1.begin(), nums1.end(), nums2.begin(), ans.begin(),
                  std::multiplies<double>{});
   return ans;
+}
+
+TEST(EncryptedNums, testFractionalAdd) {
+  auto context =
+      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
+  helib::SecKey sk(context);
+  sk.GenSecKey();
+  const helib::PubKey& pk = sk;
+  //
+  const auto params =
+      FractionalParams{.rw = 1.2, .epsil = 1e-8, .frac_degree = 4096L};
+  Coder coder(params);
+  // TODO parametrize
+  double num1 = 109.8;
+  double num2 = 9.02;
+
+  const auto op = num1 + num2;
+
+  const auto encoded1 = coder.encode(num1);
+  const auto encoded2 = coder.encode(num2);
+  const auto encrypted1 = encrypt(encoded1, pk);
+  const auto encrypted2 = encrypt(encoded2, pk);
+
+  const auto encrypted = encrypted1 + encrypted2;
+
+  const auto decrypted = decrypt(encrypted, sk);
+  const auto decoded = coder.decode(decrypted);
+
+  ASSERT_NEAR(op, decoded, params.epsil);
+}
+
+TEST(EncryptedNums, testFractionalMult) {
+  auto context =
+      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
+  helib::SecKey sk(context);
+  sk.GenSecKey();
+  const helib::PubKey& pk = sk;
+  //
+  const auto params =
+      FractionalParams{.rw = 1.2, .epsil = 1e-8, .frac_degree = 4096L};
+  Coder coder(params);
+  // TODO parametrize
+  double num1 = 1.1;
+  double num2 = 1.0;
+
+  const auto op = num1 * num2;
+
+  const auto encoded1 = coder.encode(num1);
+  const auto encoded2 = coder.encode(num2);
+  const auto encrypted1 = encrypt(encoded1, pk);
+  const auto encrypted2 = encrypt(encoded2, pk);
+
+  const auto encrypted = encrypted1 * encrypted2;
+
+  const auto decrypted = decrypt(encrypted, sk);
+  const auto decoded = coder.decode(decrypted);
+
+  ASSERT_NEAR(op, decoded, params.epsil * (num1 + num2));
+}
+
+TEST(EncryptedNums, testBalancedAdd) {
+  auto context =
+      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
+  helib::SecKey sk(context);
+  sk.GenSecKey();
+  // addSome1DMatrices(sk);
+  const helib::PubKey& pk = sk;
+  //
+  const auto params = BalancedParams{.rw = 1.2, .epsil = 1e-8};
+  Coder coder(params);
+  // TODO parametrize
+  double num1 = 1.0;  // 109.8;
+  double num2 = 1.0;  // 9.02;
+
+  const auto op = num1 + num2;
+
+  const auto encoded1 = coder.encode(num1);
+  const auto encoded2 = coder.encode(num2);
+  const auto encrypted1 = encrypt(encoded1, pk);
+  const auto encrypted2 = encrypt(encoded2, pk);
+
+  const auto encrypted = encrypted1 + encrypted2;
+
+  const auto decrypted = decrypt(encrypted, sk);
+  const auto decoded = coder.decode(decrypted);
+
+  ASSERT_NEAR(op, decoded, params.epsil);
+}
+
+TEST(EncryptedNums, testBalancedMult) {
+  auto context =
+      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
+  helib::SecKey sk(context);
+  sk.GenSecKey();
+  const helib::PubKey& pk = sk;
+  //
+  const auto params = BalancedParams{.rw = 1.2, .epsil = 1e-8};
+  Coder coder(params);
+  // TODO parametrize
+  double num1 = 109.8;
+  double num2 = 9.02;
+
+  const auto op = num1 * num2;
+
+  const auto encoded1 = coder.encode(num1);
+  const auto encoded2 = coder.encode(num2);
+  const auto encrypted1 = encrypt(encoded1, pk);
+  const auto encrypted2 = encrypt(encoded2, pk);
+
+  const auto encrypted = encrypted1 * encrypted2;
+
+  const auto decrypted = decrypt(encrypted, sk);
+  const auto decoded = coder.decode(decrypted);
+
+  ASSERT_NEAR(op, decoded, params.epsil * (num1 + num2));
 }
 
 TEST(EncryptedNums, testBalancedSlotsMult) {
@@ -180,7 +295,7 @@ TEST(EncryptedNums, testBalancedSlotsAdd) {
   const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
   Coder coder(params);
   // TODO parametrize
-  std::vector<double> nums1 = {0.0, 2.2, 109.8, 453.756};
+  std::vector<double> nums1 = {0.0, 2.2, 99.8, 53.756};
   std::vector<double> nums2 = {1.0, 2.2, 9.02, 5.67};
   nums1.resize(sk.getContext().getNSlots());
   nums2.resize(sk.getContext().getNSlots());
@@ -198,7 +313,8 @@ TEST(EncryptedNums, testBalancedSlotsAdd) {
   const auto decoded = coder.decode(decrypted);
 
   for (long i = 0; i < decoded.size(); ++i)
-    ASSERT_NEAR(op[i], decoded[i], params.epsil);
+    ASSERT_NEAR(op[i], decoded[i], params.epsil)
+        << nums1[i] << " + " << nums2[i] << " = " << op[i];
 }
 
 INSTANTIATE_TEST_SUITE_P(variousSingleNumbers, SingleNumEncrypted,
