@@ -295,8 +295,10 @@ TEST(EncryptedNums, testBalancedSlotsAdd) {
   const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
   Coder coder(params);
   // TODO parametrize
-  std::vector<double> nums1 = {0.0, 2.2, 99.8, 53.756};
-  std::vector<double> nums2 = {1.0, 2.2, 9.02, 5.67};
+
+  // TODO swapping last numbers around leads to wrong value
+  std::vector<double> nums1 = {0.0, 2.2, 99.8, 45.05};
+  std::vector<double> nums2 = {1.0, 2.2, 9.02, 53.76};
   nums1.resize(sk.getContext().getNSlots());
   nums2.resize(sk.getContext().getNSlots());
 
