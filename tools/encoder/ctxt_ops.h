@@ -29,7 +29,10 @@ inline helib::Ctxt shift(const helib::Ctxt& poly, long digit) {
   auto ctxt = poly;
   NTL::ZZX x;
   SetCoeff(x, digit);
-  ctxt *= x;
+  const auto& context = ctxt.getContext();
+  helib::PtxtArray ptxt(context);
+  ptxt = x;
+  ctxt *= ptxt;
   return ctxt;
 }
 inline auto select(const helib::Ctxt& lpoly, const helib::Ctxt& rpoly,
