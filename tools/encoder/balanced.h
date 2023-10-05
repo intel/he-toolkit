@@ -189,6 +189,8 @@ class Coder<BalancedSlotsParams> {
   Coder() = delete;
   explicit Coder(const BalancedSlotsParams& params) : m_params(params) {}
 
+  auto params() const { return m_params; }
+
   BalancedSlotsEncodedPoly<SparseMultiPoly> encode(
       const std::vector<double>& nums) const {
     std::vector<SparsePoly> polys;

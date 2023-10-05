@@ -31,14 +31,17 @@ struct Params {
   Coder<EncodingSchemeParams> coder;
 };
 
+using Slots = std::vector<double>;
+
 struct FractionalEncryptedSingleNums
     : public testing::TestWithParam<
           std::pair<Params<FractionalParams>, std::vector<double>>> {};
 struct BalancedEncryptedSingleNums
     : public testing::TestWithParam<
           std::pair<Params<BalancedParams>, std::vector<double>>> {};
-// struct BalancedSlotsEncryptedSingleNums : public
-// testing::TestWithParam<Params<BalancedSlotsParams>, std::vector<double>> {};
+struct BalancedSlotsEncryptedSingleNums
+    : public testing::TestWithParam<
+          std::pair<Params<BalancedSlotsParams>, std::vector<Slots>>> {};
 
 TEST(SparsePolyToZZX, testSparsePolyToZZXConversion) {
   auto original = SparsePoly({{1, 2}, {3, 4}});
@@ -46,17 +49,26 @@ TEST(SparsePolyToZZX, testSparsePolyToZZXConversion) {
   EXPECT_EQ(decoded, original);
 }
 
-template <typename EncodingSchemeParams>
-static void testEncryptDecrypt(const EncodingSchemeParams& get_params,
-                               const std::vector<double>& input_nums) {
+template <typename EncodingSchemeParams, typename Data>
+static inline void testEncryptDecrypt(const EncodingSchemeParams& get_params,
+                                      const Data& input_nums) {
   const auto [bgv_cb, coder] = get_params;
   Crypto crypto(bgv_cb);
   auto params = coder.params();
 
-  for (auto const& original : input_nums) {
+  for (auto original : input_nums) {
+    if constexpr (std::is_same_v<Data, std::vector<Slots>>)
+      original.resize(crypto.context.getNSlots());
+
     const auto encoded = coder.encode(original);
 
-    EXPECT_NEAR(original, coder.decode(encoded), params.epsil);
+    if constexpr (std::is_same_v<Data, std::vector<Slots>>) {
+      const auto& inter_decode = coder.decode(encoded);
+      for (long i = 0; i < original.size(); ++i)
+        EXPECT_NEAR(original[i], inter_decode[i], params.epsil);
+    } else {
+      EXPECT_NEAR(original, coder.decode(encoded), params.epsil);
+    }
 
     const auto encrypted = encrypt(encoded, crypto.pk);
     const auto decrypted = decrypt(encrypted, crypto.sk);
@@ -65,9 +77,14 @@ static void testEncryptDecrypt(const EncodingSchemeParams& get_params,
         << "Encoded Poly: " << encoded.poly().toString() << "\n"
         << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
 
-    double decoded = coder.decode(decrypted);
+    const auto decoded = coder.decode(decrypted);
 
-    EXPECT_NEAR(original, decoded, params.epsil);
+    if constexpr (std::is_same_v<Data, std::vector<Slots>>) {
+      for (long i = 0; i < original.size(); ++i)
+        EXPECT_NEAR(original[i], decoded[i], params.epsil);
+    } else {
+      EXPECT_NEAR(original, decoded, params.epsil);
+    }
   }
 }
 
@@ -81,31 +98,9 @@ TEST_P(BalancedEncryptedSingleNums, testEncryptDecrypt) {
   testEncryptDecrypt(params, input_nums);
 }
 
-TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
-  auto context =
-      helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
-  helib::SecKey sk(context);
-  sk.GenSecKey();
-  const helib::PubKey& pk = sk;
-  //
-  const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
-  Coder coder(params);
-  // TODO parametrize
-  std::vector<double> original = {0.0, 2.2, 109.8, 453.756};
-  original.resize(sk.getContext().getNSlots());
-
-  const auto encoded = coder.encode(original);
-  const auto encrypted = encrypt(encoded, pk);
-  const auto decrypted = decrypt(encrypted, sk);
-
-  EXPECT_EQ(encoded.poly(), decrypted.poly())
-      << "Encoded Poly: " << encoded.poly().toString() << "\n"
-      << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
-
-  const auto decoded = coder.decode(decrypted);
-
-  for (long i = 0; i < original.size(); ++i)
-    EXPECT_NEAR(original[i], decoded[i], params.epsil);
+TEST_P(BalancedSlotsEncryptedSingleNums, testEncryptDecrypt) {
+  const auto [params, input_nums] = GetParam();
+  testEncryptDecrypt(params, input_nums);
 }
 
 inline static std::vector<double> operator+(const std::vector<double>& nums1,
@@ -330,5 +325,13 @@ INSTANTIATE_TEST_SUITE_P(
             helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50),
             Coder{BalancedParams{.rw = 1.2, .epsil = 1e-8}}},
         std::vector<double>{0.0, 546.0, 546.789, 23.456, 0.2345}}));
+
+INSTANTIATE_TEST_SUITE_P(
+    variousSingleNumbers, BalancedSlotsEncryptedSingleNums,
+    ::testing::Values(std::pair{
+        Params<BalancedSlotsParams>{
+            helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50),
+            Coder{BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8}}},
+        std::vector<Slots>{{0.0, 2.2, 109.8, 453.756}}}));
 
 }  // namespace
