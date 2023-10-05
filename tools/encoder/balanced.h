@@ -132,6 +132,8 @@ class Coder<BalancedParams> {
   Coder() = delete;
   explicit Coder(const BalancedParams& params) : m_params(params) {}
 
+  auto params() const { return m_params; }
+
   BalancedEncodedPoly<SparsePoly> encode(const double num) const {
     const auto [a, frac_exp] = EncodeHelper(num);
     return BalancedEncodedPoly{laurentEncode(a, frac_exp), {frac_exp}};

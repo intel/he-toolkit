@@ -42,7 +42,10 @@ struct FractionalParams {
 template <>
 class Coder<FractionalParams> {
  public:
+  Coder() = delete;
   explicit Coder(const FractionalParams& params) : m_params(params) {}
+
+  auto params() const { return m_params; }
 
   FractionalEncodedPoly<SparsePoly> encode(double num) const {
     const auto [a, _] = EncodeHelper(num);

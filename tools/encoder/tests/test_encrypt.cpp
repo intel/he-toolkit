@@ -15,75 +15,73 @@ using hekit::coder::SparsePoly;
 using hekit::coder::SparsePolyToZZX;
 using hekit::coder::ZZXToSparsePoly;
 
-class SingleNumEncrypted : public testing::TestWithParam<double> {};
+struct Crypto {
+  Crypto() = delete;
+  explicit Crypto(const helib::ContextBuilder<helib::BGV>& cb)
+      : context(cb.build()), sk(context), pk((sk.GenSecKey(), sk)) {}
+
+  helib::Context context;
+  helib::SecKey sk;
+  const helib::PubKey& pk;
+};
+
+template <typename EncodingSchemeParams>
+struct Params {
+  helib::ContextBuilder<helib::BGV> context_builder;
+  Coder<EncodingSchemeParams> coder;
+};
+
+struct FractionalEncryptedSingleNums
+    : public testing::TestWithParam<
+          std::pair<Params<FractionalParams>, std::vector<double>>> {};
+struct BalancedEncryptedSingleNums
+    : public testing::TestWithParam<
+          std::pair<Params<BalancedParams>, std::vector<double>>> {};
+// struct BalancedSlotsEncryptedSingleNums : public
+// testing::TestWithParam<Params<BalancedSlotsParams>, std::vector<double>> {};
 
 TEST(SparsePolyToZZX, testSparsePolyToZZXConversion) {
   auto original = SparsePoly({{1, 2}, {3, 4}});
   const auto decoded = ZZXToSparsePoly(SparsePolyToZZX(original));
-  ASSERT_EQ(decoded, original);
+  EXPECT_EQ(decoded, original);
 }
 
-TEST_P(SingleNumEncrypted, testFractionalEncryptDecrypt) {
-  // TODO Move out
-  auto context =
-      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
-  helib::SecKey sk(context);
-  sk.GenSecKey();
-  const helib::PubKey& pk = sk;
-  //
-  const auto params =
-      FractionalParams{.rw = 1.2, .epsil = 1e-8, .frac_degree = 4096};
-  Coder coder(params);
-  double original = GetParam();
+template <typename EncodingSchemeParams>
+static void testEncryptDecrypt(const EncodingSchemeParams& get_params,
+                               const std::vector<double>& input_nums) {
+  const auto [bgv_cb, coder] = get_params;
+  Crypto crypto(bgv_cb);
+  auto params = coder.params();
 
-  const auto encoded = coder.encode(original);
+  for (auto const& original : input_nums) {
+    const auto encoded = coder.encode(original);
 
-  ASSERT_NEAR(original, coder.decode(encoded), params.epsil);
+    EXPECT_NEAR(original, coder.decode(encoded), params.epsil);
 
-  const auto encrypted = encrypt(encoded, pk);
-  const auto decrypted = decrypt(encrypted, sk);
+    const auto encrypted = encrypt(encoded, crypto.pk);
+    const auto decrypted = decrypt(encrypted, crypto.sk);
 
-  ASSERT_EQ(encoded.poly(), decrypted.poly())
-      << "Encoded Poly: " << encoded.poly().toString() << "\n"
-      << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
+    EXPECT_EQ(encoded.poly(), decrypted.poly())
+        << "Encoded Poly: " << encoded.poly().toString() << "\n"
+        << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
 
-  double decoded = coder.decode(decrypted);
+    double decoded = coder.decode(decrypted);
 
-  ASSERT_NEAR(original, decoded, params.epsil);
+    EXPECT_NEAR(original, decoded, params.epsil);
+  }
 }
 
-TEST_P(SingleNumEncrypted, testBalancedEncryptDecrypt) {
-  // TODO Move out
-  auto context =
-      helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50).build();
-  helib::SecKey sk(context);
-  sk.GenSecKey();
-  const helib::PubKey& pk = sk;
-  //
-  const auto params = BalancedParams{.rw = 1.2, .epsil = 1e-8};
-  Coder coder(params);
-  double original = GetParam();
+TEST_P(FractionalEncryptedSingleNums, testEncryptDecrypt) {
+  const auto [params, input_nums] = GetParam();
+  testEncryptDecrypt(params, input_nums);
+}
 
-  const auto encoded = coder.encode(original);
-
-  ASSERT_NEAR(original, coder.decode(encoded), params.epsil);
-
-  const auto encrypted = encrypt(encoded, pk);
-  const auto decrypted = decrypt(encrypted, sk);
-
-  ASSERT_EQ(encoded.poly(), decrypted.poly())
-      << "Encoded Poly: " << encoded.poly().toString() << "\n"
-      << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
-
-  double decoded = coder.decode(decrypted);
-
-  ASSERT_NEAR(original, decoded, params.epsil);
+TEST_P(BalancedEncryptedSingleNums, testEncryptDecrypt) {
+  const auto [params, input_nums] = GetParam();
+  testEncryptDecrypt(params, input_nums);
 }
 
 TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
-  // TODO Move out
-  //  47                  4096                73734                24576 6 47
-  //  500                 15000                 4000                  8
   auto context =
       helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
   helib::SecKey sk(context);
@@ -100,14 +98,14 @@ TEST(EncryptedNums, testBalancedSlotsEncryptDecrypt) {
   const auto encrypted = encrypt(encoded, pk);
   const auto decrypted = decrypt(encrypted, sk);
 
-  ASSERT_EQ(encoded.poly(), decrypted.poly())
+  EXPECT_EQ(encoded.poly(), decrypted.poly())
       << "Encoded Poly: " << encoded.poly().toString() << "\n"
       << "Decrypted Poly: " << decrypted.poly().toString() << "\n";
 
   const auto decoded = coder.decode(decrypted);
 
   for (long i = 0; i < original.size(); ++i)
-    ASSERT_NEAR(original[i], decoded[i], params.epsil);
+    EXPECT_NEAR(original[i], decoded[i], params.epsil);
 }
 
 inline static std::vector<double> operator+(const std::vector<double>& nums1,
@@ -158,7 +156,7 @@ TEST(EncryptedNums, testFractionalAdd) {
   const auto decrypted = decrypt(encrypted, sk);
   const auto decoded = coder.decode(decrypted);
 
-  ASSERT_NEAR(op, decoded, params.epsil);
+  EXPECT_NEAR(op, decoded, params.epsil);
 }
 
 TEST(EncryptedNums, testFractionalMult) {
@@ -187,7 +185,7 @@ TEST(EncryptedNums, testFractionalMult) {
   const auto decrypted = decrypt(encrypted, sk);
   const auto decoded = coder.decode(decrypted);
 
-  ASSERT_NEAR(op, decoded, params.epsil * (num1 + num2));
+  EXPECT_NEAR(op, decoded, params.epsil * (num1 + num2));
 }
 
 TEST(EncryptedNums, testBalancedAdd) {
@@ -216,7 +214,7 @@ TEST(EncryptedNums, testBalancedAdd) {
   const auto decrypted = decrypt(encrypted, sk);
   const auto decoded = coder.decode(decrypted);
 
-  ASSERT_NEAR(op, decoded, params.epsil);
+  EXPECT_NEAR(op, decoded, params.epsil);
 }
 
 TEST(EncryptedNums, testBalancedMult) {
@@ -244,13 +242,10 @@ TEST(EncryptedNums, testBalancedMult) {
   const auto decrypted = decrypt(encrypted, sk);
   const auto decoded = coder.decode(decrypted);
 
-  ASSERT_NEAR(op, decoded, params.epsil * (num1 + num2));
+  EXPECT_NEAR(op, decoded, params.epsil * (num1 + num2));
 }
 
 TEST(EncryptedNums, testBalancedSlotsMult) {
-  // TODO Move out
-  //  47                  4096                73734                24576 6 47
-  //  500                 15000                 4000                  8
   auto context =
       helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
   helib::SecKey sk(context);
@@ -278,23 +273,18 @@ TEST(EncryptedNums, testBalancedSlotsMult) {
   const auto decoded = coder.decode(decrypted);
 
   for (long i = 0; i < decoded.size(); ++i)
-    ASSERT_NEAR(op[i], decoded[i], params.epsil * (nums1[i] + nums2[i]));
+    EXPECT_NEAR(op[i], decoded[i], params.epsil * (nums1[i] + nums2[i]));
 }
 
 TEST(EncryptedNums, testBalancedSlotsAdd) {
-  // TODO Move out
-  //  47                  4096                73734                24576 6 47
-  //  500                 15000                 4000                  8
   auto context =
       helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
-  // addSome1DMatrices(sk);
   const helib::PubKey& pk = sk;
   //
   const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
   Coder coder(params);
-  // TODO parametrize
 
   // TODO swapping last numbers around leads to wrong value
   std::vector<double> nums1 = {0.0, 2.2, 99.8, 45.05};
@@ -315,11 +305,30 @@ TEST(EncryptedNums, testBalancedSlotsAdd) {
   const auto decoded = coder.decode(decrypted);
 
   for (long i = 0; i < decoded.size(); ++i)
-    ASSERT_NEAR(op[i], decoded[i], params.epsil)
+    EXPECT_NEAR(op[i], decoded[i], params.epsil)
         << nums1[i] << " + " << nums2[i] << " = " << op[i];
 }
 
-INSTANTIATE_TEST_SUITE_P(variousSingleNumbers, SingleNumEncrypted,
-                         // zero, integer_part, double
-                         ::testing::Values(0, 546, 546.789, 23.456, 0.2345));
+// TODO sort out this table
+// p                   m                   phi(m)
+//  47                  4096                73734                24576 6 47
+//  500                 15000                 4000                  8
+
+INSTANTIATE_TEST_SUITE_P(
+    variousSingleNumbers, FractionalEncryptedSingleNums,
+    ::testing::Values(std::pair{
+        Params<FractionalParams>{
+            helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50),
+            Coder{FractionalParams{
+                .rw = 1.2, .epsil = 1e-8, .frac_degree = 4096}}},
+        std::vector<double>{0.0, 546.0, 546.789, 23.456, 0.2345}}));
+
+INSTANTIATE_TEST_SUITE_P(
+    variousSingleNumbers, BalancedEncryptedSingleNums,
+    ::testing::Values(std::pair{
+        Params<BalancedParams>{
+            helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50),
+            Coder{BalancedParams{.rw = 1.2, .epsil = 1e-8}}},
+        std::vector<double>{0.0, 546.0, 546.789, 23.456, 0.2345}}));
+
 }  // namespace
