@@ -29,12 +29,18 @@ inline helib::Ctxt shift(const helib::Ctxt& poly, long digit) {
   auto ctxt = poly;
   NTL::ZZX x;
   SetCoeff(x, digit);
-  const auto& context = ctxt.getContext();
-  helib::PtxtArray ptxt(context);
-  ptxt = x;
-  ctxt *= ptxt;
+  // FIXME HElib's APIs are slot-centric. Temp work around
+  // encrypt and multiply.
+  helib::Ctxt x_encrypted(ctxt.getPubKey());
+  ctxt.getPubKey().Encrypt(x_encrypted, x);
+  //  std::cerr << "digit: " << digit << ", shift by x poly: "<< x << std::endl;
+  //  const auto& context = ctxt.getContext();
+  //  helib::PtxtArray ptxt(context);
+  //  ptxt = x;
+  ctxt *= x_encrypted;
   return ctxt;
 }
+
 inline auto select(const helib::Ctxt& lpoly, const helib::Ctxt& rpoly,
                    const std::vector<long>& select_mask) {
   // Given a mask for the slots output selected poly and its complimentary poly
