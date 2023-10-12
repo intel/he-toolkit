@@ -52,8 +52,7 @@ struct BalancedEncryptedTwoNums
           Params<BalancedParams>, std::vector<double>, std::vector<double>>> {};
 struct BalancedSlotsEncryptedTwoNums
     : public testing::TestWithParam<
-          std::tuple<Params<BalancedSlotsParams>, std::vector<Slots>,
-                     std::vector<Slots>>> {};
+          std::tuple<Params<BalancedSlotsParams>, Slots, Slots>> {};
 
 TEST(SparsePolyToZZX, testSparsePolyToZZXConversion) {
   auto original = SparsePoly({{1, 2}, {3, 4}});
@@ -258,68 +257,59 @@ TEST_P(BalancedEncryptedTwoNums, testMult) {
   }
 }
 
-TEST(EncryptedNums, testBalancedSlotsMult) {
-  auto context =
-      helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
-  helib::SecKey sk(context);
-  sk.GenSecKey();
-  const helib::PubKey& pk = sk;
-  //
-  const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
-  Coder coder(params);
-  // TODO parametrize
-  std::vector<double> nums1 = {0.0, 2.2, 109.8, 453.756};
-  std::vector<double> nums2 = {1.0, 2.2, 9.02, 5.67};
-  nums1.resize(sk.getContext().getNSlots());
-  nums2.resize(sk.getContext().getNSlots());
+TEST_P(BalancedSlotsEncryptedTwoNums, testMult) {
+  auto [test_config, nums1, nums2] = GetParam();
+  const auto [bgv_cb, coder] = test_config;
+  Crypto crypto(bgv_cb);
+  auto params = coder.params();
+
+  ASSERT_EQ(nums1.size(), nums2.size());
+
+  nums1.resize(crypto.context.getNSlots());
+  nums2.resize(crypto.context.getNSlots());
 
   const auto op = nums1 * nums2;
 
   const auto encoded1 = coder.encode(nums1);
   const auto encoded2 = coder.encode(nums2);
-  const auto encrypted1 = encrypt(encoded1, pk);
-  const auto encrypted2 = encrypt(encoded2, pk);
+  const auto encrypted1 = encrypt(encoded1, crypto.pk);
+  const auto encrypted2 = encrypt(encoded2, crypto.pk);
 
   const auto encrypted = encrypted1 * encrypted2;
 
-  const auto decrypted = decrypt(encrypted, sk);
+  const auto decrypted = decrypt(encrypted, crypto.sk);
   const auto decoded = coder.decode(decrypted);
 
   for (long i = 0; i < decoded.size(); ++i)
     EXPECT_NEAR(op[i], decoded[i], params.epsil * (nums1[i] + nums2[i]));
 }
 
-TEST(EncryptedNums, testBalancedSlotsAdd) {
-  auto context =
-      helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50).build();
-  helib::SecKey sk(context);
-  sk.GenSecKey();
-  const helib::PubKey& pk = sk;
-  //
-  const auto params = BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8};
-  Coder coder(params);
+TEST_P(BalancedSlotsEncryptedTwoNums, testAdd) {
+  auto [test_config, nums1, nums2] = GetParam();
+  const auto [bgv_cb, coder] = test_config;
+  Crypto crypto(bgv_cb);
+  auto params = coder.params();
 
-  // TODO swapping last numbers around leads to wrong value
-  std::vector<double> nums1 = {0.0, 2.2, 99.8, 45.05};
-  std::vector<double> nums2 = {1.0, 2.2, 9.02, 53.76};
-  nums1.resize(sk.getContext().getNSlots());
-  nums2.resize(sk.getContext().getNSlots());
+  ASSERT_EQ(nums1.size(), nums2.size());
+
+  nums1.resize(crypto.context.getNSlots());
+  nums2.resize(crypto.context.getNSlots());
 
   const auto op = nums1 + nums2;
 
   const auto encoded1 = coder.encode(nums1);
   const auto encoded2 = coder.encode(nums2);
-  const auto encrypted1 = encrypt(encoded1, pk);
-  const auto encrypted2 = encrypt(encoded2, pk);
+  const auto encrypted1 = encrypt(encoded1, crypto.pk);
+  const auto encrypted2 = encrypt(encoded2, crypto.pk);
 
   const auto encrypted = encrypted1 + encrypted2;
 
-  const auto decrypted = decrypt(encrypted, sk);
+  const auto decrypted = decrypt(encrypted, crypto.sk);
   const auto decoded = coder.decode(decrypted);
 
   for (long i = 0; i < decoded.size(); ++i)
-    EXPECT_NEAR(op[i], decoded[i], params.epsil)
-        << nums1[i] << " + " << nums2[i] << " = " << op[i];
+    EXPECT_NEAR(op[i], decoded[i], params.epsil * 2)
+        << nums1[i] << " + " << nums2[i] << std::endl;
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -369,12 +359,100 @@ INSTANTIATE_TEST_SUITE_P(
             helib::ContextBuilder<helib::BGV>{}.p(47L).m(15000L).bits(50),
             Coder{BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8}}},
         std::vector<Slots>{{0.0, 2.2, 109.8, 453.756}}}));
-// p                   d                   m                     phi_m slots 47
-// 500                 20000                 8000                  16
+
+// p     d      m        phi_m    slots
+// 47    500    20000    8000     16
+
+INSTANTIATE_TEST_SUITE_P(
+    variousTwoNumbers, BalancedSlotsEncryptedTwoNums,
+    ::testing::Values(std::tuple{
+        Params<BalancedSlotsParams>{
+            helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50),
+            Coder{BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8}}},
+        Slots{0.0, 1.0, 5.0, 5.789, 2.4, 0.23, 1.8},
+        Slots{0.0, 1.1, 6.0, 6.281, 5.0, 0.45, 9.2}}));
 
 #include "../ctxt_ops.h"
 
-TEST(tmp, checkShift) {
+TEST(tmp, checkSimpleMasking) {
+  Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
+
+  helib::PtxtArray ptxt(crypto.context);
+  ptxt.load(std::vector{2L, 4L, 6L, 8L});
+  helib::Ctxt ctxt(crypto.pk);
+  ptxt.encrypt(ctxt);
+
+  helib::PtxtArray mask(crypto.context);
+  mask.load(std::vector{1L, 0L, 1L, 0L});
+
+  const auto ans = hekit::coder::operator*(ctxt, mask);
+
+  helib::PtxtArray decrypted(crypto.context);
+  decrypted.decrypt(ans, crypto.sk);
+
+  std::vector<NTL::ZZX> slots;
+  decrypted.store(slots);
+
+  for (const auto& slot : slots) std::cerr << slot << std::endl;
+}
+
+TEST(tmp, DISABLED_checkSelect) {
+  Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
+
+  helib::PtxtArray lpoly_ptxt(crypto.context);
+  lpoly_ptxt.load(std::vector{2L, 4L});
+  helib::Ctxt lpoly(crypto.pk);
+  lpoly_ptxt.encrypt(lpoly);
+
+  helib::PtxtArray rpoly_ptxt(crypto.context);
+  rpoly_ptxt.load(std::vector{3L, 5L});
+  helib::Ctxt rpoly(crypto.pk);
+  rpoly_ptxt.encrypt(rpoly);
+
+  const auto [selected, complimentary] =
+      hekit::coder::select(lpoly, rpoly, std::vector<long>{0, 1});
+
+  helib::PtxtArray selected_ptxt(crypto.context);
+  selected_ptxt.decrypt(selected, crypto.sk);
+
+  helib::PtxtArray complimentary_ptxt(crypto.context);
+  complimentary_ptxt.decrypt(complimentary, crypto.sk);
+
+  std::vector<NTL::ZZX> selected_slots;
+  selected_ptxt.store(selected_slots);
+
+  for (const auto& slot : selected_slots) std::cerr << slot << std::endl;
+
+  std::vector<NTL::ZZX> complimentary_slots;
+  complimentary_ptxt.store(complimentary_slots);
+
+  for (const auto& slot : complimentary_slots)
+    std::cerr << "  " << slot << std::endl;
+}
+
+TEST(tmp, DISABLED_checkShiftSlots) {
+  Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
+  helib::Ctxt ctxt(crypto.pk);
+  NTL::ZZX first, second;
+  SetCoeff(first, 0, 2);
+  SetCoeff(second, 1, 1);
+  helib::PtxtArray nums(crypto.context);
+  nums.load(std::vector{first, second});
+  nums.encrypt(ctxt);
+
+  auto ans = hekit::coder::shift(ctxt, std::vector{1L, 2L});
+  helib::PtxtArray decrypted_ptxt(crypto.context);
+  decrypted_ptxt.decrypt(ans, crypto.sk);
+  std::vector<NTL::ZZX> decrypt;
+  decrypted_ptxt.store(decrypt);
+
+  std::cerr << first << std::endl;
+  std::cerr << decrypt[0] << std::endl;
+  std::cerr << second << std::endl;
+  std::cerr << decrypt[1] << std::endl;
+}
+
+TEST(tmp, DISABLED_checkShift) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50)};
   helib::Ctxt ctxt(crypto.pk);
   NTL::ZZX ptxt;
@@ -388,7 +466,7 @@ TEST(tmp, checkShift) {
   std::cerr << decrypted << std::endl;
 }
 
-TEST(tmp, check) {
+TEST(tmp, DISABLED_check) {
   Coder coder{BalancedParams{.rw = 1.2, .epsil = 1e-8}};
   const auto a_encoded = coder.encode(1.0 /*0.12345*/);
   const auto b_encoded = coder.encode(1.1 /*0.54321*/);

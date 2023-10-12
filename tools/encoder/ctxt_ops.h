@@ -44,18 +44,17 @@ inline helib::Ctxt shift(const helib::Ctxt& poly, long digit) {
 inline auto select(const helib::Ctxt& lpoly, const helib::Ctxt& rpoly,
                    const std::vector<long>& select_mask) {
   // Given a mask for the slots output selected poly and its complimentary poly
-  std::vector<long> complimentary_mask(select_mask.size());
+  std::vector<long> complimentary_mask = select_mask;
   std::for_each(complimentary_mask.begin(), complimentary_mask.end(),
-                [](auto& bit) { bit = (bit != 1); });
+                [](auto& bit) { bit = !bit; });
 
   const auto& context = lpoly.getContext();
-  helib::PtxtArray selected_ptxt(context);
-  helib::PtxtArray complimentary_ptxt(context);
-  selected_ptxt.load(select_mask);
-  selected_ptxt.load(complimentary_mask);
+  helib::PtxtArray selected_ptxt(context, select_mask);
+  helib::PtxtArray complimentary_ptxt(context, complimentary_mask);
 
   auto selected = (lpoly * selected_ptxt) + (rpoly * complimentary_ptxt);
   auto complimentary = (lpoly * complimentary_ptxt) + (rpoly * selected_ptxt);
+
   return std::pair{selected, complimentary};
 }
 
