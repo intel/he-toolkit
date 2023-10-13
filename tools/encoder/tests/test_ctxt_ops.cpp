@@ -20,7 +20,7 @@ struct Crypto {
   const helib::PubKey& pk;
 };
 
-TEST(tmp, DISABLED_checkSimpleMasking) {
+TEST(CtxtOps, checkSimpleMasking) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
 
   helib::PtxtArray ptxt(crypto.context);
@@ -31,7 +31,6 @@ TEST(tmp, DISABLED_checkSimpleMasking) {
   helib::PtxtArray mask(crypto.context);
   mask.load(std::vector{1L, 0L, 1L, 0L});
 
-  // const auto ans = hekit::coder::operator*(ctxt, mask);
   const auto ans = ctxt * mask;
 
   helib::PtxtArray decrypted(crypto.context);
@@ -40,10 +39,13 @@ TEST(tmp, DISABLED_checkSimpleMasking) {
   std::vector<NTL::ZZX> slots;
   decrypted.store(slots);
 
-  for (const auto& slot : slots) std::cerr << slot << std::endl;
+  std::vector expected{2L, 0L, 6L, 0L};
+
+  expected.resize(slots.size());
+  for (long i = 0; i < slots.size(); ++i) EXPECT_EQ(slots[i], expected[i]);
 }
 
-TEST(tmp, DISABLED_checkSelect) {
+TEST(CtxtOps, checkSelect) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
 
   helib::PtxtArray lpoly_ptxt(crypto.context);
@@ -68,21 +70,23 @@ TEST(tmp, DISABLED_checkSelect) {
   std::vector<NTL::ZZX> selected_slots;
   selected_ptxt.store(selected_slots);
 
-  for (const auto& slot : selected_slots) std::cerr << slot << std::endl;
+  EXPECT_EQ(selected_slots[0], 3L);
+  EXPECT_EQ(selected_slots[1], 4L);
 
   std::vector<NTL::ZZX> complimentary_slots;
   complimentary_ptxt.store(complimentary_slots);
 
-  for (const auto& slot : complimentary_slots)
-    std::cerr << "  " << slot << std::endl;
+  EXPECT_EQ(complimentary_slots[0], 2L);
+  EXPECT_EQ(complimentary_slots[1], 5L);
 }
 
-TEST(tmp, DISABLED_checkShiftSlots) {
+TEST(CtxtOps, checkShiftInSlots) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
   helib::Ctxt ctxt(crypto.pk);
   NTL::ZZX first, second;
   SetCoeff(first, 0, 2);
   SetCoeff(second, 1, 1);
+
   helib::PtxtArray nums(crypto.context);
   nums.load(std::vector{first, second});
   nums.encrypt(ctxt);
@@ -93,24 +97,31 @@ TEST(tmp, DISABLED_checkShiftSlots) {
   std::vector<NTL::ZZX> decrypt;
   decrypted_ptxt.store(decrypt);
 
-  std::cerr << first << std::endl;
-  std::cerr << decrypt[0] << std::endl;
-  std::cerr << second << std::endl;
-  std::cerr << decrypt[1] << std::endl;
+  NTL::ZZX expected_first, expected_second;
+  SetCoeff(expected_first, 1, 2);
+  SetCoeff(expected_second, 3, 1);
+
+  EXPECT_EQ(decrypt[0], expected_first);
+  EXPECT_EQ(decrypt[1], expected_second);
 }
 
-TEST(tmp, DISABLED_checkShift) {
+TEST(CtxtOps, checkShift) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(32640L).bits(50)};
   helib::Ctxt ctxt(crypto.pk);
   NTL::ZZX ptxt;
   SetCoeff(ptxt, 5, 2);
-  std::cerr << ptxt << std::endl;
 
   crypto.pk.Encrypt(ctxt, ptxt);
   ctxt = hekit::coder::shift(ctxt, 1);
   NTL::ZZX decrypted;
   crypto.sk.Decrypt(decrypted, ctxt);
-  std::cerr << decrypted << std::endl;
+
+  NTL::ZZX expected;
+  SetCoeff(expected, 6, 2);
+
+  ASSERT_EQ(NTL::deg(decrypted), NTL::deg(expected));
+  for (long i = 0; i < NTL::deg(decrypted) + 1; ++i)
+    EXPECT_EQ(decrypted[i], expected[i]);
 }
 
 }  // namespace
