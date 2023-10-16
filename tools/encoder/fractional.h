@@ -48,8 +48,9 @@ class Coder<FractionalParams> {
   auto params() const { return m_params; }
 
   FractionalEncodedPoly<SparsePoly> encode(double num) const {
+    const auto [rw, epsil, _] = m_params;
     return FractionalEncodedPoly{
-        encodeLaurentToFractional(encodeNumToLaurent(num))};
+        encodeLaurentToFractional(encodeNumToLaurent(num, rw, epsil))};
   }
 
   double decode(const FractionalEncodedPoly<SparsePoly>& encoded_poly) const {
@@ -88,25 +89,6 @@ class Coder<FractionalParams> {
         poly_map[key] = value;
     }
     return poly_map;
-  }
-
-  // TODO Refactor this a common code
-  SparsePoly encodeNumToLaurent(double num) const {
-    const auto [rw, epsil, _] = m_params;
-    const double log_rw = std::log(rw);
-    SparsePoly a_poly;
-    long r;
-    double t_minus_po;
-    for (double t = std::abs(num), sigma = signum(num); t >= epsil;
-         t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-      r = std::ceil(std::log(t) / log_rw);
-      r -= (std::pow(rw, r) - t > t - std::pow(rw, r - 1));
-
-      a_poly[r] = sigma;
-      t_minus_po = t - std::pow(rw, r);
-    }
-
-    return a_poly;
   }
 };
 

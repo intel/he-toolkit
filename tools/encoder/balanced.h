@@ -135,8 +135,11 @@ class Coder<BalancedParams> {
   auto params() const { return m_params; }
 
   BalancedEncodedPoly<SparsePoly> encode(const double num) const {
-    const auto [a, frac_exp] = EncodeHelper(num);
-    return BalancedEncodedPoly{laurentEncode(a, frac_exp), {frac_exp}};
+    const auto [rw, epsil] = m_params;
+    const auto a_poly = encodeNumToLaurent(num, rw, epsil);
+    const auto frac_exp = computeFracExp(a_poly);
+    return BalancedEncodedPoly{encodeLaurentToBalanced(a_poly, frac_exp),
+                               {frac_exp}};
   }
 
   double decode(const BalancedEncodedPoly<SparsePoly>& en) const {
@@ -150,29 +153,8 @@ class Coder<BalancedParams> {
   }
 
  private:
-  // TODO Refactor this a common code
-  std::pair<SparsePoly, long> EncodeHelper(double num) const {
-    const auto [rw, epsil] = m_params;
-    const double log_rw = std::log(rw);
-    SparsePoly a;
-    long r;
-    double t_minus_po;
-    for (double t = std::abs(num), sigma = signum(num); t >= epsil;
-         t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-      r = std::ceil(std::log(t) / log_rw);
-      r -= (std::pow(rw, r) - t > t - std::pow(rw, r - 1));
-
-      a[r] = sigma;
-      t_minus_po = t - std::pow(rw, r);
-    }
-
-    long first_index = a.begin()->first;
-    long frac_exp =
-        (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
-    return std::pair{a, frac_exp};
-  }
-
-  SparsePoly laurentEncode(const SparsePoly& sparse_poly, long i) const {
+  SparsePoly encodeLaurentToBalanced(const SparsePoly& sparse_poly,
+                                     long i) const {
     SparsePoly poly_map;
     for (const auto& [key, value] : sparse_poly) {
       poly_map[key - i] = value;
@@ -194,10 +176,13 @@ class Coder<BalancedSlotsParams> {
   BalancedSlotsEncodedPoly<SparseMultiPoly> encode(
       const std::vector<double>& nums) const {
     std::vector<SparsePoly> polys;
+    polys.reserve(nums.size());
     std::vector<long> is;
+    const auto [rw, epsil] = m_params;
     for (double num : nums) {
-      const auto [a, frac_exp] = EncodeHelper(num);
-      polys.push_back(laurentEncode(a, frac_exp));
+      const auto a_poly = encodeNumToLaurent(num, rw, epsil);
+      const auto frac_exp = computeFracExp(a_poly);
+      polys.push_back(encodeLaurentToBalanced(a_poly, frac_exp));
       is.push_back(frac_exp);
     }
     return BalancedSlotsEncodedPoly{SparseMultiPoly{polys}, is};
@@ -227,29 +212,8 @@ class Coder<BalancedSlotsParams> {
   }
 
  private:
-  // TODO Refactor this a common code
-  std::pair<SparsePoly, long> EncodeHelper(double num) const {
-    const auto [rw, epsil] = m_params;
-    const double log_rw = std::log(rw);
-    SparsePoly a;
-    long r;
-    double t_minus_po;
-    for (double t = std::abs(num), sigma = signum(num); t >= epsil;
-         t = std::abs(t_minus_po), sigma *= signum(t_minus_po)) {
-      r = std::ceil(std::log(t) / log_rw);
-      r -= (std::pow(rw, r) - t > t - std::pow(rw, r - 1));
-
-      a[r] = sigma;
-      t_minus_po = t - std::pow(rw, r);
-    }
-
-    long first_index = a.begin()->first;
-    long frac_exp =
-        (a.degree() == 0) ? 0 : (first_index - std::abs(first_index)) / 2;
-    return std::pair{a, frac_exp};
-  }
-
-  SparsePoly laurentEncode(const SparsePoly& sparse_poly, long i) const {
+  SparsePoly encodeLaurentToBalanced(const SparsePoly& sparse_poly,
+                                     long i) const {
     SparsePoly poly_map;
     for (const auto& [key, value] : sparse_poly) {
       poly_map[key - i] = value;
