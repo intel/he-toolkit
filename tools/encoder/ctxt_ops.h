@@ -11,15 +11,15 @@
 namespace hekit::coder {
 
 // HElib objects tend not to have out-of-place ops i.e. Ctxt
-template <typename TXTL, typename TXTR>
-inline auto operator*(const TXTL& lhs, const TXTR& rhs) {
+template <typename TXTR>
+inline helib::Ctxt operator*(const helib::Ctxt& lhs, const TXTR& rhs) {
   auto ans = lhs;
   ans *= rhs;
   return ans;
 }
 
-template <typename TXTL, typename TXTR>
-inline auto operator+(const TXTL& lhs, const TXTR& rhs) {
+template <typename TXTR>
+inline helib::Ctxt operator+(const helib::Ctxt& lhs, const TXTR& rhs) {
   auto ans = lhs;
   ans += rhs;
   return ans;

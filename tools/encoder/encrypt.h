@@ -40,6 +40,16 @@ void correctCoeffRange(NTL::ZZX& poly, long p) {
   }
 }
 
+inline helib::PtxtArray SparseMultiPolyToPtxtArray(
+    const SparseMultiPoly& sparse_multi_poly, const helib::Context& context) {
+  const std::vector sparse_polys = sparse_multi_poly.slots();
+  std::vector<NTL::ZZX> polys;
+  polys.reserve(sparse_polys.size());
+  std::transform(sparse_polys.cbegin(), sparse_polys.cend(),
+                 std::back_inserter(polys), SparsePolyToZZX);
+  return helib::PtxtArray(context, polys);
+}
+
 inline FractionalEncodedPoly<helib::Ctxt> encrypt(
     const FractionalEncodedPoly<SparsePoly>& encoded_poly,
     const helib::PubKey& pk) {

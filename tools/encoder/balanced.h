@@ -109,13 +109,17 @@ class BalancedSlotsEncodedPoly {
     // }
   }
 
+  template <typename RPOLY>
   BalancedSlotsEncodedPoly operator*(
-      const BalancedSlotsEncodedPoly& other) const {
-    auto ans = *this;
-    ans.m_poly = this->m_poly * other.m_poly;
-    std::transform(other.m_digits.cbegin(), other.m_digits.cend(),
-                   m_digits.cbegin(), ans.m_digits.begin(), std::plus<>{});
-    return ans;
+      const BalancedSlotsEncodedPoly<RPOLY>& other) const {
+    const auto poly = this->m_poly * other.poly();
+    auto other_digits = other.digits();
+    decltype(other_digits) digits;
+    digits.reserve(other_digits.size());
+    std::transform(other_digits.cbegin(), other_digits.cend(),
+                   m_digits.cbegin(), std::back_inserter(digits),
+                   std::plus<>{});
+    return BalancedSlotsEncodedPoly{poly, digits};
   }
 
   PolyType poly() const { return m_poly; }

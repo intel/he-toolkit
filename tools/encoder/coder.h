@@ -17,7 +17,7 @@ class Coder {
   explicit Coder(const Scheme& params) {}
 };
 
-// TODO move to more appropriate header?
+// NOTE move to more appropriate header?
 inline constexpr double signum(double x) { return (x > 0.0) - (x < 0.0); }
 
 inline SparsePoly encodeNumToLaurent(double num, double rw, double epsil) {
