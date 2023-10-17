@@ -306,11 +306,11 @@ TEST_P(BalancedSlotsEncryptedTwoNums, testMultWithPtxtArray) {
 
   const auto encrypted = encrypted1 * ptxt2;
 
-  // const auto decrypted = decrypt(encrypted, crypto.sk);
-  // const auto decoded = coder.decode(decrypted);
+  const auto decrypted = decrypt(encrypted, crypto.sk);
+  const auto decoded = coder.decode(decrypted);
 
-  // for (long i = 0; i < decoded.size(); ++i)
-  //   EXPECT_NEAR(op[i], decoded[i], params.epsil * (nums1[i] + nums2[i]));
+  for (long i = 0; i < decoded.size(); ++i)
+    EXPECT_NEAR(op[i], decoded[i], params.epsil * (nums1[i] + nums2[i]));
 }
 
 TEST_P(BalancedSlotsEncryptedTwoNums, testAdd) {
