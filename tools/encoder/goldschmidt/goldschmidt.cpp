@@ -11,8 +11,8 @@ using hekit::coder::Coder;
 using hekit::coder::SparseMultiPoly;
 
 template <typename EncodedPoly>
-EncodedPoly goldschmidt(const EncodedPoly& N, const EncodedPoly& D,
-                        long iterations) {
+EncodedPoly goldschmidt(const EncodedPoly& numerator,
+                        const EncodedPoly& denominator, long iterations) {
   // N/D Numerator and Divisor
   // F_i = 2 - D_i
   // N_i+1/D_i+1 = N_i/D_i * F_i/F_i
@@ -22,6 +22,8 @@ EncodedPoly goldschmidt(const EncodedPoly& N, const EncodedPoly& D,
         "`goldschmidt` must be passed non-negative integers, not " +
         std::to_string(iterations));
 
+  auto N = numerator;
+  auto D = denominator;
   const auto* context_p = &N.poly().getContext();
   long nslots = context_p->getNSlots();
   const auto minus_one = BalancedSlotsEncodedPoly(
