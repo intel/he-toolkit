@@ -28,3 +28,4 @@ find_package(helib REQUIRED)
 
 enable_testing()
 add_subdirectory(tests)
+add_subdirectory(goldschmidt)

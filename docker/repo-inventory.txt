@@ -254,6 +254,8 @@ tools/encoder/coder.h
 tools/encoder/ctxt_ops.h
 tools/encoder/encrypt.h
 tools/encoder/fractional.h
+tools/encoder/goldschmidt/CMakeLists.txt
+tools/encoder/goldschmidt/goldschmidt.cpp
 tools/encoder/sparse_poly.h
 tools/encoder/tests/CMakeLists.txt
 tools/encoder/tests/test_balanced.cpp
