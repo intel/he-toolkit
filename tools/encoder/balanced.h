@@ -70,23 +70,24 @@ class BalancedSlotsEncodedPoly {
                            const std::vector<long>& digits)
       : m_poly(poly), m_digits(digits) {}
 
+  template <typename RPOLY>
   BalancedSlotsEncodedPoly operator+(
-      const BalancedSlotsEncodedPoly& other) const {
+      const BalancedSlotsEncodedPoly<RPOLY>& other) const {
     std::vector<long> select_digits;
     select_digits.reserve(m_digits.size());
     std::transform(
-        m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+        m_digits.cbegin(), m_digits.cend(), other.digits().cbegin(),
         std::back_inserter(select_digits),
         [](const long lhs, const long rhs) { return std::min(lhs, rhs); });
 
     std::vector<long> select_mask;
     select_mask.reserve(m_digits.size());
-    std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+    std::transform(m_digits.cbegin(), m_digits.cend(), other.digits().cbegin(),
                    std::back_inserter(select_mask), std::less<long>{});
 
     std::vector<long> shift_digits;
     shift_digits.reserve(m_digits.size());
-    std::transform(m_digits.cbegin(), m_digits.cend(), other.m_digits.cbegin(),
+    std::transform(m_digits.cbegin(), m_digits.cend(), other.digits().cbegin(),
                    std::back_inserter(shift_digits),
                    [](const auto& ldigit, const auto& rdigit) {
                      return (ldigit < rdigit) ? rdigit - ldigit
@@ -94,9 +95,9 @@ class BalancedSlotsEncodedPoly {
                    });
 
     const auto [select_poly, complimentary_poly] =
-        select(m_poly, other.m_poly, select_mask);
+        select(m_poly, other.poly(), select_mask);
 
-    return BalancedSlotsEncodedPoly<PolyType>{
+    return BalancedSlotsEncodedPoly{
         select_poly + shift(complimentary_poly, shift_digits), select_digits};
 
     // if (this->m_digit < other.m_digit) {

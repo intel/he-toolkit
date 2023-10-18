@@ -25,6 +25,21 @@ inline helib::Ctxt operator+(const helib::Ctxt& lhs, const TXTR& rhs) {
   return ans;
 }
 
+// NOTE these may be better suited as specializations
+inline helib::PtxtArray operator*(const helib::PtxtArray& lhs,
+                                  const helib::PtxtArray& rhs) {
+  auto ans = lhs;
+  ans *= rhs;
+  return ans;
+}
+
+inline helib::PtxtArray operator+(const helib::PtxtArray& lhs,
+                                  const helib::PtxtArray& rhs) {
+  auto ans = lhs;
+  ans += rhs;
+  return ans;
+}
+
 inline helib::Ctxt shift(const helib::Ctxt& poly, long digit) {
   auto ctxt = poly;
   NTL::ZZX x;
@@ -41,7 +56,8 @@ inline helib::Ctxt shift(const helib::Ctxt& poly, long digit) {
   return ctxt;
 }
 
-inline auto select(const helib::Ctxt& lpoly, const helib::Ctxt& rpoly,
+template <typename RPoly>
+inline auto select(const helib::Ctxt& lpoly, const RPoly& rpoly,
                    const std::vector<long>& select_mask) {
   // Given a mask for the slots output selected poly and its complimentary poly
   std::vector<long> complimentary_mask = select_mask;
