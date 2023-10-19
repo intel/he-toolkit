@@ -41,10 +41,15 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
   return std::pair{N, D};
 }
 
-int main() {
+int main(int argc, char** argv) {
+  if (argc != 2) {
+    std::cerr << "please give number of iterations" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   std::cout << "Initializing HElib Context and keys\n";
   const helib::Context context =
-      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(500).build();
+      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(1000).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
   const helib::PubKey& pk = sk;
@@ -58,21 +63,26 @@ int main() {
 
   double tmp = 0.2;
   std::generate_n(divisor_nums.begin(), context.getNSlots(),
-                  [&tmp]() mutable { return tmp *= tmp; });
+                  [&tmp]() mutable { return tmp = tmp * tmp + 0.25; });
   const auto N = hekit::coder::encrypt(coder.encode(numerator_nums), pk);
   const auto D = hekit::coder::encrypt(coder.encode(divisor_nums), pk);
 
   std::cout << "Performing division\n";
-  const auto [encrypted_result, _] = goldschmidt(N, D, 1);
+  long iterations = std::stoll(argv[1]);
+  const auto [encrypted_result, encrypted_divisors] =
+      goldschmidt(N, D, iterations);
 
   std::cout << "Decrypting and decoding\n";
   const auto decrypted_result = hekit::coder::decrypt(encrypted_result, sk);
   const std::vector decoded_results = coder.decode(decrypted_result);
 
+  const auto decrypted_divisors = hekit::coder::decrypt(encrypted_divisors, sk);
+  const std::vector decoded_divisors = coder.decode(decrypted_divisors);
+
   std::cout << "Printing results\n";
   for (long i = 0; i < decoded_results.size(); ++i) {
     std::cout << numerator_nums[i] << " / " << divisor_nums[i] << " = "
-              << decoded_results[i] << '\n';
+              << decoded_results[i] << " (" << decoded_divisors[i] << ")\n";
   }
   std::cout << "Fin." << std::endl;
 
