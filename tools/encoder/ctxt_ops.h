@@ -81,8 +81,7 @@ inline helib::Ctxt shift(const helib::Ctxt& poly,
     SetCoeff(shifts[i], digits[i]);
   }
 
-  helib::PtxtArray ptxt(poly.getContext());
-  ptxt.load(shifts);
+  helib::PtxtArray ptxt(poly.getContext(), shifts);
   auto ctxt = poly;
   ctxt *= ptxt;
 

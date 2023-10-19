@@ -23,13 +23,11 @@ struct Crypto {
 TEST(CtxtOps, checkSimpleMasking) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
 
-  helib::PtxtArray ptxt(crypto.context);
-  ptxt.load(std::vector{2L, 4L, 6L, 8L});
+  helib::PtxtArray ptxt(crypto.context, std::vector{2L, 4L, 6L, 8L});
   helib::Ctxt ctxt(crypto.pk);
   ptxt.encrypt(ctxt);
 
-  helib::PtxtArray mask(crypto.context);
-  mask.load(std::vector{1L, 0L, 1L, 0L});
+  helib::PtxtArray mask(crypto.context, std::vector{1L, 0L, 1L, 0L});
 
   const auto ans = ctxt * mask;
 
@@ -48,13 +46,11 @@ TEST(CtxtOps, checkSimpleMasking) {
 TEST(CtxtOps, checkSelect) {
   Crypto crypto{helib::ContextBuilder<helib::BGV>{}.p(47L).m(20000L).bits(50)};
 
-  helib::PtxtArray lpoly_ptxt(crypto.context);
-  lpoly_ptxt.load(std::vector{2L, 4L});
+  helib::PtxtArray lpoly_ptxt(crypto.context, std::vector{2L, 4L});
   helib::Ctxt lpoly(crypto.pk);
   lpoly_ptxt.encrypt(lpoly);
 
-  helib::PtxtArray rpoly_ptxt(crypto.context);
-  rpoly_ptxt.load(std::vector{3L, 5L});
+  helib::PtxtArray rpoly_ptxt(crypto.context, std::vector{3L, 5L});
   helib::Ctxt rpoly(crypto.pk);
   rpoly_ptxt.encrypt(rpoly);
 
@@ -87,8 +83,7 @@ TEST(CtxtOps, checkShiftInSlots) {
   SetCoeff(first, 0, 2);
   SetCoeff(second, 1, 1);
 
-  helib::PtxtArray nums(crypto.context);
-  nums.load(std::vector{first, second});
+  helib::PtxtArray nums(crypto.context, std::vector{first, second});
   nums.encrypt(ctxt);
 
   auto ans = hekit::coder::shift(ctxt, std::vector{1L, 2L});

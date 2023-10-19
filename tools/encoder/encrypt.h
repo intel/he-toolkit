@@ -97,8 +97,7 @@ inline BalancedSlotsEncodedPoly<helib::Ctxt> encrypt(
   std::transform(polys.cbegin(), polys.cend(), std::back_inserter(ntl_polys),
                  SparsePolyToZZX);
   helib::Ctxt ctxt(pk);
-  helib::PtxtArray ptxt(pk.getContext());
-  ptxt.load(ntl_polys);
+  helib::PtxtArray ptxt(pk.getContext(), ntl_polys);
   ptxt.encrypt(ctxt);
   return BalancedSlotsEncodedPoly{ctxt, encoded_poly.digits()};
 }

@@ -284,6 +284,35 @@ TEST_P(BalancedSlotsEncryptedTwoNums, testMult) {
     EXPECT_NEAR(op[i], decoded[i], params.epsil * (nums1[i] + nums2[i]));
 }
 
+TEST_P(BalancedSlotsEncryptedTwoNums, testAddWithPtxtArray) {
+  auto [test_config, nums1, nums2] = GetParam();
+  const auto [bgv_cb, coder] = test_config;
+  Crypto crypto(bgv_cb);
+  auto params = coder.params();
+
+  ASSERT_EQ(nums1.size(), nums2.size());
+
+  nums1.resize(crypto.context.getNSlots());
+  nums2.resize(crypto.context.getNSlots());
+
+  const auto op = nums1 + nums2;
+
+  const auto encoded1 = coder.encode(nums1);
+  const auto encoded2 = coder.encode(nums2);
+  const auto encrypted1 = encrypt(encoded1, crypto.pk);
+  const auto ptxt2 = hekit::coder::BalancedSlotsEncodedPoly{
+      SparseMultiPolyToPtxtArray(encoded2.poly(), crypto.context),
+      encoded2.digits()};
+
+  const auto encrypted = encrypted1 + ptxt2;
+
+  const auto decrypted = decrypt(encrypted, crypto.sk);
+  const auto decoded = coder.decode(decrypted);
+
+  for (long i = 0; i < decoded.size(); ++i)
+    EXPECT_NEAR(op[i], decoded[i], params.epsil * 2);
+}
+
 TEST_P(BalancedSlotsEncryptedTwoNums, testMultWithPtxtArray) {
   auto [test_config, nums1, nums2] = GetParam();
   const auto [bgv_cb, coder] = test_config;
