@@ -28,12 +28,12 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
   long nslots = context_p->getNSlots();
   const auto minus_one = BalancedSlotsEncodedPoly(
       helib::PtxtArray(*context_p, -1L), std::vector(nslots, 0L));
-  const auto minus_two = BalancedSlotsEncodedPoly(
-      helib::PtxtArray(*context_p, -2L), std::vector(nslots, 0L));
+  const auto two = BalancedSlotsEncodedPoly(helib::PtxtArray(*context_p, 2L),
+                                            std::vector(nslots, 0L));
 
   for (long i = 0; i < iterations; ++i) {
     // F = 2 - D
-    auto F = (D + minus_two) * minus_one;
+    auto F = D * minus_one + two;
     N = N * F;
     D = D * F;
   }
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
   std::cout << "Initializing HElib Context and keys\n";
   const helib::Context context =
-      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(1000).build();
+      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
   const helib::PubKey& pk = sk;
@@ -67,8 +67,8 @@ int main(int argc, char** argv) {
   const auto N = hekit::coder::encrypt(coder.encode(numerator_nums), pk);
   const auto D = hekit::coder::encrypt(coder.encode(divisor_nums), pk);
 
-  std::cout << "Performing division\n";
   long iterations = std::stoll(argv[1]);
+  std::cout << "Performing division\n";
   const auto [encrypted_result, encrypted_divisors] =
       goldschmidt(N, D, iterations);
 
