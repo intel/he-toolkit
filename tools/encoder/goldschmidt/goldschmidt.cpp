@@ -48,26 +48,39 @@ struct Args {
   double rw = 1.2;
   double epsil = 1e-8;
   long iterations = 5;
+  // read in via file
+  long p;
+  long m;
+  long bits;
 };
 
 int main(int argc, char** argv) {
   Args args;
+  std::string params_file;
 
+  // clang-format off
   helib::ArgMap{}
       .arg("rw", args.rw)
       .arg("epsil", args.epsil)
       .arg("iterations", args.iterations)
+      .required()
+      .positional()
+      .arg("params", params_file)
       .parse(argc, argv);
 
-  //      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
-  // 127                  2500                 6250                 2500 1
-  // 127                  1000                 3001                 3000 3
-  // 127                  2502                10012                 5004 2
+  helib::ArgMap{}
+      .arg("p", args.p)
+      .arg("m", args.m)
+      .arg("bits", args.bits)
+      .parse(params_file);
+  // clang-format on
 
   std::cout << "Initializing HElib Context and keys\n";
-  const helib::Context context =
-      helib::ContextBuilder<helib::BGV>{}.p(127).m(10012).bits(1000).build();
-  //      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
+  const helib::Context context = helib::ContextBuilder<helib::BGV>{}
+                                     .p(args.p)
+                                     .m(args.m)
+                                     .bits(args.bits)
+                                     .build();
   helib::SecKey sk(context);
   sk.GenSecKey();
   const helib::PubKey& pk = sk;
