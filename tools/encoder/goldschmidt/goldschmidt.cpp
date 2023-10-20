@@ -15,10 +15,6 @@ using hekit::coder::SparseMultiPoly;
 template <typename EncodedPoly>
 auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
                  long iterations) {
-  // N/D Numerator and Divisor
-  // F_i = 2 - D_i
-  // N_i+1/D_i+1 = N_i/D_i * F_i/F_i
-
   if (iterations < 0)
     throw std::logic_error(
         "`goldschmidt` must be passed non-negative integers, not " +
@@ -35,7 +31,9 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
                                             std::vector(nslots, 0L));
 
   for (long i = 0; i < iterations; ++i) {
-    // F = 2 - D
+    // N/D Numerator and Divisor
+    // F_i = 2 - D_i
+    // N_i+1/D_i+1 = N_i/D_i * F_i/F_i
     const auto F = D * minus_one + two;
     N = N * F;
     D = D * F;
@@ -45,6 +43,7 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
 }
 
 struct Args {
+  // read in via cli
   double rw = 1.2;
   double epsil = 1e-8;
   long iterations = 5;

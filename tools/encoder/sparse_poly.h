@@ -86,6 +86,11 @@ class SparsePoly {
     return m_coeffs == other.m_coeffs;
   }
 
+  SparsePoly& negate() {
+    for (auto [k, v] : m_coeffs) m_coeffs[k] = -v;
+    return *this;
+  }
+
  private:
   // <index, coeff>
   std::map<long, long> m_coeffs;
@@ -134,6 +139,11 @@ class SparseMultiPoly {
 
   bool operator==(const SparseMultiPoly& other) const {
     return m_slots == other.m_slots;
+  }
+
+  SparseMultiPoly& negate() {
+    for (auto& slot : m_slots) slot.negate();
+    return *this;
   }
 
  private:
