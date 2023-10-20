@@ -47,9 +47,13 @@ int main(int argc, char** argv) {
     exit(EXIT_FAILURE);
   }
 
+  //      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
+  // 127                  2500                 6250                 2500 1
+  //  127                  1000                 3001                 3000 3
   std::cout << "Initializing HElib Context and keys\n";
   const helib::Context context =
-      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
+      helib::ContextBuilder<helib::BGV>{}.p(127).m(6250).bits(1000).build();
+  //      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
   const helib::PubKey& pk = sk;
@@ -82,7 +86,7 @@ int main(int argc, char** argv) {
   std::cout << "Printing results\n";
   for (long i = 0; i < decoded_results.size(); ++i) {
     std::cout << numerator_nums[i] << " / " << divisor_nums[i] << " = "
-              << decoded_results[i] << " (" << decoded_divisors[i] << ")\n";
+              << decoded_results[i] << " (D=" << decoded_divisors[i] << ")\n";
   }
   std::cout << "Fin." << std::endl;
 
