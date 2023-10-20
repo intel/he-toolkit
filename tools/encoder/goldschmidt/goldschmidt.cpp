@@ -1,6 +1,8 @@
 // Copyright (C) 2023 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#include <helib/ArgMap.h>
+
 #include <iostream>
 
 #include "../encrypt.h"
@@ -26,6 +28,7 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
   auto D = denominator;
   const auto* context_p = &N.poly().getContext();
   long nslots = context_p->getNSlots();
+  // TODO negation op make this obsolete
   const auto minus_one = BalancedSlotsEncodedPoly(
       helib::PtxtArray(*context_p, -1L), std::vector(nslots, 0L));
   const auto two = BalancedSlotsEncodedPoly(helib::PtxtArray(*context_p, 2L),
@@ -33,7 +36,7 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
 
   for (long i = 0; i < iterations; ++i) {
     // F = 2 - D
-    auto F = D * minus_one + two;
+    const auto F = D * minus_one + two;
     N = N * F;
     D = D * F;
   }
@@ -41,40 +44,51 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
   return std::pair{N, D};
 }
 
+struct Args {
+  double rw = 1.2;
+  double epsil = 1e-8;
+  long iterations = 5;
+};
+
 int main(int argc, char** argv) {
-  if (argc != 2) {
-    std::cerr << "please give number of iterations" << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  Args args;
+
+  helib::ArgMap{}
+      .arg("rw", args.rw)
+      .arg("epsil", args.epsil)
+      .arg("iterations", args.iterations)
+      .parse(argc, argv);
 
   //      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
   // 127                  2500                 6250                 2500 1
-  //  127                  1000                 3001                 3000 3
+  // 127                  1000                 3001                 3000 3
+  // 127                  2502                10012                 5004 2
+
   std::cout << "Initializing HElib Context and keys\n";
   const helib::Context context =
-      helib::ContextBuilder<helib::BGV>{}.p(127).m(6250).bits(1000).build();
+      helib::ContextBuilder<helib::BGV>{}.p(127).m(10012).bits(1000).build();
   //      helib::ContextBuilder<helib::BGV>{}.p(47).m(20000).bits(2000).build();
   helib::SecKey sk(context);
   sk.GenSecKey();
   const helib::PubKey& pk = sk;
 
   std::cout << "Initializing coder\n";
-  Coder coder(BalancedSlotsParams{.rw = 1.2, .epsil = 1e-8});
+  Coder coder(BalancedSlotsParams{.rw = args.rw, .epsil = args.epsil});
 
   std::cout << "Encoding and encrypting\n";
   const std::vector numerator_nums(context.getNSlots(), 0.2);
   std::vector divisor_nums(context.getNSlots(), 0.0);
 
   double tmp = 0.2;
-  std::generate_n(divisor_nums.begin(), context.getNSlots(),
-                  [&tmp]() mutable { return tmp = tmp * tmp + 0.25; });
+  std::generate_n(divisor_nums.begin(), context.getNSlots(), [&tmp]() mutable {
+    return tmp = 1.2; /*tmp * tmp + 0.25;*/
+  });
   const auto N = hekit::coder::encrypt(coder.encode(numerator_nums), pk);
   const auto D = hekit::coder::encrypt(coder.encode(divisor_nums), pk);
 
-  long iterations = std::stoll(argv[1]);
   std::cout << "Performing division\n";
   const auto [encrypted_result, encrypted_divisors] =
-      goldschmidt(N, D, iterations);
+      goldschmidt(N, D, args.iterations);
 
   std::cout << "Decrypting and decoding\n";
   const auto decrypted_result = hekit::coder::decrypt(encrypted_result, sk);
