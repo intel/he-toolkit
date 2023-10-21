@@ -85,6 +85,21 @@ TEST_P(BalancedSlotsArith, testBalancedSlotsMultiplication) {
   }
 }
 
+TEST_P(BalancedSlotsArith, testBalancedSlotsNegate) {
+  const auto& [rw, epsil, nums, _] = GetParam();
+
+  BalancedSlotsParams params{rw, epsil};
+  Coder coder(params);
+  auto encoded = coder.encode(nums);
+  encoded.negate();
+  const auto decoded = coder.decode(encoded);
+
+  for (long n = 0; n < nums.size(); ++n) {
+    const auto& num = nums[n];
+    EXPECT_NEAR(-num, decoded[n], epsil);
+  }
+}
+
 double default_epsil = 1e-8;
 
 INSTANTIATE_TEST_SUITE_P(

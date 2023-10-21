@@ -24,17 +24,14 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
   auto D = denominator;
   const auto* context_p = &N.poly().getContext();
   long nslots = context_p->getNSlots();
-  // TODO negation op make this obsolete
-  const auto minus_one = BalancedSlotsEncodedPoly(
-      helib::PtxtArray(*context_p, -1L), std::vector(nslots, 0L));
+
   const auto two = BalancedSlotsEncodedPoly(helib::PtxtArray(*context_p, 2L),
                                             std::vector(nslots, 0L));
-
+  // N/D Numerator and Divisor
+  // F_i = 2 - D_i
+  // N_i+1/D_i+1 = N_i/D_i * F_i/F_i
   for (long i = 0; i < iterations; ++i) {
-    // N/D Numerator and Divisor
-    // F_i = 2 - D_i
-    // N_i+1/D_i+1 = N_i/D_i * F_i/F_i
-    const auto F = D * minus_one + two;
+    const auto F = -D + two;
     N = N * F;
     D = D * F;
   }
@@ -91,10 +88,12 @@ int main(int argc, char** argv) {
   const std::vector numerator_nums(context.getNSlots(), 0.2);
   std::vector divisor_nums(context.getNSlots(), 0.0);
 
-  double tmp = 0.2;
-  std::generate_n(divisor_nums.begin(), context.getNSlots(), [&tmp]() mutable {
-    return tmp = 1.2; /*tmp * tmp + 0.25;*/
-  });
+  double step = -0.1;
+  double tmp = 0;
+  std::generate_n(divisor_nums.begin(), context.getNSlots(),
+                  [&tmp, &step]() mutable {
+                    return tmp = 0.8 + step; /*tmp * tmp + 0.25;*/
+                  });
   const auto N = hekit::coder::encrypt(coder.encode(numerator_nums), pk);
   const auto D = hekit::coder::encrypt(coder.encode(divisor_nums), pk);
 

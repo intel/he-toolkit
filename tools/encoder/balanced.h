@@ -126,6 +126,16 @@ class BalancedSlotsEncodedPoly {
   PolyType poly() const { return m_poly; }
   std::vector<long> digits() const { return m_digits; }
 
+  BalancedSlotsEncodedPoly& negate() {
+    m_poly.negate();
+    return *this;
+  }
+
+  BalancedSlotsEncodedPoly operator-() const {
+    auto ans = *this;
+    return ans.negate();
+  }
+
  private:
   PolyType m_poly;
   std::vector<long> m_digits;
