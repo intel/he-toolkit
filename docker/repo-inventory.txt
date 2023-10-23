@@ -252,6 +252,7 @@ tools/encoder/CMakeLists.txt
 tools/encoder/balanced.h
 tools/encoder/coder.h
 tools/encoder/ctxt_ops.h
+tools/encoder/dual_poly.h
 tools/encoder/encrypt.h
 tools/encoder/fractional.h
 tools/encoder/goldschmidt/CMakeLists.txt
