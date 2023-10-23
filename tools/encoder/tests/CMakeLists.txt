@@ -18,7 +18,7 @@ set(TEST_FILES
   test_balanced_slots.cpp
   test_encrypt.cpp
   test_ctxt_ops.cpp
-  test_euclid.cpp
+  test_rns.cpp
 )
 
 add_executable(run_tests ${TEST_FILES})

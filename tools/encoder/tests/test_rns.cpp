@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../euclid.h"
+#include "../rns.h"
 
 namespace {
 
@@ -25,5 +25,20 @@ INSTANTIATE_TEST_SUITE_P(
                       std::pair{7L, 0L}, std::pair{127L, 257L},
                       std::pair{-5, 45}, std::pair{-45, -5},
                       std::pair{0L, -5L}));
+
+TEST(testRNS, DecompRecomp) {
+  long original = 5432;
+  long mod_a = 257;
+  long mod_b = 127;
+
+  const auto decomposed = hekit::coder::decompCRT(original, {mod_a, mod_b});
+
+  EXPECT_LT(decomposed.first, mod_a);
+  EXPECT_LT(decomposed.second, mod_b);
+
+  const auto recomposed = hekit::coder::recompCRT({decomposed.first, mod_a},
+                                                  {decomposed.second, mod_b});
+  EXPECT_EQ(recomposed, original);
+}
 
 }  // namespace

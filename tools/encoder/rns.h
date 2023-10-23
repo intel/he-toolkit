@@ -36,12 +36,20 @@ inline auto extendedGCD(long a, long b) -> ExtendedEuclidResults {
                                .b = (b < 0 ? -1 : 1) * old_t};
 }
 
-inline long solveCRT(std::pair<long, long> am, std::pair<long, long> bn) {
+inline auto decompCRT(long num, const std::pair<long, long>& mod_pair)
+    -> std::pair<long, long> {
+  return std::pair{num % mod_pair.first, num % mod_pair.second};
+}
+
+inline long recompCRT(const std::pair<long, long>& am,
+                      const std::pair<long, long>& bn) {
   const auto result = extendedGCD(am.second, bn.second);
   if (result.gcd != 1) throw std::runtime_error("");
+  const auto big_mod = am.second * bn.second;
   const auto recompose =
       am.first * bn.second * result.b + bn.first * am.second * result.a;
-  return recompose % (bn.second * am.second);
+  const auto recomp_mod = recompose % big_mod;
+  return (recomp_mod > 0) ? recomp_mod : recomp_mod + big_mod;
 }
 
 }  // namespace hekit::coder
