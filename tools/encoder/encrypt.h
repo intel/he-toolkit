@@ -33,7 +33,7 @@ inline SparsePoly ZZXToSparsePoly(const NTL::ZZX& ntl_poly) {
 }
 
 // Correct to -p/2 to +p/2
-void correctCoeffRange(NTL::ZZX& poly, long p) {
+inline void correctCoeffRange(NTL::ZZX& poly, long p) {
   for (long i = 0; i < NTL::deg(poly) + 1; ++i) {
     const auto& coeff = poly[i];
     if (coeff > p / 2) poly[i] = coeff - p;
