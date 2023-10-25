@@ -19,6 +19,7 @@ set(TEST_FILES
   test_encrypt.cpp
   test_ctxt_ops.cpp
   test_rns.cpp
+  test_dual_poly.cpp
 )
 
 add_executable(run_tests ${TEST_FILES})

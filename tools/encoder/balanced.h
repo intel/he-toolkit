@@ -183,6 +183,8 @@ class Coder<BalancedParams> {
 template <>
 class Coder<BalancedSlotsParams> {
  public:
+  using PolyType = BalancedSlotsEncodedPoly<SparseMultiPoly>;
+
   Coder() = delete;
   explicit Coder(const BalancedSlotsParams& params) : m_params(params) {}
 

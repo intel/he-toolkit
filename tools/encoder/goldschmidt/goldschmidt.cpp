@@ -17,7 +17,8 @@ auto goldschmidt(const EncodedPoly& numerator, const EncodedPoly& denominator,
                  long iterations) {
   if (iterations < 0)
     throw std::logic_error(
-        "`goldschmidt` must be passed non-negative integers, not " +
+        "`goldschmidt` must be passed non-negative integers for iterations, "
+        "not " +
         std::to_string(iterations));
 
   auto N = numerator;

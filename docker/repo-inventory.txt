@@ -264,6 +264,7 @@ tools/encoder/tests/CMakeLists.txt
 tools/encoder/tests/test_balanced.cpp
 tools/encoder/tests/test_balanced_slots.cpp
 tools/encoder/tests/test_ctxt_ops.cpp
+tools/encoder/tests/test_dual_poly.cpp
 tools/encoder/tests/test_encrypt.cpp
 tools/encoder/tests/test_fractional.cpp
 tools/encoder/tests/test_rns.cpp
