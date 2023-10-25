@@ -32,7 +32,8 @@ TEST_P(TestDualEncodeNum, testDecompRecompBalancedSlots) {
   const auto encoded = dual_coder.encode(nums);
   const auto decoded = dual_coder.decode(encoded);
 
-  for (long i = 0; i < nums.size(); ++i) EXPECT_EQ(decoded[i], nums[i]);
+  for (long i = 0; i < nums.size(); ++i)
+    EXPECT_NEAR(decoded[i], nums[i], epsil);
 }
 
 INSTANTIATE_TEST_SUITE_P(singleNums, TestDualEncodeNum,

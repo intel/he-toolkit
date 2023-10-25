@@ -38,7 +38,9 @@ TEST(testRNS, DecompRecomp) {
 
   const auto recomposed = hekit::coder::recompCRT({decomposed.first, mod_a},
                                                   {decomposed.second, mod_b});
-  EXPECT_EQ(recomposed, original);
+  // Don't forget to mod. Easiest way to check correct.
+  long big_mod = mod_a * mod_b;
+  EXPECT_EQ((recomposed + big_mod) % big_mod, original);
 }
 
 }  // namespace

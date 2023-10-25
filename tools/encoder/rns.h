@@ -49,7 +49,7 @@ inline long recompCRT(const std::pair<long, long>& am,
   const auto recompose =
       am.first * bn.second * result.b + bn.first * am.second * result.a;
   const auto recomp_mod = recompose % big_mod;
-  return (recomp_mod > 0) ? recomp_mod : recomp_mod + big_mod;
+  return recomp_mod;
 }
 
 }  // namespace hekit::coder
