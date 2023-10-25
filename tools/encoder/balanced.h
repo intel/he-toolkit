@@ -65,6 +65,8 @@ class BalancedEncodedPoly {
 template <typename PolyType>
 class BalancedSlotsEncodedPoly {
  public:
+  using UsingPolyType = PolyType;
+
   BalancedSlotsEncodedPoly() = delete;
   BalancedSlotsEncodedPoly(const PolyType& poly,
                            const std::vector<long>& digits)

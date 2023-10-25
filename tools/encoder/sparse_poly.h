@@ -10,7 +10,10 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
+
+#include "rns.h"
 
 namespace hekit::coder {
 
@@ -91,6 +94,27 @@ class SparsePoly {
     return *this;
   }
 
+  SparsePoly& mod(long p) {
+    for (auto [k, v] : m_coeffs) m_coeffs[k] = v % p;
+    return *this;
+  }
+
+  using SparsePolyMod = std::pair<SparsePoly, long>;
+  // NOTE Assumptions are that inside a DualPoly these Polys will have same
+  // sizes and same coeffs due to all ops b eing applied to both indside the
+  // DualPoly. Maybe we should have further sanity checks (or rethink some of
+  // the design).
+  static SparsePoly recompCRT(const SparsePolyMod& am,
+                              const SparsePolyMod& bn) {
+    const auto [a_poly, m] = am;
+    const auto [b_poly, n] = bn;
+    SparsePoly recomp;
+    for (const auto [k, v] : a_poly) {
+      recomp[k] = hekit::coder::recompCRT({v, m}, {b_poly[k], n});
+    }
+    return recomp;
+  }
+
  private:
   // <index, coeff>
   std::map<long, long> m_coeffs;
@@ -146,8 +170,34 @@ class SparseMultiPoly {
     return *this;
   }
 
+  SparseMultiPoly& mod(long p) {
+    for (auto& slot : m_slots) slot.mod(p);
+    return *this;
+  }
+
  private:
   std::vector<SparsePoly> m_slots;
+
+  // static method
+ public:
+  using SparseMultiPolyMod = std::pair<SparseMultiPoly, long>;
+  // NOTE Assumptions are that inside a DualPoly these Polys will have same
+  // sizes and same coeffs due to all ops b eing applied to both indside the
+  // DualPoly. Maybe we should have further sanity checks (or rethink some of
+  // the design).
+  static SparseMultiPoly recompCRT(const SparseMultiPolyMod& am,
+                                   const SparseMultiPolyMod& bn) {
+    const auto [a_poly, m] = am;
+    const auto [b_poly, n] = bn;
+    const auto a_slots = a_poly.slots();
+    const auto b_slots = b_poly.slots();
+    std::vector<SparsePoly> recomp;
+    recomp.reserve(a_slots.size());
+    for (long i = 0; i < a_slots.size(); ++i) {
+      recomp.push_back(SparsePoly::recompCRT({a_slots[i], m}, {b_slots[i], n}));
+    }
+    return SparseMultiPoly{recomp};
+  }
 };
 
 inline SparseMultiPoly shift(const SparseMultiPoly& poly,

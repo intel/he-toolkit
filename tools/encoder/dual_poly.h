@@ -54,6 +54,9 @@ class DualPoly {
 template <typename EncodedPolyParams>
 class DualCoder {
  public:
+  // e.g. BalancedSlotsEncodedPoly
+  using CoderPolyType = typename Coder<EncodedPolyParams>::PolyType;
+
   DualCoder() = delete;
   explicit DualCoder(const EncodedPolyParams& params,
                      std::pair<long, long> mods)
@@ -63,38 +66,37 @@ class DualCoder {
 
   // NOTE for now just support multi nums
   auto encode(const std::vector<double>& nums) const {
-    std::vector<double> hi_nums;
-    hi_nums.reserve(nums.size());
-    std::vector<double> lo_nums;
-    lo_nums.reserve(nums.size());
-    for (const auto& num : nums) {
-      auto [hi_num, lo_num] = decompCRT(num, m_mods);
-      hi_nums.push_back(hi_num);
-      lo_nums.push_back(lo_num);
-    }
-
-    return DualPoly{m_coder.encode(hi_nums), m_coder.encode(lo_nums)};
+    const auto whole_encoded = m_coder.encode(nums);
+    return DualPoly{mod(whole_encoded, m_mods.first),
+                    mod(whole_encoded, m_mods.second)};
   }
 
   // NOTE for now just support multi nums
-  auto decode(const DualPoly<typename Coder<EncodedPolyParams>::PolyType>&
-                  dual_poly) const -> std::vector<double> {
-    const auto [hi_poly, lo_poly] = dual_poly.polys();
-    const auto hi_nums = m_coder.decode(hi_poly);
-    const auto lo_nums = m_coder.decode(lo_poly);
-    auto [hi_mod, lo_mod] = m_mods;
-    std::vector<double> recomposed_nums;
-    recomposed_nums.reserve(hi_nums.size());
-    for (long i = 0; i < hi_nums.size(); ++i) {
-      recomposed_nums.push_back(
-          recompCRT({hi_nums[i], hi_mod}, {lo_nums[i], lo_mod}));
-    }
-    return recomposed_nums;
+  auto decode(const DualPoly<CoderPolyType>& dual_poly) const
+      -> std::vector<double> {
+    return m_coder.decode(recompose(dual_poly));
   }
 
  private:
   Coder<EncodedPolyParams> m_coder;
   std::pair<long, long> m_mods;
+
+  static auto mod(const CoderPolyType& encoded_poly, long p) {
+    auto poly = encoded_poly.poly().mod(p);
+    return decltype(encoded_poly){poly, encoded_poly.digits()};
+  }
+
+  // NOTE for now just support multi nums
+  auto recompose(const DualPoly<CoderPolyType>& dual_poly) const {
+    const auto [hi_encoded, lo_encoded] = dual_poly.polys();
+    if (hi_encoded.digits() != lo_encoded.digits())
+      throw std::logic_error("Digits were not equal while recomposing");
+
+    const auto [m, n] = m_mods;
+    const auto recomposed_poly = CoderPolyType::UsingPolyType::recompCRT(
+        {hi_encoded.poly(), m}, {lo_encoded.poly(), n});
+    return CoderPolyType{recomposed_poly, hi_encoded.digits()};
+  }
 };
 
 }  // namespace hekit::coder
