@@ -62,10 +62,10 @@ class DualCoder {
   auto params() const { return m_coder.params(); }
 
   // NOTE for now just support multi nums
-  auto encode(const std::vector<long>& nums) const {
-    std::vector<long> hi_nums;
+  auto encode(const std::vector<double>& nums) const {
+    std::vector<double> hi_nums;
     hi_nums.reserve(nums.size());
-    std::vector<long> lo_nums;
+    std::vector<double> lo_nums;
     lo_nums.reserve(nums.size());
     for (const auto& num : nums) {
       auto [hi_num, lo_num] = decompCRT(num, m_mods);
@@ -78,12 +78,12 @@ class DualCoder {
 
   // NOTE for now just support multi nums
   auto decode(const DualPoly<typename Coder<EncodedPolyParams>::PolyType>&
-                  dual_poly) const -> std::vector<long> {
+                  dual_poly) const -> std::vector<double> {
     const auto [hi_poly, lo_poly] = dual_poly.polys();
     const auto hi_nums = m_coder.decode(hi_poly);
     const auto lo_nums = m_coder.decode(lo_poly);
     auto [hi_mod, lo_mod] = m_mods;
-    std::vector<long> recomposed_nums;
+    std::vector<double> recomposed_nums;
     recomposed_nums.reserve(hi_nums.size());
     for (long i = 0; i < hi_nums.size(); ++i) {
       recomposed_nums.push_back(

@@ -25,12 +25,14 @@ struct DualEncodeNum {
 
 class TestDualEncodeNum : public testing::TestWithParam<DualEncodeNum> {};
 
-TEST_P(TestDualEncodeNum, testDecompRecomp) {
+TEST_P(TestDualEncodeNum, testDecompRecompBalancedSlots) {
   const auto [rw, epsil, mod_pair, nums] = GetParam();
   auto dual_coder = DualCoder(BalancedSlotsParams{rw, epsil}, mod_pair);
 
-  //  const auto encoded = coder.encode(original);
-  //  double decoded = coder.decode(encoded);
+  const auto encoded = dual_coder.encode(nums);
+  const auto decoded = dual_coder.decode(encoded);
+
+  for (long i = 0; i < nums.size(); ++i) EXPECT_EQ(decoded[i], nums[i]);
 }
 
 INSTANTIATE_TEST_SUITE_P(singleNums, TestDualEncodeNum,
