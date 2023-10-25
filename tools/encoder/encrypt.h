@@ -6,11 +6,13 @@
 #include <helib/helib.h>
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include "ctxt_ops.h"
 
 #include "balanced.h"
+#include "dual_poly.h"
 #include "fractional.h"
 
 namespace hekit::coder {
@@ -120,6 +122,23 @@ inline BalancedSlotsEncodedPoly<SparseMultiPoly> decrypt(
                    return ZZXToSparsePoly(new_poly);
                  });
   return BalancedSlotsEncodedPoly{sparse_multi_poly, encoded_poly.digits()};
+}
+
+//// Dual Poly ////
+// NOTE at the moment only balanced slots version
+
+inline DualPoly<BalancedSlotsEncodedPoly<helib::Ctxt>> encrypt(
+    const DualPoly<BalancedSlotsEncodedPoly<SparseMultiPoly>>& encoded_poly,
+    const helib::PubKey& pk) {
+  const std::pair polys = encoded_poly.polys();
+  return DualPoly{encrypt(polys.first, pk), encrypt(polys.second, pk)};
+}
+
+inline DualPoly<BalancedSlotsEncodedPoly<SparseMultiPoly>> decrypt(
+    const DualPoly<BalancedSlotsEncodedPoly<helib::Ctxt>>& encoded_poly,
+    const helib::SecKey& sk) {
+  const std::pair ctxts = encoded_poly.polys();
+  return DualPoly{decrypt(ctxts.first, sk), decrypt(ctxts.second, sk)};
 }
 
 }  // namespace hekit::coder
