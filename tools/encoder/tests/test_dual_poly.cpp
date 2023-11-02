@@ -12,6 +12,7 @@
 
 namespace {
 
+using hekit::coder::BalancedParams;
 using hekit::coder::BalancedSlotsEncodedPoly;
 using hekit::coder::BalancedSlotsParams;
 using hekit::coder::DualCoder;
@@ -24,6 +25,18 @@ struct DualEncodeNum {
 };
 
 class TestDualEncodeNum : public testing::TestWithParam<DualEncodeNum> {};
+
+TEST_P(TestDualEncodeNum, testDecompRecompBalanced) {
+  const auto [rw, epsil, mod_pair, nums] = GetParam();
+  auto dual_coder =
+      DualCoder<BalancedParams>(BalancedParams{rw, epsil}, mod_pair);
+
+  // TODO better than just first num
+  const auto encoded = dual_coder.encode(nums[0]);
+  const auto decoded = dual_coder.decode(encoded);
+
+  EXPECT_NEAR(decoded, nums[0], epsil);
+}
 
 TEST_P(TestDualEncodeNum, testDecompRecompBalancedSlots) {
   const auto [rw, epsil, mod_pair, nums] = GetParam();

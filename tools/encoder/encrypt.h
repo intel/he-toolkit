@@ -125,20 +125,37 @@ inline BalancedSlotsEncodedPoly<SparseMultiPoly> decrypt(
 }
 
 //// Dual Poly ////
-// NOTE at the moment only balanced slots version
 
-inline DualPoly<BalancedSlotsEncodedPoly<helib::Ctxt>> encrypt(
-    const DualPoly<BalancedSlotsEncodedPoly<SparseMultiPoly>>& encoded_poly,
-    const helib::PubKey& pk) {
+template <typename EncodedPoly>
+inline auto encrypt(const DualPoly<EncodedPoly>& encoded_poly,
+                    const std::pair<helib::PubKey, helib::PubKey>& pks) {
   const std::pair polys = encoded_poly.polys();
-  return DualPoly{encrypt(polys.first, pk), encrypt(polys.second, pk)};
+  return DualPoly{encrypt(polys.first, pks.first),
+                  encrypt(polys.second, pks.second)};
 }
 
-inline DualPoly<BalancedSlotsEncodedPoly<SparseMultiPoly>> decrypt(
-    const DualPoly<BalancedSlotsEncodedPoly<helib::Ctxt>>& encoded_poly,
-    const helib::SecKey& sk) {
+template <typename EncodedPoly>
+inline auto decrypt(const DualPoly<EncodedPoly>& encoded_poly,
+                    const std::pair<helib::SecKey, helib::SecKey>& sks) {
   const std::pair ctxts = encoded_poly.polys();
-  return DualPoly{decrypt(ctxts.first, sk), decrypt(ctxts.second, sk)};
+  return DualPoly{decrypt(ctxts.first, sks.first),
+                  decrypt(ctxts.second, sks.second)};
+}
+
+inline DualPoly<BalancedSlotsEncodedPoly<helib::Ctxt>> encrypt_old(
+    const DualPoly<BalancedSlotsEncodedPoly<SparseMultiPoly>>& encoded_poly,
+    const std::pair<helib::PubKey, helib::PubKey>& pks) {
+  const std::pair polys = encoded_poly.polys();
+  return DualPoly{encrypt(polys.first, pks.first),
+                  encrypt(polys.second, pks.second)};
+}
+
+inline DualPoly<BalancedSlotsEncodedPoly<SparseMultiPoly>> decrypt_old(
+    const DualPoly<BalancedSlotsEncodedPoly<helib::Ctxt>>& encoded_poly,
+    const std::pair<helib::SecKey, helib::SecKey>& sks) {
+  const std::pair ctxts = encoded_poly.polys();
+  return DualPoly{decrypt(ctxts.first, sks.first),
+                  decrypt(ctxts.second, sks.second)};
 }
 
 }  // namespace hekit::coder

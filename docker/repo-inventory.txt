@@ -249,6 +249,8 @@ third-party/hello_world_plugin/plugin.toml
 third-party/hello_world_plugin/start.py
 tools/README.md
 tools/encoder/CMakeLists.txt
+tools/encoder/a_params.txt
+tools/encoder/b_params.txt
 tools/encoder/balanced.h
 tools/encoder/coder.h
 tools/encoder/ctxt_ops.h
@@ -257,7 +259,6 @@ tools/encoder/encrypt.h
 tools/encoder/fractional.h
 tools/encoder/goldschmidt/CMakeLists.txt
 tools/encoder/goldschmidt/goldschmidt.cpp
-tools/encoder/params.txt
 tools/encoder/rns.h
 tools/encoder/sparse_poly.h
 tools/encoder/tests/CMakeLists.txt

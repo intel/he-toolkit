@@ -9,6 +9,7 @@
 // Dual BalancedSlots<SparseMultiPoly> -> Dual BalancedSlots<TXT>
 // Dual BalancedSlots<SparseMultiPoly> -> Dual BalancedSlots<TXT>
 
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -54,7 +55,7 @@ class DualPoly {
 template <typename EncodedPolyParams>
 class DualCoder {
  public:
-  // e.g. BalancedSlotsEncodedPoly
+  // e.g. BalancedSlotsEncodedPoly, etc
   using CoderPolyType = typename Coder<EncodedPolyParams>::PolyType;
 
   DualCoder() = delete;
@@ -64,16 +65,15 @@ class DualCoder {
 
   auto params() const { return m_coder.params(); }
 
-  // NOTE for now just support multi nums
-  auto encode(const std::vector<double>& nums) const {
-    const auto whole_encoded = m_coder.encode(nums);
-    return DualPoly{mod(whole_encoded, m_mods.first),
-                    mod(whole_encoded, m_mods.second)};
+  // Input i.e. double or vector of doubles
+  template <typename Input>
+  auto encode(const Input& num) const {
+    const auto whole_encoded = m_coder.encode(num);
+    return DualPoly{mod<Input>(whole_encoded, m_mods.first),
+                    mod<Input>(whole_encoded, m_mods.second)};
   }
 
-  // NOTE for now just support multi nums
-  auto decode(const DualPoly<CoderPolyType>& dual_poly) const
-      -> std::vector<double> {
+  auto decode(const DualPoly<CoderPolyType>& dual_poly) const {
     return m_coder.decode(recompose(dual_poly));
   }
 
@@ -81,13 +81,33 @@ class DualCoder {
   Coder<EncodedPolyParams> m_coder;
   std::pair<long, long> m_mods;
 
+  template <typename T>
   static auto mod(const CoderPolyType& encoded_poly, long p) {
     auto poly = encoded_poly.poly().mod(p);
-    return decltype(encoded_poly){poly, encoded_poly.digits()};
+    if constexpr (std::is_same_v<std::vector<double>, T>)
+      return CoderPolyType{poly, encoded_poly.digits()};
+    else
+      return CoderPolyType{poly, encoded_poly.digit()};
   }
 
-  // NOTE for now just support multi nums
-  auto recompose(const DualPoly<CoderPolyType>& dual_poly) const {
+  // Single nums encoding
+  template <typename Q = typename CoderPolyType::UsingPolyType>
+  auto recompose(const DualPoly<CoderPolyType>& dual_poly) const
+      -> decltype(CoderPolyType{Q{}, 0L}) {
+    const auto [hi_encoded, lo_encoded] = dual_poly.polys();
+    if (hi_encoded.digit() != lo_encoded.digit())
+      throw std::logic_error("Digits were not equal while recomposing");
+
+    const auto [m, n] = m_mods;
+    const auto recomposed_poly = CoderPolyType::UsingPolyType::recompCRT(
+        {hi_encoded.poly(), m}, {lo_encoded.poly(), n});
+    return CoderPolyType{recomposed_poly, hi_encoded.digit()};
+  }
+
+  // Multi nums encoding
+  template <typename Q = typename CoderPolyType::UsingPolyType>
+  auto recompose(const DualPoly<CoderPolyType>& dual_poly) const
+      -> decltype(CoderPolyType{Q{}, std::vector<long>{}}) {
     const auto [hi_encoded, lo_encoded] = dual_poly.polys();
     if (hi_encoded.digits() != lo_encoded.digits())
       throw std::logic_error("Digits were not equal while recomposing");

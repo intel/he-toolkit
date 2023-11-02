@@ -30,32 +30,46 @@ struct BalancedSlotsParams {
 template <typename PolyType>
 class BalancedEncodedPoly {
  public:
+  using UsingPolyType = PolyType;
+
   BalancedEncodedPoly() = delete;
   BalancedEncodedPoly(const PolyType& poly, long digit)
       : m_poly(poly), m_digit(digit) {}
 
-  BalancedEncodedPoly operator+(const BalancedEncodedPoly& other) const {
-    auto ans = other;
-    if (this->m_digit < other.m_digit) {
+  template <typename RPOLY>
+  BalancedEncodedPoly operator+(const BalancedEncodedPoly<RPOLY>& other) const {
+    auto ans = *this;
+    if (this->m_digit < other.digit()) {
       ans.m_poly =
-          this->m_poly + shift(other.m_poly, other.m_digit - this->m_digit);
-      ans.m_digit = this->m_digit;
+          this->m_poly + shift(other.poly(), other.digit() - this->m_digit);
     } else {
       ans.m_poly =
-          other.m_poly + shift(this->m_poly, this->m_digit - other.m_digit);
+          shift(this->m_poly, this->m_digit - other.digit()) + other.poly();
+      ans.m_digit = other.digit();
     }
     return ans;
   }
 
-  BalancedEncodedPoly operator*(const BalancedEncodedPoly& other) const {
-    auto ans = other;
-    ans.m_poly = this->m_poly * other.m_poly;
-    ans.m_digit = this->m_digit + other.m_digit;
+  template <typename RPOLY>
+  BalancedEncodedPoly operator*(const BalancedEncodedPoly<RPOLY>& other) const {
+    auto ans = *this;
+    ans.m_poly = this->m_poly * other.poly();
+    ans.m_digit = this->m_digit + other.digit();
     return ans;
   }
 
   PolyType poly() const { return m_poly; }
   long digit() const { return m_digit; }
+
+  BalancedEncodedPoly& negate() {
+    m_poly.negate();
+    return *this;
+  }
+
+  BalancedEncodedPoly operator-() const {
+    auto ans = *this;
+    return ans.negate();
+  }
 
  private:
   PolyType m_poly;
@@ -146,6 +160,8 @@ class BalancedSlotsEncodedPoly {
 template <>
 class Coder<BalancedParams> {
  public:
+  using PolyType = BalancedEncodedPoly<SparsePoly>;
+
   Coder() = delete;
   explicit Coder(const BalancedParams& params) : m_params(params) {}
 

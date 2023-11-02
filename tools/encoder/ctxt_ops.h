@@ -25,6 +25,24 @@ inline helib::Ctxt operator+(const helib::Ctxt& lhs, const TXTR& rhs) {
   return ans;
 }
 
+// NOTE ZZX specializations required because of HElib's slot-centric issue
+// Means requires unnecessary encryption
+template <>
+inline helib::Ctxt operator*(const helib::Ctxt& lhs, const NTL::ZZX& rhs) {
+  const auto& pk = lhs.getPubKey();
+  helib::Ctxt encrypted_rhs(pk);
+  pk.Encrypt(encrypted_rhs, rhs);
+  return lhs * encrypted_rhs;
+}
+
+template <>
+inline helib::Ctxt operator+(const helib::Ctxt& lhs, const NTL::ZZX& rhs) {
+  const auto& pk = lhs.getPubKey();
+  helib::Ctxt encrypted_rhs(pk);
+  pk.Encrypt(encrypted_rhs, rhs);
+  return lhs + encrypted_rhs;
+}
+
 // NOTE these may be better suited as specializations
 inline helib::PtxtArray operator*(const helib::PtxtArray& lhs,
                                   const helib::PtxtArray& rhs) {
@@ -54,6 +72,14 @@ inline helib::Ctxt shift(const helib::Ctxt& poly, long digit) {
   //  ptxt = x;
   ctxt *= x_encrypted;
   return ctxt;
+}
+
+inline NTL::ZZX shift(const NTL::ZZX& poly, long digit) {
+  auto ptxt = poly;
+  NTL::ZZX x;
+  SetCoeff(x, digit);
+  ptxt *= x;
+  return ptxt;
 }
 
 template <typename RPoly>
