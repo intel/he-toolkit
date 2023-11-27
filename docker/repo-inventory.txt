@@ -259,6 +259,9 @@ tools/encoder/encrypt.h
 tools/encoder/fractional.h
 tools/encoder/goldschmidt/CMakeLists.txt
 tools/encoder/goldschmidt/goldschmidt.cpp
+tools/encoder/goldschmidt/goldschmidt_sparse.cpp
+tools/encoder/goldschmidt/goldschmidt_sparse_npoly.cpp
+tools/encoder/npoly.h
 tools/encoder/rns.h
 tools/encoder/sparse_poly.h
 tools/encoder/tests/CMakeLists.txt
@@ -268,5 +271,6 @@ tools/encoder/tests/test_ctxt_ops.cpp
 tools/encoder/tests/test_dual_poly.cpp
 tools/encoder/tests/test_encrypt.cpp
 tools/encoder/tests/test_fractional.cpp
+tools/encoder/tests/test_npoly.cpp
 tools/encoder/tests/test_rns.cpp
 tools/encoder/tests/test_sparse_poly.cpp

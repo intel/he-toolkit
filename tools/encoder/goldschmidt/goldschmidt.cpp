@@ -18,22 +18,22 @@ using hekit::coder::SparseMultiPoly;
 template <template <typename> typename EncodedPoly, typename Poly>
 auto setTwo(const DualPoly<EncodedPoly<Poly>>& N,
             const DualPoly<EncodedPoly<Poly>>& D) {
-  const auto* numerator_context_ptr = &N.polys().first.poly().getContext();
-  const auto* denominator_context_ptr = &N.polys().second.poly().getContext();
-  long nslots = numerator_context_ptr->getNSlots();
+  const auto& numerator_context = N.polys().first.poly().getContext();
+  const auto& denominator_context = N.polys().second.poly().getContext();
+  long nslots = numerator_context.getNSlots();
 
   if constexpr (std::is_same_v<EncodedPoly<Poly>,
                                BalancedSlotsEncodedPoly<Poly>>) {
-    return DualPoly{EncodedPoly{helib::PtxtArray(*numerator_context_ptr, 2L),
+    return DualPoly{EncodedPoly{helib::PtxtArray(numerator_context, 2L),
                                 std::vector(nslots, 0L)},
-                    EncodedPoly{helib::PtxtArray(*denominator_context_ptr, 2L),
+                    EncodedPoly{helib::PtxtArray(denominator_context, 2L),
                                 std::vector(nslots, 0L)}};
   } else {
     auto first = NTL::ZZX{};
     SetCoeff(first, 0, 2);
     auto second = NTL::ZZX{};
     SetCoeff(second, 0, 2);
-
+    //    std::cout << first << "\n" << second << std::endl;
     // Unlike PtxtArray no limit defined by context
     return DualPoly{EncodedPoly{first, 0L}, EncodedPoly{second, 0L}};
   }
@@ -41,16 +41,16 @@ auto setTwo(const DualPoly<EncodedPoly<Poly>>& N,
 
 template <template <typename> typename EncodedPoly, typename Poly>
 inline auto setTwo(const EncodedPoly<Poly>& N, const EncodedPoly<Poly>& D) {
-  const auto* numerator_context_ptr = &N.polys().first.poly().getContext();
-  const auto* denominator_context_ptr = &N.polys().second.poly().getContext();
-  long nslots = numerator_context_ptr->getNSlots();
+  const auto& numerator_context = N.polys().first.poly().getContext();
+  const auto& denominator_context = N.polys().second.poly().getContext();
+  long nslots = numerator_context.getNSlots();
 
   if constexpr (std::is_same_v<EncodedPoly<Poly>,
                                BalancedSlotsEncodedPoly<Poly>>) {
-    return EncodedPoly{helib::PtxtArray(*numerator_context_ptr, 2L),
+    return EncodedPoly{helib::PtxtArray(numerator_context, 2L),
                        std::vector(nslots, 0L)};
   } else {
-    return EncodedPoly{helib::PtxtArray(*numerator_context_ptr, 2L), 0L};
+    return EncodedPoly{helib::PtxtArray(numerator_context, 2L), 0L};
   }
 }
 
@@ -160,36 +160,42 @@ int main(int argc, char** argv) {
   //                  });
 
   double numerator_nums = 0.2;
-  double divisor_nums = 0.5;
+  double divisor_nums = 0.7;
 
   std::pair pks{a_crypto.pk, b_crypto.pk};
   std::pair sks{a_crypto.sk, b_crypto.sk};
   const auto N = hekit::coder::encrypt(coder.encode(numerator_nums), pks);
   const auto D = hekit::coder::encrypt(coder.encode(divisor_nums), pks);
 
-  std::cout << "Performing division\n";
-  const auto [encrypted_result, encrypted_divisors] =
-      goldschmidt(N, D, args.iterations);
+  for (long i = 0; i < args.iterations; ++i) {
+    std::cout << "Performing division for iteration: " << i << std::endl;
+    const auto [encrypted_result, encrypted_divisors] = goldschmidt(N, D, i);
 
-  std::cout << "Decrypting and decoding\n";
-  const auto decrypted_result = hekit::coder::decrypt(encrypted_result, sks);
-  // const std::vector decoded_results = coder.decode(decrypted_result);
-  double decoded_results = coder.decode(decrypted_result);
+    std::cout << "Decrypting and decoding\n";
+    const auto decrypted_result = hekit::coder::decrypt(encrypted_result, sks);
+    // const std::vector decoded_results = coder.decode(decrypted_result);
+    double decoded_results = coder.decode(decrypted_result);
 
-  const auto decrypted_divisors =
-      hekit::coder::decrypt(encrypted_divisors, sks);
-  //  const std::vector decoded_divisors = coder.decode(decrypted_divisors);
-  double decoded_divisors = coder.decode(decrypted_divisors);
+    const auto decrypted_divisors =
+        hekit::coder::decrypt(encrypted_divisors, sks);
+    //  const std::vector decoded_divisors = coder.decode(decrypted_divisors);
+    double decoded_divisors = coder.decode(decrypted_divisors);
 
-  std::cout << "Printing results\n";
-  //  for (long i = 0; i < decoded_results.size(); ++i) {
-  //    std::cout << numerator_nums[i] << " / " << divisor_nums[i] << " = "
-  //              << decoded_results[i] << " (D=" << decoded_divisors[i] <<
-  //              ")\n";
-  //  }
+    std::cout << "Printing results\n";
+    //  for (long i = 0; i < decoded_results.size(); ++i) {
+    //    std::cout << numerator_nums[i] << " / " << divisor_nums[i] << " = "
+    //              << decoded_results[i] << " (D=" << decoded_divisors[i] <<
+    //              ")\n";
+    //  }
 
-  std::cout << numerator_nums << " / " << divisor_nums << " = "
-            << decoded_results << " (D=" << decoded_divisors << ")\n";
+    std::cout << numerator_nums << " / " << divisor_nums << " = "
+              << decoded_results << " (D=" << decoded_divisors << ")\n";
+
+    std::cout << "Degree divisors: "
+              << decrypted_divisors.polys().first.poly().degree() << std::endl;
+    std::cout << "Degree results: "
+              << decrypted_result.polys().first.poly().degree() << std::endl;
+  }
 
   std::cout << "Fin." << std::endl;
 

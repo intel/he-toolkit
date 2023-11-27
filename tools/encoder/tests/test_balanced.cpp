@@ -43,6 +43,30 @@ TEST_P(SingleNum, testCompareOriginalToDecodedEncoded) {
   ASSERT_NEAR(original, decoded, params.epsil);
 }
 
+TEST_P(SingleNum, testChangeRepresentation) {
+  auto params = BalancedParams{.rw = 1.2, .epsil = 1e-8};
+  auto coder = Coder(params);
+  double original = GetParam();
+  auto encoded = coder.encode(original);
+
+  const auto shifted = encoded.shiftRepresentation();
+  double decoded = coder.decode(shifted);
+  ASSERT_NEAR(original, decoded, params.epsil);
+}
+
+TEST_P(SingleNum, testDivideByBaseAndShift) {
+  auto params = BalancedParams{.rw = 1.2, .epsil = 1e-8};
+  auto coder = Coder(params);
+  double original = GetParam();
+  auto encoded = coder.encode(original);
+  const auto encoded_base_inv = coder.encode(1 / params.rw);
+  const auto divided = encoded * encoded_base_inv;
+  const auto shifted = hekit::coder::BalancedEncodedPoly{
+      shift(divided.poly(), -1), divided.digit() - 1};
+  double decoded = coder.decode(shifted);
+  ASSERT_NEAR(original, decoded, params.epsil);
+}
+
 TEST_P(ParamsSingleNum, testRw) {
   auto& [num, rw, terms_map] = GetParam();
   Coder<BalancedParams> coder({rw, 1e-8});

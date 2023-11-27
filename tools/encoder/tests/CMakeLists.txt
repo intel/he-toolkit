@@ -20,6 +20,7 @@ set(TEST_FILES
   test_ctxt_ops.cpp
   test_rns.cpp
   test_dual_poly.cpp
+#  test_npoly.cpp
 )
 
 add_executable(run_tests ${TEST_FILES})

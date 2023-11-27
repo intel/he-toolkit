@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <NTL/ZZ.h>
+
 #include "rns.h"
 
 namespace hekit::coder {
@@ -60,6 +62,12 @@ class SparsePoly {
   auto cend() const noexcept { return m_coeffs.cend(); }
   size_t size() const { return m_coeffs.size(); }
 
+  auto minMaxCoeffs() const {
+    return std::minmax_element(
+        m_coeffs.cbegin(), m_coeffs.cend(),
+        [](const auto& a, const auto& b) { return a.second < b.second; });
+  }
+
   std::string toString() const {
     std::ostringstream oss;
     for (const auto& [key, value] : m_coeffs) {
@@ -101,7 +109,7 @@ class SparsePoly {
 
   using SparsePolyMod = std::pair<SparsePoly, long>;
   // NOTE Assumptions are that inside a DualPoly these Polys will have same
-  // sizes and same coeffs due to all ops b eing applied to both indside the
+  // sizes and same coeffs due to all ops being applied to both indside the
   // DualPoly. Maybe we should have further sanity checks (or rethink some of
   // the design).
   static SparsePoly recompCRT(const SparsePolyMod& am,

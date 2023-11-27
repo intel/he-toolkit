@@ -43,4 +43,25 @@ TEST(testRNS, DecompRecomp) {
   EXPECT_EQ((recomposed + big_mod) % big_mod, original);
 }
 
+TEST(testRNS, DecompRecompWithSomeArithMultiply) {
+  long original = 5432;
+  long mod_a = 257;
+  long mod_b = 127;
+
+  auto decomposed = hekit::coder::decompCRT(original, {mod_a, mod_b});
+
+  EXPECT_LT(decomposed.first, mod_a);
+  EXPECT_LT(decomposed.second, mod_b);
+
+  long other = 5;
+  decomposed.first *= other;
+  decomposed.second *= other;
+
+  const auto recomposed = hekit::coder::recompCRT({decomposed.first, mod_a},
+                                                  {decomposed.second, mod_b});
+  // Don't forget to mod. Easiest way to check correct.
+  long big_mod = mod_a * mod_b;
+  EXPECT_EQ((recomposed + big_mod) % big_mod, original * other);
+}
+
 }  // namespace

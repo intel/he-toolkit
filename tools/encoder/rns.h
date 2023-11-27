@@ -7,6 +7,7 @@
 #include <numeric>
 #include <tuple>
 #include <utility>
+#include <NTL/RR.h>
 
 namespace hekit::coder {
 
@@ -41,10 +42,23 @@ inline auto decompCRT(long num, const std::pair<long, long>& mod_pair)
   return std::pair{num % mod_pair.first, num % mod_pair.second};
 }
 
+// TODO Write with NTL?
+using ZZ_pair = std::pair<NTL::ZZ, NTL::ZZ>;
+inline NTL::ZZ recompCRT(const ZZ_pair& am, const ZZ_pair& bn) {
+  // TODO use NTL version or rewrite this one
+  NTL::ZZ gcd, a, b;
+  NTL::XGCD(gcd, a, b, am.second, bn.second);
+  if (gcd != 1L) throw std::runtime_error("Not co-prime numbers");
+  const auto big_mod = am.second * bn.second;
+  const auto recompose = am.first * bn.second * b + bn.first * am.second * a;
+  return recompose % big_mod;
+}
+
+// NOTE simpler impl. limited by machine word size
 inline long recompCRT(const std::pair<long, long>& am,
                       const std::pair<long, long>& bn) {
   const auto result = extendedGCD(am.second, bn.second);
-  if (result.gcd != 1) throw std::runtime_error("");
+  if (result.gcd != 1) throw std::runtime_error("Not co-prime numbers");
   const auto big_mod = am.second * bn.second;
   const auto recompose =
       am.first * bn.second * result.b + bn.first * am.second * result.a;

@@ -71,6 +71,10 @@ class BalancedEncodedPoly {
     return ans.negate();
   }
 
+  BalancedEncodedPoly shiftRepresentation(long i = 1L) const {
+    return BalancedEncodedPoly{shift(m_poly, i), m_digit - i};
+  }
+
  private:
   PolyType m_poly;
   long m_digit;
