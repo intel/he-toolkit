@@ -22,20 +22,24 @@ namespace hekit::coder {
 class SparsePoly {
  public:
   SparsePoly() = default;
-  explicit SparsePoly(const std::map<long, long>& terms) : m_coeffs(terms) {}
-  explicit SparsePoly(const std::vector<long>& expanded_poly) {
+  explicit SparsePoly(const std::map<long, long>& terms)
+      : m_coeffs(changeToZZ(terms)) {}
+  explicit SparsePoly(const std::map<long, NTL::ZZ>& terms) : m_coeffs(terms) {}
+  explicit SparsePoly(const std::vector<NTL::ZZ>& expanded_poly) {
     for (long k = 0; k < expanded_poly.size(); ++k) {
-      const long v = expanded_poly[k];
+      const auto v = expanded_poly[k];
       if (v != 0L) m_coeffs[k] = v;
     }
   }
-  long coeff(long i) const { return m_coeffs.count(i) ? m_coeffs.at(i) : 0L; }
+  NTL::ZZ coeff(long i) const {
+    return m_coeffs.count(i) ? m_coeffs.at(i) : NTL::ZZ{0L};
+  }
   void coeff(long i, long value) { m_coeffs[i] = value; }
   long degree() const {
     return m_coeffs.empty() ? 0L : m_coeffs.rbegin()->first;
   }
-  long operator[](long i) const { return coeff(i); }
-  long& operator[](long i) { return m_coeffs[i]; }
+  NTL::ZZ operator[](long i) const { return coeff(i); }
+  NTL::ZZ& operator[](long i) { return m_coeffs[i]; }
 
   SparsePoly operator+(const SparsePoly& other) const {
     auto res = other;
@@ -76,11 +80,11 @@ class SparsePoly {
     return oss.str();
   }
 
-  std::vector<long> expand() const {
+  auto expand() const {
     if (is_laurent())
       throw std::logic_error("Cannot expand a laurent polynomial");
 
-    std::vector<long> expanded(degree() + 1, 0L);
+    std::vector<NTL::ZZ> expanded(degree() + 1, NTL::ZZ(0L));
     for (const auto [k, v] : m_coeffs) {
       expanded[k] = v;
     }
@@ -103,7 +107,11 @@ class SparsePoly {
   }
 
   SparsePoly& mod(long p) {
-    for (auto [k, v] : m_coeffs) m_coeffs[k] = v % p;
+    for (auto [k, v] : m_coeffs) {
+      NTL::ZZ new_value = v % NTL::ZZ(p);
+      if (new_value > p / 2) new_value -= p;
+      m_coeffs[k] = new_value;
+    }
     return *this;
   }
 
@@ -116,16 +124,25 @@ class SparsePoly {
                               const SparsePolyMod& bn) {
     const auto [a_poly, m] = am;
     const auto [b_poly, n] = bn;
+    const NTL::ZZ m_ZZ{m};
+    const NTL::ZZ n_ZZ{n};
+
     SparsePoly recomp;
     for (const auto [k, v] : a_poly) {
-      recomp[k] = hekit::coder::recompCRT({v, m}, {b_poly[k], n});
+      recomp[k] = hekit::coder::recompCRT({v, m_ZZ}, {b_poly[k], n_ZZ});
     }
     return recomp;
   }
 
  private:
   // <index, coeff>
-  std::map<long, long> m_coeffs;
+  std::map<long, NTL::ZZ> m_coeffs;
+
+  static std::map<long, NTL::ZZ> changeToZZ(const std::map<long, long>& terms) {
+    std::map<long, NTL::ZZ> correct_terms;
+    for (const auto& [k, v] : terms) correct_terms[k] = NTL::ZZ(v);
+    return correct_terms;
+  }
 };
 
 inline SparsePoly shift(const SparsePoly& poly, long i) {

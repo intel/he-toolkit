@@ -181,12 +181,16 @@ class Coder<BalancedParams> {
 
   double decode(const BalancedEncodedPoly<SparsePoly>& en) const {
     const auto& poly = en.poly();
-    auto laurentDecode = [rw = m_params.rw, i = en.digit()](double init,
+    auto laurentDecode = [rw = m_params.rw, i = en.digit()](NTL::RR init,
                                                             const auto& pair) {
-      return init + pair.second * std::pow(rw, pair.first + i);
+      const auto coeff = NTL::conv<NTL::RR>(pair.second);
+      return init + coeff * std::pow(rw, pair.first + i);
     };
 
-    return std::accumulate(poly.begin(), poly.end(), 0.0, laurentDecode);
+    const auto result_RR =
+        std::accumulate(poly.begin(), poly.end(), NTL::RR(0.0), laurentDecode);
+    double result = NTL::conv<double>(result_RR);
+    return result;
   }
 
  private:
@@ -241,11 +245,12 @@ class Coder<BalancedSlotsParams> {
     for (int n = 0; n < slots.size(); ++n) {
       const auto& poly = slots[n];
       auto laurentDecode = [rw = m_params.rw, i = en.digits().at(n)](
-                               double init, const auto& pair) {
-        return init + pair.second * std::pow(rw, pair.first + i);
+                               NTL::RR init, const auto& pair) {
+        const auto coeff = NTL::conv<NTL::RR>(pair.second);
+        return init + coeff * std::pow(rw, pair.first + i);
       };
-      nums.emplace_back(
-          std::accumulate(poly.begin(), poly.end(), 0.0, laurentDecode));
+      nums.emplace_back(NTL::conv<double>(std::accumulate(
+          poly.begin(), poly.end(), NTL::RR(0.0), laurentDecode)));
     }
     return nums;
   }

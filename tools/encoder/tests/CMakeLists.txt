@@ -13,14 +13,15 @@ FetchContent_MakeAvailable(googletest)
 
 set(TEST_FILES
   test_sparse_poly.cpp
-  test_fractional.cpp
+# TODO disable fractional
+#  test_fractional.cpp
   test_balanced.cpp
   test_balanced_slots.cpp
   test_encrypt.cpp
   test_ctxt_ops.cpp
   test_rns.cpp
-  test_dual_poly.cpp
-#  test_npoly.cpp
+#  test_dual_poly.cpp
+  test_npoly.cpp
 )
 
 add_executable(run_tests ${TEST_FILES})

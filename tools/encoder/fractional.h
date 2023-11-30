@@ -58,10 +58,10 @@ class Coder<FractionalParams> {
     // frac_degree power of 2
     const auto [rw, _, frac_degree] = m_params;
 
-    return std::accumulate(
-        poly.cbegin(), poly.cend(), 0.0,
+    return NTL::conv<double>(std::accumulate(
+        poly.cbegin(), poly.cend(), NTL::RR(0.0),
         [rw, frac_degree, midpoint = m_params.frac_degree / 2](
-            double init, const auto& pair) {
+            NTL::RR init, const auto& pair) {
           const auto [index, coeff] = pair;
           //      std::cerr << "init, mono: " << init << ", " << coeff << "x^"
           //      << index << std::endl;
@@ -69,9 +69,10 @@ class Coder<FractionalParams> {
           // bound by the fractional degree.
           //          if (index >= frac_degree) return init;
           if (index > midpoint)  // fractional values
-            return init - coeff * std::pow(rw, index - frac_degree);
-          return init + coeff * std::pow(rw, index);
-        });
+            return init - NTL::conv<NTL::RR>(coeff) *
+                              std::pow(rw, index - frac_degree);
+          return init + NTL::conv<NTL::RR>(coeff) * std::pow(rw, index);
+        }));
   }
 
  private:

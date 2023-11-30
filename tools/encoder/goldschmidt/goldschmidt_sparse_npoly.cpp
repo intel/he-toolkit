@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
       .arg("iterations", args.iterations)
       .arg("mods", args.mods)
       .arg("num", num)
-      .arg("dem", denom)
+      .arg("den", denom)
       .parse(argc, argv);
   // clang-format on
 
@@ -128,6 +128,8 @@ int main(int argc, char** argv) {
     //  }
 
     std::cout << numerator_nums << " / " << divisor_nums << " = "
+              << numerator_nums / divisor_nums << std::endl;
+    std::cout << coder.decode(N) << " / " << coder.decode(D) << " = "
               << decoded_results << " (D=" << decoded_divisors << ")\n";
   }
 

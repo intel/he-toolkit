@@ -127,6 +127,7 @@ class NCoder {
     auto recomposed_poly = encoded_polys.front().poly();
     auto recomposed_mod = m_mods.front();
     for (long i = 1; i < m_mods.size(); ++i) {
+      std::cout << "recomp loop\n";
       recomposed_poly = CoderPolyType::UsingPolyType::recompCRT(
           std::pair{recomposed_poly, recomposed_mod},
           std::pair{encoded_polys[i].poly(), m_mods[i]});
