@@ -47,7 +47,7 @@ RUN apt update && \
                    --no-install-recommends tzdata \
                    patchelf                       \
                    # Workaround for CVE-2023-5752 will install upstream pip as user
-                   # python3-pip                    \  
+                   # python3-pip                    \
                    software-properties-common     \
                    sudo                           \
                    unzip                          \
