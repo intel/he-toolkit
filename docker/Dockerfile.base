@@ -48,6 +48,7 @@ RUN apt update && \
                    patchelf                       \
                    # Workaround for CVE-2023-5752 will install upstream pip as user
                    # python3-pip                    \
+                   python-is-python3              \
                    software-properties-common     \
                    sudo                           \
                    unzip                          \
@@ -59,7 +60,6 @@ RUN apt update && \
     apt autoclean -y  && \
     rm -rf /var/lib/apt/lists/*
 
-RUN ["pip", "install", "toml", "argcomplete"]
 # Update alternatives clean up cpp configuration
 RUN update-alternatives --remove-all cpp
 # Update alternatives for GCC-11

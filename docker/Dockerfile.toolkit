@@ -35,9 +35,11 @@ RUN mkdir -p $HOME/pip-install-package \
 WORKDIR $HOME/pip-install-package
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
-    source $HOME/.profile && \
+    . $HOME/.profile && \
     pip install pip --upgrade
 ###################################################
+
+RUN ["pip", "install", "toml", "argcomplete"]
 
 # Change directories to $HOME/Intel-HE-Toolkit
 WORKDIR $HOME/he-toolkit
