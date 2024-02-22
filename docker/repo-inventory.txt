@@ -48,6 +48,7 @@ deployments/config_psi/setenv.sh
 deployments/config_psi/tests/test_config_psi.py
 dev_reqs.txt
 docker/Dockerfile.base
+docker/Dockerfile.samples
 docker/Dockerfile.toolkit
 docker/Dockerfile.vscode
 docker/README.md

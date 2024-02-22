@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+ARG CUSTOM_FROM
+
+FROM $CUSTOM_FROM
+
+LABEL maintainer="https://github.com/intel/he-toolkit"
+
+# User setup
+ARG UNAME
+ARG UID
+ARG GID
+ARG HOME="/home/$UNAME"
+ENV SHELL="/bin/bash"
+
+# Switch user to $UNAME
+USER $UNAME
+
+# Change directories to $HOME/he-toolkit
+WORKDIR $HOME/he-toolkit
+
+# Build and install libraries, examples, and kernels
+RUN ./hekit install recipes/default.toml && \
+    ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
+    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+
+ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash

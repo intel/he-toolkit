@@ -11,6 +11,7 @@
     - [Steps](#steps)
     - [Using VS Code Server](#using-vs-code-server)
     - [Using Custom Dockerfiles](#using-custom-dockerfiles)
+    - [Using a Custom Base Platform](#using-a-custom-base-platform)
   - [Running the Examples](#running-the-examples)
     - [Docker Controls](#docker-controls)
       - [Commands used inside the Docker Container](#commands-used-inside-the-docker-container)
@@ -90,9 +91,21 @@ on `Apply & Restart`.
   memory. This can be done via the `Resources` tab under `Preferences`.
 
 ### Steps
-To build and run the Intel HE Toolkit container run
+To build the base docker container run
 ```bash
 hekit docker-build
+```
+This will build a base image containing the necessary dependencies and then an
+image containing the HE Toolkit repository with the `hekit` command enabled.
+This can be useful as a base for users to use the HE Toolkit to build a subset
+of the provided sample kernels and examples or an entirely custom HE project of
+their choosing.
+
+If a full installation of the sample kernels, examples, and supported HE
+libraries is desired then build the Intel HE Toolkit container in its entirety
+with
+```bash
+hekit docker-build --enable samples
 ```
 The installation should take a few minutes and once successful will run the
 container as the current user. This will be signified with the printing of the
@@ -112,11 +125,11 @@ follows
 hekit docker-build --id 1234
 ```
 
-After the image has been successfully built, the below message will be
-displayed
+After the image has been successfully built, the below message or a variation
+will be displayed
 ```bash
 Run container with
-docker run -it <username>/ubuntu_he_toolkit:<hekit-version>
+docker run -it <username>/ubuntu_he_samples:<hekit-version>
 ```
 Executing this command shall start the container using `bash`.
 
@@ -126,6 +139,10 @@ Code IDE via [code-server](https://coder.com/docs/code-server/latest) instead
 of directly via the command line. To enable this run
 ```bash
 hekit docker-build --enable vscode
+```
+or alternatively to include pre-built samples and examples
+```bash
+hekit docker-build --enable samples,vscode
 ```
 This will build an extra layer on top of the previous images containing a VS
 Code configuration.
@@ -196,7 +213,7 @@ The toolkit will build the images in the order that they appear in the list,
 i.e. `feature-three` will be built on `feature-two` which will be built on
 `feature-one`.
 
-### Using custom base platform
+### Using a Custom Base Platform
 When building a docker image, `hekit` uses by default a version of Ubuntu as a
 base image that it fetches from dockerhub if it does not exist locally. This
 can be overridden as follows
