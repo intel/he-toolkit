@@ -27,7 +27,6 @@ RUN for e in vscode.cpp twxs.cmake ms-vscode.cmake-tools vadimcn.vscode-lldb; do
       code-server --user-data-dir=$HOME/ --install-extension $e; \
     done
 
-
 # Update code-server user settings
 RUN echo '{"extensions.autoUpdate": false, "workbench.colorTheme": "Default Dark+"}' |\
     jq . > $HOME/User/settings.json && \

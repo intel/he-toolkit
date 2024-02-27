@@ -3,4 +3,5 @@
 #   `hekit docker-build --enable <custom-feature>`
 # NOTE: Paths must be absolute
 
+samples = "${HEKITPATH}/docker/Dockerfile.samples"
 vscode = "${HEKITPATH}/docker/Dockerfile.vscode"

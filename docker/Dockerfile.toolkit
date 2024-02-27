@@ -45,9 +45,6 @@ RUN ["pip", "install", "toml", "argcomplete"]
 WORKDIR $HOME/he-toolkit
 
 # Initialize hekit and install librares, examples, and kernels
-RUN echo "y" | ./hekit init --default-config && \
-    ./hekit install recipes/default.toml && \
-    ./hekit build recipes/examples.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit" && \
-    ./hekit build recipes/sample-kernels.toml --recipe_arg "toolkit-path=${HOME}/he-toolkit"
+RUN echo "y" | ./hekit init --default-config
 
 ENTRYPOINT . docker/runners.sh && welcome_message && cd $HOME && /bin/bash
