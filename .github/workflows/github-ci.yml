@@ -18,6 +18,9 @@ on:
 ################
 # Ubuntu 22.04 #
 ################
+permissions:
+  contents: read
+
 jobs:
   format:
     name: Format
